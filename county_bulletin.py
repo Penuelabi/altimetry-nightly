@@ -656,9 +656,12 @@ if EXTRAS_OK:
     try:
         _ver = None
         _vp = os.path.join(OUT_DIR, 'forecast_verification.csv')
-        if os.path.exists(_vp):
-            import verify_forecasts as _vf
-            _ver = _vf.headline(pd.read_csv(_vp)) or None
+        if os.path.exists(_vp) and os.path.getsize(_vp) > 20:      # the Drive placeholder is 1 byte
+            try:
+                import verify_forecasts as _vf
+                _ver = _vf.headline(pd.read_csv(_vp)) or None
+            except Exception as _e2:
+                print(f"WARNING: forecast verification summary not added: {type(_e2).__name__}: {_e2}")
         _pc = (P_HEAVY, P_DRY, P_WSP)
         print('->', bx.write_json(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR, _ver))
         print('->', bx.write_pdf(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR))
