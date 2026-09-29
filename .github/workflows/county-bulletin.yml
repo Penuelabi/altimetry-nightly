@@ -65,6 +65,8 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           DIGEST_TO: ${{ secrets.DIGEST_TO }}
           DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
+          DIGEST_MIN_LEVEL: ${{ vars.DIGEST_MIN_LEVEL }}
+          DIGEST_ONLY_IF_ALERTS: ${{ vars.DIGEST_ONLY_IF_ALERTS }}
         run: python send_digest.py
 
       - name: Show error tail in run summary
