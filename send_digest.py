@@ -47,7 +47,8 @@ def build_message(doc, pdf_path=None, min_level='yellow', sender='', to=''):
 
 
 def main():
-    host, user, pw, to = (os.environ.get(k, '') for k in ('SMTP_HOST', 'SMTP_USER', 'SMTP_PASSWORD', 'DIGEST_TO'))
+    host, user, pw, to = (os.environ.get(k, '').strip() for k in ('SMTP_HOST', 'SMTP_USER', 'SMTP_PASSWORD', 'DIGEST_TO'))
+    pw = pw.replace(' ', '')                       # Google shows app passwords in groups of four
     if not (host and user and pw and to):
         print('Email digest not configured (SMTP_HOST/SMTP_USER/SMTP_PASSWORD/DIGEST_TO); skipped.')
         return
@@ -65,7 +66,8 @@ def main():
     if n == 0 and os.environ.get('DIGEST_ONLY_IF_ALERTS') == '1':
         print('No alerts; digest not sent.')
         return
-    port = int(os.environ.get('SMTP_PORT') or 587)
+    port = int((os.environ.get('SMTP_PORT') or '587').strip())
+    print(f'Sending via {host}:{port} as {user} to {len(to.split(","))} recipient(s) ...')
     with (smtplib.SMTP_SSL(host, port, timeout=60) if port == 465 else smtplib.SMTP(host, port, timeout=60)) as s:
         if port != 465:
             s.starttls()
@@ -77,6 +79,10 @@ def main():
 if __name__ == '__main__':
     try:
         main()
+    except smtplib.SMTPAuthenticationError as e:
+        print(f'WARNING: digest failed: the mail server rejected the login ({e.smtp_code}). For Gmail use an '
+              'APP PASSWORD (not your normal password), with 2-Step Verification on, and SMTP_USER = the same Gmail address.')
+        sys.exit(0)
     except Exception as e:
         print(f'WARNING: digest failed: {type(e).__name__}: {e}')
         sys.exit(0)

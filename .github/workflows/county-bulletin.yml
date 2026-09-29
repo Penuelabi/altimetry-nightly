@@ -56,11 +56,6 @@ jobs:
           set -o pipefail
           python county_bulletin.py 2>&1 | tee "$RUNNER_TEMP/bulletin.log"
 
-      - name: Show warnings in run summary
-        if: always()
-        run: |
-          { echo '### Warnings in bulletin log'; echo '```'; grep -a 'WARNING' "$RUNNER_TEMP/bulletin.log" 2>/dev/null | cut -c1-300 | head -40; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-
       - name: Email digest (optional, needs SMTP secrets)
         continue-on-error: true
         env:
@@ -72,7 +67,13 @@ jobs:
           DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
           DIGEST_MIN_LEVEL: ${{ vars.DIGEST_MIN_LEVEL }}
           DIGEST_ONLY_IF_ALERTS: ${{ vars.DIGEST_ONLY_IF_ALERTS }}
-        run: python send_digest.py
+        run: python send_digest.py 2>&1 | tee "$RUNNER_TEMP/digest.log"
+
+      - name: Show warnings and digest result in run summary
+        if: always()
+        run: |
+          { echo '### Warnings in bulletin log'; echo '```'; grep -a 'WARNING' "$RUNNER_TEMP/bulletin.log" 2>/dev/null | cut -c1-300 | head -40; echo '```';
+            echo '### Email digest'; echo '```'; cat "$RUNNER_TEMP/digest.log" 2>/dev/null | cut -c1-300; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Show error tail in run summary
         if: failure()
