@@ -63,6 +63,7 @@ Z_VERY_WET = 1.5
 # --- Part B: ensemble spell outlook ---
 RUN_OUTLOOK = True
 ENS_SOURCES = ['ecmwf', 'aws', 'azure']
+ENS_RUN_HOUR = int(os.environ.get('ENS_RUN_HOUR', '0'))   # ECMWF cycle: 0 (00 UTC) or 12 (12 UTC)
 BBOX = [23.0, 3.0, 36.5, 13.0]
 WET_DAY_MM = 1.0                  # a grid cell with at least this much rain is wet
 WET_AREA_FRACTION = 0.5           # a county day is wet if this share of its cells is wet
@@ -387,7 +388,7 @@ if RUN_OUTLOOK:
         for src in ENS_SOURCES:
             try:
                 client = Client(source=src)
-                run = client.latest(stream='enfo', type='pf', param='tp', step=360, time=0)
+                run = client.latest(stream='enfo', type='pf', param='tp', step=360, time=ENS_RUN_HOUR)
                 print(f"Source: {src}")
                 break
             except Exception as e:
@@ -401,7 +402,7 @@ if RUN_OUTLOOK:
         for typ in ('cf', 'pf'):                                   # control is optional
             target = os.path.join(TMP_DIR, f'ens_tp_{typ}.grib2')
             try:
-                client.retrieve(date=run.strftime('%Y-%m-%d'), time=0, stream='enfo', type=typ,
+                client.retrieve(date=run.strftime('%Y-%m-%d'), time=run.hour, stream='enfo', type=typ,
                                 param='tp', step=STEPS, target=target)
                 files[typ] = target
             except Exception as e:

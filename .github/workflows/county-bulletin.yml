@@ -1,8 +1,9 @@
-name: County hydro-climate bulletin (daily, after ECMWF 00 UTC release)
+name: County hydro-climate bulletin (twice daily, after ECMWF 00 and 12 UTC releases)
 
 on:
   schedule:
-    - cron: '30 9 * * *'     # 09:30 UTC = 12:30 Juba; ECMWF open-data 00 UTC run is out by ~08:00 UTC
+    - cron: '30 9 * * *'     # 09:30 UTC = 11:30 Juba; ECMWF open-data 00 UTC run is out by ~08:00 UTC
+    - cron: '30 21 * * *'    # 21:30 UTC = 23:30 Juba; ECMWF open-data 12 UTC run is out by ~20:00 UTC
   workflow_dispatch:
 
 concurrency:
@@ -22,8 +23,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set temp folder
-        run: echo "BULLETIN_TMP_DIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Set temp folder and ECMWF cycle
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          echo "BULLETIN_TMP_DIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
+          # evening schedule (and manual runs after 21:00 UTC) use the 12 UTC ECMWF run, otherwise the 00 UTC run
+          if [ "$SCHEDULE" = "30 21 * * *" ] || { [ -z "$SCHEDULE" ] && [ "$(date -u +%H)" -ge 21 ]; }; then
+            echo "ENS_RUN_HOUR=12" >> "$GITHUB_ENV"
+          else
+            echo "ENS_RUN_HOUR=0" >> "$GITHUB_ENV"
+          fi
 
       - uses: actions/setup-python@v7
         with:
