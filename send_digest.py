@@ -52,7 +52,13 @@ def main():
         print('Email digest not configured (SMTP_HOST/SMTP_USER/SMTP_PASSWORD/DIGEST_TO); skipped.')
         return
     out = os.environ.get('BULLETIN_OUT_DIR', 'bulletin')
-    doc = json.load(open(os.path.join(out, 'county_bulletin_latest.json'), encoding='utf-8'))
+    jpath = os.path.join(out, 'county_bulletin_latest.json')
+    if not os.path.exists(jpath) or os.path.getsize(jpath) < 20:
+        print('Digest skipped: county_bulletin_latest.json was not written by this run. '
+              'Look for "WARNING: impact/alert layer skipped" or "JSON/PDF outputs skipped" in the '
+              '"Run county bulletin" step.')
+        return
+    doc = json.load(open(jpath, encoding='utf-8'))
     msg, n = build_message(doc, os.path.join(out, 'county_bulletin_latest.pdf'),
                            os.environ.get('DIGEST_MIN_LEVEL', 'yellow').lower(),
                            os.environ.get('DIGEST_FROM') or user, to)
