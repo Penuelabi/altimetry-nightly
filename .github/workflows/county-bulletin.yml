@@ -38,7 +38,14 @@ jobs:
         run: python drive_sync.py pull bulletin
 
       - name: Run county bulletin (antecedent conditions + ENS outlook + GEE asset)
-        run: python county_bulletin.py
+        run: |
+          set -o pipefail
+          python county_bulletin.py 2>&1 | tee "$RUNNER_TEMP/bulletin.log"
+
+      - name: Show error tail in run summary
+        if: failure()
+        run: |
+          { echo '### Last lines of bulletin log'; echo '```'; tail -n 40 "$RUNNER_TEMP/bulletin.log" 2>/dev/null | cut -c1-300; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Push updated bulletin files back to Drive
         if: always()

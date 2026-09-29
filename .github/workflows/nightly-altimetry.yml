@@ -64,3 +64,8 @@ jobs:
       - name: "Save: push updated files back to Drive"
         if: always() && steps.gate.outputs.run == 'true'
         run: python drive_sync.py push
+
+      - name: Show error tail in run summary
+        if: failure()
+        run: |
+          { echo '### Last lines of nightly log'; echo '```'; tail -n 40 "$ALTIMETRY_OUT_DIR/nightly_run_log.txt" 2>/dev/null | cut -c1-300; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
