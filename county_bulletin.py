@@ -111,6 +111,31 @@ else:
         ee.Authenticate()
         ee.Initialize(project=PROJECT_ID)
 
+
+def make_public(asset_id):
+    """Give 'Anyone can read' on an asset (an export/rename creates a fresh asset with a private ACL)."""
+    try:
+        ee.data.setAssetAcl(asset_id, {'all_users_can_read': True})
+        print(f"  shared publicly (anyone can read): {asset_id}")
+        return True
+    except Exception as e1:
+        try:
+            pol = ee.data.getIamPolicy(asset_id)
+            bindings = [b for b in pol.get('bindings', []) if b.get('role') != 'roles/earthengine.viewer'
+                        or 'allUsers' not in b.get('members', [])]
+            viewers = [b for b in pol.get('bindings', []) if b.get('role') == 'roles/earthengine.viewer']
+            members = sorted(set(sum([b.get('members', []) for b in viewers], []) + ['allUsers']))
+            bindings = [b for b in pol.get('bindings', []) if b.get('role') != 'roles/earthengine.viewer']
+            bindings.append({'role': 'roles/earthengine.viewer', 'members': members})
+            pol['bindings'] = bindings
+            ee.data.setIamPolicy(asset_id, {'policy': pol})
+            print(f"  shared publicly (anyone can read): {asset_id}")
+            return True
+        except Exception as e2:
+            print(f"  WARNING: could not share {asset_id} publicly ({str(e1)[:120]} | {str(e2)[:120]}). "
+                  f"Give the service account the 'Earth Engine Resource Admin' role, or share it by hand.")
+            return False
+
 TODAY = datetime.date.today()
 
 
@@ -643,3 +668,11 @@ if EXPORT_TO_GEE:
                                          description='county_hydroclimate', assetId=COUNTY_ASSET)
     task.start()
     print(f"Started export -> {COUNTY_ASSET} (check the Tasks tab in the Code Editor)")
+    # wait for the export, then re-apply public read access (the delete + re-export reset it)
+    while task.status()['state'] not in ('COMPLETED', 'FAILED', 'CANCELLED'):
+        time.sleep(15)
+    _st = task.status()
+    if _st['state'] == 'COMPLETED':
+        make_public(COUNTY_ASSET)
+    else:
+        print(f"  county asset export {_st['state']}: {_st.get('error_message', '')}")

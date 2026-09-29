@@ -1667,6 +1667,31 @@ def asset_exists(asset_id):
         return False
 
 
+def make_public(asset_id):
+    """Give 'Anyone can read' on an asset (an export/rename creates a fresh asset with a private ACL)."""
+    try:
+        ee.data.setAssetAcl(asset_id, {'all_users_can_read': True})
+        print(f"  shared publicly (anyone can read): {asset_id}")
+        return True
+    except Exception as e1:
+        try:
+            pol = ee.data.getIamPolicy(asset_id)
+            bindings = [b for b in pol.get('bindings', []) if b.get('role') != 'roles/earthengine.viewer'
+                        or 'allUsers' not in b.get('members', [])]
+            viewers = [b for b in pol.get('bindings', []) if b.get('role') == 'roles/earthengine.viewer']
+            members = sorted(set(sum([b.get('members', []) for b in viewers], []) + ['allUsers']))
+            bindings = [b for b in pol.get('bindings', []) if b.get('role') != 'roles/earthengine.viewer']
+            bindings.append({'role': 'roles/earthengine.viewer', 'members': members})
+            pol['bindings'] = bindings
+            ee.data.setIamPolicy(asset_id, {'policy': pol})
+            print(f"  shared publicly (anyone can read): {asset_id}")
+            return True
+        except Exception as e2:
+            print(f"  WARNING: could not share {asset_id} publicly ({str(e1)[:120]} | {str(e2)[:120]}). "
+                  f"Give the service account the 'Earth Engine Resource Admin' role, or share it by hand.")
+            return False
+
+
 def start_export(fc, asset_id, desc):
     if asset_exists(asset_id):
         ee.data.deleteAsset(asset_id)
@@ -1792,6 +1817,8 @@ if UPLOAD_TO_GEE:
             part_ids.append(pid)
         print(f"Started {n_parts} observation export(s) of up to {ROWS_PER_PART} rows")
         states = wait_for(tasks + [st_task])
+        if states[-1] == 'COMPLETED':
+            make_public(f'{ASSET_FOLDER}/stations')
 
         if all(s == 'COMPLETED' for s in states[:-1]):
             # 2. merge INSIDE GEE: current merged_observations + new parts
@@ -1807,6 +1834,7 @@ if UPLOAD_TO_GEE:
                         ee.data.deleteAsset(backup)
                     ee.data.renameAsset(target, backup)
                 ee.data.renameAsset(staging, target)
+                make_public(target)
                 for p in part_ids:
                     ee.data.deleteAsset(p)
                 uploaded = set(master_keys) if rebuild else done_keys | set(obs_key(pending))
