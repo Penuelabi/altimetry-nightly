@@ -16,7 +16,6 @@ jobs:
     timeout-minutes: 300
     env:
       ALTIMETRY_OUT_DIR: ${{ github.workspace }}/data
-      ALTIMETRY_WORK_DIR: ${{ runner.temp }}/hydroweb_extract
       GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
       DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
       DAHITI_API_KEY: ${{ secrets.DAHITI_API_KEY }}
@@ -25,6 +24,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set work folder
+        run: echo "ALTIMETRY_WORK_DIR=$RUNNER_TEMP/hydroweb_extract" >> "$GITHUB_ENV"
 
       - name: Is it 00:00 in Cairo?
         id: gate
