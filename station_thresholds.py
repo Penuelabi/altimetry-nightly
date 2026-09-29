@@ -32,6 +32,11 @@ def gumbel_levels(annual_max, return_periods=(2, 5, 10)):
 
 
 def _station_key(df):
+    """Column identifying a station; builds station_uid ('dahiti:213') from source + station_id when absent."""
+    if 'station_uid' not in df.columns and {'source', 'station_id'} <= set(df.columns):
+        sid = pd.to_numeric(df['station_id'], errors='coerce')
+        df['station_uid'] = (df['source'].astype(str).str.lower() + ':'
+                             + sid.round().astype('Int64').astype(str)).where(sid.notna())
     return 'station_uid' if 'station_uid' in df.columns else 'station_id'
 
 
