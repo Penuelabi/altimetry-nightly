@@ -1,0 +1,43 @@
+name: County hydro-climate bulletin (daily, after ECMWF 00 UTC release)
+
+on:
+  schedule:
+    - cron: '30 9 * * *'     # 09:30 UTC = 12:30 Juba; ECMWF open-data 00 UTC run is out by ~08:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: county-bulletin
+  cancel-in-progress: false
+
+jobs:
+  bulletin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      BULLETIN_OUT_DIR: ${{ github.workspace }}/bulletin
+      BULLETIN_TMP_DIR: ${{ runner.temp }}
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      BULLETIN_FOLDER_ID: ${{ secrets.BULLETIN_FOLDER_ID }}
+      PYTHONUNBUFFERED: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-bulletin.txt
+
+      - name: Install packages
+        run: pip install -r requirements-bulletin.txt
+
+      - name: Pull bulletin files from Drive
+        run: python drive_sync.py pull bulletin
+
+      - name: Run county bulletin (antecedent conditions + ENS outlook + GEE asset)
+        run: python county_bulletin.py
+
+      - name: Push updated bulletin files back to Drive
+        if: always()
+        run: python drive_sync.py push bulletin

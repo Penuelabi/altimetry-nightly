@@ -1,0 +1,13 @@
+earthengine-api>=1.0
+pandas>=2.0
+numpy
+requests
+openpyxl
+xarray
+geopandas
+shapely
+ecmwf-opendata
+cfgrib
+eccodes
+google-api-python-client
+google-auth

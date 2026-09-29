@@ -35,16 +35,25 @@ SYNC_FILES = [
     'merged_altimetry_stations.xlsx',
     'gee_uploaded_keys.csv',
     'dahiti_water_levels_raw.xlsx',
+    'dahiti_seed_check.csv',
     'hydroweb_water_levels_raw.xlsx',
-    'HYDROWEB_RIVERS_OPE.zip',
+    'Theia_Hydroweb_Operational_Rivers.zip',
     'HYDROWEB_LAKES_OPE.zip',
-    'cache_climate_15d.csv',
+    'cache_climate_15d_v2.csv',
     'cache_elevation.csv',
+    'cache_station_catchments.csv',
     'nightly_run_log.txt',
 ]
 # Read-only inputs: pulled, never pushed back
 PULL_ONLY = [
-    'combined_water_levels_analyzed_20260922_093406.xlsx',
+    'station_lookup.xlsx',
+]
+# County bulletin folder (Drive subfolder county_bulletin, ID in BULLETIN_FOLDER_ID)
+BULLETIN_FILES = [
+    'county_bulletin_latest.csv',
+    'county_bulletin_latest.xlsx',
+    'forecast_log_ens.csv',
+    'counties_dissolved.geojson',
 ]
 
 
@@ -81,10 +90,12 @@ def md5(path):
     return h.hexdigest()
 
 
-def pull(svc, folder_id, local_dir):
+def pull(svc, folder_id, local_dir, sync_files=None, pull_only=None):
+    sync_files = SYNC_FILES if sync_files is None else sync_files
+    pull_only = PULL_ONLY if pull_only is None else pull_only
     os.makedirs(local_dir, exist_ok=True)
     remote = folder_files(svc, folder_id)
-    for name in SYNC_FILES + PULL_ONLY:
+    for name in sync_files + pull_only:
         f = remote.get(name)
         if f is None:
             print(f"  - {name}: not in the Drive folder (will be created locally if needed)")
@@ -102,10 +113,11 @@ def pull(svc, folder_id, local_dir):
         print(f"  pulled {name} ({os.path.getsize(path) / 1e6:.1f} MB)")
 
 
-def push(svc, folder_id, local_dir):
+def push(svc, folder_id, local_dir, sync_files=None):
+    sync_files = SYNC_FILES if sync_files is None else sync_files
     remote = folder_files(svc, folder_id)
     missing = []
-    for name in SYNC_FILES:
+    for name in sync_files:
         path = os.path.join(local_dir, name)
         if not os.path.exists(path):
             continue
@@ -136,10 +148,20 @@ def push(svc, folder_id, local_dir):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2 or sys.argv[1] not in ('pull', 'push'):
-        sys.exit("usage: python drive_sync.py pull|push")
+    args = sys.argv[1:]
+    if not args or args[0] not in ('pull', 'push') or (len(args) > 1 and args[1] != 'bulletin'):
+        sys.exit("usage: python drive_sync.py pull|push [bulletin]")
     service = drive_service()
-    folder = os.environ['DRIVE_FOLDER_ID'].strip()
-    local = os.environ.get('ALTIMETRY_OUT_DIR', 'data')
-    print(f"{sys.argv[1]}: Drive folder {folder} <-> {local}")
-    (pull if sys.argv[1] == 'pull' else push)(service, folder, local)
+    if len(args) > 1:
+        folder = os.environ['BULLETIN_FOLDER_ID'].strip()
+        local = os.environ.get('BULLETIN_OUT_DIR', 'bulletin')
+        files, only = BULLETIN_FILES, []
+    else:
+        folder = os.environ['DRIVE_FOLDER_ID'].strip()
+        local = os.environ.get('ALTIMETRY_OUT_DIR', 'data')
+        files, only = SYNC_FILES, PULL_ONLY
+    print(f"{args[0]}: Drive folder {folder} <-> {local}")
+    if args[0] == 'pull':
+        pull(service, folder, local, files, only)
+    else:
+        push(service, folder, local, files)
