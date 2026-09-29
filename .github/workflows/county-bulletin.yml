@@ -47,10 +47,25 @@ jobs:
       - name: Pull bulletin files from Drive
         run: python drive_sync.py pull bulletin
 
+      - name: Verify past forecasts against observed rain (optional)
+        continue-on-error: true
+        run: python verify_forecasts.py
+
       - name: Run county bulletin (antecedent conditions + ENS outlook + GEE asset)
         run: |
           set -o pipefail
           python county_bulletin.py 2>&1 | tee "$RUNNER_TEMP/bulletin.log"
+
+      - name: Email digest (optional, needs SMTP secrets)
+        continue-on-error: true
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          DIGEST_TO: ${{ secrets.DIGEST_TO }}
+          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
+        run: python send_digest.py
 
       - name: Show error tail in run summary
         if: failure()

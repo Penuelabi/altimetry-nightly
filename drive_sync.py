@@ -43,6 +43,7 @@ SYNC_FILES = [
     'cache_elevation.csv',
     'cache_station_catchments.csv',
     'nightly_run_log.txt',
+    'station_status.csv',
 ]
 # Read-only inputs: pulled, never pushed back
 PULL_ONLY = [
@@ -54,6 +55,13 @@ BULLETIN_FILES = [
     'county_bulletin_latest.xlsx',
     'forecast_log_ens.csv',
     'counties_dissolved.geojson',
+    'county_bulletin_latest.json',
+    'county_bulletin_latest.pdf',
+    'forecast_verification.csv',
+    'forecast_reliability.csv',
+    'forecast_verification_by_county.csv',
+    'forecast_obs_cache.csv',
+    'county_exposure_cache.csv',
 ]
 
 

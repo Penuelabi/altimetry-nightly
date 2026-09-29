@@ -61,6 +61,13 @@ jobs:
           } >> "$ALTIMETRY_OUT_DIR/nightly_run_log.txt"
           python merge_dahiti_hydroweb.py 2>&1 | tee -a "$ALTIMETRY_OUT_DIR/nightly_run_log.txt"
 
+      - name: "Station flood status + river outlook (optional)"
+        if: steps.gate.outputs.run == 'true'
+        continue-on-error: true
+        run: |
+          pip install xarray zarr s3fs pyarrow || true
+          python station_status.py 2>&1 | tee -a "$ALTIMETRY_OUT_DIR/nightly_run_log.txt"
+
       - name: "Save: push updated files back to Drive"
         if: always() && steps.gate.outputs.run == 'true'
         run: python drive_sync.py push

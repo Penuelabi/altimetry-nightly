@@ -579,11 +579,23 @@ def advisory(r):
 bulletin['advisory_flags'] = bulletin.apply(advisory, axis=1)
 bulletin = bulletin.sort_values(['state', 'county']).reset_index(drop=True)
 
+# Impact layer + alert levels (optional: a failure here must never stop the bulletin)
+EXTRAS_OK = False
+try:
+    import bulletin_extras as bx
+    bulletin = bx.add_exposure(bulletin, counties, ee, OUT_DIR)
+    bulletin = bx.add_alert_levels(bulletin, P_HEAVY, P_DRY, P_WSP, Z_WET, RECOVERY_SEVERE, RECOVERY_MODERATE)
+    bulletin['advisory_flags'] = bx.append_exposure_to_advisory(bulletin)
+    EXTRAS_OK = True
+except Exception as _e:
+    print(f"WARNING: impact/alert layer skipped: {type(_e).__name__}: {_e}")
+
 KEY_COLS = ['state', 'county', 'data_end_date', 'data_source', 'soil_rootzone_class', 'sm_rootzone_z',
             'sm_rootzone_pctile', 'soil_deficit_mm', 'rain_30d_mm', 'rain_30d_pct_of_normal', 'rain_30d_class',
             'runoff_30d_class', 'et_30d_mm', 'wb_30d_mm', 'run_utc', 'n_members', 'week1_rain_median_mm',
             'week1_rain_p20_mm', 'week1_rain_p80_mm', 'week2_rain_median_mm', P_DRY, P_WSP, P_HEAVY,
-            'spell_windows', 'advisory_flags']
+            'spell_windows', 'alert_level', 'alert_hazard', 'alert_likelihood', 'alert_impact',
+            'pop_total', 'pop_flood_prone', 'cropland_km2', 'advisory_flags']
 key = bulletin[[c for c in KEY_COLS if c in bulletin.columns]]
 
 notes = pd.DataFrame([
@@ -615,6 +627,8 @@ notes = pd.DataFrame([
                        f'{RECOVERY_MODERATE:.0%} moderate, otherwise easing. Wet soil for watches: z >= {ADV_WET_SOIL_Z}. '
                        'Evaporation is ignored, so grading errs towards recovery. Thresholds are provisional.'),
 ], columns=['item', 'definition'])
+if EXTRAS_OK:
+    notes = pd.concat([notes, pd.DataFrame(bx.notes_rows(), columns=['item', 'definition'])], ignore_index=True)
 
 stamp = (RUN_UTC[:10].replace('-', '') if RUN_UTC else (ANTE_END or TODAY).strftime('%Y%m%d'))
 xlsx_path = os.path.join(OUT_DIR, f'county_bulletin_{stamp}.xlsx')
@@ -635,6 +649,19 @@ import shutil
 shutil.copyfile(csv_path, os.path.join(OUT_DIR, 'county_bulletin_latest.csv'))
 shutil.copyfile(xlsx_path, os.path.join(OUT_DIR, 'county_bulletin_latest.xlsx'))
 print(f"-> {xlsx_path}\n-> {csv_path}\n-> county_bulletin_latest.(csv|xlsx)")
+
+if EXTRAS_OK:
+    try:
+        _ver = None
+        _vp = os.path.join(OUT_DIR, 'forecast_verification.csv')
+        if os.path.exists(_vp):
+            import verify_forecasts as _vf
+            _ver = _vf.headline(pd.read_csv(_vp)) or None
+        _pc = (P_HEAVY, P_DRY, P_WSP)
+        print('->', bx.write_json(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR, _ver))
+        print('->', bx.write_pdf(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR))
+    except Exception as _e:
+        print(f"WARNING: JSON/PDF outputs skipped: {type(_e).__name__}: {_e}")
 
 show = [c for c in ['state', 'county', 'soil_rootzone_class', 'sm_rootzone_z', 'soil_deficit_mm',
                     'rain_30d_pct_of_normal', 'week1_rain_median_mm'] if c in bulletin]
