@@ -69,11 +69,25 @@ jobs:
           DIGEST_ONLY_IF_ALERTS: ${{ vars.DIGEST_ONLY_IF_ALERTS }}
         run: python send_digest.py 2>&1 | tee "$RUNNER_TEMP/digest.log"
 
+      - name: Post to Facebook / LinkedIn (optional, needs secrets)
+        continue-on-error: true
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          LI_AUTHOR_URN: ${{ secrets.LI_AUTHOR_URN }}
+          LI_ACCESS_TOKEN: ${{ secrets.LI_ACCESS_TOKEN }}
+          SOCIAL_MIN_LEVEL: ${{ vars.SOCIAL_MIN_LEVEL }}
+          SOCIAL_RUN_HOURS: ${{ vars.SOCIAL_RUN_HOURS }}
+          SOCIAL_DRY_RUN: ${{ vars.SOCIAL_DRY_RUN }}
+          SOCIAL_ONLY_IF_ALERTS: ${{ vars.SOCIAL_ONLY_IF_ALERTS }}
+        run: python send_social.py 2>&1 | tee "$RUNNER_TEMP/social.log"
+
       - name: Show warnings and digest result in run summary
         if: always()
         run: |
           { echo '### Warnings in bulletin log'; echo '```'; grep -a 'WARNING' "$RUNNER_TEMP/bulletin.log" 2>/dev/null | cut -c1-300 | head -40; echo '```';
-            echo '### Email digest'; echo '```'; cat "$RUNNER_TEMP/digest.log" 2>/dev/null | cut -c1-300; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            echo '### Email digest'; echo '```'; cat "$RUNNER_TEMP/digest.log" 2>/dev/null | cut -c1-300; echo '```';
+            echo '### Social posts'; echo '```'; cat "$RUNNER_TEMP/social.log" 2>/dev/null | cut -c1-300 | tail -n 40; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Show error tail in run summary
         if: failure()
