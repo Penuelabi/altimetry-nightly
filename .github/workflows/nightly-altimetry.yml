@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 300
     env:
       ALTIMETRY_OUT_DIR: ${{ github.workspace }}/data
@@ -23,7 +23,7 @@ jobs:
       PYTHONUNBUFFERED: '1'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set work folder
         run: echo "ALTIMETRY_WORK_DIR=$RUNNER_TEMP/hydroweb_extract" >> "$GITHUB_ENV"
@@ -35,7 +35,7 @@ jobs:
           SCHEDULE: ${{ github.event.schedule }}
         run: python3 cairo_midnight_check.py
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         if: steps.gate.outputs.run == 'true'
         with:
           python-version: '3.11'
