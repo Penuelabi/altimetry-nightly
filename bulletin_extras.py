@@ -47,8 +47,8 @@ ATTRIBUTION = [
     'Forecast: ECMWF IFS ensemble (ENS) open data, CC BY 4.0, (c) European Centre for Medium-Range '
     'Weather Forecasts; processed by this platform (probabilities per county derived from the 51 members).',
     'Population: WorldPop (2020, 100 m, University of Southampton), CC BY 4.0; '
-    'cropland: ESA WorldCover 2021 v200, CC BY 4.0; flood-prone ground: Global Flood Database '
-    '(Cloud to Street / Dartmouth Flood Observatory, 2000-2018).',
+    'cropland: ESA WorldCover 2021 v200, CC BY 4.0; flood-prone ground: JRC Global Surface Water '
+    '(EC JRC / Google, 1984-2021) and Global Flood Database (Cloud to Street / Dartmouth Flood Observatory, 2000-2018).',
     'River levels: DAHITI (DGFI-TUM) and Hydroweb.Next (Theia / CNES, LEGOS) satellite altimetry.',
     'River discharge outlook: GEOGLOWS ECMWF Streamflow Model (BYU / ECMWF), where available.',
     'Alert levels follow the impact-based likelihood x impact approach of WMO-No. 1150; '
@@ -58,13 +58,14 @@ ATTRIBUTION = [
 COLORS = {'green': '#2e7d32', 'yellow': '#f9a825', 'orange': '#ef6c00', 'red': '#c62828'}
 
 EXPOSURE_COLS = ['pop_total', 'pop_flood_prone', 'cropland_km2']
+EXPOSURE_METHOD = 'gsw+gfd-v2'      # bump to force a recompute of the cached exposure
 
 
 # --------------------------------------------------------------------------- #
 # exposure (Earth Engine, cached)                                             #
 # --------------------------------------------------------------------------- #
 def add_exposure(bulletin, counties, ee, out_dir, batch=8):
-    """Adds pop_total, pop_flood_prone (people in ground flooded at least once 2000-2018), cropland_km2.
+    """Adds pop_total, pop_flood_prone (people on ground mapped as water or flooded at least once), cropland_km2.
     Values are cached in county_exposure_cache.csv: slow-changing, computed once."""
     from shapely.geometry import mapping
     path = os.path.join(out_dir, 'county_exposure_cache.csv')
@@ -75,15 +76,21 @@ def add_exposure(bulletin, counties, ee, out_dir, batch=8):
         except Exception:
             cache = None
     names = list(counties['county'])
-    if cache is None or sorted(cache['county']) != sorted(names) or not set(EXPOSURE_COLS) <= set(cache.columns):
+    if cache is None or sorted(cache['county']) != sorted(names) or not set(EXPOSURE_COLS) <= set(cache.columns) \
+            or 'method' not in cache.columns or cache['method'].iloc[0] != EXPOSURE_METHOD:
         print("Computing county exposure (population, flood-prone population, cropland) - first run only...")
         pop = ee.ImageCollection('WorldPop/GP/100m/pop').filter(ee.Filter.eq('country', 'SSD')) \
             .filter(ee.Filter.eq('year', 2020)).mosaic().select('population')
-        flooded = ee.ImageCollection('GLOBAL_FLOOD_DB/MODIS_EVENTS/V1').select('flooded').sum().gt(0)
+        # flood-prone ground = mapped as water at least once (JRC Global Surface Water 1984-2021, 30 m)
+        # OR inside a Global Flood Database event (MODIS, 2000-2018). The Flood Database alone misses most
+        # of the Sudd, so it gave zero flood-prone people for the wetland counties.
+        gsw = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('max_extent').eq(1).unmask(0)
+        gfd = ee.ImageCollection('GLOBAL_FLOOD_DB/MODIS_EVENTS/V1').select('flooded').sum().gt(0).unmask(0)
+        flooded = gsw.max(gfd).selfMask()
         crop = ee.ImageCollection('ESA/WorldCover/v200').first().eq(40) \
             .multiply(ee.Image.pixelArea()).divide(1e6).rename('cropland_km2')
         img = ee.Image.cat([pop.rename('pop_total'),
-                            pop.updateMask(flooded.reproject(pop.projection())).rename('pop_flood_prone'),
+                            pop.updateMask(flooded).rename('pop_flood_prone'),
                             crop])
         geo = counties.set_index('county').geometry
         rows = []
@@ -98,6 +105,7 @@ def add_exposure(bulletin, counties, ee, out_dir, batch=8):
                              'cropland_km2': p.get('cropland_km2')})
             print(f"  exposure: {min(k + batch, len(names))}/{len(names)} counties")
         cache = pd.DataFrame(rows).round(1)
+        cache['method'] = EXPOSURE_METHOD
         cache.to_csv(path, index=False)
     return bulletin.merge(cache[['county'] + EXPOSURE_COLS], on='county', how='left')
 
@@ -200,12 +208,12 @@ def notes_rows(recovery_note=''):
     rows = [('alert_level', 'Green / Yellow / Orange / Red from hazard likelihood x impact on people '
                             '(WMO-No. 1150 approach). ' + ' '.join(f'{k.title()}: {v}.' for k, v in LEVEL_MEANING.items())),
             ('alert scales (provisional)',
-             'Likelihood: low < 20%, medium 20-50%, high >= 50%. Flood impact tier by people living on ground flooded '
-             'at least once in 2000-2018 (minor < 20,000; moderate < 100,000; significant < 300,000; severe above). '
+             'Likelihood: low < 20%, medium 20-50%, high >= 50%. Flood impact tier by people living on ground mapped as water '
+             'or flooded at least once (1984-2021) (minor < 20,000; moderate < 100,000; significant < 300,000; severe above). '
              'Drought impact tier by county population (minor < 75,000; moderate < 200,000; significant < 400,000; '
              'severe above). A severe soil deficit counts as high likelihood (already happening).'),
             ('pop_total / pop_flood_prone / cropland_km2',
-             'WorldPop 2020 population; population on ground flooded at least once 2000-2018 (Global Flood Database); '
+             'WorldPop 2020 population; population on ground mapped as water at least once (JRC Global Surface Water) or flooded in a Global Flood Database event; '
              'cropland area from ESA WorldCover 2021 (sampled at 100 m, approximate). Static: refreshed only if the '
              'county list changes.')]
     rows += [('attribution', a) for a in ATTRIBUTION]
