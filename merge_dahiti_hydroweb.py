@@ -1817,6 +1817,8 @@ if UPLOAD_TO_GEE:
             part_ids.append(pid)
         print(f"Started {n_parts} observation export(s) of up to {ROWS_PER_PART} rows")
         states = wait_for(tasks + [st_task])
+        if states[-1] == 'COMPLETED':
+            make_public(f'{ASSET_FOLDER}/stations')
 
         if all(s == 'COMPLETED' for s in states[:-1]):
             # 2. merge INSIDE GEE: current merged_observations + new parts
