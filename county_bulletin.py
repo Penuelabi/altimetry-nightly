@@ -588,7 +588,9 @@ try:
     bulletin['advisory_flags'] = bx.append_exposure_to_advisory(bulletin)
     EXTRAS_OK = True
 except Exception as _e:
+    import traceback
     print(f"WARNING: impact/alert layer skipped: {type(_e).__name__}: {_e}")
+    print('\n'.join('WARNING:   ' + l for l in traceback.format_exc().splitlines()[-8:]))
 
 KEY_COLS = ['state', 'county', 'data_end_date', 'data_source', 'soil_rootzone_class', 'sm_rootzone_z',
             'sm_rootzone_pctile', 'soil_deficit_mm', 'rain_30d_mm', 'rain_30d_pct_of_normal', 'rain_30d_class',
@@ -661,7 +663,9 @@ if EXTRAS_OK:
         print('->', bx.write_json(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR, _ver))
         print('->', bx.write_pdf(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR))
     except Exception as _e:
+        import traceback
         print(f"WARNING: JSON/PDF outputs skipped: {type(_e).__name__}: {_e}")
+        print('\n'.join('WARNING:   ' + l for l in traceback.format_exc().splitlines()[-8:]))
 
 show = [c for c in ['state', 'county', 'soil_rootzone_class', 'sm_rootzone_z', 'soil_deficit_mm',
                     'rain_30d_pct_of_normal', 'week1_rain_median_mm'] if c in bulletin]

@@ -56,6 +56,11 @@ jobs:
           set -o pipefail
           python county_bulletin.py 2>&1 | tee "$RUNNER_TEMP/bulletin.log"
 
+      - name: Show warnings in run summary
+        if: always()
+        run: |
+          { echo '### Warnings in bulletin log'; echo '```'; grep -a 'WARNING' "$RUNNER_TEMP/bulletin.log" 2>/dev/null | cut -c1-300 | head -40; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Email digest (optional, needs SMTP secrets)
         continue-on-error: true
         env:
