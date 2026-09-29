@@ -17,7 +17,7 @@ ORDER = ['green', 'yellow', 'orange', 'red']
 
 
 def build_message(doc, pdf_path=None, min_level='yellow', sender='', to=''):
-    lo = ORDER.index(min_level)
+    lo = ORDER.index(min_level) if min_level in ORDER else 1
     rows = [c for c in doc['counties'] if c['alert']['level'] in ORDER and ORDER.index(c['alert']['level']) >= lo]
     rows.sort(key=lambda c: (-ORDER.index(c['alert']['level']), c['state'], c['county']))
     counts = {k: sum(1 for c in doc['counties'] if c['alert']['level'] == k) for k in ORDER}
@@ -61,7 +61,7 @@ def main():
         return
     doc = json.load(open(jpath, encoding='utf-8'))
     msg, n = build_message(doc, os.path.join(out, 'county_bulletin_latest.pdf'),
-                           os.environ.get('DIGEST_MIN_LEVEL', 'yellow').lower(),
+                           (os.environ.get('DIGEST_MIN_LEVEL') or 'yellow').strip().lower(),
                            os.environ.get('DIGEST_FROM') or user, to)
     if n == 0 and os.environ.get('DIGEST_ONLY_IF_ALERTS') == '1':
         print('No alerts; digest not sent.')
