@@ -155,21 +155,20 @@ def level_features(assign, ml, months):
     """county x month x group: mean over the group's stations of the monthly max level percentile, and 1-month rise."""
     ml = ml.copy()
     ml['ym'] = ml['ym'].astype('period[M]')
-    rows = []
-    for (county, grp), a in assign.groupby(['county', 'group']):
-        sub = ml[ml['station_uid'].isin(a['station_uid'])]
-        if sub.empty:
-            continue
-        s = sub.groupby('ym')['level_pct'].mean().reindex(months)
-        rows.append(pd.DataFrame({'county': county, 'ym': months, f'lvl_{grp}': s.values,
-                                  f'rise_{grp}': (s - s.shift(1)).values}))
-    if not rows:
+    frames = []
+    for county, ac in assign.groupby('county'):
+        cf = pd.DataFrame({'county': county, 'ym': months})
+        for grp, a in ac.groupby('group'):
+            sub = ml[ml['station_uid'].isin(a['station_uid'])]
+            if sub.empty:
+                continue
+            s = sub.groupby('ym')['level_pct'].mean().reindex(months)
+            cf[f'lvl_{grp}'] = s.values
+            cf[f'rise_{grp}'] = (s - s.shift(1)).values
+        frames.append(cf)
+    if not frames:
         return pd.DataFrame(columns=['county', 'ym'])
-    f = rows[0]
-    for r in rows[1:]:
-        f = f.merge(r, on=['county', 'ym'], how='outer')
-    # collapse duplicate merge keys produced by different groups of the same county
-    return f.groupby(['county', 'ym'], as_index=False).first()
+    return pd.concat(frames, ignore_index=True)
 
 
 # ----------------------------------------------------------------------------- #
