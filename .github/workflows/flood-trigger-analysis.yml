@@ -1,0 +1,38 @@
+name: Flood trigger analysis (manual run)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  analyse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      ALTIMETRY_OUT_DIR: ${{ github.workspace }}/altdata
+      BULLETIN_OUT_DIR: ${{ github.workspace }}/bulletin
+      ANALYSIS_OUT_DIR: ${{ github.workspace }}/analysis_out
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+      BULLETIN_FOLDER_ID: ${{ secrets.BULLETIN_FOLDER_ID }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install packages
+        run: pip install -r requirements-bulletin.txt scikit-learn tabulate
+      - name: Pull altimetry and county files from Drive
+        run: |
+          mkdir -p "$ALTIMETRY_OUT_DIR" "$BULLETIN_OUT_DIR" "$ANALYSIS_OUT_DIR"
+          python drive_sync.py pull
+          python drive_sync.py pull bulletin
+      - name: Self-test
+        run: python flood_trigger_analysis.py --selftest
+      - name: Run analysis
+        run: python flood_trigger_analysis.py
+      - name: Keep results
+        uses: actions/upload-artifact@v4
+        with:
+          name: flood-trigger-analysis
+          path: analysis_out/
