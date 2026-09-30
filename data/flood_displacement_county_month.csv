@@ -1,0 +1,108 @@
+county,year,month,flood,natural disaster (unspecified),state,pop_2025,pct_of_pop2025
+Bor South,2020,5,0,12320,Jonglei,354711,0.0
+Canal/Pigi,2020,8,0,10174,Jonglei,111613,0.0
+Guit,2020,8,3082,0,Unity,73878,4.2
+Panyijiar,2020,8,0,2650,Unity,126239,0.0
+Renk,2020,8,0,13556,Upper Nile,210351,0.0
+Awerial,2020,9,0,32660,Lakes,144223,0.0
+Juba,2020,9,0,40907,Central Equatoria,570834,0.0
+Leer,2020,9,0,3223,Unity,86784,0.0
+Leer,2020,10,19717,0,Unity,86784,22.7
+Fangak,2020,12,50000,0,Jonglei,213029,23.5
+Melut,2021,1,1500,0,Upper Nile,134054,1.1
+Panyikang,2021,1,13400,0,Upper Nile,69656,19.2
+Fangak,2021,2,38457,0,Jonglei,213029,18.1
+Fangak,2021,3,32286,0,Jonglei,213029,15.2
+Malakal,2021,3,924,0,Upper Nile,204041,0.5
+Rubkona,2021,3,285,0,Unity,361802,0.1
+Fashoda,2021,4,8172,0,Upper Nile,83775,9.8
+Manyo,2021,4,2532,0,Upper Nile,83853,3.0
+Rubkona,2021,4,364,0,Unity,361802,0.1
+Leer,2021,6,933,0,Unity,86784,1.1
+Rubkona,2021,6,169,0,Unity,361802,0.0
+Ayod,2021,7,39292,0,Jonglei,205709,19.1
+Fangak,2021,7,15000,0,Jonglei,213029,7.0
+Leer,2021,7,1391,0,Unity,86784,1.6
+Ayod,2021,8,420,0,Jonglei,205709,0.2
+Guit,2021,8,395,0,Unity,73878,0.5
+Koch,2021,8,162,0,Unity,115158,0.1
+Leer,2021,8,1070,0,Unity,86784,1.2
+Malakal,2021,8,4119,0,Upper Nile,204041,2.0
+Panyijiar,2021,8,180,0,Unity,126239,0.1
+Rubkona,2021,8,14962,0,Unity,361802,4.1
+Yirol East,2021,8,431,0,Lakes,165810,0.3
+Bor South,2021,9,574,0,Jonglei,354711,0.2
+Canal/Pigi,2021,9,4496,0,Jonglei,111613,4.0
+Koch,2021,9,2895,0,Unity,115158,2.5
+Malakal,2021,9,3672,0,Upper Nile,204041,1.8
+Panyijiar,2021,9,25084,0,Unity,126239,19.9
+Rubkona,2021,9,3054,0,Unity,361802,0.8
+Koch,2021,10,3504,0,Unity,115158,3.0
+Leer,2021,10,2556,0,Unity,86784,2.9
+Malakal,2021,10,1962,0,Upper Nile,204041,1.0
+Melut,2021,10,14597,0,Upper Nile,134054,10.9
+Panyikang,2021,10,23299,0,Upper Nile,69656,33.4
+Rubkona,2021,10,3418,0,Unity,361802,0.9
+Guit,2021,11,7818,0,Unity,73878,10.6
+Juba,2021,11,340,0,Central Equatoria,570834,0.1
+Koch,2021,11,306,0,Unity,115158,0.3
+Malakal,2021,11,384,0,Upper Nile,204041,0.2
+Rubkona,2021,11,3355,0,Unity,361802,0.9
+Rubkona,2021,12,537,0,Unity,361802,0.1
+Rubkona,2022,1,3883,0,Unity,361802,1.1
+Leer,2022,2,364,0,Unity,86784,0.4
+Pariang,2022,2,330,0,Unity,143832,0.2
+Renk,2022,2,10243,0,Upper Nile,210351,4.9
+Rubkona,2022,2,416,0,Unity,361802,0.1
+Rubkona,2022,3,5734,444,Unity,361802,1.6
+Rubkona,2022,4,921,0,Unity,361802,0.3
+Rubkona,2022,5,5388,0,Unity,361802,1.5
+Panyijiar,2022,6,0,515,Unity,126239,0.0
+Manyo,2022,9,9563,0,Upper Nile,83853,11.4
+Panyijiar,2022,9,6876,0,Unity,126239,5.4
+Renk,2022,9,16036,0,Upper Nile,210351,7.6
+Ayod,2022,10,23400,0,Jonglei,205709,11.4
+Duk,2022,10,8566,0,Jonglei,206545,4.1
+Rubkona,2022,10,2414,0,Unity,361802,0.7
+Melut,2022,11,8590,0,Upper Nile,134054,6.4
+Rubkona,2022,11,934,0,Unity,361802,0.3
+Rubkona,2022,12,1573,0,Unity,361802,0.4
+Rubkona,2023,1,587,0,Unity,361802,0.2
+Rubkona,2023,3,1178,0,Unity,361802,0.3
+Rubkona,2023,4,258,0,Unity,361802,0.1
+Rubkona,2023,5,125,0,Unity,361802,0.0
+Renk,2023,9,4256,0,Upper Nile,210351,2.0
+Bor South,2023,11,5672,0,Jonglei,354711,1.6
+Panyijiar,2024,6,4476,0,Unity,126239,3.5
+Fangak,2024,7,6987,0,Jonglei,213029,3.3
+Panyijiar,2024,7,468,0,Unity,126239,0.4
+Rubkona,2024,7,458,0,Unity,361802,0.1
+Bor South,2024,8,4233,0,Jonglei,354711,1.2
+Fangak,2024,8,7270,0,Jonglei,213029,3.4
+Panyijiar,2024,8,402,0,Unity,126239,0.3
+Renk,2024,8,39736,0,Upper Nile,210351,18.9
+Fangak,2024,9,6500,0,Jonglei,213029,3.1
+Guit,2024,10,1575,0,Unity,73878,2.1
+Malakal,2024,10,6156,0,Upper Nile,204041,3.0
+Ayod,2024,11,8951,0,Jonglei,205709,4.4
+Fashoda,2024,11,3619,0,Upper Nile,83775,4.3
+Koch,2024,11,14142,0,Unity,115158,12.3
+Leer,2024,11,4223,0,Unity,86784,4.9
+Mayendit,2024,11,1682,0,Unity,74335,2.3
+Panyijiar,2024,11,14764,0,Unity,126239,11.7
+Rubkona,2024,11,4844,0,Unity,361802,1.3
+Yirol East,2024,11,1683,0,Lakes,165810,1.0
+Mayendit,2024,12,1413,0,Unity,74335,1.9
+Rubkona,2024,12,1597,0,Unity,361802,0.4
+Fangak,2025,8,4470,0,Jonglei,213029,2.1
+Leer,2025,8,3981,0,Unity,86784,4.6
+Panyijiar,2025,8,26496,0,Unity,126239,21.0
+Twic East,2025,8,11516,0,Jonglei,129822,8.9
+Ayod,2025,9,34586,0,Jonglei,205709,16.8
+Canal/Pigi,2025,9,3488,0,Jonglei,111613,3.1
+Malakal,2025,9,11090,0,Upper Nile,204041,5.4
+Panyikang,2025,9,2948,0,Upper Nile,69656,4.2
+Malakal,2025,10,740,0,Upper Nile,204041,0.4
+Panyijiar,2025,10,10652,0,Unity,126239,8.4
+Fangak,2025,11,38199,0,Jonglei,213029,17.9
+Guit,2025,11,2311,0,Unity,73878,3.1
