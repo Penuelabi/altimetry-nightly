@@ -592,6 +592,23 @@ except Exception as _e:
     print(f"WARNING: impact/alert layer skipped: {type(_e).__name__}: {_e}")
     print('\n'.join('WARNING:   ' + l for l in traceback.format_exc().splitlines()[-8:]))
 
+SUDD_TRIGGER = None
+try:
+    import sudd_trigger as _st
+    _alt = os.path.join(os.environ.get('ALTIMETRY_OUT_DIR', 'data'), 'merged_altimetry_stations.csv')
+    _cg = COUNTY_CACHE
+    _dp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'flood_displacement_county_month.csv')
+    if os.path.exists(_alt) and os.path.getsize(_alt) > 1000:
+        SUDD_TRIGGER, _ = _st.compute(_alt, _cg, _dp)
+        _st.append_log(SUDD_TRIGGER, OUT_DIR)
+        print('RIVER TRIGGER:', SUDD_TRIGGER['text'])
+    else:
+        print('River trigger skipped: merged_altimetry_stations.csv not found')
+except Exception as _e:
+    import traceback
+    print(f"WARNING: river trigger skipped: {type(_e).__name__}: {_e}")
+    print('\n'.join('WARNING:   ' + l for l in traceback.format_exc().splitlines()[-8:]))
+
 KEY_COLS = ['state', 'county', 'data_end_date', 'data_source', 'soil_rootzone_class', 'sm_rootzone_z',
             'sm_rootzone_pctile', 'soil_deficit_mm', 'rain_30d_mm', 'rain_30d_pct_of_normal', 'rain_30d_class',
             'runoff_30d_class', 'et_30d_mm', 'wb_30d_mm', 'run_utc', 'n_members', 'week1_rain_median_mm',
@@ -663,8 +680,8 @@ if EXTRAS_OK:
             except Exception as _e2:
                 print(f"WARNING: forecast verification summary not added: {type(_e2).__name__}: {_e2}")
         _pc = (P_HEAVY, P_DRY, P_WSP)
-        print('->', bx.write_json(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR, _ver))
-        print('->', bx.write_pdf(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR))
+        print('->', bx.write_json(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR, _ver, SUDD_TRIGGER))
+        print('->', bx.write_pdf(bulletin, _pc, RUN_UTC, ANTE_END, OUT_DIR, SUDD_TRIGGER))
     except Exception as _e:
         import traceback
         print(f"WARNING: JSON/PDF outputs skipped: {type(_e).__name__}: {_e}")

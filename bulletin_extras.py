@@ -240,6 +240,10 @@ def notes_rows(recovery_note=''):
              '2025 county population estimates; population on ground mapped as water at least once (JRC Global Surface Water) or flooded in a Global Flood Database event (WorldPop 2020 shares scaled to the 2025 county totals); '
              'cropland area from ESA WorldCover 2021 (sampled at 100 m, approximate). Static: refreshed only if the '
              'county list changes.')]
+    rows += [('sudd river trigger (experimental)',
+              'Mean percentile of the monthly maximum level at the 3 nearest upstream altimetry stations of the counties with recorded '
+              'flood displacement. Watch from the 55th, elevated from the 70th percentile. Derived from 6 flood onsets in 2020-2025: '
+              'to be scored in 2026, not a validated warning. Logged in sudd_trigger_log.csv.')]
     rows += [('attribution', a) for a in ATTRIBUTION]
     return rows
 
@@ -257,7 +261,7 @@ def _num(v, nd=2):
     return v
 
 
-def build_json(bulletin, p_cols, run_utc, data_end, verification=None):
+def build_json(bulletin, p_cols, run_utc, data_end, verification=None, river_trigger=None):
     p_heavy, p_dry, p_wsp = p_cols
     day_cols = sorted(c for c in bulletin.columns if re.fullmatch(r'p_wet_\d{4}', c))
     counties = []
@@ -290,13 +294,14 @@ def build_json(bulletin, p_cols, run_utc, data_end, verification=None):
         'ecmwf_run_utc': run_utc, 'antecedent_data_end': str(data_end),
         'alert_levels': {k: LEVEL_MEANING[k] for k in LEVEL_ORDER},
         'forecast_verification': verification or None,
+        'sudd_river_trigger': river_trigger or None,
         'attribution': ATTRIBUTION,
         'counties': counties,
     }
 
 
-def write_json(bulletin, p_cols, run_utc, data_end, out_dir, verification=None):
-    doc = build_json(bulletin, p_cols, run_utc, data_end, verification)
+def write_json(bulletin, p_cols, run_utc, data_end, out_dir, verification=None, river_trigger=None):
+    doc = build_json(bulletin, p_cols, run_utc, data_end, verification, river_trigger)
     path = os.path.join(out_dir, 'county_bulletin_latest.json')
     with open(path, 'w', encoding='utf-8') as fh:
         json.dump(doc, fh, ensure_ascii=False, indent=1)
@@ -306,7 +311,7 @@ def write_json(bulletin, p_cols, run_utc, data_end, out_dir, verification=None):
 # --------------------------------------------------------------------------- #
 # PDF                                                                         #
 # --------------------------------------------------------------------------- #
-def write_pdf(bulletin, p_cols, run_utc, data_end, out_dir):
+def write_pdf(bulletin, p_cols, run_utc, data_end, out_dir, river_trigger=None):
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -373,6 +378,8 @@ def write_pdf(bulletin, p_cols, run_utc, data_end, out_dir):
                             enumerate(('red', 'orange', 'yellow', 'green'))] +
                            [('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('GRID', (0, 0), (-1, -1), 0.25, colors.white)]))
     story += [lt, Spacer(1, 4 * mm)]
+    if river_trigger and river_trigger.get('text'):
+        story += [Paragraph(river_trigger['text'], body), Spacer(1, 3 * mm)]
     raised = bulletin[bulletin['alert_level'].isin(['red', 'orange', 'yellow'])].copy()
     raised['o'] = raised['alert_level'].map(LEVEL_ORDER)
     raised = raised.sort_values(['o', 'county'], ascending=[False, True])

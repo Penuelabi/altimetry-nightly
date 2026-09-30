@@ -18,6 +18,8 @@ jobs:
       BULLETIN_OUT_DIR: ${{ github.workspace }}/bulletin
       GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
       BULLETIN_FOLDER_ID: ${{ secrets.BULLETIN_FOLDER_ID }}
+      DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+      ALTIMETRY_OUT_DIR: ${{ github.workspace }}/altdata
       PYTHONUNBUFFERED: '1'
 
     steps:
@@ -45,7 +47,9 @@ jobs:
         run: pip install -r requirements-bulletin.txt
 
       - name: Pull bulletin files from Drive
-        run: python drive_sync.py pull bulletin
+        run: |
+          python drive_sync.py pull bulletin
+          python drive_sync.py pull || echo "WARNING: altimetry pull failed; river trigger will be skipped"
 
       - name: Verify past forecasts against observed rain (optional)
         continue-on-error: true
@@ -86,6 +90,7 @@ jobs:
         if: always()
         run: |
           { echo '### Warnings in bulletin log'; echo '```'; grep -a 'WARNING' "$RUNNER_TEMP/bulletin.log" 2>/dev/null | cut -c1-300 | head -40; echo '```';
+            echo '### River trigger'; echo '```'; grep -a 'RIVER TRIGGER\|River trigger' "$RUNNER_TEMP/bulletin.log" 2>/dev/null | cut -c1-400; echo '```';
             echo '### Email digest'; echo '```'; cat "$RUNNER_TEMP/digest.log" 2>/dev/null | cut -c1-300; echo '```';
             echo '### Social posts'; echo '```'; cat "$RUNNER_TEMP/social.log" 2>/dev/null | cut -c1-300 | tail -n 40; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 

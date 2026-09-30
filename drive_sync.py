@@ -62,6 +62,7 @@ BULLETIN_FILES = [
     'forecast_verification_by_county.csv',
     'forecast_obs_cache.csv',
     'county_exposure_cache.csv',
+    'sudd_trigger_log.csv',
 ]
 
 
