@@ -46,8 +46,8 @@ ATTRIBUTION = [
     'Soil moisture, evapotranspiration, runoff: NASA SMAP Level-4 (SPL4SMGP), via Google Earth Engine.',
     'Forecast: ECMWF IFS ensemble (ENS) open data, CC BY 4.0, (c) European Centre for Medium-Range '
     'Weather Forecasts; processed by this platform (probabilities per county derived from the 51 members).',
-    'Population: WorldPop (2020, 100 m, University of Southampton), CC BY 4.0; '
-    'cropland: ESA WorldCover 2021 v200, CC BY 4.0; flood-prone ground: JRC Global Surface Water '
+    'Population: county estimates for 2025 (Admin2 totals supplied by the project); flood-prone share from WorldPop '
+    '(2020, 100 m, University of Southampton, CC BY 4.0); cropland: ESA WorldCover 2021 v200, CC BY 4.0; flood-prone ground: JRC Global Surface Water '
     '(EC JRC / Google, 1984-2021) and Global Flood Database (Cloud to Street / Dartmouth Flood Observatory, 2000-2018).',
     'River levels: DAHITI (DGFI-TUM) and Hydroweb.Next (Theia / CNES, LEGOS) satellite altimetry.',
     'River discharge outlook: GEOGLOWS ECMWF Streamflow Model (BYU / ECMWF), where available.',
@@ -107,7 +107,31 @@ def add_exposure(bulletin, counties, ee, out_dir, batch=8):
         cache = pd.DataFrame(rows).round(1)
         cache['method'] = EXPOSURE_METHOD
         cache.to_csv(path, index=False)
+    cache = apply_official_population(cache)
     return bulletin.merge(cache[['county'] + EXPOSURE_COLS], on='county', how='left')
+
+
+POP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'ssd_county_population_2025.csv')
+
+
+def apply_official_population(cache):
+    """Replaces WorldPop county totals by the 2025 county estimates (data/ssd_county_population_2025.csv).
+    pop_flood_prone is rescaled by official/WorldPop so the flood-prone share still comes from the maps."""
+    cache = cache.copy()
+    try:
+        off = pd.read_csv(POP_FILE).set_index('county')['pop_2025']
+    except Exception as e:
+        print(f"WARNING: official population file not used ({e}); keeping WorldPop 2020")
+        return cache
+    wp = cache['pop_total'].astype(float)
+    new = cache['county'].map(off).astype(float)
+    ratio = (new / wp).where(wp > 0)
+    cache['pop_flood_prone'] = (cache['pop_flood_prone'].astype(float) * ratio).fillna(cache['pop_flood_prone']).round(0)
+    cache['pop_total'] = new.fillna(wp).round(0)
+    miss = cache.loc[new.isna(), 'county'].tolist()
+    if miss:
+        print(f"WARNING: no 2025 population for {miss}; WorldPop used for these")
+    return cache
 
 
 # --------------------------------------------------------------------------- #
@@ -213,7 +237,7 @@ def notes_rows(recovery_note=''):
              'Drought impact tier by county population (minor < 75,000; moderate < 200,000; significant < 400,000; '
              'severe above). A severe soil deficit counts as high likelihood (already happening).'),
             ('pop_total / pop_flood_prone / cropland_km2',
-             'WorldPop 2020 population; population on ground mapped as water at least once (JRC Global Surface Water) or flooded in a Global Flood Database event; '
+             '2025 county population estimates; population on ground mapped as water at least once (JRC Global Surface Water) or flooded in a Global Flood Database event (WorldPop 2020 shares scaled to the 2025 county totals); '
              'cropland area from ESA WorldCover 2021 (sampled at 100 m, approximate). Static: refreshed only if the '
              'county list changes.')]
     rows += [('attribution', a) for a in ATTRIBUTION]
