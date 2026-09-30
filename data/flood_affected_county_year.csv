@@ -1,0 +1,156 @@
+year,month,state,county,affected,pct_of_pop2025,source,src_county
+2021,,Central Equatoria,Juba,10000.0,1.8,"2021 assessment, 13 Dec 2021",Juba
+2021,,Jonglei,Akobo,13986.0,5.9,"2021 assessment, 13 Dec 2021",Akobo
+2021,4.0,Jonglei,Ayod,55000.0,26.7,"2021 assessment, 13 Dec 2021",Ayod
+2021,9.0,Jonglei,Bor South,42051.0,11.9,"2021 assessment, 13 Dec 2021",Bor
+2021,8.0,Jonglei,Canal/Pigi,35462.0,31.8,"2021 assessment, 13 Dec 2021",Pigi / Canal
+2021,,Jonglei,Duk,45000.0,21.8,"2021 assessment, 13 Dec 2021",Duk
+2021,,Jonglei,Fangak,67191.0,31.5,"2021 assessment, 13 Dec 2021",Fangak
+2021,10.0,Jonglei,Fangak,6000.0,2.8,"2021 assessment, 13 Dec 2021",Fangak
+2021,,Jonglei,Twic East,58069.0,44.7,"2021 assessment, 13 Dec 2021",Twic East
+2021,,Lakes,Cueibet,33000.0,17.4,"2021 assessment, 13 Dec 2021",Cueibet
+2021,,Lakes,Rumbek East,15000.0,8.3,"2021 assessment, 13 Dec 2021",Rumbek East
+2021,9.0,Lakes,Rumbek North,12000.0,16.0,"2021 assessment, 13 Dec 2021",Rumbek North
+2021,10.0,Lakes,Yirol East,1398.0,0.8,"2021 assessment, 13 Dec 2021",Yirol East
+2021,8.0,Northern Bahr el Ghazal,Aweil Centre,1800.0,2.3,"2021 assessment, 13 Dec 2021",Aweil Centre
+2021,10.0,Northern Bahr el Ghazal,Aweil East,40000.0,10.1,"2021 assessment, 13 Dec 2021",Aweil East
+2021,7.0,Northern Bahr el Ghazal,Aweil South,23000.0,15.2,"2021 assessment, 13 Dec 2021",Aweil South
+2021,,Unity,Guit,8000.0,10.8,"2021 assessment, 13 Dec 2021",Guit
+2021,,Unity,Koch,2898.0,2.5,"2021 assessment, 13 Dec 2021",Koch
+2021,,Unity,Leer,41000.0,47.2,"2021 assessment, 13 Dec 2021",Leer
+2021,7.0,Unity,Mayendit,31000.0,41.7,"2021 assessment, 13 Dec 2021",Mayendit
+2021,,Unity,Mayom,60000.0,35.2,"2021 assessment, 13 Dec 2021",Mayom
+2021,,Unity,Panyijiar,44836.0,35.5,"2021 assessment, 13 Dec 2021",Panyijar
+2021,,Unity,Rubkona,32648.0,9.0,"2021 assessment, 13 Dec 2021",Rubkona
+2021,9.0,Upper Nile,Fashoda,13476.0,16.1,"2021 assessment, 13 Dec 2021",Fashoda
+2021,9.0,Upper Nile,Longochuk,31000.0,38.5,"2021 assessment, 13 Dec 2021",Longochuk
+2021,8.0,Upper Nile,Luakpiny/Nasir,20000.0,5.7,"2021 assessment, 13 Dec 2021",Nasir
+2021,7.0,Upper Nile,Maiwut,18000.0,12.2,"2021 assessment, 13 Dec 2021",Maiwut
+2021,7.0,Upper Nile,Malakal,5000.0,2.5,"2021 assessment, 13 Dec 2021",Malakal
+2021,10.0,Upper Nile,Melut,14872.0,11.1,"2021 assessment, 13 Dec 2021",Melut
+2021,,Upper Nile,Panyikang,31000.0,44.5,"2021 assessment, 13 Dec 2021",Panyikang
+2021,7.0,Upper Nile,Renk,8000.0,3.8,"2021 assessment, 13 Dec 2021",Renk
+2021,7.0,Warrap,Gogrial West,13000.0,3.7,"2021 assessment, 13 Dec 2021",Gogrial West
+2021,7.0,Warrap,Tonj East,10000.0,5.2,"2021 assessment, 13 Dec 2021",Tonj East
+2021,9.0,Western Bahr el Ghazal,Jur River,10000.0,3.4,"2021 assessment, 13 Dec 2021",Jur
+2022,,Eastern Equatoria,Magwi,2537.0,0.8,"2022 response, 21 Oct 2022 (assessed only)",Magwi
+2022,,Jonglei,Fangak,17669.0,8.3,"2022 response, 21 Oct 2022 (assessed only)",Fangak
+2022,,Jonglei,Nyirol,8832.0,5.8,"2022 response, 21 Oct 2022 (assessed only)",Nyirol
+2022,,Jonglei,Pochalla,31326.0,37.9,"2022 response, 21 Oct 2022 (assessed only)",Pochalla
+2022,,Lakes,Cueibet,68988.0,36.5,"2022 response, 21 Oct 2022 (assessed only)",Cueibet
+2022,,Northern Bahr el Ghazal,Aweil Centre,45288.0,57.4,"2022 response, 21 Oct 2022 (assessed only)",Aweil Centre
+2022,,Northern Bahr el Ghazal,Aweil East,135030.0,34.1,"2022 response, 21 Oct 2022 (assessed only)",Aweil East
+2022,,Northern Bahr el Ghazal,Aweil North,14041.0,7.6,"2022 response, 21 Oct 2022 (assessed only)",Aweil North
+2022,,Northern Bahr el Ghazal,Aweil South,45246.0,29.8,"2022 response, 21 Oct 2022 (assessed only)",Aweil South
+2022,,Northern Bahr el Ghazal,Aweil West,12158.0,5.4,"2022 response, 21 Oct 2022 (assessed only)",Aweil West
+2022,,Unity,Leer,48295.0,55.6,"2022 response, 21 Oct 2022 (assessed only)",Leer
+2022,,Unity,Mayendit,17004.0,22.9,"2022 response, 21 Oct 2022 (assessed only)",Mayendit
+2022,,Unity,Panyijiar,6420.0,5.1,"2022 response, 21 Oct 2022 (assessed only)",Panyijiar
+2022,,Unity,Rubkona,52247.0,14.4,"2022 response, 21 Oct 2022 (assessed only)",Rubkona
+2022,,Upper Nile,Baliet,13152.0,17.3,"2022 response, 21 Oct 2022 (assessed only)",Baliet
+2022,,Upper Nile,Luakpiny/Nasir,3402.0,1.0,"2022 response, 21 Oct 2022 (assessed only)",Luakpiny/Nasir
+2022,,Upper Nile,Maban,31452.0,37.2,"2022 response, 21 Oct 2022 (assessed only)",Maban
+2022,,Upper Nile,Manyo,24540.0,29.3,"2022 response, 21 Oct 2022 (assessed only)",Manyo
+2022,,Upper Nile,Renk,18581.0,8.8,"2022 response, 21 Oct 2022 (assessed only)",Renk
+2022,,Warrap,Gogrial East,46583.0,33.6,"2022 response, 21 Oct 2022 (assessed only)",Gogrial East
+2022,,Warrap,Gogrial West,71821.0,20.6,"2022 response, 21 Oct 2022 (assessed only)",Gogrial West
+2022,,Warrap,Tonj East,31785.0,16.6,"2022 response, 21 Oct 2022 (assessed only)",Tonj East
+2022,,Warrap,Tonj North,12207.0,4.5,"2022 response, 21 Oct 2022 (assessed only)",Tonj North
+2022,,Warrap,Tonj South,16693.0,13.2,"2022 response, 21 Oct 2022 (assessed only)",Tonj South
+2022,,Warrap,Twic,29044.0,10.0,"2022 response, 21 Oct 2022 (assessed only)",Twic
+2022,,Western Bahr el Ghazal,Jur River,8767.0,3.0,"2022 response, 21 Oct 2022 (assessed only)",Jur River
+2022,,Western Equatoria,Ezo,600.0,0.4,"2022 response, 21 Oct 2022 (assessed only)",Ezo
+2022,,Western Equatoria,Ibba,7524.0,11.0,"2022 response, 21 Oct 2022 (assessed only)",Ibba
+2022,,Western Equatoria,Mundri East,29946.0,29.0,"2022 response, 21 Oct 2022 (assessed only)",Mundri East
+2022,,Western Equatoria,Mundri West,15677.0,30.5,"2022 response, 21 Oct 2022 (assessed only)",Mundri West
+2022,,Western Equatoria,Mundri West,6780.0,13.2,"2022 response, 21 Oct 2022 (assessed only)",Mundri West
+2022,,Western Equatoria,Mundri West,8493.0,16.5,"2022 response, 21 Oct 2022 (assessed only)",Mundri West
+2022,,Western Equatoria,Mundri West,10424.0,20.3,"2022 response, 21 Oct 2022 (assessed only)",Mundri West
+2022,,Western Equatoria,Mvolo,23730.0,30.6,"2022 response, 21 Oct 2022 (assessed only)",Mvolo
+2022,,Western Equatoria,Mvolo,2466.0,3.2,"2022 response, 21 Oct 2022 (assessed only)",Mvolo
+2022,,Western Equatoria,Mvolo,1560.0,2.0,"2022 response, 21 Oct 2022 (assessed only)",Mvolo
+2022,,Western Equatoria,Mvolo,1182.0,1.5,"2022 response, 21 Oct 2022 (assessed only)",Mvolo
+2022,,Western Equatoria,Mvolo,651.0,0.8,"2022 response, 21 Oct 2022 (assessed only)",Mvolo
+2022,,Western Equatoria,Mvolo,834.0,1.1,"2022 response, 21 Oct 2022 (assessed only)",Mvolo
+2022,,Western Equatoria,Mvolo,1536.0,2.0,"2022 response, 21 Oct 2022 (assessed only)",Mvolo
+2024,,Abyei Administrative Area,Abyei Region,24468.0,16.8,"2024 response, 20 Dec 2024",Abyei Administrative Area
+2024,,Central Equatoria,Juba,13320.0,2.3,"2024 response, 20 Dec 2024",Juba
+2024,,Central Equatoria,Terekeka,8503.0,3.2,"2024 response, 20 Dec 2024",Terekeka
+2024,,Eastern Equatoria,Lafon,18178.0,11.1,"2024 response, 20 Dec 2024",Lafon
+2024,,Jonglei,Akobo,97730.0,41.1,"2024 response, 20 Dec 2024",Akobo
+2024,,Jonglei,Ayod,26700.0,13.0,"2024 response, 20 Dec 2024",Ayod
+2024,,Jonglei,Bor South,2946.0,0.8,"2024 response, 20 Dec 2024",Bor South
+2024,,Jonglei,Canal/Pigi,39971.0,35.8,"2024 response, 20 Dec 2024",Canal/Pigi
+2024,,Jonglei,Duk,16771.0,8.1,"2024 response, 20 Dec 2024",Duk
+2024,,Jonglei,Fangak,154005.0,72.3,"2024 response, 20 Dec 2024",Fangak
+2024,,Jonglei,Nyirol,0.0,0.0,"2024 response, 20 Dec 2024",Nyirol
+2024,,Jonglei,Pibor,0.0,0.0,"2024 response, 20 Dec 2024",Pibor
+2024,,Jonglei,Pochalla,15335.0,18.6,"2024 response, 20 Dec 2024",Pochalla
+2024,,Jonglei,Twic East,55349.0,42.6,"2024 response, 20 Dec 2024",Twic East
+2024,,Jonglei,Uror,24516.0,11.9,"2024 response, 20 Dec 2024",Uror
+2024,,Lakes,Cueibet,52395.0,27.7,"2024 response, 20 Dec 2024",Cueibet
+2024,,Lakes,Rumbek East,93459.0,51.6,"2024 response, 20 Dec 2024",Rumbek East
+2024,,Northern Bahr el Ghazal,Aweil Centre,48864.0,61.9,"2024 response, 20 Dec 2024",Aweil Centre
+2024,,Northern Bahr el Ghazal,Aweil East,91128.0,23.0,"2024 response, 20 Dec 2024",Aweil East
+2024,,Northern Bahr el Ghazal,Aweil North,30846.0,16.6,"2024 response, 20 Dec 2024",Aweil North
+2024,,Northern Bahr el Ghazal,Aweil South,85302.0,56.3,"2024 response, 20 Dec 2024",Aweil South
+2024,,Northern Bahr el Ghazal,Aweil West,30168.0,13.5,"2024 response, 20 Dec 2024",Aweil West
+2024,,Unity,Guit,5010.0,6.8,"2024 response, 20 Dec 2024",Guit
+2024,,Unity,Koch,36278.0,31.5,"2024 response, 20 Dec 2024",Koch
+2024,,Unity,Leer,6611.0,7.6,"2024 response, 20 Dec 2024",Leer
+2024,,Unity,Mayendit,23963.0,32.2,"2024 response, 20 Dec 2024",Mayendit
+2024,,Unity,Mayom,42844.0,25.2,"2024 response, 20 Dec 2024",Mayom
+2024,,Unity,Panyijiar,56318.0,44.6,"2024 response, 20 Dec 2024",Panyijiar
+2024,,Unity,Rubkona,28000.0,7.7,"2024 response, 20 Dec 2024",Rubkona
+2024,,Upper Nile,Fashoda,2620.0,3.1,"2024 response, 20 Dec 2024",Fashoda
+2024,,Upper Nile,Luakpiny/Nasir,13800.0,3.9,"2024 response, 20 Dec 2024",Luakpiny/Nasir
+2024,,Upper Nile,Maiwut,24213.0,16.4,"2024 response, 20 Dec 2024",Maiwut
+2024,,Upper Nile,Manyo,19236.0,22.9,"2024 response, 20 Dec 2024",Manyo
+2024,,Upper Nile,Panyikang,39680.0,57.0,"2024 response, 20 Dec 2024",Panyikang
+2024,,Warrap,Gogrial East,25218.0,18.2,"2024 response, 20 Dec 2024",Gogrial East
+2024,,Warrap,Gogrial West,48828.0,14.0,"2024 response, 20 Dec 2024",Gogrial West
+2024,,Warrap,Tonj East,15000.0,7.9,"2024 response, 20 Dec 2024",Tonj East
+2024,,Warrap,Tonj North,30000.0,11.1,"2024 response, 20 Dec 2024",Tonj North
+2024,,Warrap,Tonj South,15600.0,12.4,"2024 response, 20 Dec 2024",Tonj South
+2024,,Warrap,Twic,24000.0,8.2,"2024 response, 20 Dec 2024",Twic
+2024,,Western Bahr el Ghazal,Jur River,26850.0,9.1,"2024 response, 20 Dec 2024",Jur River
+2024,,Western Equatoria,Mundri West,1530.0,3.0,"2024 response, 20 Dec 2024",Mundri West
+2024,,Western Equatoria,Nzara,1125.0,1.3,"2024 response, 20 Dec 2024",Nzara
+2025,,Central Equatoria,Juba,16000.0,2.8,"2025 people affected, 30 Nov 2025",Juba
+2025,,Central Equatoria,Terekeka,8505.0,3.2,"2025 people affected, 30 Nov 2025",Terekeka
+2025,,Jonglei,Akobo,17652.0,7.4,"2025 people affected, 30 Nov 2025",Akobo
+2025,,Jonglei,Ayod,57270.0,27.8,"2025 people affected, 30 Nov 2025",Ayod
+2025,,Jonglei,Bor South,76000.0,21.4,"2025 people affected, 30 Nov 2025",Bor South
+2025,,Jonglei,Canal/Pigi,25500.0,22.8,"2025 people affected, 30 Nov 2025",Canal/Pigi
+2025,,Jonglei,Duk,22548.0,10.9,"2025 people affected, 30 Nov 2025",Duk
+2025,,Jonglei,Fangak,145316.0,68.2,"2025 people affected, 30 Nov 2025",Fangak
+2025,,Jonglei,Nyirol,16500.0,10.8,"2025 people affected, 30 Nov 2025",Nyirol
+2025,,Jonglei,Pibor,146851.0,61.8,"2025 people affected, 30 Nov 2025",Pibor
+2025,,Jonglei,Pochalla,22477.0,27.2,"2025 people affected, 30 Nov 2025",Pochalla
+2025,,Jonglei,Twic East,101675.0,78.3,"2025 people affected, 30 Nov 2025",Twic East
+2025,,Lakes,Awerial,8130.0,5.6,"2025 people affected, 30 Nov 2025",Awerial
+2025,,Lakes,Cueibet,13655.0,7.2,"2025 people affected, 30 Nov 2025",Cueibet
+2025,,Lakes,Rumbek Centre,88865.0,39.9,"2025 people affected, 30 Nov 2025",Rumbek Centre
+2025,,Lakes,Rumbek East,22655.0,12.5,"2025 people affected, 30 Nov 2025",Rumbek East
+2025,,Lakes,Rumbek North,45225.0,60.3,"2025 people affected, 30 Nov 2025",Rumbek North
+2025,,Lakes,Wulu,5570.0,6.0,"2025 people affected, 30 Nov 2025",Wulu
+2025,,Lakes,Yirol East,26155.0,15.8,"2025 people affected, 30 Nov 2025",Yirol East
+2025,,Lakes,Yirol West,87830.0,48.4,"2025 people affected, 30 Nov 2025",Yirol West
+2025,,Northern Bahr el Ghazal,Aweil North,16820.0,9.0,"2025 people affected, 30 Nov 2025",Aweil North
+2025,,Unity,Guit,3336.0,4.5,"2025 people affected, 30 Nov 2025",Guit
+2025,,Unity,Koch,47984.0,41.7,"2025 people affected, 30 Nov 2025",Koch
+2025,,Unity,Leer,62796.0,72.4,"2025 people affected, 30 Nov 2025",Leer
+2025,,Unity,Mayendit,58438.0,78.6,"2025 people affected, 30 Nov 2025",Mayendit
+2025,,Unity,Panyijiar,82548.0,65.4,"2025 people affected, 30 Nov 2025",Panyijiar
+2025,,Unity,Rubkona,1000.0,0.3,"2025 people affected, 30 Nov 2025",Rubkona
+2025,,Upper Nile,Fashoda,8690.0,10.4,"2025 people affected, 30 Nov 2025",Fashoda
+2025,,Upper Nile,Longochuk,15000.0,18.6,"2025 people affected, 30 Nov 2025",Longochuk
+2025,,Upper Nile,Maiwut,10416.0,7.0,"2025 people affected, 30 Nov 2025",Maiwut
+2025,,Upper Nile,Malakal,5784.0,2.8,"2025 people affected, 30 Nov 2025",Malakal
+2025,,Upper Nile,Manyo,18540.0,22.1,"2025 people affected, 30 Nov 2025",Manyo
+2025,,Upper Nile,Melut,21135.0,15.8,"2025 people affected, 30 Nov 2025",Melut
+2025,,Upper Nile,Panyikang,15140.0,21.7,"2025 people affected, 30 Nov 2025",Panyikang
+2025,,Upper Nile,Renk,1500.0,0.7,"2025 people affected, 30 Nov 2025",Renk
+2025,,Warrap,Tonj East,5634.0,3.0,"2025 people affected, 30 Nov 2025",Tonj East
+2025,,Warrap,Twic,4944.0,1.7,"2025 people affected, 30 Nov 2025",Twic
+2025,,Western Equatoria,Mvolo,15780.0,20.3,"2025 people affected, 30 Nov 2025",Mvolo
