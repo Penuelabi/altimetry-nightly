@@ -28,6 +28,7 @@ import pandas as pd
 
 LEVEL_COL = 'Water Surface Elevation - values(m)'
 LAGS = 4
+NEAREST = 3              # stations kept per county and position group (nearest first)
 MAX_KM = 150.0           # stations farther than this from a county are not candidates
 LOCAL_BAND_DEG = 0.15    # |lat difference| below this = "local"; north of it = downstream, south = upstream
 FLOOD_SEASON = {7, 8, 9, 10, 11, 12, 1}
@@ -148,7 +149,11 @@ def assign_stations(counties, st):
                 dl = p['lat'] - cen_lat
                 grp = 'local' if abs(dl) <= LOCAL_BAND_DEG else ('downstream' if dl > 0 else 'upstream')
                 out.append(dict(county=c['county'], station_uid=p['station_uid'], group=grp, km=round(dk, 1)))
-    return pd.DataFrame(out)
+    out = pd.DataFrame(out)
+    if out.empty:
+        return out
+    # keep only the nearest few stations per county and position: averaging 50+ stations washes the signal out
+    return out.sort_values('km').groupby(['county', 'group']).head(NEAREST).reset_index(drop=True)
 
 
 def level_features(assign, ml, months):
