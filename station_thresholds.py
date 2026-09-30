@@ -19,6 +19,8 @@ import pandas as pd
 LEVEL_COL = 'Water Surface Elevation - values(m)'
 MIN_OBS_PER_YEAR = 6          # a year counts for the annual maximum only with this many passes
 MIN_YEARS_GUMBEL = 8          # fewer annual maxima than this -> percentile fallback
+MIN_MARGIN_M = 0.15           # exceeding the 2-yr level by less than this is within altimetry error -> 'Near', not 'Above'
+MIN_SPREAD_M = 0.25           # 2-yr to 10-yr spread below this is within altimetry error -> low confidence
 STALE_DAYS = 60               # latest pass older than this -> status "stale"
 EULER = 0.5772156649
 
@@ -71,6 +73,9 @@ def compute_thresholds(df, today=None):
             continue
         # keep the levels ordered even when the fit is noisy
         l2, l5, l10 = sorted((lev[2], lev[5], lev[10]))
+        if l10 - l2 < MIN_SPREAD_M:
+            conf = 'low'
+            method += '; 2-10 yr spread < %.2f m (within altimetry error)' % MIN_SPREAD_M
         last = g.iloc[-1]
         level = float(last[LEVEL_COL])
         age = int((today - last['date'].normalize()).days)
@@ -78,8 +83,10 @@ def compute_thresholds(df, today=None):
             status = 'Above 10-yr level'
         elif level >= l5:
             status = 'Above 5-yr level'
-        elif level >= l2:
+        elif level >= l2 + MIN_MARGIN_M:
             status = 'Above 2-yr level'
+        elif level >= l2:
+            status = 'Near 2-yr level (within error)'
         else:
             status = 'Below 2-yr level'
         if age > STALE_DAYS:
