@@ -6,9 +6,8 @@ Method = the one the app uses for its same-season baseline (Sentinel-1 descendin
 flooded vegetation = VV rise >= 3 dB over the Feb-Mar dry-season median, terrain <= 15 m HAND), but the maximum over the last
 EXTENT_DAYS days (default 12, i.e. at least one full Sentinel-1 repeat cycle) instead of a fixed late-September window.
 
-Writes (1 = flooded, 0 = not) to FLOOD_EXTENT_ASSET (default projects/wajaras-remote-s-1565857510402/assets/maximum_flood_extent).
-It exports to a staging asset first, then copies over the constant name, so the app never sees a gap. If the service account cannot
-write to that project, it falls back to projects/<EE project>/assets/altimetry/maximum_flood_extent and says so.
+Writes (1 = flooded, 0 = not) to FLOOD_EXTENT_ASSET (default projects/sudan-1575919084043/assets/maximum_flood_extent).
+It exports to a staging asset first, then copies over the constant name, so the app never sees a gap.
 """
 import datetime as dt
 import os
@@ -19,8 +18,7 @@ import ee
 
 import ee_util
 
-TARGET = os.environ.get('FLOOD_EXTENT_ASSET') or 'projects/wajaras-remote-s-1565857510402/assets/maximum_flood_extent'
-FALLBACK = f'{ee_util.ASSET_FOLDER}/maximum_flood_extent'
+TARGET = os.environ.get('FLOOD_EXTENT_ASSET') or 'projects/sudan-1575919084043/assets/maximum_flood_extent'
 DAYS = int(os.environ.get('EXTENT_DAYS') or '12')
 WATER_VV_DB, FLOODVEG_RISE_DB, HAND_MAX_M, SPECKLE_M = -18, 3, 15, 50
 
@@ -75,12 +73,4 @@ def run(target):
     print('updated and shared:', target)
 
 
-try:
-    run(TARGET)
-except Exception as e:
-    print(f'could not write {TARGET}: {str(e)[:300]}')
-    if TARGET == FALLBACK:
-        sys.exit(1)
-    print('falling back to', FALLBACK)
-    run(FALLBACK)
-    print('NOTE: point the app and exposure_cache.py at', FALLBACK, 'or give the service account Writer access on', TARGET)
+run(TARGET)
