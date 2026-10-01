@@ -1,0 +1,16 @@
+name: Infrastructure asset probe (manual)
+on:
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - run: pip install earthengine-api
+      - run: python infrastructure_probe.py | tee "$GITHUB_STEP_SUMMARY"

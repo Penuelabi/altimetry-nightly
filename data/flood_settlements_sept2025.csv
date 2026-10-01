@@ -1,0 +1,186 @@
+name,Settlement,population,rank,lat,lon,source,payam,payam_pcode,county,county_pcode,state
+Pakur,Pakur,3680,K,8.807346,29.6277,High Ground (OCHA 2024 & UNMISS 2025),Pakur,SS060307,Koch,SS0603,Unity
+Boaw,Bauw,11597,B,8.84139,29.72804,Other Flooded Settlements,Boaw,SS060301,Koch,SS0603,Unity
+Parboung,Parboung,3600,L,8.829138,29.770639,Other Flooded Settlements,Boaw,SS060301,Koch,SS0603,Unity
+Chanlual,Chanlual,3000,I,9.344508,29.821238,Other Flooded Settlements,Wathnyona,SS060207,Guit,SS0602,Unity
+Kayjak,Kayjak,2800,O,9.274045,29.84536,Other Flooded Settlements,Kuerguini,SS060204,Guit,SS0602,Unity
+Tharkuer,Tharker,1000,Y,9.165845,29.84726,Other Flooded Settlements,Kuach,SS060203,Guit,SS0602,Unity
+Kerchuor,Kerchuor,3100,H,9.2149,29.8545,Other Flooded Settlements,Kuerguini,SS060204,Guit,SS0602,Unity
+Guit,Chaka Chad,5600,A,9.179843,29.858271,Other Flooded Settlements,Guit,SS060201,Guit,SS0602,Unity
+Gawjal,Gawjal,870,AD,9.207732,29.8763726,Other Flooded Settlements,Kuerguini,SS060204,Guit,SS0602,Unity
+Kuerguina,Kuerguina,3400,F,9.25967,29.88717,High Ground (OCHA 2024 & UNMISS 2025),Kuerguini,SS060204,Guit,SS0602,Unity
+Thoan,Thoan,4900,B,9.26617,29.89115,High Ground (OCHA 2024 & UNMISS 2025),Kuerguini,SS060204,Guit,SS0602,Unity
+Tuak,Tuak,1900,R,9.2904,29.89379,Other Flooded Settlements,Nyathoar,SS060206,Guit,SS0602,Unity
+Kuerbona,Kuerbona,4800,C,9.4931078,29.9027059,Other Flooded Settlements,Wathnyona,SS060207,Guit,SS0602,Unity
+Wathnyona,Wathnyona,1000,AA,9.354183,29.90795,High Ground (OCHA 2024 & UNMISS 2025),Wathnyona,SS060207,Guit,SS0602,Unity
+Kuach,Kuach,2900,L,8.846768,29.918881,High Ground (OCHA 2024 & UNMISS 2025),Kuach,SS060203,Guit,SS0602,Unity
+Kuer-Latjor,Kuer-Latjor,3570,E,9.288633,29.9229,High Ground (OCHA 2024 & UNMISS 2025),Kuerguini,SS060204,Guit,SS0602,Unity
+Norbor,Kuer Deng,8227,C,8.83665,29.925633,Other Flooded Settlements,Jaak,SS060303,Koch,SS0603,Unity
+Nying,Nying,2000,Q,9.07185,29.925833,High Ground (OCHA 2024 & UNMISS 2025),Kuach,SS060203,Guit,SS0602,Unity
+Tongo Dol Center,Tongo Dol Center,2200,P,8.778703,29.939738,Other Flooded Settlements,Jaak,SS060303,Koch,SS0603,Unity
+Chot Yiel,Chot Yiel,2000,P,9.035425,29.941572,High Ground (OCHA 2024 & UNMISS 2025),Kuach,SS060203,Guit,SS0602,Unity
+Dhorreng,Dhorreng,1800,S,9.035425416,29.941572,Other Flooded Settlements,Kuach,SS060203,Guit,SS0602,Unity
+Duar,Duar,3100,G,8.88968,29.9438881,High Ground (OCHA 2024 & UNMISS 2025),Kuach,SS060203,Guit,SS0602,Unity
+Pamkuoy,Pamkuy,1400,V,9.297098,29.955883,Other Flooded Settlements,Kuerguini,SS060204,Guit,SS0602,Unity
+Gany,Gany,1991,Q,8.47814,29.9575,High Ground (OCHA 2024 & UNMISS 2025),Gany,SS060302,Koch,SS0603,Unity
+Liech,Liech,2200,N,8.65818,29.959,High Ground (OCHA 2024 & UNMISS 2025),Jaak,SS060303,Koch,SS0603,Unity
+Tol,Tol,1500,U,8.958,29.969,Small Towns,Kuach,SS060203,Guit,SS0602,Unity
+Dengbow,Dengbow,750,AE,9.31215,29.97751667,Other Flooded Settlements,Nyathoar,SS060206,Guit,SS0602,Unity
+Nyathoar,Nyathoar,1000,AB,9.31151281,29.98295138,Other Flooded Settlements,Nyathoar,SS060206,Guit,SS0602,Unity
+Burbur,Burbur,1100,X,9.145255,29.986801,Other Flooded Settlements,Kedad,SS060202,Guit,SS0602,Unity
+Kuachlual,Koch,12382,A,8.593617,29.993615,Other Flooded Settlements,Kuachlual,SS060304,Koch,SS0603,Unity
+Patit,Patit,5690,G,8.54045,29.99541,High Ground (OCHA 2024 & UNMISS 2025),Gany,SS060302,Koch,SS0603,Unity
+Gham Two,Gham Two,2200,L,8.13297,30.0051,High Ground (OCHA 2024 & UNMISS 2025),Bor 2,SS060502,Mayendit,SS0605,Unity
+Bow,Bow,4700,F,8.477879,30.005216,High Ground (OCHA 2024 & UNMISS 2025),Norbor,SS060306,Koch,SS0603,Unity
+Guk Center,Guk Center,3920,I,8.744881,30.007873,Other Flooded Settlements,Jaak,SS060303,Koch,SS0603,Unity
+Dhiach,Dhiach,2500,F,8.14218,30.00868,High Ground (OCHA 2024 & UNMISS 2025),Bor 2,SS060502,Mayendit,SS0605,Unity
+Darbor,Darbor,3900,J,8.493989,30.019708,Other Flooded Settlements,Ngony,SS060305,Koch,SS0603,Unity
+Niemni,Nimni,3000,J,9.306406,30.027341,Small Towns,Niemni,SS060205,Guit,SS0602,Unity
+Dandok,Dandok,2800,N,8.898561,30.036697,High Ground (OCHA 2024 & UNMISS 2025),Kuach,SS060203,Guit,SS0602,Unity
+Petpet,Patpat,2200,O,8.873417,30.0387,Other Flooded Settlements,Jaak,SS060303,Koch,SS0603,Unity
+Wanglieth,Wanglieth,1000,Z,9.242466,30.039009,Other Flooded Settlements,Kedad,SS060202,Guit,SS0602,Unity
+Thoriak,Thorek,7732,D,8.54532,30.04208,High Ground (OCHA 2024 & UNMISS 2025),Jaak,SS060303,Koch,SS0603,Unity
+Biil,Biil,2800,M,9.326384,30.042499,Small Towns,Niemni,SS060205,Guit,SS0602,Unity
+Nyang,Nyang,2400,J,8.38163,30.04295,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Payokyok,Payokyok,1600,T,9.20356,30.047962,Other Flooded Settlements,Kedad,SS060202,Guit,SS0602,Unity
+Buow,Buow,4000,D,9.3658897,30.0541514,Other Flooded Settlements,Niemni,SS060205,Guit,SS0602,Unity
+Tutnyang,Tutnyang,2900,E,8.32305,30.0559,Other Flooded Settlements,Dablual,SS060503,Mayendit,SS0605,Unity
+Padeah Centre,Padeah Centre,4600,C,8.38712,30.05977,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Doal,Doal,900,AC,9.333733,30.06311667,Other Flooded Settlements,Niemni,SS060205,Guit,SS0602,Unity
+Dhor Nyiet,Dhor Nyiet,2400,H,8.32948,30.06987,High Ground (OCHA 2024 & UNMISS 2025),Dablual,SS060503,Mayendit,SS0605,Unity
+Luokduel,Luokduel,2200,N,8.37953,30.0727,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Wichluak,Wichluak,1400,W,8.916726,30.074133,High Ground (OCHA 2024 & UNMISS 2025),Kuach,SS060203,Guit,SS0602,Unity
+Mayom,Mayom,4800,H,7.6983333,30.075,Other Flooded Settlements,Mayom 2,SS060703,Panyijiar,SS0607,Unity
+Dhorjak,Dhorjak,1900,S,8.32698,30.07619,High Ground (OCHA 2024 & UNMISS 2025),Dablual,SS060503,Mayendit,SS0605,Unity
+Pading Two,Pading Two,1900,T,8.39139,30.07659,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Rieri One,Rieri One,2400,K,8.4065,30.076817,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Rubnor,Rubnor,2000,R,8.4065,30.07682,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Buoth,Buoth,2000,O,8.33357,30.07798,High Ground (OCHA 2024 & UNMISS 2025),Dablual,SS060503,Mayendit,SS0605,Unity
+Majiok,Majiok,3000,K,9.335667,30.08595,Other Flooded Settlements,Niemni,SS060205,Guit,SS0602,Unity
+Biem Thuok,Biem Thuok,2000,P,8.371979,30.090976,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Mayendit,Mayendit,4100,D,8.32855,30.092217,Other Flooded Settlements,Dablual,SS060503,Mayendit,SS0605,Unity
+Rier,Rir,4500,H,8.7834,30.09782,High Ground (OCHA 2024 & UNMISS 2025),Jaak,SS060303,Koch,SS0603,Unity
+Gier,Gier,2500,G,8.36,30.100467,Other Flooded Settlements,Tutnyang,SS060509,Mayendit,SS0605,Unity
+Ngony,Ngony,7274,F,8.49352,30.10129,High Ground (OCHA 2024 & UNMISS 2025),Ngony,SS060305,Koch,SS0603,Unity
+Mirmir,Mirmir,7712,E,8.46796,30.10164,High Ground (OCHA 2024 & UNMISS 2025),Ngony,SS060305,Koch,SS0603,Unity
+Lual,Lual,2200,M,8.35208,30.10515,High Ground (OCHA 2024 & UNMISS 2025),Tutnyang,SS060509,Mayendit,SS0605,Unity
+Payak,Payak,3900,I,8.30833,30.1084,High Ground (OCHA 2024 & UNMISS 2025),Leer,SS060406,Leer,SS0604,Unity
+Buol,Buol,2000,Q,8.421719,30.112026,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Thorwichmok,Zorwich,100,T,8.336507,30.115399,Other Flooded Settlements,Juong Kang,SS060405,Leer,SS0604,Unity
+Koat,Koat,4700,B,8.35337,30.11757,High Ground (OCHA 2024 & UNMISS 2025),Tutnyang,SS060509,Mayendit,SS0605,Unity
+Mirnyal,Mirnyal,2400,I,8.36583,30.12478,High Ground (OCHA 2024 & UNMISS 2025),Tutnyang,SS060509,Mayendit,SS0605,Unity
+Gandor,Gandor,4400,H,8.333157,30.137309,High Ground (OCHA 2024 & UNMISS 2025),Guat,SS060404,Leer,SS0604,Unity
+Chuothdir,Chuothdir,6200,A,8.42952,30.1394,High Ground (OCHA 2024 & UNMISS 2025),Rubkuay,SS060506,Mayendit,SS0605,Unity
+Nyaruop Port,Nyaruop Puop,2500,M,8.753358,30.145914,Other Flooded Settlements,Jaak,SS060303,Koch,SS0603,Unity
+Leer town,Leer Town,9000,B,8.298,30.153,High Ground (OCHA 2024 & UNMISS 2025),Leer,SS060406,Leer,SS0604,Unity
+Thorguani,Thon Kuani,2800,M,8.253317,30.157467,Other Flooded Settlements,Pilieny,SS060407,Leer,SS0604,Unity
+Juong,Juong,19900,A,8.31542,30.158583,High Ground (OCHA 2024 & UNMISS 2025),Juong Kang,SS060405,Leer,SS0604,Unity
+Kaigai,Kaigai,3700,K,8.283104,30.174581,High Ground (OCHA 2024 & UNMISS 2025),Pilieny,SS060407,Leer,SS0604,Unity
+Tiep,Tiep,1400,O,8.37565,30.184617,Other Flooded Settlements,Bou,SS060403,Leer,SS0604,Unity
+Guat,Guat,400,P,8.414839,30.185125,High Ground (OCHA 2024 & UNMISS 2025),Padeah,SS060401,Leer,SS0604,Unity
+Padeah,Padeah,2500,N,8.401933,30.194067,High Ground (OCHA 2024 & UNMISS 2025),Padeah,SS060401,Leer,SS0604,Unity
+Pilieny,Pilieny,6600,D,8.267539,30.201721,High Ground (OCHA 2024 & UNMISS 2025),Pilieny,SS060407,Leer,SS0604,Unity
+Ngop,Thar Ngop,0,V,8.264917,30.213817,Other Flooded Settlements,Adok,SS060402,Leer,SS0604,Unity
+Thoriak,Thoriak,100,S,8.333036,30.214861,High Ground (OCHA 2024 & UNMISS 2025),Adok,SS060402,Leer,SS0604,Unity
+Rubinchar,Rubinchar,3900,J,8.281807,30.214881,High Ground (OCHA 2024 & UNMISS 2025),Adok,SS060402,Leer,SS0604,Unity
+Paak,Paak,300,Q,8.323169,30.215777,Other Flooded Settlements,Adok,SS060402,Leer,SS0604,Unity
+Thornyor,Thonyor,5800,E,8.22,30.22,High Ground (OCHA 2024 & UNMISS 2025),Yang,SS060408,Leer,SS0604,Unity
+Pachar,Pachar,6200,F,7.70098,30.22283,High Ground (OCHA 2024 & UNMISS 2025),Nyal,SS060704,Panyijiar,SS0607,Unity
+Thorhnom,Dhor-Nhom,8800,C,7.68078,30.22707,High Ground (OCHA 2024 & UNMISS 2025),Nyal,SS060704,Panyijiar,SS0607,Unity
+Dindin,Dindin,4700,G,8.30319,30.23127,Other Flooded Settlements,Adok,SS060402,Leer,SS0604,Unity
+Kuernyala,Kuernyala,0,U,8.376762,30.237526,Other Flooded Settlements,Padeah,SS060401,Leer,SS0604,Unity
+Yang,Yang,3500,L,8.207083,30.239333,High Ground (OCHA 2024 & UNMISS 2025),Yang,SS060408,Leer,SS0604,Unity
+Nyal,Nyal,10700,B,7.6684,30.242433,Other Flooded Settlements,Kol,SS060702,Panyijiar,SS0607,Unity
+Pachak,Pachak,3900,K,7.723339,30.246859,Small Towns,Nyal,SS060704,Panyijiar,SS0607,Unity
+Ganyliel,Ganyliel,16900,A,7.656947,30.24885,Other Flooded Settlements,Kol,SS060702,Panyijiar,SS0607,Unity
+Meer,Meer,1100,W,7.724181871,30.25322224,Other Flooded Settlements,Nyal,SS060704,Panyijiar,SS0607,Unity
+Meer,Meer,100,R,8.188417,30.25875,High Ground (OCHA 2024 & UNMISS 2025),Yang,SS060408,Leer,SS0604,Unity
+Pathiel,Pathiel,2100,R,7.671833,30.263383,Other Flooded Settlements,Nyal,SS060704,Panyijiar,SS0607,Unity
+Majak Ganydieng,Ganyding,1800,T,7.46318,30.27628,High Ground (OCHA 2024 & UNMISS 2025),Panyijiar,SS060708,Panyijiar,SS0607,Unity
+Adok,Adok,6600,C,8.18528,30.320499,High Ground (OCHA 2024 & UNMISS 2025),Adok,SS060402,Leer,SS0604,Unity
+Borjakaar,Borjockjiak,2200,Q,7.394883,30.40155,Other Flooded Settlements,Thoarnhoum,SS060709,Panyijiar,SS0607,Unity
+Marial,Marial,1200,V,7.3085,30.41056667,Other Flooded Settlements,Pachaar,SS060706,Panyijiar,SS0607,Unity
+Kapthar,Kapthar,4100,J,7.336833,30.412667,Small Towns,Pachaar,SS060706,Panyijiar,SS0607,Unity
+Nyingoany,Nyingoany,8200,D,7.260883,30.422433,Other Flooded Settlements,Pachak,SS060705,Panyijiar,SS0607,Unity
+Manyal,Manyal,2600,O,7.321154,30.424413,High Ground (OCHA 2024 & UNMISS 2025),Pachaar,SS060706,Panyijiar,SS0607,Unity
+Pachienjok,Pachienjok,6100,G,7.414094,30.429078,Other Flooded Settlements,Tiap,SS060710,Panyijiar,SS0607,Unity
+Paliay,Paliay,1900,S,7.283867,30.439217,Other Flooded Settlements,Pachak,SS060705,Panyijiar,SS0607,Unity
+Makang,Makuang,4200,I,7.2942,30.44402,High Ground (OCHA 2024 & UNMISS 2025),Pachak,SS060705,Panyijiar,SS0607,Unity
+Pulmuor,Pulmuor,2800,N,7.323093,30.464638,Other Flooded Settlements,Pachienjok,SS060707,Panyijiar,SS0607,Unity
+Dhor Kan,Dhor Kan,2900,M,7.299267,30.46745,Other Flooded Settlements,Pachienjok,SS060707,Panyijiar,SS0607,Unity
+Panjyiar,Panjyiar,1800,U,7.4033,30.47185,High Ground (OCHA 2024 & UNMISS 2025),Ganyliel,SS060701,Panyijiar,SS0607,Unity
+Puolmok,Pulmok,7500,E,7.43,30.48,Small Towns,Thoarnhoum,SS060709,Panyijiar,SS0607,Unity
+Tiath,Tiath,2300,P,7.347752,30.484068,Other Flooded Settlements,Ganyliel,SS060701,Panyijiar,SS0607,Unity
+Morgok Centre,Morgok Centre,3200,L,7.3138,30.505,High Ground (OCHA 2024 & UNMISS 2025),Pachienjok,SS060707,Panyijiar,SS0607,Unity
+Pageu,Pageu,6500,D,7.720643,30.57426,Other Flooded Settlements,Pajiek,SS030206,Ayod,SS0302,Jonglei
+Gorwai,Gorwai,2000,H,7.714609,30.63944,High Ground (OCHA 2024 & UNMISS 2025),Pajiek,SS030206,Ayod,SS0302,Jonglei
+Keew,Keew,7100,D,9.254566,30.645808,Small Towns,Paguir,SS030604,Fangak,SS0306,Jonglei
+Beykers,Beykers,500,Q,7.462222,30.655,Other Flooded Settlements,Dongchak,SS030502,Duk,SS0305,Jonglei
+Jaibor,Jaibor,3500,F,9.397655,30.668626,Small Towns,Manajang,SS030601,Fangak,SS0306,Jonglei
+Nyadin,Nyadin,400,Q,8.805764,30.672483,Small Towns,Mareang,SS030602,Fangak,SS0306,Jonglei
+Fulkit,Fulkit,400,V,8.549039,30.673135,Other Flooded Settlements,Kurwai,SS030202,Ayod,SS0302,Jonglei
+Koadchiengai,Koadchiengai,600,M,9.111238,30.68038,Other Flooded Settlements,Paguir,SS030604,Fangak,SS0306,Jonglei
+Yar-adiu,Yaradew,8400,B,9.362618,30.70386,Small Towns,Manajang,SS030601,Fangak,SS0306,Jonglei
+Toch,Toch,8140,C,8.964557,30.711116,Small Towns,Mareang,SS030602,Fangak,SS0306,Jonglei
+Kwong,Kwong,1900,J,9.299737,30.711851,Other Flooded Settlements,Manajang,SS030601,Fangak,SS0306,Jonglei
+Dongchack,Dongchack,1300,L,7.368508,30.716508,High Ground (OCHA 2024 & UNMISS 2025),Dongchak,SS030502,Duk,SS0305,Jonglei
+Nyikan,Nyikan,600,N,8.92257,30.742598,Other Flooded Settlements,Mareang,SS030602,Fangak,SS0306,Jonglei
+Paguir,Fagwir,9160,A,9.092678,30.745925,Small Towns,Paguir,SS030604,Fangak,SS0306,Jonglei
+Kawer,Kawer,800,P,7.398508,30.7508,Other Flooded Settlements,Dongchak,SS030502,Duk,SS0305,Jonglei
+Thukchak,Thukchak,500,O,9.172571,30.752157,Other Flooded Settlements,Paguir,SS030604,Fangak,SS0306,Jonglei
+Bolbel,Bwon Ngera,100,R,9.234863,30.810847,Other Flooded Settlements,Manajang,SS030601,Fangak,SS0306,Jonglei
+Wau,Wau,500,T,8.14154,30.834055,Other Flooded Settlements,Pajiek,SS030206,Ayod,SS0302,Jonglei
+Mandeng,Mandeng,2500,I,9.353507,30.849437,Other Flooded Settlements,Manajang,SS030601,Fangak,SS0306,Jonglei
+Old Fangak,Old Fangak,0,S,9.067583,30.881453,High Ground (OCHA 2024 & UNMISS 2025),Old Fangak,SS030603,Fangak,SS0306,Jonglei
+Muk,Muk,600,S,7.826276,30.922839,Other Flooded Settlements,Pajiek,SS030206,Ayod,SS0302,Jonglei
+Nurlonga,Nurlonga,900,L,9.250321,30.931587,Other Flooded Settlements,Manajang,SS030601,Fangak,SS0306,Jonglei
+Patai,Patai,3000,G,9.102672,30.932402,Other Flooded Settlements,Old Fangak,SS030603,Fangak,SS0306,Jonglei
+Tangnyang,Lachtanjak,400,P,9.398985,30.954272,Other Flooded Settlements,Manajang,SS030601,Fangak,SS0306,Jonglei
+Mayat Berboi,Mayat Berboi,2700,H,9.448914,30.978726,Small Towns,Manajang,SS030601,Fangak,SS0306,Jonglei
+Pakur,Pakur,2200,G,8.615808,30.985818,Other Flooded Settlements,Pagil,SS030205,Ayod,SS0302,Jonglei
+Wechjakok,Wechjakok,2000,I,8.777684,31.018615,Other Flooded Settlements,Pagil,SS030205,Ayod,SS0302,Jonglei
+Keer,Keer,1000,N,8.833333,31.033333,Other Flooded Settlements,Pagil,SS030205,Ayod,SS0302,Jonglei
+Yapakee,Yapakee,800,Q,8.701111,31.056279,Other Flooded Settlements,Pagil,SS030205,Ayod,SS0302,Jonglei
+Kolanyang,Kolanyang,5700,E,9.313478,31.066363,Small Towns,Manajang,SS030601,Fangak,SS0306,Jonglei
+Mogok,Mogok,1700,J,8.13583,31.078454,Small Towns,Pajiek,SS030206,Ayod,SS0302,Jonglei
+Farial,Farial,700,R,8.339013,31.084794,High Ground (OCHA 2024 & UNMISS 2025),Wau,SS030207,Ayod,SS0302,Jonglei
+Pabol,Pabol,1200,K,9.433589,31.122291,Other Flooded Settlements,Manajang,SS030601,Fangak,SS0306,Jonglei
+Pagoung,Pagoung,400,U,8.370242,31.137578,Other Flooded Settlements,Kurwai,SS030202,Ayod,SS0302,Jonglei
+Nyanapol,Nyanapol,1400,L,8.559176,31.141691,Small Towns,Mogok,SS030204,Ayod,SS0302,Jonglei
+Ayod Center,Ayod Center,16500,A,8.750361,31.14973,Other Flooded Settlements,Pagil,SS030205,Ayod,SS0302,Jonglei
+Woi,Woi,1600,K,8.696304,31.153544,Small Towns,Pagil,SS030205,Ayod,SS0302,Jonglei
+Phom El Jafar,Phom El Jafar,0,T,9.405821,31.164266,Small Towns,Phom,SS030605,Fangak,SS0306,Jonglei
+Weygwori,Weygwori,900,O,7.970195,31.202336,Other Flooded Settlements,Pajiek,SS030206,Ayod,SS0302,Jonglei
+Kandag,Kandag,13500,B,8.227499,31.206103,Small Towns,Kuach-deng,SS030203,Ayod,SS0302,Jonglei
+Pajiek,Pajiek,2500,E,8.224372,31.278142,Small Towns,Kuach-deng,SS030203,Ayod,SS0302,Jonglei
+Pan-Ajei,Pan-Ajei,1300,K,6.657184,31.290337,Other Flooded Settlements,Pakeer,SS031005,Twic East,SS0310,Jonglei
+Dorok,Dorok,500,S,7.784128,31.301627,Other Flooded Settlements,Padiet,SS030503,Duk,SS0305,Jonglei
+Dung Kvak,Dung Kvak,1600,J,7.029282,31.312056,Other Flooded Settlements,Nyuak,SS031004,Twic East,SS0310,Jonglei
+Padieu,Padieu,28900,A,7.7304,31.322,Small Towns,Padiet,SS030503,Duk,SS0305,Jonglei
+Deng,Deng,500,R,7.779895,31.331965,Other Flooded Settlements,Padiet,SS030503,Duk,SS0305,Jonglei
+Luak Kwoth,Luak Kwoth,2400,F,8.438092,31.343602,High Ground (OCHA 2024 & UNMISS 2025),Mogok,SS030204,Ayod,SS0302,Jonglei
+Jiech,Jiech,8300,C,8.194,31.347,High Ground (OCHA 2024 & UNMISS 2025),Kuach-deng,SS030203,Ayod,SS0302,Jonglei
+Kongor,Kongor,7100,F,7.155232,31.355067,Small Towns,Kongor,SS031002,Twic East,SS0310,Jonglei
+Kiir Adau,Kiir Adau,1900,H,7.24609,31.35915,Other Flooded Settlements,Lith,SS031003,Twic East,SS0310,Jonglei
+Apiir,Apiir,7300,E,7.292259,31.36384,Other Flooded Settlements,Lith,SS031003,Twic East,SS0310,Jonglei
+Paliau,Paliau,11100,D,6.959691,31.373489,Small Towns,Ajuong,SS031001,Twic East,SS0310,Jonglei
+Maar,Maar,13600,B,6.883041,31.377915,Small Towns,Pakeer,SS031005,Twic East,SS0310,Jonglei
+Wanglei,Wanglei,13000,C,7.085186,31.379791,Small Towns,Nyuak,SS031004,Twic East,SS0310,Jonglei
+Duk Fadiat,Duk Fadiat,9600,D,7.74941,31.39732,High Ground (OCHA 2024 & UNMISS 2025),Padiet,SS030503,Duk,SS0305,Jonglei
+Wichden,Wichden,1000,M,8.13,31.41,High Ground (OCHA 2024 & UNMISS 2025),Ayod,SS030201,Ayod,SS0302,Jonglei
+Poktap,Poktap,10800,B,7.46,31.4103,Small Towns,Payuel,SS030504,Duk,SS0305,Jonglei
+Panyagor,Panyagor,14200,A,7.168333,31.411667,Small Towns,Kongor,SS031002,Twic East,SS0310,Jonglei
+Wernyol,Wernyol,1750,I,7.335932,31.412519,Small Towns,Lith,SS031003,Twic East,SS0310,Jonglei
+Payuiel,Payuiel,1200,N,7.603961,31.451539,High Ground (OCHA 2024 & UNMISS 2025),Payuel,SS030504,Duk,SS0305,Jonglei
+Mareang,Mareang,1200,M,7.60396,31.45154,High Ground (OCHA 2024 & UNMISS 2025),Payuel,SS030504,Duk,SS0305,Jonglei
+Patuatnoi,Patuatnoi,2200,I,7.51763,31.47921,High Ground (OCHA 2024 & UNMISS 2025),Ageer,SS030501,Duk,SS0305,Jonglei
+Katdalok,Katdalok,4500,F,7.988585,31.486412,Small Towns,Pagak,SS030505,Duk,SS0305,Jonglei
+Pagak,Pagak,2300,H,7.92848,31.49582,High Ground (OCHA 2024 & UNMISS 2025),Pagak,SS030505,Duk,SS0305,Jonglei
+Ager,Ager,9900,C,7.49319,31.51152,High Ground (OCHA 2024 & UNMISS 2025),Payuel,SS030504,Duk,SS0305,Jonglei
+Jockura,Jockura,800,P,8.122204,31.5168,Small Towns,Ayod,SS030201,Ayod,SS0302,Jonglei
+Werbior,Werbior,1800,K,7.869413,31.68529,Other Flooded Settlements,Pagak,SS030505,Duk,SS0305,Jonglei
+Kachtong,,2000,J,7.7444,31.691,Small Towns,Panyang,SS030506,Duk,SS0305,Jonglei
+Patuet,Patuet,3400,G,7.88614,31.69284,High Ground (OCHA 2024 & UNMISS 2025),Pagak,SS030505,Duk,SS0305,Jonglei
+Kadiang,,900,O,7.53,31.693,Small Towns,Panyang,SS030506,Duk,SS0305,Jonglei
+Panyang,Panyang,6200,E,7.847869,31.702492,High Ground (OCHA 2024 & UNMISS 2025),Panyang,SS030506,Duk,SS0305,Jonglei
+Gadiang,Gadiang,2200,G,7.163033,31.732867,High Ground (OCHA 2024 & UNMISS 2025),Nyuak,SS031004,Twic East,SS0310,Jonglei
