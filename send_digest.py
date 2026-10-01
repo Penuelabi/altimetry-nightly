@@ -53,6 +53,19 @@ def build_message(doc, pdf_path=None, min_level='yellow', sender='', to='', toda
     return msg, len(rows)
 
 
+def _emails_from_csv(url):
+    import csv, io, re, urllib.request
+    with urllib.request.urlopen(url, timeout=30) as r:
+        txt = r.read().decode('utf-8', 'replace')
+    out = []
+    for row in csv.reader(io.StringIO(txt)):
+        for cell in row:
+            m = re.fullmatch(r'\s*([^@\s,;]+@[^@\s,;]+\.[^@\s,;]+)\s*', cell)
+            if m and m.group(1).lower() not in out:
+                out.append(m.group(1).lower())
+    return out
+
+
 def subscribers(url):
     """Addresses from a published Google Sheet CSV (any column containing '@'); blank/invalid skipped."""
     if not url:
@@ -70,6 +83,13 @@ def subscribers(url):
             m = re.fullmatch(r'\s*([^@\s,;]+@[^@\s,;]+\.[^@\s,;]+)\s*', cell)
             if m and m.group(1).lower() not in out:
                 out.append(m.group(1).lower())
+    unsub = (os.environ.get('UNSUBSCRIBE_CSV_URL') or '').strip()
+    if unsub:
+        try:
+            gone = set(_emails_from_csv(unsub))
+            out = [e for e in out if e not in gone]
+        except Exception as e:
+            print(f'WARNING: unsubscribe list not read ({type(e).__name__}: {e}).')
     return out
 
 

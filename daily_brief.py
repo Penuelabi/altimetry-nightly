@@ -166,13 +166,17 @@ def _table(headers, rows, widths=None):
 
 
 def _footer(subscribe_url, unsubscribe_to):
+    unsub = (os.environ.get('UNSUBSCRIBE_URL') or '').strip()
+    stop_h = (f'. To stop receiving it, <a href="{html.escape(unsub)}">unsubscribe here</a>.' if unsub
+              else '. To stop receiving it, reply with "unsubscribe".')
+    stop_t = f'unsubscribe: {unsub}' if unsub else 'reply "unsubscribe" to stop'
     h = (f'<p style="font-size:12px">Open the live map: <a href="{APP_URL}">{APP_URL}</a></p>'
          + (f'<p style="font-size:12px">Subscribe to the email list: <a href="{html.escape(subscribe_url)}">{html.escape(subscribe_url)}</a>'
-            f'. To stop receiving it, reply with "unsubscribe".</p>' if subscribe_url else
+            f'{stop_h}</p>' if subscribe_url else
             f'<p style="font-size:12px">To join or leave this list, reply to {html.escape(unsubscribe_to)}.</p>')
          + f'<p style="font-size:13px">{_signature_html()}</p>')
     t = (f'\nLive map: {APP_URL}\n'
-         + (f'Subscribe to the email list: {subscribe_url} (reply "unsubscribe" to stop)\n' if subscribe_url else '')
+         + (f'Subscribe to the email list: {subscribe_url} ({stop_t})\n' if subscribe_url else '')
          + '\n' + _signature_text() + '\n')
     return h, t
 

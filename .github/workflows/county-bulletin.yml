@@ -73,6 +73,8 @@ jobs:
           DIGEST_ONLY_IF_ALERTS: ${{ vars.DIGEST_ONLY_IF_ALERTS }}
           SUBSCRIBE_URL: ${{ vars.SUBSCRIBE_URL }}
           SUBSCRIBERS_CSV_URL: ${{ vars.SUBSCRIBERS_CSV_URL }}
+          UNSUBSCRIBE_URL: ${{ vars.UNSUBSCRIBE_URL }}
+          UNSUBSCRIBE_CSV_URL: ${{ vars.UNSUBSCRIBE_CSV_URL }}
           RELIEFWEB_APPNAME: ${{ vars.RELIEFWEB_APPNAME }}
           ALTIMETRY_OUT_DIR: ${{ github.workspace }}/altdata
         run: python send_digest.py 2>&1 | tee "$RUNNER_TEMP/digest.log"
