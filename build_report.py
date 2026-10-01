@@ -47,6 +47,16 @@ def county_dicts(doc, cache=None, stations=None):
         ip = sorted(cache.get('payams', {}).get(_key(name), []), key=lambda r: -(r.get('area_risk_km2') or 0))[:4]
         ip = [{k: _clean(v) if k.endswith('_risk') or k.startswith('buildings') else v for k, v in r.items()} for r in ip]
         cc = cache.get('county', {}).get(_key(name))
+        allp = {r['payam']: r for r in cache.get('payams', {}).get(_key(name), [])}
+        nowm = (cache.get('payams_now') or {}).get(_key(name)) or {}
+        inow = []
+        for pn, v in sorted(nowm.items(), key=lambda kv: -(kv[1].get('area_now_km2') or 0))[:4]:
+            base = allp.get(pn, {})
+            inow.append({'payam': pn, 'area_km2': base.get('area_km2'), 'area_now_km2': v.get('area_now_km2'),
+                         'schools': base.get('schools'), 'schools_now': v.get('schools_now'),
+                         'health': base.get('health'), 'health_now': v.get('health_now'),
+                         'buildings': base.get('buildings'), 'buildings_now': _clean(v.get('buildings_now')),
+                         'roads_km': base.get('roads_km'), 'roads_now_km': v.get('roads_now_km')})
         sts = []
         for si, ex in sorted([x for x in by_county.get(_key(name), []) if x[0]['age'] <= 45 and x[0]['cls'] not in HIDDEN],
                              key=lambda x: -(x[0]['pct'] or 0))[:2]:
@@ -56,7 +66,7 @@ def county_dicts(doc, cache=None, stations=None):
                               'counties': ex.get('counties') or [], 'payams': (ex.get('payams') or [])[:4]}
             sts.append(si)
         out.append({'county': name, 'state': state, 'population': popn, 'advisory': adv, 'previous': prev,
-                    'scenarios': scen, 'settlements': sett or None, 'infra_payam': ip or None, 'infra_county': cc if ip else None,
+                    'scenarios': scen, 'settlements': sett or None, 'infra_payam': ip or None, 'infra_county': cc if ip else None, 'infra_now': inow or None,
                     'stations': sts})
     return out
 

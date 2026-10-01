@@ -181,7 +181,7 @@ def county_story(c, today=None):
         s.append(table(rows, [42 * mm, 24 * mm, 24 * mm, 24 * mm, 26 * mm, 26 * mm]))
     ip = c.get('infra_payam')
     if ip:
-        s.append(P('Infrastructure at risk of flooding, by payam', H2))
+        s.append(P('Infrastructure at risk of flooding, by payam (flood-prone ground)', H2))
         s.append(P('At risk = flooded now or in at least 15% of years in the same season (Sentinel-1, 2020–2025).', SMALL))
         rows = [['Payam', 'Payam area km²', 'At risk km²', 'Schools (at risk)', 'Health (at risk)', 'Buildings (at risk)', 'Roads km (at risk)']]
         for r in ip:
@@ -193,6 +193,16 @@ def county_story(c, today=None):
         if cc:
             s.append(P(f"Health facilities: {n(cc['health'])} in the county, {n(cc['health_risk'])} on flood-prone ground | "
                        f"Schools: {n(cc['schools'])} in the county, {n(cc['schools_risk'])} on flood-prone ground", SMALL))
+    inow = c.get('infra_now')
+    if inow:
+        s.append(P('Infrastructure at risk of flooding, by payam (flooded now)', H2))
+        s.append(P('At risk = flooded now, inside the current Sentinel-1 maximum flood extent.', SMALL))
+        rows = [['Payam', 'Payam area km²', 'Flooded now km²', 'Schools (flooded)', 'Health (flooded)', 'Buildings (flooded)', 'Roads km (flooded)']]
+        for r in inow:
+            rows.append([r['payam'], n(r.get('area_km2')), n(r.get('area_now_km2')), f"{n(r.get('schools'))} ({n(r.get('schools_now'))})",
+                         f"{n(r.get('health'))} ({n(r.get('health_now'))})", f"{n(r.get('buildings'))} ({n(r.get('buildings_now'))})",
+                         f"{n(r.get('roads_km'), 1)} ({n(r.get('roads_now_km'), 1)})"])
+        s.append(table(rows, [28 * mm, 24 * mm, 20 * mm, 24 * mm, 24 * mm, 26 * mm, 28 * mm]))
     for g in c.get('stations', []):
         s.extend(station_story(g))
     return s

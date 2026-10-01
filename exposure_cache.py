@@ -75,6 +75,7 @@ for k in (A1, A2, A3):
 
 # --- risk image (same definition as the app) -------------------------------------------------------------------
 risk_basis = 'Sentinel-1 same-season baseline + current extent'
+flooded = None
 try:
     ee.data.getAsset(BASELINE_ASSET)
     base = ee.Image(BASELINE_ASSET)
@@ -169,6 +170,59 @@ if not c.get('payams_complete') or REFRESH:
         c['payams_complete'] = len(rows) >= 0.98 * n
         save(c)
         print('payam table saved:', len(rows), 'payams')
+
+# --- 1b. flooded-now table (current maximum flood extent only) ------------------------------------------------------
+c = load()
+if flooded is not None and risk_basis.startswith('Sentinel-1 same-season baseline +') and (not c.get('now_complete') or REFRESH) \
+        and c.get('payams_complete') and left() > 900:
+    nowi = flooded.rename('now')
+    now30 = nowi.reproject('EPSG:4326', None, 30)
+    schools_n = now30.reduceRegions(schools, ee.Reducer.max(), 30, tileScale=4)
+    health_n = now30.reduceRegions(health, ee.Reducer.max(), 30, tileScale=4)
+    n = payam.size().getInfo()
+    lst = payam.toList(n)
+    nrows = []
+    road_now = None
+    try:
+        rd = ee.FeatureCollection(ROADS).filterBounds(payam.geometry())
+        road_now = ee.Image().byte().paint(rd, 1, 1).unmask(0).reproject('EPSG:4326', None, 100)
+    except Exception as e:
+        print('roads unavailable (now):', str(e)[:120])
+    for i in range(0, n, CHUNK):
+        if left() < 600:
+            print('budget used up during the flooded-now table; it will continue on the next run'); break
+        sub = ee.FeatureCollection(lst.slice(i, i + CHUNK))
+
+        def pern(f):
+            g = f.geometry()
+            a = area.multiply(nowi).rename('an').reduceRegion(ee.Reducer.sum(), g, 100, maxPixels=1e10, tileScale=8)
+            props = {'payam': f.get(A3), 'county': f.get(A2),
+                     'area_now_km2': a.get('an'),
+                     'schools_now': cnt(schools_n, g)[1], 'health_now': cnt(health_n, g)[1]}
+            b = bld.filterBounds(g)
+            props['buildings_now'] = ee.Number(ee.Algorithms.If(
+                b.size().lt(40000), now30.reduceRegions(b, ee.Reducer.max(), 30, tileScale=8).filter(ee.Filter.gt('max', 0)).size(), -1))
+            if road_now is not None:
+                r = road_now.multiply(nowi.reproject('EPSG:4326', None, 100)).rename('rn').reduceRegion(
+                    ee.Reducer.sum(), g, 100, maxPixels=1e10, tileScale=8)
+                props['roads_now_km'] = ee.Number(r.get('rn')).multiply(0.1)
+            return ee.Feature(None, props)
+        for attempt in range(2):
+            try:
+                nrows += [r['properties'] for r in sub.map(pern).getInfo()['features']]
+                break
+            except Exception as e:
+                print(f'  now payams {i}-{i + CHUNK} attempt {attempt + 1} failed: {str(e)[:200]}')
+        print(f'flooded-now payams {min(i + CHUNK, n)}/{n}', flush=True)
+    if nrows:
+        by = {}
+        for r in nrows:
+            by.setdefault(r['county'], {})[r['payam']] = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in r.items()
+                                                          if k not in ('county', 'payam')}
+        c['payams_now'] = by
+        c['now_complete'] = len(nrows) >= 0.98 * n
+        save(c)
+        print('flooded-now table saved:', len(nrows), 'payams')
 
 # --- 2. station exposure (25 km) -----------------------------------------------------------------------------------
 ss = os.path.join(ALT, 'station_status.csv')
