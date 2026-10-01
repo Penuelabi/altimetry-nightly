@@ -18,6 +18,7 @@ import urllib.request
 import numpy as np
 import pandas as pd
 
+SUBSCRIBE_PAGE = 'https://claude.ai/artifact/NW1fEYxo4VQ2BoUfsVfQoK'   # one-click subscribe / unsubscribe page
 APP_URL = 'https://penuelabi.users.earthengine.app/view/south-sudan-weather-forecast'
 SIGNATURE_LINES = [
     'ALLAU, Denis Abi, PhD',
@@ -169,7 +170,7 @@ def _footer(subscribe_url, unsubscribe_to):
     unsub = (os.environ.get('UNSUBSCRIBE_URL') or '').strip()
     if not subscribe_url and os.environ.get('SUBSCRIBE_BY_EMAIL', '1') == '1':
         me = urllib.parse.quote(unsubscribe_to)
-        subscribe_url = f'mailto:{me}?subject=SUBSCRIBE'
+        subscribe_url = SUBSCRIBE_PAGE
         unsub = unsub or f'mailto:{me}?subject=UNSUBSCRIBE'
     stop_h = (f'. To stop receiving it, <a href="{html.escape(unsub)}">unsubscribe here</a>.' if unsub
               else '. To stop receiving it, reply with "unsubscribe".')
