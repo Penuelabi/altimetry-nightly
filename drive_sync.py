@@ -58,6 +58,7 @@ BULLETIN_FILES = [
     'county_bulletin_latest.json',
     'county_bulletin_latest.pdf',
     'forecast_verification.csv',
+    'subscribers.csv',
     'forecast_reliability.csv',
     'forecast_verification_by_county.csv',
     'forecast_obs_cache.csv',

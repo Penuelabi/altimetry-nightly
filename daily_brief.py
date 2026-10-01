@@ -167,6 +167,10 @@ def _table(headers, rows, widths=None):
 
 def _footer(subscribe_url, unsubscribe_to):
     unsub = (os.environ.get('UNSUBSCRIBE_URL') or '').strip()
+    if not subscribe_url and os.environ.get('SUBSCRIBE_BY_EMAIL', '1') == '1':
+        me = urllib.parse.quote(unsubscribe_to)
+        subscribe_url = f'mailto:{me}?subject=SUBSCRIBE'
+        unsub = unsub or f'mailto:{me}?subject=UNSUBSCRIBE'
     stop_h = (f'. To stop receiving it, <a href="{html.escape(unsub)}">unsubscribe here</a>.' if unsub
               else '. To stop receiving it, reply with "unsubscribe".')
     stop_t = f'unsubscribe: {unsub}' if unsub else 'reply "unsubscribe" to stop'

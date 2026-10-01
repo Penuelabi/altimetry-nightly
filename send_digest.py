@@ -149,6 +149,11 @@ def main():
             print('Evening run: rich daily email already sent this morning; skipped.')
             return
         bcc = subscribers((os.environ.get('SUBSCRIBERS_CSV_URL') or '').strip())
+        if os.environ.get('SUBSCRIBE_BY_EMAIL', '1') == '1':
+            import subscribers_imap as si
+            lst, na, nr = si.sync(os.path.join(out, 'subscribers.csv'), user=user, password=pw, own=user)
+            print(f'Subscribers by e-mail: {len(lst)} (added {na}, removed {nr}).')
+            bcc = sorted(set(bcc) | set(lst))
         try:
             msg = rich_message(doc, out, sender, to, bcc, kind, now.date())
             n = 1
