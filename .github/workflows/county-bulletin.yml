@@ -69,7 +69,8 @@ jobs:
           sudo apt-get install -y -q fonts-dejavu-core || true
           python build_report.py 2>&1 | tee "$RUNNER_TEMP/report.log"
 
-      - name: Email digest (optional, needs SMTP secrets)
+      - name: Email digest (optional, needs SMTP secrets; once a day, midnight Juba run and manual runs)
+        if: github.event.schedule != '30 9 * * *'
         continue-on-error: true
         env:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
