@@ -1,0 +1,36 @@
+name: Maximum flood extent asset (every Sunday)
+
+on:
+  schedule:
+    - cron: '0 4 * * 0'      # Sundays 04:00 UTC = 06:00 Juba; before the Sunday exposure-cache job
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Days of Sentinel-1 to take the maximum over (blank = 12)'
+        required: false
+        default: ''
+
+concurrency:
+  group: flood-extent
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      EXTENT_DAYS: ${{ github.event.inputs.days }}
+      FLOOD_EXTENT_ASSET: ${{ vars.FLOOD_EXTENT_ASSET }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - run: pip install earthengine-api pandas numpy
+      - run: python export_flood_extent.py 2>&1 | tee "$RUNNER_TEMP/extent.log"
+      - name: Summary
+        if: always()
+        run: |
+          { echo '```'; tail -n 15 "$RUNNER_TEMP/extent.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
