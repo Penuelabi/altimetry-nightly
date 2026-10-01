@@ -202,16 +202,23 @@ def station_story(g):
     s = [P(f"River station: {g['name']} ({g['uid']})", H2)]
     lv = g.get('level')
     if lv:
+        f2 = lambda v, d=2: 'n/a' if v is None else f'{v:.{d}f}'
         s.append(P('River level status', H3))
-        s.append(P(f"Latest pass {lv['date']}: <b>{lv['cls']}</b> (percentile {lv['pct']}). Level {lv['wse']:.2f} m; seasonal median {lv['median']:.2f} m; "
-                   f"anomaly {lv['wse'] - lv['median']:+.2f} m. Record: min {lv['min']:.2f} m, max {lv['max']:.2f} m, average {lv['avg']:.2f} m."))
-        s.append(P(f"Baseline: {lv['years']} years, {lv['passes']} passes within ±30 days, 2016–2025. Quality: {lv['qc']}; uncertainty ±{lv['unc']:.2f} m; "
-                   f"{lv['since_prev']} days since previous pass.", SMALL))
+        anom = f" anomaly {lv['wse'] - lv['median']:+.2f} m." if lv.get('wse') is not None and lv.get('median') is not None else ''
+        s.append(P(f"Latest pass {lv['date']}: <b>{lv['cls']}</b>" + (f" (percentile {lv['pct']})" if lv.get('pct') is not None else '') +
+                   f". Level {f2(lv.get('wse'))} m; seasonal median {f2(lv.get('median'))} m;{anom} "
+                   f"Record: min {f2(lv.get('min'))} m, max {f2(lv.get('max'))} m, average {f2(lv.get('avg'))} m."))
+        q = []
+        if lv.get('years') is not None:
+            q.append(f"Baseline: {lv['years']} years, {lv.get('passes')} passes within ±30 days, 2016–2025.")
+        q.append(f"Quality: {lv.get('qc') or 'ok'}" + (f"; uncertainty ±{lv['unc']:.2f} m" if lv.get('unc') is not None else '') +
+                 (f"; {lv['since_prev']} days since previous pass." if lv.get('since_prev') is not None else '.'))
+        s.append(P(' '.join(q), SMALL))
     if g.get('routed'):
         s.append(P('Routed upstream signal', H3))
         rows = [['Upstream station', 'Status (latest pass)', 'Median travel time', 'Expected here around']]
         for r in g['routed']:
-            rows.append([r['uid'], f"{r['cls']} (percentile {r['pct']}) on {r['date']}", f"{r['lag']} days", r['expected']])
+            rows.append([r['uid'], f"{r['cls']}" + (f" (percentile {r['pct']})" if r.get('pct') is not None else '') + f" on {r['date']}", (f"{r['lag']} days" if isinstance(r['lag'], int) else r['lag']), r['expected']])
         s.append(table(rows, [32 * mm, 62 * mm, 32 * mm, 40 * mm]))
     rd = g.get('routed_down')
     if rd is not None:
@@ -219,7 +226,7 @@ def station_story(g):
         if rd:
             rows = [['Downstream station', 'Status (latest pass)', 'Median travel time from here', 'This station\'s signal expected there around']]
             for r in rd:
-                rows.append([r['uid'], f"{r['cls']} (percentile {r['pct']}) on {r['date']}", f"{r['lag']} days", r['expected']])
+                rows.append([r['uid'], f"{r['cls']}" + (f" (percentile {r['pct']})" if r.get('pct') is not None else '') + f" on {r['date']}", (f"{r['lag']} days" if isinstance(r['lag'], int) else r['lag']), r['expected']])
             s.append(table(rows, [32 * mm, 56 * mm, 36 * mm, 42 * mm]))
         else:
             s.append(P(g.get('routed_down_note') or 'No downstream station linked.', SMALL))
@@ -329,6 +336,26 @@ def cover_from_bulletin(doc, gauges=None, today=None, n_monitor=5, n_gauges=5):
          [58, 18, 16, 26, 26, 26], None if mrows else 'No other county is at red or orange.')]}
 
 
+def fit_county(c, today, w, h):
+    """One page per county: drop the second station, then trim the payam rows, then shrink slightly if it is still too tall."""
+    from reportlab.platypus import KeepInFrame
+    def height(cc):
+        return sum(f.wrap(w, 10000)[1] + f.getSpaceBefore() + f.getSpaceAfter() for f in county_story(cc, today))
+    cc = dict(c)
+    for step in range(5):
+        if height(cc) <= h:
+            break
+        if step == 0 and len(cc.get('stations') or []) > 1:
+            cc['stations'] = cc['stations'][:1]
+        elif step == 1:
+            cc['stations'] = [dict(g, exposure=dict(g['exposure'], payams=g['exposure']['payams'][:2])) if g.get('exposure') else g for g in cc.get('stations') or []]
+        elif step == 2 and cc.get('infra_payam'):
+            cc['infra_payam'] = cc['infra_payam'][:2]
+        elif step == 3:
+            cc['stations'] = [dict(g, exposure=dict(g['exposure'], payams=[])) if g.get('exposure') else g for g in cc.get('stations') or []]
+    return [KeepInFrame(w, h, county_story(cc, today), mode='shrink')]
+
+
 def build_pdf(counties, path, run_label=None, today=None, cover=None, logo=None):
     today = today or dt.date.today()
     run_label = run_label or str(today)
@@ -354,7 +381,7 @@ def build_pdf(counties, path, run_label=None, today=None, cover=None, logo=None)
     for i, c in enumerate(counties):
         if i:
             story.append(PageBreak())
-        story.extend(county_story(c, today))
+        story.extend(fit_county(c, today, doc.width, doc.height - 2 * mm))
     doc.build(story)
     return path
 
