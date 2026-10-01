@@ -181,6 +181,10 @@ if flooded is not None and risk_basis.startswith('Sentinel-1 same-season baselin
     health_n = now30.reduceRegions(health, ee.Reducer.max(), 30, tileScale=4)
     n = payam.size().getInfo()
     lst = payam.toList(n)
+    done = {} if REFRESH else (c.get('payams_now') or {})
+    meta = payam.reduceColumns(ee.Reducer.toList(2), [A2, A3]).get('list').getInfo()
+    todo = [i for i, (cn, pn) in enumerate(meta) if pn not in (done.get(cn) or {})]
+    print(f'flooded-now: {len(meta) - len(todo)} payams already done, {len(todo)} to do')
     nrows = []
     road_now = None
     try:
@@ -188,10 +192,10 @@ if flooded is not None and risk_basis.startswith('Sentinel-1 same-season baselin
         road_now = ee.Image().byte().paint(rd, 1, 1).unmask(0).reproject('EPSG:4326', None, 100)
     except Exception as e:
         print('roads unavailable (now):', str(e)[:120])
-    for i in range(0, n, CHUNK):
+    for i in range(0, len(todo), CHUNK):
         if left() < 600:
             print('budget used up during the flooded-now table; it will continue on the next run'); break
-        sub = ee.FeatureCollection(lst.slice(i, i + CHUNK))
+        sub = ee.FeatureCollection([lst.get(j) for j in todo[i:i + CHUNK]])
 
         def pern(f):
             g = f.geometry()
@@ -213,14 +217,14 @@ if flooded is not None and risk_basis.startswith('Sentinel-1 same-season baselin
                 break
             except Exception as e:
                 print(f'  now payams {i}-{i + CHUNK} attempt {attempt + 1} failed: {str(e)[:200]}')
-        print(f'flooded-now payams {min(i + CHUNK, n)}/{n}', flush=True)
+        print(f'flooded-now payams {min(i + CHUNK, len(todo))}/{len(todo)}', flush=True)
     if nrows:
-        by = {}
+        by = {k: dict(v) for k, v in done.items()}
         for r in nrows:
             by.setdefault(r['county'], {})[r['payam']] = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in r.items()
                                                           if k not in ('county', 'payam')}
         c['payams_now'] = by
-        c['now_complete'] = len(nrows) >= 0.98 * n
+        c['now_complete'] = sum(len(v) for v in by.values()) >= 0.98 * n
         save(c)
         print('flooded-now table saved:', len(nrows), 'payams')
 
