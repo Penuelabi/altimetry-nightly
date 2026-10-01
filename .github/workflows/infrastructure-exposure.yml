@@ -1,0 +1,23 @@
+name: Infrastructure exposure by payam (manual)
+on:
+  workflow_dispatch:
+jobs:
+  exposure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      INFRA_OUT_DIR: ${{ github.workspace }}/infra_out
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - run: pip install earthengine-api pandas
+      - run: python infrastructure_exposure.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: infra-exposure
+          path: infra_out/
