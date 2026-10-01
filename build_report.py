@@ -149,13 +149,21 @@ def gauges():
         return None
 
 
+def _verif(doc):
+    v = (doc.get('forecast_verification') or {}).get('day 1-5')
+    if not v:
+        return None
+    return (f"days 1–5, {v.get('n')} county-days: hit rate {v.get('hit_rate', 0):.0%}, false-alarm ratio {v.get('false_alarm_ratio', 0):.0%}, "
+            f"Brier skill {v.get('brier_skill')}.")
+
+
 def main():
     doc = json.load(open(os.path.join(OUT, 'county_bulletin_latest.json'), encoding='utf-8'))
     today = dt.datetime.utcnow() + dt.timedelta(hours=2)   # Juba time (UTC+2)
     cover = m.cover_from_bulletin(doc, gauges(), today)
     logo = os.path.join(HERE, 'assets', 'uj_logo.png')
     path = os.path.join(OUT, 'county_report_latest.pdf')
-    m.build_pdf(county_dicts(doc, load_cache(), station_info()), path, run_label=str(doc.get('ecmwf_run_utc') or ''), today=today.date(), cover=cover, logo=logo)
+    m.build_pdf(county_dicts(doc, load_cache(), station_info()), path, run_label=str(doc.get('ecmwf_run_utc') or ''), today=today.date(), cover=cover, logo=logo, verification=_verif(doc))
     os.makedirs(os.path.join(HERE, 'reports'), exist_ok=True)
     shutil.copyfile(path, os.path.join(HERE, 'reports', 'latest.pdf'))
     print('wrote', path, 'and reports/latest.pdf')

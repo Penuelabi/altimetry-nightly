@@ -336,6 +336,102 @@ def cover_from_bulletin(doc, gauges=None, today=None, n_monitor=5, n_gauges=5):
          [58, 18, 16, 26, 26, 26], None if mrows else 'No other county is at red or orange.')]}
 
 
+def method_story(verification=None):
+    """Closing pages: data sources, methods and references for everything in the report."""
+    s = [P('About this report: data, methods and references', H1),
+         P('Decision support, not an official warning. Alert levels follow the impact-based likelihood x impact approach of WMO-No. 1150; '
+           'the scales are provisional. Figures are planning and monitoring information and carry the uncertainties listed below.', SMALL)]
+    s.append(P('1. How the report is produced', H2))
+    s.append(P('A GitHub Actions workflow runs the county bulletin twice a day, after the ECMWF 00 and 12 UTC releases (11:30 and 23:30 Juba). '
+               'The combined report is rebuilt from that bulletin after the evening run (midnight Juba), emailed to subscribers as one PDF and published '
+               'as the latest report linked from the live map. A weekly Earth Engine job refreshes the flood extent, the infrastructure-at-risk table and '
+               'the 25 km station exposure. The weekly version label (vDDMMYY) is the Monday of the issue week; the first is v51026 (5 Oct 2026).'))
+    s.append(P('2. County indicators and alert levels', H2))
+    s.append(P('<b>Rain so far:</b> GSMaP v8 gauge-corrected rainfall, 7, 15 and 30-day totals against the same dates 2001–2025. '
+               '<b>Soil and water balance:</b> NASA SMAP Level-4 root-zone soil moisture, evapotranspiration and runoff against 2015–2025; wetness is judged by the root-zone '
+               'z-score (steadier than a percentile with about ten comparison years that include the flood years 2019–2022 and 2024). The soil deficit is the root-zone water '
+               'missing against the median, in mm. '
+               '<b>Outlook:</b> ECMWF IFS ensemble (up to 51 members, 15 days); chances of a 7-day dry spell, a 3-day wet spell and 50 mm in week 1 are the share of members '
+               'that show the event. <b>Alert level:</b> likelihood x impact (green no action, yellow be aware, orange be prepared, red take action), for the hazard '
+               '(drought / dry spell or flood / waterlogging) named in each county advisory; the likelihood and impact ratings are shown in the advisory text.'))
+    if verification:
+        s.append(P(f'Forecast check against observed rain: {verification}', SMALL))
+    s.append(P('3. Cover lists', H2))
+    s.append(P('<b>Drought watch:</b> counties with the lowest root-zone soil moisture that the next 2 weeks of rain will not fix. <b>Flood watch:</b> wettest soil, water surplus and heavy '
+               'rain ahead, weighted by people on flood-prone ground. <b>Gauge watch:</b> stations where the water takes more than 5 days to reach the next station downstream and the last '
+               'pass is newer than that travel time, so there is still time to warn downstream counties (star = a station already on the watch list). <b>Towns and counties to monitor:</b> '
+               'red or orange counties not already in the drought or flood lists.'))
+    s.append(P('4. Flood history, scenarios and settlements', H2))
+    s.append(P('People affected in 2021, 2022, 2024 and 2025 come from the flood assessments compiled for the project (county totals; "not listed" means the county does not appear in that '
+               'assessment, not that nobody was affected). The 2026 scenarios are planning figures from the 2026 Floods and Drought Plan (scenario 1 lower, 2 planning, 3 severe, and '
+               'people displaced in the planning case); scenarios 1 and 3 apply the plan\'s state coefficients to the county planning case and are not forecasts or probabilities. '
+               'Settlements are those assessed in September 2025 (OCHA 2024 and UNMISS 2025 high-ground list, other flooded settlements and small towns), grouped by payam. '
+               'Population is the 2025 county estimate supplied to the project.'))
+    s.append(P('5. Infrastructure at risk, by payam', H2))
+    s.append(P('<b>At risk</b> = flooded in the current maximum flood extent, or flooded in at least 15% of the same-season baseline years (2020–2025) where at least three baseline years exist. '
+               'The baseline is Sentinel-1 (descending VV): open water below -18 dB after a 50 m focal median, plus flooded vegetation where VV rises at least 3 dB over the Feb–Mar '
+               'dry-season median, limited to terrain within 15 m above the nearest drainage (MERIT Hydro HAND). The current extent is the maximum over the latest 12 days of Sentinel-1, '
+               'exported every Sunday to a fixed Earth Engine asset. Counts are per payam (512 payam polygons): schools and health facilities (project point layers, counted when the point '
+               'falls on at-risk ground), buildings (VIDA Google-Microsoft combined footprints; at-risk count skipped where a payam has more than 40,000), roads (GRIP4, 100 m raster, length '
+               'on at-risk ground) and area. County totals are the sum of its payams.'))
+    s.append(P('6. River stations', H2))
+    s.append(P('Levels are satellite-altimetry passes from DAHITI (DGFI-TUM) and Hydroweb.Next (Theia / CNES, LEGOS), merged nightly with quality flags (jumps checked against neighbours, '
+               'long gaps, high uncertainty). The <b>status</b> compares the latest level with passes within ±30 days of the same date in 2016–2025: unusually high from the 70th percentile, above normal '
+               '60th–70th, near normal 40th–60th, below normal 30th–40th, unusually low below the 30th; fewer than 2 years or 6 passes counts as insufficient record. Low and insufficient stations are '
+               'not shown. The <b>routed signal</b> reads the linked upstream and downstream stations: the median travel time is the typical lag between the two stations over their overlapping passes, and '
+               '"expected here around" is the observation date plus that lag. Altimetry samples a river every 10–35 days, so a pass can miss a peak, and flood-level thresholds are "as seen by the satellite", '
+               'not gauge return periods.'))
+    s.append(P('7. Exposure within 25 km of a station', H2))
+    s.append(P('Population (WorldPop 2020, 100 m), schools, health facilities and VIDA buildings inside a 25 km circle around the station, with the share on at-risk ground (definition in section 5) and '
+               'a payam-by-payam breakdown of the part of each payam inside the circle. Circles overlap neighbouring counties, which are listed. A station is assigned to the county that contains it.'))
+    s.append(P('8. Main limits', H2))
+    for t in ('Rain, soil and flood layers are satellite products: coarse (GSMaP about 10 km, SMAP L4 about 9 km) and subject to retrieval error, especially in wetlands.',
+              'The ensemble gives chances, not certainties; the dry-spell and heavy-rain chances are for the county as a whole.',
+              'Flood extent from radar misses flooding under dense canopy and can over-detect on wet floodplain vegetation; the weekly window can miss short events.',
+              'Population, building and facility layers are modelled or compiled, and may be out of date or incomplete in remote areas.',
+              'River flooding from upstream can continue while local soils are dry: the land model does not include river overflow.',
+              'Assessment and scenario figures describe past or planned situations, not the situation now.'):
+        s.append(P('• ' + t))
+    s.append(P('Data sources', H2))
+    rows = [['Layer', 'Source', 'Used for'],
+            ['Rainfall', 'GSMaP v8 operational, gauge-corrected (JAXA), via Google Earth Engine', 'Rain so far, anomalies'],
+            ['Soil moisture, ET, runoff', 'NASA SMAP Level-4 SPL4SMGP', 'Soil z-score, deficit, water balance'],
+            ['Forecast', 'ECMWF IFS ensemble open data (CC BY 4.0, © ECMWF)', 'Dry / wet spell and heavy-rain chances'],
+            ['Forecast rain, 7-day', 'NOAA GFS 0.25°; ECMWF IFS NRT; CHIRPS daily (UCSB-CHG)', 'Station rainfall outlook in the app'],
+            ['River levels', 'DAHITI (DGFI-TUM); Hydroweb.Next (Theia / CNES, LEGOS)', 'Station status and routed signals'],
+            ['River discharge outlook', 'GEOGLOWS ECMWF Streamflow Model (BYU / ECMWF)', 'River alert, where available'],
+            ['Flood extent and baseline', 'Copernicus Sentinel-1 GRD; MERIT Hydro HAND', 'Current and same-season flood extent'],
+            ['Flood-prone ground', 'JRC Global Surface Water; Global Flood Database', 'Flood-prone share of population'],
+            ['Population', 'County estimates 2025 (project); WorldPop 2020, 100 m (Univ. of Southampton, CC BY 4.0)', 'County and 25 km population'],
+            ['Settlement and buildings', 'GHSL built-up surface (JRC); VIDA combined footprints; JRC GHS-OBAT 2020', 'Built-up area, building counts'],
+            ['Roads', 'GRIP4 Africa (Meijer et al. 2018)', 'Road length at risk'],
+            ['Schools, health facilities', 'Project point layers (Earth Engine assets)', 'Facilities at risk'],
+            ['Cropland', 'ESA WorldCover 2021 v200 (CC BY 4.0)', 'Cropland in the county bulletin'],
+            ['Catchments', 'HydroBASINS / HydroSHEDS', 'Upstream catchment rainfall'],
+            ['Admin boundaries', 'Payam and county polygons (project asset, 512 payams)', 'All county and payam figures'],
+            ['Flood assessments, scenarios', 'Flood assessments 2021–2025; 2026 Floods and Drought Plan; OCHA 2024 / UNMISS 2025 settlement list', 'Earlier assessments, scenarios, settlements']]
+    s.append(table(rows, [34 * mm, 90 * mm, 46 * mm], align_right_from=9))
+    s.append(P('Key references', H2))
+    for t in ('Gorelick, N. et al. (2017). Google Earth Engine: planetary-scale geospatial analysis for everyone. Remote Sensing of Environment 202, 18–27.',
+              'Pekel, J.-F. et al. (2016). High-resolution mapping of global surface water and its long-term changes. Nature 540, 418–422.',
+              'Tellman, B. et al. (2021). Satellite imaging reveals increased proportion of population exposed to floods. Nature 596, 80–86.',
+              'Torres, R. et al. (2012). GMES Sentinel-1 mission. Remote Sensing of Environment 120, 9–24.',
+              'Yamazaki, D. et al. (2019). MERIT Hydro: a high-resolution global hydrography map based on latest topography datasets. Water Resources Research 55, 5053–5073.',
+              'Schwatke, C. et al. (2015). DAHITI: an innovative approach for estimating water level time series over inland waters using multi-mission satellite altimetry. Hydrology and Earth System Sciences 19, 4345–4364.',
+              'Lehner, B. and Grill, G. (2013). Global river hydrography and network routing (HydroSHEDS, HydroBASINS). Hydrological Processes 27, 2171–2186.',
+              'Meijer, J. R. et al. (2018). Global patterns of current and future road infrastructure. Environmental Research Letters 13, 064006.',
+              'Zanaga, D. et al. (2022). ESA WorldCover 10 m 2021 v200. Zenodo.',
+              'Gumbel, E. J. (1958). Statistics of Extremes. Columbia University Press.',
+              'World Meteorological Organization (2015). WMO Guidelines on Multi-hazard Impact-based Forecast and Warning Services, WMO-No. 1150.',
+              'Data providers: JAXA (GSMaP), NASA (SMAP L4), ECMWF (IFS ensemble), NOAA (GFS), UCSB Climate Hazards Center (CHIRPS), DGFI-TUM (DAHITI), CNES / LEGOS (Hydroweb.Next), '
+              'BYU / ECMWF (GEOGLOWS), University of Southampton (WorldPop), European Commission JRC (GSW, GHSL, GHS-OBAT), VIDA / Google / Microsoft (building footprints), ESA (WorldCover, Sentinel-1).'):
+        s.append(P('• ' + t, SMALL))
+    s.append(P('Method code and the live map', H2))
+    s.append(P(f'Pipeline code: github.com/Penuelabi/altimetry-nightly. Live map: <link href="{APP_URL}" color="#1d5ede">{APP_URL}</link>. '
+               'Prepared by ALLAU, Denis Abi, PhD, Abuk Project, Mayardit Academy for Space Sciences, University of Juba and University of California, Davis.', SMALL))
+    return s
+
+
 def fit_county(c, today, w, h):
     """One page per county: drop the second station, then trim the payam rows, then shrink slightly if it is still too tall."""
     from reportlab.platypus import KeepInFrame
@@ -356,7 +452,7 @@ def fit_county(c, today, w, h):
     return [KeepInFrame(w, h, county_story(cc, today), mode='shrink')]
 
 
-def build_pdf(counties, path, run_label=None, today=None, cover=None, logo=None):
+def build_pdf(counties, path, run_label=None, today=None, cover=None, logo=None, method=True, verification=None):
     today = today or dt.date.today()
     run_label = run_label or str(today)
     doc = BaseDocTemplate(path, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm, topMargin=19 * mm, bottomMargin=15 * mm,
@@ -382,6 +478,9 @@ def build_pdf(counties, path, run_label=None, today=None, cover=None, logo=None)
         if i:
             story.append(PageBreak())
         story.extend(fit_county(c, today, doc.width, doc.height - 2 * mm))
+    if method:
+        story.append(PageBreak())
+        story.extend(method_story(verification))
     doc.build(story)
     return path
 
