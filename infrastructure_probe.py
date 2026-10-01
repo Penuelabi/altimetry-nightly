@@ -5,9 +5,7 @@ import ee
 key = os.environ['GEE_SERVICE_ACCOUNT_KEY'].strip()
 txt = key if key.startswith('{') else open(key).read()
 ee.Initialize(ee.ServiceAccountCredentials(json.loads(txt)['client_email'], key_data=txt), project='sudan-1575919084043')
-for a in ['ee-penuelabi/assets/SSD_Schools', 'ee-penuelabi/assets/SSD_Health',
-          'projects/ee-penuelabi/assets/SSD_Schools', 'projects/ee-penuelabi/assets/SSD_Health',
-          'projects/sat-io/open-datasets/GRIP4/Africa']:
+for a in ['projects/ee-penuelabi/assets/SDD_Schools', 'users/penuelabi/ssd_payam', 'projects/ee-penuelabi/assets/SSD_Health']:
     try:
         info = ee.data.getAsset(a if a.startswith('projects/') else 'projects/' + a)
         print('OK', a, info.get('type'))
