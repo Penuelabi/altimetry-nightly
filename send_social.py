@@ -103,7 +103,9 @@ def main():
         if not ok:
             continue
         try:
-            print(f'{name}: posted ({fn()})')
+            pid = fn()
+            link = f' https://www.linkedin.com/feed/update/{pid}/' if name == 'LinkedIn' and str(pid).startswith('urn:li:') else ''
+            print(f'{name}: posted ({pid}){link}')
         except Exception as e:
             print(f'WARNING: {name} post failed: {type(e).__name__}: {e}')
 
