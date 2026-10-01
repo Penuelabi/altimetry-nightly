@@ -6,6 +6,9 @@ on:
     - cron: '30 21 * * *'    # 21:30 UTC = 23:30 Juba; ECMWF open-data 12 UTC run is out by ~20:00 UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: county-bulletin
   cancel-in-progress: false
@@ -60,6 +63,12 @@ jobs:
           set -o pipefail
           python county_bulletin.py 2>&1 | tee "$RUNNER_TEMP/bulletin.log"
 
+      - name: Build combined county report PDF
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -q fonts-dejavu-core || true
+          python build_report.py 2>&1 | tee "$RUNNER_TEMP/report.log"
+
       - name: Email digest (optional, needs SMTP secrets)
         continue-on-error: true
         env:
@@ -104,6 +113,17 @@ jobs:
         if: failure()
         run: |
           { echo '### Last lines of bulletin log'; echo '```'; tail -n 40 "$RUNNER_TEMP/bulletin.log" 2>/dev/null | cut -c1-300; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish latest report for the GEE download link (midnight Juba run and manual runs)
+        if: always() && (github.event.schedule != '30 9 * * *')
+        continue-on-error: true
+        run: |
+          if [ -f reports/latest.pdf ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add reports/latest.pdf
+            git diff --cached --quiet || { git commit -m "Update latest county report PDF [skip ci]"; git pull --rebase -q origin main || true; git push origin HEAD:main; }
+          fi
 
       - name: Push updated bulletin files back to Drive
         if: always()

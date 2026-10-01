@@ -16,6 +16,12 @@ from email.message import EmailMessage
 ORDER = ['green', 'yellow', 'orange', 'red']
 
 
+def _best_pdf(out):
+    """Combined all-county report if it was built tonight, else the older bulletin PDF."""
+    p = os.path.join(out, 'county_report_latest.pdf')
+    return p if os.path.exists(p) else os.path.join(out, 'county_bulletin_latest.pdf')
+
+
 def pdf_name(doc, today=None):
     """Dated attachment name, e.g. South_Sudan_county_bulletin_2026-10-01.pdf (ECMWF run date, else today)."""
     import datetime as dt
@@ -115,7 +121,7 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None):
     msg['Reply-To'] = sender
     msg.set_content(text)
     msg.add_alternative(html, subtype='html')
-    pdf = os.path.join(out, 'county_bulletin_latest.pdf')
+    pdf = _best_pdf(out)
     if os.path.exists(pdf):
         with open(pdf, 'rb') as fh:
             msg.add_attachment(fh.read(), maintype='application', subtype='pdf', filename=pdf_name(doc, today))
@@ -163,7 +169,7 @@ def main():
     else:
         msg = None
     if msg is None:
-        msg, n = build_message(doc, os.path.join(out, 'county_bulletin_latest.pdf'),
+        msg, n = build_message(doc, _best_pdf(out),
                                (os.environ.get('DIGEST_MIN_LEVEL') or 'yellow').strip().lower(), sender, to)
     if n == 0 and os.environ.get('DIGEST_ONLY_IF_ALERTS') == '1':
         print('No alerts; digest not sent.')
