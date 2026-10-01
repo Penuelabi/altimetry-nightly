@@ -133,10 +133,10 @@ def gauge_watch(merged_csv, status_csv=None, today=None, max_rows=12):
     if out.empty:
         return out
     out['rising'] = out['trend_m'] > 0.02
-    out = out.sort_values(['star', 'vs_2yr'] if 'vs_2yr' in out else ['star'], ascending=[False, False] if 'vs_2yr' in out else False)
     # keep the starred stations plus those within 0.3 m of the 2-yr level or rising
     keep = out['star'] | out['rising'] | (out.get('vs_2yr', pd.Series(-9, index=out.index)).fillna(-9) > -0.3)
-    return out[keep].head(max_rows)
+    out = out[keep].sort_values(['days_to_warn', 'age_days'], ascending=[True, True])
+    return out.head(max_rows)
 
 
 # ----------------------------------------------------------------------------------------------
