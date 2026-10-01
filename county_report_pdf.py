@@ -371,7 +371,7 @@ def method_story(verification=None):
     s.append(P('<b>At risk</b> = flooded in the current maximum flood extent, or flooded in at least 15% of the same-season baseline years (2020–2025) where at least three baseline years exist. '
                'The baseline is Sentinel-1 (descending VV): open water below -18 dB after a 50 m focal median, plus flooded vegetation where VV rises at least 3 dB over the Feb–Mar '
                'dry-season median, limited to terrain within 15 m above the nearest drainage (MERIT Hydro HAND). The current extent is the maximum over the latest 12 days of Sentinel-1, '
-               'exported every Sunday to a fixed Earth Engine asset. Counts are per payam (512 payam polygons): schools and health facilities (OCHA Humanitarian Data Exchange point layers, counted when the point '
+               'exported every Sunday to a fixed Earth Engine asset. Counts are per payam (512 payam polygons): schools and health facilities (OCHA point layers, counted when the point '
                'falls on at-risk ground), buildings (VIDA Google-Microsoft combined footprints; at-risk count skipped where a payam has more than 40,000), roads (GRIP4, 100 m raster, length '
                'on at-risk ground) and area. County totals are the sum of its payams.'))
     s.append(P('6. River stations', H2))
@@ -405,10 +405,10 @@ def method_story(verification=None):
             ['Population', 'County estimates 2025 (project); WorldPop 2020, 100 m (Univ. of Southampton, CC BY 4.0)', 'County and 25 km population'],
             ['Settlement and buildings', 'GHSL built-up surface (JRC); VIDA combined footprints; JRC GHS-OBAT 2020', 'Built-up area, building counts'],
             ['Roads', 'GRIP4 Africa (Meijer et al. 2018)', 'Road length at risk'],
-            ['Schools, health facilities', 'OCHA Humanitarian Data Exchange, South Sudan (data.humdata.org/group/ssd), held as project Earth Engine assets', 'Facilities at risk'],
+            ['Schools, health facilities', 'OCHA (data.humdata.org/group/ssd)', 'Facilities at risk'],
             ['Cropland', 'ESA WorldCover 2021 v200 (CC BY 4.0)', 'Cropland in the county bulletin'],
             ['Catchments', 'HydroBASINS / HydroSHEDS', 'Upstream catchment rainfall'],
-            ['Admin boundaries', 'OCHA Humanitarian Data Exchange, South Sudan administrative boundaries (data.humdata.org/group/ssd); 512 payams, held as a project asset', 'All county and payam figures'],
+            ['Admin boundaries', 'OCHA (data.humdata.org/group/ssd); 512 payams', 'All county and payam figures'],
             ['Flood assessments, scenarios', 'Flood assessments 2021–2025; 2026 Floods and Drought Plan; OCHA 2024 / UNMISS 2025 settlement list', 'Earlier assessments, scenarios, settlements']]
     s.append(table(rows, [34 * mm, 90 * mm, 46 * mm], align_right_from=9))
     s.append(P('Key references', H2))
