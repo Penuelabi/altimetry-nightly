@@ -16,7 +16,14 @@ from email.message import EmailMessage
 ORDER = ['green', 'yellow', 'orange', 'red']
 
 
-def build_message(doc, pdf_path=None, min_level='yellow', sender='', to=''):
+def pdf_name(doc, today=None):
+    """Dated attachment name, e.g. South_Sudan_county_bulletin_2026-10-01.pdf (ECMWF run date, else today)."""
+    import datetime as dt
+    d = (doc.get('ecmwf_run_utc') or '')[:10] or str((today or dt.datetime.utcnow().date()))
+    return f'South_Sudan_county_bulletin_{d}.pdf'
+
+
+def build_message(doc, pdf_path=None, min_level='yellow', sender='', to='', today=None):
     lo = ORDER.index(min_level) if min_level in ORDER else 1
     rows = [c for c in doc['counties'] if c['alert']['level'] in ORDER and ORDER.index(c['alert']['level']) >= lo]
     rows.sort(key=lambda c: (-ORDER.index(c['alert']['level']), c['state'], c['county']))
@@ -42,7 +49,7 @@ def build_message(doc, pdf_path=None, min_level='yellow', sender='', to=''):
     if pdf_path and os.path.exists(pdf_path):
         with open(pdf_path, 'rb') as fh:
             msg.add_attachment(fh.read(), maintype='application', subtype='pdf',
-                               filename='county_bulletin_latest.pdf')
+                               filename=pdf_name(doc, today))
     return msg, len(rows)
 
 
@@ -91,7 +98,7 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None):
     pdf = os.path.join(out, 'county_bulletin_latest.pdf')
     if os.path.exists(pdf):
         with open(pdf, 'rb') as fh:
-            msg.add_attachment(fh.read(), maintype='application', subtype='pdf', filename='county_bulletin_latest.pdf')
+            msg.add_attachment(fh.read(), maintype='application', subtype='pdf', filename=pdf_name(doc, today))
     return msg
 
 
