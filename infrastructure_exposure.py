@@ -84,7 +84,6 @@ except Exception:
 # roads: rasterise GRIP4 (any class), 100 m cells ~ 0.1 km each
 try:
     rd = ee.FeatureCollection(ROADS).filterBounds(payam.geometry())
-    road_img = rd.reduceToImage(['gp_rtp'] if False else [], ee.Reducer.countEvery()).gt(0).unmask(0) if False else None
     road_img = ee.Image().byte().paint(rd, 1, 1).unmask(0).reproject('EPSG:4326', None, 100)
 
     def roads(f):
