@@ -203,8 +203,84 @@ def county_story(c, today=None):
                          f"{n(r.get('health'))} ({n(r.get('health_now'))})", f"{n(r.get('buildings'))} ({n(r.get('buildings_now'))})",
                          f"{n(r.get('roads_km'), 1)} ({n(r.get('roads_now_km'), 1)})"])
         s.append(table(rows, [28 * mm, 24 * mm, 20 * mm, 24 * mm, 24 * mm, 26 * mm, 28 * mm]))
+    if c.get('clusters'):
+        s.extend(cluster_story(c))
     for g in c.get('stations', []):
         s.extend(station_story(g))
+    return s
+
+
+CLUSTERS = [
+    ('WASH',
+     '• Water scarcity and drying of groundwater in drought areas.<br/>• Damage to infrastructure and water contamination in flood zones.',
+     '• Rehabilitate and expand water storage facilities.<br/>• Pre-position water treatment chemicals and repair parts.<br/>'
+     '• Improve resilience of groundwater pumps and map high-risk water points.'),
+    ('Food Security &amp; Agriculture',
+     '• Crop failure, moisture stress and heat stress.<br/>• Livestock mortality and sudden pasture depletion.',
+     '• Distribute drought-tolerant, short-cycle seed varieties ahead of planting seasons.<br/>'
+     '• Coordinate early livestock destocking and step up veterinary and deworming services.<br/>'
+     '• Provide flexible anticipatory cash transfers to farmers before the season fails.'),
+    ('Health &amp; Nutrition',
+     '• Surges in vector-borne (malaria) and waterborne (cholera) disease.<br/>• Risk of acute malnutrition from harvest losses.',
+     '• Strengthen integrated epidemiological surveillance.<br/>• Pre-position cholera kits, bed nets and ready-to-use therapeutic food (RUTF).<br/>'
+     '• Prepare heat-stress management and prioritise essential maternal and child health care.'),
+    ('Shelter &amp; NFIs',
+     '• Sudden displacement and destruction of homes from localized floods or storms.',
+     '• Pre-position emergency shelter kits and basic household supplies outside flood zones.<br/>'
+     '• Map highly exposed riverine settlements and set up early-warning protocols.'),
+    ('Education',
+     '• Learning disruption from school closures, water shortages or infrastructure damage.',
+     '• Activate pre-agreed education contingency plans before peak impacts.<br/>'
+     '• Secure temporary learning structures and deploy emergency school WASH services.'),
+    ('Protection',
+     '• Heightened protection, gender-based violence (GBV) and child labour risks from resource strain and climate displacement.',
+     '• Mainstream GBV risk mitigation across emergency service delivery.<br/>'
+     '• Establish conflict-resolution mechanisms along shifting pastoral migration corridors.'),
+]
+
+
+def _local(c):
+    """One data-driven line per cluster, from numbers already in the county dict."""
+    L = {}
+    adv = c.get('advisory') or []
+    adv = adv[0] if isinstance(adv, list) and adv else (adv if isinstance(adv, str) else '')
+    soil = adv.split(';')[0].strip() if adv else ''
+    ic, inow = c.get('infra_county') or {}, c.get('infra_now') or []
+    st = (c.get('stations') or [None])[0]
+    wash = []
+    if st and st.get('level'):
+        lv = st['level']
+        wash.append(f"{st['name']}: {lv['cls']}" + (f" (percentile {lv['pct']})" if lv.get('pct') is not None else '') + f" on {lv['date']}")
+    L['WASH'] = '; '.join(wash)
+    L['Food Security &amp; Agriculture'] = soil
+    hl = []
+    if ic.get('health') is not None:
+        hl.append(f"{n(ic['health_risk'])} of {n(ic['health'])} health facilities on flood-prone ground")
+    if inow:
+        hl.append(f"{n(sum((r.get('health_now') or 0) for r in inow))} flooded now in the top payams")
+    L['Health &amp; Nutrition'] = '; '.join(hl)
+    sc = c.get('scenarios')
+    L['Shelter &amp; NFIs'] = (f"planning case {n(sc[1])} people affected, {n(sc[3])} displaced" if sc else '')
+    ed = []
+    if ic.get('schools') is not None:
+        ed.append(f"{n(ic['schools_risk'])} of {n(ic['schools'])} schools on flood-prone ground")
+    if inow:
+        ed.append(f"{n(sum((r.get('schools_now') or 0) for r in inow))} flooded now in the top payams")
+    L['Education'] = '; '.join(ed)
+    L['Protection'] = (f"up to {n(sc[3])} people displaced in the planning case" if sc else '')
+    return L
+
+
+def cluster_story(c):
+    L = _local(c)
+    s = [P('Cluster-specific guidance and action priorities', H2)]
+    rows = [['Cluster', 'Core climate risk implication', 'Required actions and guidance']]
+    for name, risk, act in CLUSTERS:
+        loc = L.get(name)
+        rows.append([f'<b>{name}</b>', risk + (f'<br/><b>This county:</b> {loc}.' if loc else ''), act])
+    s.append(table(rows, [26 * mm, 62 * mm, 86 * mm], align_right_from=9))
+    s.append(P('Guidance adapted from the Global Nutrition Cluster, Climate Crisis and Humanitarian Coordination (2025) and the Global Protection Cluster '
+               'preparedness guidance. Decision support, to be confirmed by cluster coordinators.', SMALL))
     return s
 
 
