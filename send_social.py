@@ -42,6 +42,10 @@ def build_text(doc, min_level='orange', max_list=12):
     if len(hit) > max_list:
         lines.append(f"... and {len(hit) - max_list} more counties.")
     lines += ["",
+              "Each county page of the full report now carries guidance by humanitarian cluster (WASH, Food Security, Health and Nutrition, "
+              "Shelter and NFIs, Education, Protection): "
+              "https://raw.githubusercontent.com/Penuelabi/altimetry-nightly/main/reports/latest.pdf",
+              "",
               "Impact-based alert = hazard likelihood x people exposed. Decision support, not an official warning; "
               "scales are provisional.",
               "Data: GSMaP (JAXA), NASA SMAP, ECMWF IFS ensemble open data (CC BY 4.0, (c) ECMWF), WorldPop."]

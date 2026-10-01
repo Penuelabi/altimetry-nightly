@@ -66,7 +66,7 @@ def county_dicts(doc, cache=None, stations=None):
                               'counties': ex.get('counties') or [], 'payams': (ex.get('payams') or [])[:4]}
             sts.append(si)
         out.append({'county': name, 'state': state, 'population': popn, 'advisory': adv, 'previous': prev,
-                    'scenarios': scen, 'settlements': sett or None, 'infra_payam': ip or None, 'infra_county': cc if ip else None, 'infra_now': inow or None,
+                    'scenarios': scen, 'settlements': sett or None, 'infra_payam': ip or None, 'infra_county': cc if ip else None, 'infra_now': inow or None, 'clusters': True,
                     'stations': sts})
     return out
 
