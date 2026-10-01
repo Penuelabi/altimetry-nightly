@@ -452,7 +452,53 @@ def fit_county(c, today, w, h):
     return [KeepInFrame(w, h, county_story(cc, today), mode='shrink')]
 
 
+class Anchor(Flowable):
+    """Zero-size marker: creates the PDF destination and records the page it lands on (for the contents page)."""
+    def __init__(self, key, title, pages):
+        super().__init__()
+        self.key, self.title, self.pages = key, title, pages
+        self.width = self.height = 0
+
+    def wrap(self, aw, ah):
+        return 0, 0
+
+    def draw(self):
+        c = self.canv
+        c.bookmarkPage(self.key)
+        c.addOutlineEntry(self.title, self.key, level=0, closed=True)
+        self.pages[self.key] = c.getPageNumber()
+
+
+def _ckey(c):
+    import re
+    return 'c_' + re.sub(r'[^A-Za-z0-9]', '', f"{c.get('state', '')}{c['county']}")
+
+
+def toc_story(counties, pages, width):
+    """Page 2: counties grouped by state, each a link to its page."""
+    s = [P('Contents', H1), P('Counties by state. Click a county to jump to its page.', SMALL), Spacer(1, 2 * mm)]
+    from itertools import groupby
+    for state, grp in groupby(counties, key=lambda c: c.get('state', '')):
+        rows = []
+        for c in grp:
+            k = _ckey(c)
+            rows.append([P(f'<a href="#{k}" color="#1d5ede">{c["county"]}</a>', CELL), P(str(pages.get(k, '')), CELL)])
+        t = Table(rows, colWidths=[width - 9 * mm, 9 * mm])
+        t.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'), ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+                               ('TOPPADDING', (0, 0), (-1, -1), 0.6), ('BOTTOMPADDING', (0, 0), (-1, -1), 0.6),
+                               ('LEFTPADDING', (0, 0), (-1, -1), 0), ('RIGHTPADDING', (0, 0), (-1, -1), 0)]))
+        s.append(KeepTogether([P(f'{state} ({len(rows)})', H3), t]))
+    return s
+
+
 def build_pdf(counties, path, run_label=None, today=None, cover=None, logo=None, method=True, verification=None):
+    pages = {}
+    _build(counties, path, run_label, today, cover, logo, method, verification, pages)      # pass 1: find the pages
+    _build(counties, path, run_label, today, cover, logo, method, verification, dict(pages), final=True)
+    return path
+
+
+def _build(counties, path, run_label, today, cover, logo, method, verification, pages, final=False):
     today = today or dt.date.today()
     run_label = run_label or str(today)
     doc = BaseDocTemplate(path, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm, topMargin=19 * mm, bottomMargin=15 * mm,
@@ -466,17 +512,27 @@ def build_pdf(counties, path, run_label=None, today=None, cover=None, logo=None,
         fm = Frame(doc.leftMargin, doc.bottomMargin + bh, doc.width, doc.height - bh, id='fm')
         doc.addPageTemplates([PageTemplate(id='cover', frames=[fm, fb], onPage=_footer(run_label, True))])
     doc.addPageTemplates([PageTemplate(id='p', frames=[fr], onPage=_footer(run_label, bool(cover)))])
+    if cover and len(counties) > 1:
+        gap = 5 * mm
+        cw = (doc.width - 2 * gap) / 3
+        doc.addPageTemplates([PageTemplate(id='toc', frames=[Frame(doc.leftMargin + i * (cw + gap), doc.bottomMargin, cw, doc.height, id=f't{i}', leftPadding=0, rightPadding=0)
+                                                         for i in range(3)], onPage=_footer(run_label, True))])
     story = []
     if cover:
         from reportlab.platypus import FrameBreak, NextPageTemplate
         story.extend(cover_main)
         story.append(FrameBreak())
         story.extend(cover_bottom)
+        if len(counties) > 1:
+            story.append(NextPageTemplate('toc'))
+            story.append(PageBreak())
+            story.extend(toc_story(counties, pages, (doc.width - 10 * mm) / 3))
         story.append(NextPageTemplate('p'))
         story.append(PageBreak())
     for i, c in enumerate(counties):
         if i:
             story.append(PageBreak())
+        story.append(Anchor(_ckey(c), f"{c.get('state', '')}: {c['county']}", pages if not final else {}))
         story.extend(fit_county(c, today, doc.width, doc.height - 2 * mm))
     if method:
         story.append(PageBreak())
