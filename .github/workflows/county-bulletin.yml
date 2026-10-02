@@ -3,7 +3,8 @@ name: County hydro-climate bulletin (twice daily, after ECMWF 00 and 12 UTC rele
 on:
   schedule:
     - cron: '30 9 * * *'     # 09:30 UTC = 11:30 Juba; ECMWF open-data 00 UTC run is out by ~08:00 UTC
-    - cron: '30 21 * * *'    # 21:30 UTC = 23:30 Juba; ECMWF open-data 12 UTC run is out by ~20:00 UTC
+    - cron: '30 21 * * 1-6'  # Mon-Sat 21:30 UTC = 23:30 Juba; ECMWF open-data 12 UTC run is out by ~20:00 UTC
+    - cron: '30 21 * * 0'    # Sunday 21:30 UTC, after the weekly flood-extent (04:00) and exposure (18:00) jobs; the only scheduled run that emails
   workflow_dispatch:
 
 permissions:
@@ -34,7 +35,7 @@ jobs:
         run: |
           echo "BULLETIN_TMP_DIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
           # evening schedule (and manual runs after 21:00 UTC) use the 12 UTC ECMWF run, otherwise the 00 UTC run
-          if [ "$SCHEDULE" = "30 21 * * *" ] || { [ -z "$SCHEDULE" ] && [ "$(date -u +%H)" -ge 21 ]; }; then
+          if [ "$SCHEDULE" = "30 21 * * 1-6" ] || [ "$SCHEDULE" = "30 21 * * 0" ] || { [ -z "$SCHEDULE" ] && [ "$(date -u +%H)" -ge 21 ]; }; then
             echo "ENS_RUN_HOUR=12" >> "$GITHUB_ENV"
           else
             echo "ENS_RUN_HOUR=0" >> "$GITHUB_ENV"
@@ -69,8 +70,8 @@ jobs:
           sudo apt-get install -y -q fonts-dejavu-core || true
           python build_report.py 2>&1 | tee "$RUNNER_TEMP/report.log"
 
-      - name: Email digest (optional, needs SMTP secrets; once a day, midnight Juba run and manual runs)
-        if: github.event.schedule != '30 9 * * *'
+      - name: Email digest (optional, needs SMTP secrets; weekly on Sunday night, plus manual runs)
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 21 * * 0'
         continue-on-error: true
         env:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -78,6 +79,7 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           DIGEST_TO: ${{ secrets.DIGEST_TO }}
+          DIGEST_KIND: weekly
           DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
           DIGEST_MIN_LEVEL: ${{ vars.DIGEST_MIN_LEVEL }}
           DIGEST_ONLY_IF_ALERTS: ${{ vars.DIGEST_ONLY_IF_ALERTS }}
