@@ -174,7 +174,12 @@ def main():
     cover = m.cover_from_bulletin(doc, gauges(), today)
     logo = os.path.join(HERE, 'assets', 'uj_logo.png')
     path = os.path.join(OUT, 'county_report_latest.pdf')
-    m.build_pdf(county_dicts(doc, load_cache(), station_info(), today), path, run_label=str(doc.get('ecmwf_run_utc') or ''), today=today.date(), cover=cover, logo=logo, verification=_verif(doc))
+    counties = county_dicts(doc, load_cache(), station_info(), today)
+    kwargs = dict(run_label=str(doc.get('ecmwf_run_utc') or ''), today=today.date(), logo=logo, verification=_verif(doc))
+    m.build_pdf(counties, path, cover=cover, **kwargs)
+    import pickle                       # kept so send_digest can build per-subscriber PDFs (states / counties chosen on the form)
+    with open(os.path.join(OUT, 'pdf_inputs.pkl'), 'wb') as fh:
+        pickle.dump({'counties': counties, 'cover': cover, 'kwargs': kwargs}, fh)
     os.makedirs(os.path.join(HERE, 'reports'), exist_ok=True)
     shutil.copyfile(path, os.path.join(HERE, 'reports', 'latest.pdf'))
     print('wrote', path, 'and reports/latest.pdf')

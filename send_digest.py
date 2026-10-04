@@ -99,7 +99,7 @@ def subscribers(url):
     return out
 
 
-def rich_message(doc, out, sender, to, bcc, kind, today=None):
+def rich_message(doc, out, sender, to, bcc, kind, today=None, pdf=None, label=''):
     """Daily (kind='daily') or weekly (kind='weekly') email with HTML body, PDF attached, BCC subscribers."""
     import daily_brief as db
     alt = os.environ.get('ALTIMETRY_OUT_DIR', 'altdata')
@@ -121,10 +121,11 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None):
     msg['Reply-To'] = sender
     msg.set_content(text)
     msg.add_alternative(html, subtype='html')
-    pdf = _best_pdf(out)
+    pdf = pdf or _best_pdf(out)
     if os.path.exists(pdf):
         with open(pdf, 'rb') as fh:
-            msg.add_attachment(fh.read(), maintype='application', subtype='pdf', filename=pdf_name(doc, today))
+            name = pdf_name(doc, today)
+            msg.add_attachment(fh.read(), maintype='application', subtype='pdf', filename=name[:-4] + label + '.pdf' if label and name.endswith('.pdf') else name)
     return msg
 
 
@@ -160,6 +161,14 @@ def main():
             lst, na, nr = si.sync(os.path.join(out, 'subscribers.csv'), user=user, password=pw, own=user)
             print(f'Subscribers by e-mail: {len(lst)} (added {na}, removed {nr}).')
             bcc = sorted(set(bcc) | set(lst))
+        custom = {}
+        try:                                                 # per-subscriber choices from the form sheet
+            import subscriber_prefs as sp
+            prefs = sp.fetch_prefs((os.environ.get('SUBSCRIBERS_CSV_URL') or '').strip())
+            bcc, custom = sp.groups(bcc, prefs)
+            print(f'Subscriber choices: {len(bcc)} full report, {sum(len(v[1]) for v in custom.values())} custom in {len(custom)} group(s).')
+        except Exception as e:
+            print(f'WARNING: subscriber choices skipped ({type(e).__name__}: {e}); everyone gets the full report.')
         try:
             msg = rich_message(doc, out, sender, to, bcc, kind, now.date())
             n = 1
@@ -182,6 +191,33 @@ def main():
         s.login(user, pw)
         s.send_message(msg, to_addrs=[t.strip() for t in to.split(',') if t.strip()] + bcc)
     print(f'Digest sent to {to} + {len(bcc)} subscriber(s) (BCC).')
+    if os.environ.get('DIGEST_FORMAT', 'rich') == 'rich' and custom:
+        send_custom(doc, out, sender, kind, now.date(), custom, host, port, user, pw)
+
+
+def send_custom(doc, out, sender, kind, day, custom, host, port, user, pw):
+    """One email per distinct choice (states / counties), with a PDF holding only those counties."""
+    import pickle, subscriber_prefs as sp
+    pk = os.path.join(out, 'pdf_inputs.pkl')
+    if not os.path.exists(pk):
+        print('WARNING: pdf_inputs.pkl missing; custom subscribers skipped this time.')
+        return
+    inputs = pickle.load(open(pk, 'rb'))
+    for key, (pref, emails) in custom.items():
+        try:
+            path, n = sp.build_subset_pdf(inputs, pref, os.path.join(out, f'county_report_{key}.pdf'))
+            if not path:
+                print(f'WARNING: choice {key}: no matching counties ({len(emails)} subscriber(s) skipped).')
+                continue
+            msg = rich_message(doc, out, sender, sender, emails, kind, day, pdf=path, label='_selected')
+            with (smtplib.SMTP_SSL(host, port, timeout=60) if port == 465 else smtplib.SMTP(host, port, timeout=60)) as s:
+                if port != 465:
+                    s.starttls()
+                s.login(user, pw)
+                s.send_message(msg, to_addrs=[sender] + emails)
+            print(f'Custom report ({n} counties) sent to {len(emails)} subscriber(s) (BCC).')
+        except Exception as e:
+            print(f'WARNING: custom report {key} failed ({type(e).__name__}: {e}).')
 
 
 if __name__ == '__main__':
