@@ -105,8 +105,8 @@ jobs:
           LI_AUTHOR_URN: ${{ secrets.LI_AUTHOR_URN }}
           LI_ACCESS_TOKEN: ${{ secrets.LI_ACCESS_TOKEN }}
           SOCIAL_MIN_LEVEL: ${{ vars.SOCIAL_MIN_LEVEL }}
-          SOCIAL_RUN_HOURS: ${{ vars.SOCIAL_RUN_HOURS }}
-          SOCIAL_DRY_RUN: ${{ vars.SOCIAL_DRY_RUN }}
+          SOCIAL_RUN_HOURS: "00,12"
+          SOCIAL_DRY_RUN: "0"
           SOCIAL_ONLY_IF_ALERTS: ${{ vars.SOCIAL_ONLY_IF_ALERTS }}
           SUBSCRIBE_URL: ${{ vars.SUBSCRIBE_URL }}
         run: python send_social.py 2>&1 | tee "$RUNNER_TEMP/social.log"
