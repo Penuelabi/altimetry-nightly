@@ -100,8 +100,8 @@ class Bars(Flowable):
 
 
 APP_URL = 'https://penuelabi.users.earthengine.app/view/south-sudan-weather-forecast'
-SUBSCRIBE_URL = 'https://claude.ai/artifact/NW1fEYxo4VQ2BoUfsVfQoK'
-UNSUB_URL = 'mailto:penuelabi@gmail.com?subject=UNSUBSCRIBE'
+SUBSCRIBE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeDtY-twsGL0Xx9FlK_nLjC9X_6FSt7QxzTa4NXJqztwRe5VA/viewform'
+UNSUB_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfjTMvOg98EsZl56wfGGhxqKSlPHs-mM2mhblWZD6c1LEtXwQ/viewform'
 UCD_URL = 'https://globalaffairs.ucdavis.edu/news/exploring-complex-social-ecological-systems'
 LINK = '#1d5ede'
 
