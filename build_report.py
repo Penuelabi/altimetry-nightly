@@ -17,7 +17,7 @@ def _num(v):
     return None if pd.isna(v) else int(round(float(v)))
 
 
-def county_dicts(doc, cache=None, stations=None):
+def county_dicts(doc, cache=None, stations=None, today=None):
     cache, stations = cache or {}, stations or {}
     by_county = {}
     for uid, ex in (cache.get('stations') or {}).items():
@@ -27,6 +27,7 @@ def county_dicts(doc, cache=None, stations=None):
     aff = pd.read_csv(D('flood_affected_county_year.csv'))
     sc = pd.read_csv(D('flood_scenarios_2026_county.csv'))
     st = pd.read_csv(D('flood_settlements_sept2025.csv'))
+    news = m.load_news(today)[0]
     alias = {'Abyei Region': 'Abyei Administrative Area', 'Kajo-keji': 'Kajo-Keji'}
     out = []
     for c in sorted(doc['counties'], key=lambda c: (c['state'], c['county'])):
@@ -66,7 +67,7 @@ def county_dicts(doc, cache=None, stations=None):
                               'counties': ex.get('counties') or [], 'payams': (ex.get('payams') or [])[:4]}
             sts.append(si)
         out.append({'county': name, 'state': state, 'population': popn, 'advisory': adv, 'previous': prev,
-                    'scenarios': scen, 'settlements': sett or None, 'infra_payam': ip or None, 'infra_county': cc if ip else None, 'infra_now': inow or None, 'clusters': True,
+                    'scenarios': scen, 'settlements': sett or None, 'infra_payam': ip or None, 'infra_county': cc if ip else None, 'infra_now': inow or None, 'news': news.get(_key(name)),
                     'stations': sts})
     return out
 
@@ -173,7 +174,7 @@ def main():
     cover = m.cover_from_bulletin(doc, gauges(), today)
     logo = os.path.join(HERE, 'assets', 'uj_logo.png')
     path = os.path.join(OUT, 'county_report_latest.pdf')
-    m.build_pdf(county_dicts(doc, load_cache(), station_info()), path, run_label=str(doc.get('ecmwf_run_utc') or ''), today=today.date(), cover=cover, logo=logo, verification=_verif(doc))
+    m.build_pdf(county_dicts(doc, load_cache(), station_info(), today), path, run_label=str(doc.get('ecmwf_run_utc') or ''), today=today.date(), cover=cover, logo=logo, verification=_verif(doc))
     os.makedirs(os.path.join(HERE, 'reports'), exist_ok=True)
     shutil.copyfile(path, os.path.join(HERE, 'reports', 'latest.pdf'))
     print('wrote', path, 'and reports/latest.pdf')
