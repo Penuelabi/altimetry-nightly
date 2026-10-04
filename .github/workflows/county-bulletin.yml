@@ -11,6 +11,10 @@ on:
         description: 'Email the digest to subscribers (untick to rebuild and post to Facebook only)'
         type: boolean
         default: true
+      force_social:
+        description: 'Post to Facebook even if no county is at the alert level (test the social pipeline)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -107,7 +111,7 @@ jobs:
           SOCIAL_MIN_LEVEL: ${{ vars.SOCIAL_MIN_LEVEL }}
           SOCIAL_RUN_HOURS: "00,12"
           SOCIAL_DRY_RUN: "0"
-          SOCIAL_ONLY_IF_ALERTS: ${{ vars.SOCIAL_ONLY_IF_ALERTS }}
+          SOCIAL_ONLY_IF_ALERTS: ${{ github.event.inputs.force_social == 'true' && '0' || vars.SOCIAL_ONLY_IF_ALERTS }}
           SUBSCRIBE_URL: ${{ vars.SUBSCRIBE_URL }}
         run: python send_social.py 2>&1 | tee "$RUNNER_TEMP/social.log"
 
