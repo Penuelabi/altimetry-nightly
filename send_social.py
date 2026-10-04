@@ -55,6 +55,13 @@ def build_text(doc, min_level='orange', max_list=12):
         lines.append(f"{ICON[a['level']]} - {c['county']} ({c['state']}): {a['hazard']}")
     if len(hit) > max_list:
         lines.append(f"... and {len(hit) - max_list} more counties.")
+    try:
+        import nile_pulse
+        pu = nile_pulse.pulse()
+        if pu:
+            lines += ["", nile_pulse.one_line(pu) + '.']
+    except Exception:
+        pass
     news = recent_news(run)
     if news:
         lines += ["", "Reported this week:"]

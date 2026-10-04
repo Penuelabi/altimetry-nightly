@@ -1,0 +1,14 @@
+{
+  "note": "Travel-time clock for water leaving Lake Victoria. Edit signal_date when there is a new signal. Later this can be set automatically from the DAHITI Lake Victoria series (DAHITI ID 2).",
+  "signal_date": "2026-09-20",
+  "signal": "Lake Victoria outflow clock started 20 Sep 2026",
+  "lake_to_nimule_days": 103,
+  "nimule_to_juba_days": 9,
+  "lake_to_juba_days": 112,
+  "station": "dahiti:2",
+  "levels_m": [
+    {"date": "2026-08-15", "level_m": 1135.889, "source": "DAHITI 2"},
+    {"date": "2026-08-25", "level_m": 1135.922, "source": "DAHITI 2", "note": "last DAHITI pass; 2-yr level 1136.173 m"},
+    {"date": "2026-09-24", "level_m": 1135.950, "source": "Hydroweb Lake Victoria"}
+  ]
+}

@@ -349,6 +349,14 @@ def cover_story(cover, logo=None):
             s.append(table([headers] + rows, [w * mm for w in widths]))
         if note:
             s.append(P(note, SMALL))
+    np_ = cover.get('nile_pulse')
+    if np_:
+        import nile_pulse as _np
+        s.append(P('Nile pulse countdown from Lake Victoria', H2))
+        rows = [['Point', 'Expected', 'Days left']] + [[n, f'{w:%d %b %Y}', ('arrived' if st == 'arrived' else str(l))] for n, w, l, st in np_['points']]
+        s.append(table(rows, [60 * mm, 40 * mm, 30 * mm]))
+        s.append(P(f"Clock started {np_['signal_date']:%d %b %Y}. Travel time of 103 days from the lake to Nimule and 9 more to Rejaf (Juba). "
+                   'Amber at 30 days, red at 10 days. A travel-time estimate, not a river-level forecast.', SMALL))
     nat = cover.get('news') or []
     if nat:
         s.append(P('Countrywide and state-level news', H2))
@@ -409,7 +417,7 @@ def cover_from_bulletin(doc, gauges=None, today=None, n_monitor=5, n_gauges=5):
          if grows else 'No gauge meets the rule today.'),
         (f'{n_monitor} Towns and counties to monitor (red or orange, not in the lists above)', ['Town / county', 'Alert', 'Soil z', 'Rain next 2 wk', 'Chance 50 mm wk 1', 'Chance 7-day dry spell'], mrows,
          [58, 18, 16, 26, 26, 26], None if mrows else 'No other county is at red or orange.')],
-            'news': national_news(today)}
+            'news': national_news(today), 'nile_pulse': __import__('nile_pulse').pulse(today)}
 
 
 def method_story(verification=None):

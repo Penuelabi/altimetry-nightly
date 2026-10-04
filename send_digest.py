@@ -116,6 +116,16 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None, pdf=None, label=''
         except Exception as e:
             print(f'WARNING: gauge watch skipped: {type(e).__name__}: {e}')
         subject, text, html = db.build_daily(doc, gauges, sub, sender, today)
+    try:
+        import nile_pulse
+        pu = nile_pulse.pulse(today)
+        if pu:
+            text = nile_pulse.text_block(pu) + '\n\n' + text
+            i = html.lower().find('<body')
+            j = html.find('>', i) + 1 if i >= 0 else 0
+            html = html[:j] + nile_pulse.html_block(pu) + html[j:]
+    except Exception as e:
+        print(f'WARNING: Nile pulse block skipped: {type(e).__name__}: {e}')
     msg = EmailMessage()
     msg['Subject'], msg['From'], msg['To'] = subject, sender, to
     msg['Reply-To'] = sender
