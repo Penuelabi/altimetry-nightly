@@ -27,7 +27,7 @@ def _split(cell):
 
 
 def parse_prefs(text):
-    """CSV text -> {email: {'mode': 'all'|'states'|'counties', 'states': set, 'counties': set}} (normalised names)."""
+    """CSV text -> {email: {'mode': 'all'|'custom', 'states': set, 'counties': set}} (normalised names)."""
     out = {}
     rd = csv.reader(io.StringIO(text))
     try:
@@ -51,12 +51,10 @@ def parse_prefs(text):
         mode_txt = get(m_i).lower()
         states = {_k(s) for s in _split(get(s_i))}
         counties = {_k(c) for i in c_idx for c in _split(get(i))}
-        if 'state' in mode_txt and states:
-            out[addr] = {'mode': 'states', 'states': states, 'counties': set()}
-        elif 'count' in mode_txt and counties:
-            out[addr] = {'mode': 'counties', 'states': set(), 'counties': counties}
-        else:
+        if 'whole' in mode_txt or not (states or counties):
             out[addr] = {'mode': 'all', 'states': set(), 'counties': set()}
+        else:                                  # states and counties ticked on the form are both honoured
+            out[addr] = {'mode': 'custom', 'states': states, 'counties': counties}
     return out
 
 
@@ -73,11 +71,9 @@ def fetch_prefs(url):
 
 def select(counties, pref):
     """Counties (list of dicts with 'county', 'state') matching one choice; order kept."""
-    if pref['mode'] == 'states':
-        return [c for c in counties if _k(c.get('state', '')) in pref['states']]
-    if pref['mode'] == 'counties':
-        return [c for c in counties if _k(c['county']) in pref['counties']]
-    return list(counties)
+    if pref['mode'] == 'all':
+        return list(counties)
+    return [c for c in counties if _k(c.get('state', '')) in pref['states'] or _k(c['county']) in pref['counties']]
 
 
 def group_key(pref):
