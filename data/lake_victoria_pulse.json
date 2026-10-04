@@ -7,8 +7,27 @@
   "lake_to_juba_days": 112,
   "station": "dahiti:2",
   "levels_m": [
-    {"date": "2026-08-15", "level_m": 1135.889, "source": "DAHITI 2"},
-    {"date": "2026-08-25", "level_m": 1135.922, "source": "DAHITI 2", "note": "last DAHITI pass; 2-yr level 1136.173 m"},
-    {"date": "2026-09-24", "level_m": 1135.950, "source": "Hydroweb Lake Victoria"}
-  ]
+    {
+      "date": "2026-08-15",
+      "level_m": 1135.889,
+      "source": "DAHITI 2"
+    },
+    {
+      "date": "2026-08-25",
+      "level_m": 1135.922,
+      "source": "DAHITI 2",
+      "note": "last DAHITI pass; 2-yr level 1136.173 m"
+    },
+    {
+      "date": "2026-09-24",
+      "level_m": 1135.95,
+      "source": "Hydroweb Lake Victoria"
+    }
+  ],
+  "level_station": "dahiti:2",
+  "trigger_level_m": 1136.12,
+  "trigger_label": "May 2023 mean level (DAHITI 2)",
+  "double_alert_days_to_juba": 30,
+  "hydroweb_station": "hydroweb:1300000000016",
+  "hydroweb_trigger_level_m": 1136.43
 }

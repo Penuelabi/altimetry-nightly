@@ -59,6 +59,7 @@ jobs:
         run: |
           python drive_sync.py pull bulletin
           python drive_sync.py pull || echo "WARNING: altimetry pull failed; river trigger will be skipped"
+          python export_lake_victoria.py || echo "WARNING: Lake Victoria series not refreshed"
 
       - name: Verify past forecasts against observed rain (optional)
         continue-on-error: true

@@ -355,6 +355,10 @@ def cover_story(cover, logo=None):
         s.append(P('Nile pulse countdown from Lake Victoria', H2))
         rows = [['Point', 'Expected', 'Days left']] + [[n, f'{w:%d %b %Y}', ('arrived' if st == 'arrived' else str(l))] for n, w, l, st in np_['points']]
         s.append(table(rows, [60 * mm, 40 * mm, 30 * mm]))
+        if _np.alert_phrase(np_):
+            s.append(P(f"<b><font color='#b00020'>{_np.alert_phrase(np_)}</font></b>", SMALL))
+        if _np.level_phrase(np_):
+            s.append(P(_np.level_phrase(np_) + '.', SMALL))
         s.append(P(f"Clock started {np_['signal_date']:%d %b %Y}. Travel time of 103 days from the lake to Nimule and 9 more to Rejaf (Juba). "
                    'Amber at 30 days, red at 10 days. A travel-time estimate, not a river-level forecast.', SMALL))
     nat = cover.get('news') or []
