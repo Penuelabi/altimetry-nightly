@@ -360,7 +360,7 @@ def cover_story(cover, logo=None):
         if _np.level_phrase(np_):
             s.append(P(_np.level_phrase(np_) + '.', SMALL))
         s.append(P(f"Clock started {np_['signal_date']:%d %b %Y}. Travel time of 103 days from the lake to Nimule and 9 more to Rejaf (Juba). "
-                   'Amber at 30 days, red at 10 days. A travel-time estimate, not a river-level forecast.', SMALL))
+                   'Amber at 30 days, red at 10 days. If Lake Victoria reaches the May 2023 level, a second 30-day countdown to Juba starts. A travel-time estimate, not a river-level forecast.', SMALL))
     nat = cover.get('news') or []
     if nat:
         s.append(P('Countrywide and state-level news', H2))

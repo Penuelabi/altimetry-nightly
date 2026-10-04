@@ -32,6 +32,30 @@ def _latest_level(uid, path=None):
     return last
 
 
+def _series(uid, path=None):
+    import csv
+    f = path or os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'lake_victoria_levels.csv')
+    out = []
+    try:
+        for r in csv.DictReader(open(f, encoding='utf-8')):
+            if r['station_uid'] == uid:
+                out.append((dt.date.fromisoformat(r['date'][:10]), float(r['level_m'])))
+    except Exception:
+        return []
+    return sorted(out)
+
+
+def _streak_start(series, trigger):
+    """Date of the first pass in the current run of consecutive passes at or above the trigger, or None when the latest pass is below it."""
+    start = None
+    for d, v in reversed(series):
+        if v >= trigger:
+            start = d
+        else:
+            break
+    return start
+
+
 def pulse(today=None, path=None, levels_path=None):
     """dict(signal_date, points=[(name, date, days_left, state)], levels) or None when the file is missing."""
     try:
@@ -55,11 +79,16 @@ def pulse(today=None, path=None, levels_path=None):
         lv = {'date': last[0], 'level': last[1], 'trigger': float(trig), 'label': cfg.get('trigger_label', 'trigger level'),
               'diff': round(last[1] - float(trig), 3), 'hit': last[1] >= float(trig),
               'hw': ({'date': hw[0], 'level': hw[1], 'trigger': cfg.get('hydroweb_trigger_level_m')} if hw else None)}
-    juba_days = pts[-1][2]
-    limit = int(cfg.get('double_alert_days_to_juba', 30))
-    time_hit = 0 <= juba_days <= limit
-    level_hit = bool(lv and lv['hit'])
-    mode = 'double' if (level_hit and time_hit) else ('level' if level_hit else ('time' if time_hit else 'none'))
+    mode, limit = 'none', int(cfg.get('level_countdown_days', 30))
+    if lv and lv['hit']:
+        ser = _series(cfg.get('level_station', 'dahiti:2'), levels_path)
+        td = cfg.get('level_trigger_date')
+        td = dt.date.fromisoformat(td) if td else (_streak_start(ser, float(trig)) or lv['date'])
+        when = td + dt.timedelta(days=limit)
+        left = (when - today).days
+        pts.append(('Juba (new 30-day clock)', when, left, _state(left)))
+        lv['trigger_date'] = td
+        mode = 'double'
     return {'signal_date': start, 'signal': cfg.get('signal', ''), 'points': pts, 'levels': cfg.get('levels_m', []),
             'lake': lv, 'mode': mode, 'limit': limit}
 
@@ -79,10 +108,10 @@ def level_phrase(p):
 
 
 def alert_phrase(p):
-    return {'double': f"DOUBLE ALERT: lake at or above the trigger level and Juba {p['limit']} days or less away",
-            'level': 'LEVEL ALERT: lake at or above the trigger level',
-            'time': f"TIME ALERT: Juba {p['limit']} days or less away, lake still below the trigger level",
-            'none': ''}[p.get('mode', 'none')]
+    if p.get('mode') != 'double':
+        return ''
+    td = (p.get('lake') or {}).get('trigger_date')
+    return (f"DOUBLE ALERT: Lake Victoria reached the {p['lake']['label']} on {td:%d %b %Y}; a second {p['limit']}-day countdown to Juba is running" if td else '')
 
 
 def one_line(p):

@@ -27,7 +27,7 @@
   "level_station": "dahiti:2",
   "trigger_level_m": 1136.12,
   "trigger_label": "May 2023 mean level (DAHITI 2)",
-  "double_alert_days_to_juba": 30,
   "hydroweb_station": "hydroweb:1300000000016",
-  "hydroweb_trigger_level_m": 1136.43
+  "hydroweb_trigger_level_m": 1136.43,
+  "level_countdown_days": 30
 }
