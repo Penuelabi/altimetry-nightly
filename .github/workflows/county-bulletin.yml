@@ -6,6 +6,11 @@ on:
     - cron: '30 21 * * 1-6'  # Mon-Sat 21:30 UTC = 23:30 Juba; ECMWF open-data 12 UTC run is out by ~20:00 UTC
     - cron: '30 21 * * 0'    # Sunday 21:30 UTC, after the weekly flood-extent (04:00) and exposure (18:00) jobs; the only scheduled run that emails
   workflow_dispatch:
+    inputs:
+      email:
+        description: 'Email the digest to subscribers (untick to rebuild and post to Facebook only)'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -71,7 +76,7 @@ jobs:
           python build_report.py 2>&1 | tee "$RUNNER_TEMP/report.log"
 
       - name: Email digest (optional, needs SMTP secrets; weekly on Sunday night, plus manual runs)
-        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 21 * * 0'
+        if: (github.event_name == 'workflow_dispatch' && github.event.inputs.email != 'false') || github.event.schedule == '30 21 * * 0'
         continue-on-error: true
         env:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -102,6 +107,7 @@ jobs:
           SOCIAL_RUN_HOURS: ${{ vars.SOCIAL_RUN_HOURS }}
           SOCIAL_DRY_RUN: ${{ vars.SOCIAL_DRY_RUN }}
           SOCIAL_ONLY_IF_ALERTS: ${{ vars.SOCIAL_ONLY_IF_ALERTS }}
+          SUBSCRIBE_URL: ${{ vars.SUBSCRIBE_URL }}
         run: python send_social.py 2>&1 | tee "$RUNNER_TEMP/social.log"
 
       - name: Show warnings and digest result in run summary

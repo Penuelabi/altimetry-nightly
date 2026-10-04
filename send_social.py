@@ -26,6 +26,20 @@ LI_POSTS = 'https://api.linkedin.com/rest/posts'
 LI_VERSION = os.environ.get('LI_API_VERSION', '202506')
 
 
+def recent_news(run, days=14, limit=3):
+    """Newest items from data/news.json (reported news), at most `limit`, newer than `days` before the run date."""
+    import datetime as dt
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'news.json')
+    try:
+        today = dt.date.fromisoformat(run) if run else dt.date.today()
+        items = json.load(open(path, encoding='utf-8')).get('items', [])
+        keep = [i for i in items if 0 <= (today - dt.date.fromisoformat(i['date'])).days <= days]
+    except Exception:
+        return []
+    keep.sort(key=lambda i: i['date'], reverse=True)
+    return keep[:limit]
+
+
 def build_text(doc, min_level='orange', max_list=12):
     lo = ORDER.index(min_level) if min_level in ORDER else 2
     cs = doc['counties']
@@ -41,11 +55,19 @@ def build_text(doc, min_level='orange', max_list=12):
         lines.append(f"{ICON[a['level']]} - {c['county']} ({c['state']}): {a['hazard']}")
     if len(hit) > max_list:
         lines.append(f"... and {len(hit) - max_list} more counties.")
+    news = recent_news(run)
+    if news:
+        lines += ["", "Reported this week:"]
+        for it in news:
+            where = ', '.join(it.get('counties') or []) or 'Countrywide'
+            lines.append(f"- {where}: {it['text']} ({it['source']})")
+    sub = (os.environ.get('SUBSCRIBE_URL') or '').strip()
     lines += ["",
-              "Each county page of the full report now carries guidance by humanitarian cluster (WASH, Food Security, Health and Nutrition, "
-              "Shelter and NFIs, Education, Protection): "
-              "https://raw.githubusercontent.com/Penuelabi/altimetry-nightly/main/reports/latest.pdf",
-              "",
+              "Full county report (PDF, one page per county): "
+              "https://raw.githubusercontent.com/Penuelabi/altimetry-nightly/main/reports/latest.pdf"]
+    if sub:
+        lines.append(f"Get the report by email, whole country, selected states or counties: {sub}")
+    lines += ["",
               "Impact-based alert = hazard likelihood x people exposed. Decision support, not an official warning; "
               "scales are provisional.",
               "Data: GSMaP (JAXA), NASA SMAP, ECMWF IFS ensemble open data (CC BY 4.0, (c) ECMWF), WorldPop."]
