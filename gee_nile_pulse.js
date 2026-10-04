@@ -3,7 +3,7 @@
 var SIGNAL = '2026-09-20';
 var TO_NIMULE = 103;   // days, Lake Victoria to Nimule
 var TO_JUBA = 112;     // days, Lake Victoria to Rejaf (Juba): 103 + 9
-// Second clock: when Lake Victoria reaches the May 2023 mean level (1136.12 m, DAHITI 2), a new 30-day countdown to Juba starts.
+// Second clock: when Lake Victoria reaches the May 2023 mean level (1136.43 m, Hydroweb Lake Victoria), a new 30-day countdown to Juba starts.
 // Set LEVEL_TRIGGER_DATE (YYYY-MM-DD) from the report when the "DOUBLE ALERT" appears; leave null while the lake is below the level.
 var LEVEL_TRIGGER_DATE = null;
 var LEVEL_COUNTDOWN = 30;

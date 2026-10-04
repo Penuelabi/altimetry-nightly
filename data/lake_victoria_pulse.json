@@ -1,5 +1,5 @@
 {
-  "note": "Travel-time clock for water leaving Lake Victoria. Edit signal_date when there is a new signal. Later this can be set automatically from the DAHITI Lake Victoria series (DAHITI ID 2).",
+  "note": "Travel-time clock for water leaving Lake Victoria. Level trigger uses the Hydroweb Lake Victoria series (median of the last 3 passes); DAHITI 2 is shown as a second opinion.",
   "signal_date": "2026-09-20",
   "signal": "Lake Victoria outflow clock started 20 Sep 2026",
   "lake_to_nimule_days": 103,
@@ -24,10 +24,10 @@
       "source": "Hydroweb Lake Victoria"
     }
   ],
-  "level_station": "dahiti:2",
-  "trigger_level_m": 1136.12,
-  "trigger_label": "May 2023 mean level (DAHITI 2)",
-  "hydroweb_station": "hydroweb:1300000000016",
-  "hydroweb_trigger_level_m": 1136.43,
-  "level_countdown_days": 30
+  "level_station": "hydroweb:1300000000016",
+  "trigger_level_m": 1136.43,
+  "trigger_label": "May 2023 mean level (Hydroweb)",
+  "level_countdown_days": 30,
+  "secondary_station": "dahiti:2",
+  "secondary_trigger_level_m": 1136.12
 }

@@ -45,6 +45,15 @@ def _series(uid, path=None):
     return sorted(out)
 
 
+def _smooth(series, k=3):
+    """Running median of up to k passes, so one noisy pass does not start or stop an alert."""
+    out = []
+    for i, (d, v) in enumerate(series):
+        w = sorted(x for _, x in series[max(0, i - k + 1):i + 1])
+        out.append((d, w[len(w) // 2]))
+    return out
+
+
 def _streak_start(series, trigger):
     """Date of the first pass in the current run of consecutive passes at or above the trigger, or None when the latest pass is below it."""
     start = None
@@ -73,15 +82,16 @@ def pulse(today=None, path=None, levels_path=None):
         pts.append((name, when, left, _state(left)))
     lv = None
     trig = cfg.get('trigger_level_m')
-    last = _latest_level(cfg.get('level_station', 'dahiti:2'), levels_path)
-    hw = _latest_level(cfg.get('hydroweb_station', ''), levels_path)
+    ser0 = _smooth(_series(cfg.get('level_station', 'hydroweb:1300000000016'), levels_path))
+    last = ser0[-1] if ser0 else None
+    hw = _latest_level(cfg.get('secondary_station', ''), levels_path)
     if last and trig:
         lv = {'date': last[0], 'level': last[1], 'trigger': float(trig), 'label': cfg.get('trigger_label', 'trigger level'),
               'diff': round(last[1] - float(trig), 3), 'hit': last[1] >= float(trig),
-              'hw': ({'date': hw[0], 'level': hw[1], 'trigger': cfg.get('hydroweb_trigger_level_m')} if hw else None)}
+              'hw': ({'date': hw[0], 'level': hw[1], 'trigger': cfg.get('secondary_trigger_level_m')} if hw else None)}
     mode, limit = 'none', int(cfg.get('level_countdown_days', 30))
     if lv and lv['hit']:
-        ser = _series(cfg.get('level_station', 'dahiti:2'), levels_path)
+        ser = ser0
         td = cfg.get('level_trigger_date')
         td = dt.date.fromisoformat(td) if td else (_streak_start(ser, float(trig)) or lv['date'])
         when = td + dt.timedelta(days=limit)
