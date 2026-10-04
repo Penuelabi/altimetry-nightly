@@ -4,7 +4,7 @@ Combined county report PDF: one section per county, one PDF for all subscribers.
 
 build_pdf(counties, path, run_label) takes a list of county dicts (see SAMPLE at the bottom for the shape)
 and writes a PDF with a cover page, a contents table and one section per county:
-  advisory | people affected, previous assessments | 2026 plan scenarios | settlements assessed Sept 2025 |
+  advisory | reported news | people affected, previous assessments | 2026 plan scenarios | settlements assessed Sept 2025 |
   infrastructure at risk (payam) | river station status, routed upstream signal, flooding vs same season,
   exposure within 25 km.
 Sections whose data is missing are skipped, never filled with placeholders.
@@ -203,84 +203,63 @@ def county_story(c, today=None):
                          f"{n(r.get('health'))} ({n(r.get('health_now'))})", f"{n(r.get('buildings'))} ({n(r.get('buildings_now'))})",
                          f"{n(r.get('roads_km'), 1)} ({n(r.get('roads_now_km'), 1)})"])
         s.append(table(rows, [28 * mm, 24 * mm, 20 * mm, 24 * mm, 24 * mm, 26 * mm, 28 * mm]))
-    if c.get('clusters'):
-        s.extend(cluster_story(c))
+    s.extend(news_story(c))
     for g in c.get('stations', []):
         s.extend(station_story(g))
     return s
 
 
-CLUSTERS = [
-    ('WASH',
-     '• Water scarcity and drying of groundwater in drought areas.<br/>• Damage to infrastructure and water contamination in flood zones.',
-     '• Rehabilitate and expand water storage facilities.<br/>• Pre-position water treatment chemicals and repair parts.<br/>'
-     '• Improve resilience of groundwater pumps and map high-risk water points.'),
-    ('Food Security &amp; Agriculture',
-     '• Crop failure, moisture stress and heat stress.<br/>• Livestock mortality and sudden pasture depletion.',
-     '• Distribute drought-tolerant, short-cycle seed varieties ahead of planting seasons.<br/>'
-     '• Coordinate early livestock destocking and step up veterinary and deworming services.<br/>'
-     '• Provide flexible anticipatory cash transfers to farmers before the season fails.'),
-    ('Health &amp; Nutrition',
-     '• Surges in vector-borne (malaria) and waterborne (cholera) disease.<br/>• Risk of acute malnutrition from harvest losses.',
-     '• Strengthen integrated epidemiological surveillance.<br/>• Pre-position cholera kits, bed nets and ready-to-use therapeutic food (RUTF).<br/>'
-     '• Prepare heat-stress management and prioritise essential maternal and child health care.'),
-    ('Shelter &amp; NFIs',
-     '• Sudden displacement and destruction of homes from localized floods or storms.',
-     '• Pre-position emergency shelter kits and basic household supplies outside flood zones.<br/>'
-     '• Map highly exposed riverine settlements and set up early-warning protocols.'),
-    ('Education',
-     '• Learning disruption from school closures, water shortages or infrastructure damage.',
-     '• Activate pre-agreed education contingency plans before peak impacts.<br/>'
-     '• Secure temporary learning structures and deploy emergency school WASH services.'),
-    ('Protection',
-     '• Heightened protection, gender-based violence (GBV) and child labour risks from resource strain and climate displacement.',
-     '• Mainstream GBV risk mitigation across emergency service delivery.<br/>'
-     '• Establish conflict-resolution mechanisms along shifting pastoral migration corridors.'),
-]
+NEWS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'news.json')
+NEWS_DAYS = 21          # items older than this are left out
 
 
-def _local(c):
-    """One data-driven line per cluster, from numbers already in the county dict."""
-    L = {}
-    adv = c.get('advisory') or []
-    adv = adv[0] if isinstance(adv, list) and adv else (adv if isinstance(adv, str) else '')
-    soil = adv.split(';')[0].strip() if adv else ''
-    ic, inow = c.get('infra_county') or {}, c.get('infra_now') or []
-    st = (c.get('stations') or [None])[0]
-    wash = []
-    if st and st.get('level'):
-        lv = st['level']
-        wash.append(f"{st['name']}: {lv['cls']}" + (f" (percentile {lv['pct']})" if lv.get('pct') is not None else '') + f" on {lv['date']}")
-    L['WASH'] = '; '.join(wash)
-    L['Food Security &amp; Agriculture'] = soil
-    hl = []
-    if ic.get('health') is not None:
-        hl.append(f"{n(ic['health_risk'])} of {n(ic['health'])} health facilities on flood-prone ground")
-    if inow:
-        hl.append(f"{n(sum((r.get('health_now') or 0) for r in inow))} flooded now in the top payams")
-    L['Health &amp; Nutrition'] = '; '.join(hl)
-    sc = c.get('scenarios')
-    L['Shelter &amp; NFIs'] = (f"planning case {n(sc[1])} people affected, {n(sc[3])} displaced" if sc else '')
-    ed = []
-    if ic.get('schools') is not None:
-        ed.append(f"{n(ic['schools_risk'])} of {n(ic['schools'])} schools on flood-prone ground")
-    if inow:
-        ed.append(f"{n(sum((r.get('schools_now') or 0) for r in inow))} flooded now in the top payams")
-    L['Education'] = '; '.join(ed)
-    L['Protection'] = (f"up to {n(sc[3])} people displaced in the planning case" if sc else '')
-    return L
+def _nkey(name):
+    import re
+    return re.sub(r'[^a-z0-9]', '', str(name).lower())
 
 
-def cluster_story(c):
-    L = _local(c)
-    s = [P('Cluster-specific guidance and action priorities', H2)]
-    rows = [['Cluster', 'Core climate risk implication', 'Required actions and guidance']]
-    for name, risk, act in CLUSTERS:
-        loc = L.get(name)
-        rows.append([f'<b>{name}</b>', risk + (f'<br/><b>This county:</b> {loc}.' if loc else ''), act])
-    s.append(table(rows, [26 * mm, 62 * mm, 86 * mm], align_right_from=9))
-    s.append(P('Guidance adapted from the Global Nutrition Cluster, Climate Crisis and Humanitarian Coordination (2025) and the Global Protection Cluster '
-               'preparedness guidance. Decision support, to be confirmed by cluster coordinators.', SMALL))
+def load_news(today=None, path=None, days=NEWS_DAYS):
+    """Return (by_county, national). by_county maps a normalised county name to its news items (newest first);
+    national holds items that name no county (state-level or countrywide). Missing file or no items = empty."""
+    import json
+    path = path or NEWS_PATH
+    if not os.path.exists(path):
+        return {}, []
+    today = today or dt.date.today()
+    today = today.date() if isinstance(today, dt.datetime) else today
+    by, nat = {}, []
+    for it in json.load(open(path, encoding='utf-8')).get('items', []):
+        try:
+            d = dt.date.fromisoformat(it['date'])
+        except (KeyError, ValueError):
+            continue
+        if (today - d).days > days or d > today:
+            continue
+        if it.get('counties'):
+            for c in it['counties']:
+                by.setdefault(_nkey(c), []).append(it)
+        else:
+            nat.append(it)
+    key = lambda it: it['date']
+    return {k: sorted(v, key=key, reverse=True) for k, v in by.items()}, sorted(nat, key=key, reverse=True)
+
+
+def _news_line(it, scope=None):
+    d = dt.date.fromisoformat(it['date'])
+    src = f"<a href=\"{it['url']}\" color=\"{LINK}\">{it['source']}</a>" if it.get('url') else it['source']
+    tag = f"<b>{scope or it.get('hazard', '')}:</b> " if (scope or it.get('hazard')) else ''
+    return f"• {d:%d %b}: {tag}{it['text']} ({src})"
+
+
+def news_story(c):
+    """Reported news for this county, newest first. Skipped when the county has no recent item."""
+    items = c.get('news')
+    if not items:
+        return []
+    s = [P('Reported news', H2)]
+    for it in items[:4]:
+        s.append(P(_news_line(it, it.get('hazard'))))
+    s.append(P('From local media and ReliefWeb; single-source items are unverified. Counties are as named in the article, or inferred from the place where stated.', SMALL))
     return s
 
 
@@ -370,10 +349,20 @@ def cover_story(cover, logo=None):
             s.append(table([headers] + rows, [w * mm for w in widths]))
         if note:
             s.append(P(note, SMALL))
+    nat = cover.get('news') or []
+    if nat:
+        s.append(P('Countrywide and state-level news', H2))
+        for it in nat[:5]:
+            s.append(P(_news_line(it, it.get('scope') or it.get('hazard'))))
+        s.append(P('News that names no county. County-level items are on each county page.', SMALL))
     bottom = links_block() + [Spacer(1, 4)] + signature_block() + [Spacer(1, 6),
         P('Decision support, not an official warning. One page per county follows. Rainfall figures are an outlook for local flooding and access, '
           'not a river-level forecast.', SMALL)]
     return s, bottom
+
+
+def national_news(today=None):
+    return load_news(today)[1]
 
 
 def cover_from_bulletin(doc, gauges=None, today=None, n_monitor=5, n_gauges=5):
@@ -419,7 +408,8 @@ def cover_from_bulletin(doc, gauges=None, today=None, n_monitor=5, n_gauges=5):
          [36, 26, 26, 26, 16, 19, 21], 'Travel time to the next station over 5 days and last pass newer than the travel time. ★ = station you already watch.'
          if grows else 'No gauge meets the rule today.'),
         (f'{n_monitor} Towns and counties to monitor (red or orange, not in the lists above)', ['Town / county', 'Alert', 'Soil z', 'Rain next 2 wk', 'Chance 50 mm wk 1', 'Chance 7-day dry spell'], mrows,
-         [58, 18, 16, 26, 26, 26], None if mrows else 'No other county is at red or orange.')]}
+         [58, 18, 16, 26, 26, 26], None if mrows else 'No other county is at red or orange.')],
+            'news': national_news(today)}
 
 
 def method_story(verification=None):
@@ -470,7 +460,11 @@ def method_story(verification=None):
     s.append(P('7. Exposure within 25 km of a station', H2))
     s.append(P('Population (WorldPop 2020, 100 m), schools, health facilities and VIDA buildings inside a 25 km circle around the station, with the share on at-risk ground (definition in section 5) and '
                'a payam-by-payam breakdown of the part of each payam inside the circle. Circles overlap neighbouring counties, which are listed. A station is assigned to the county that contains it.'))
-    s.append(P('8. Main limits', H2))
+    s.append(P('8. News', H2))
+    s.append(P('Reported news comes from Eye Radio, Radio Tamazuj, Sudans Post, UN and ReliefWeb items collected by the climate-news monitor and stored in data/news.json. '
+               'Each county page lists items from the last 21 days that name that county; items naming no county appear on the cover. Items are summarised, not quoted; '
+               'single-source items are unverified and county names may be inferred from places. Media coverage is partial and Facebook is not covered.'))
+    s.append(P('9. Main limits', H2))
     for t in ('Rain, soil and flood layers are satellite products: coarse (GSMaP about 10 km, SMAP L4 about 9 km) and subject to retrieval error, especially in wetlands.',
               'The ensemble gives chances, not certainties; the dry-spell and heavy-rain chances are for the county as a whole.',
               'Flood extent from radar misses flooding under dense canopy and can over-detect on wet floodplain vegetation; the weekly window can miss short events.',
