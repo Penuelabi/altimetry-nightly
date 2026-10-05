@@ -66,6 +66,9 @@ ALIASES = {'abyeiadministrativearea': 'abyeiregion'}
 VARIABLES = [
     ('alert_level', 'county bulletin', "impact-based alert: 'green', 'yellow', 'orange' or 'red'"),
     ('alert_rank', 'county bulletin', 'alert as a number: 0 green, 1 yellow, 2 orange, 3 red'),
+    ('alert_stage', 'county bulletin', "the AA stage alert_level corresponds to: 'monitoring', 'warning', "
+                                       "'readiness' or 'activation' -- readiness/activation line up with this "
+                                       "engine's own plan stages ('readiness', 'activated')"),
     ('alert_hazard', 'county bulletin', "'flood / waterlogging' or 'drought / dry spell'"),
     ('p_heavy', 'county bulletin', 'chance of >= 50 mm of rain in week 1 (0-1, ECMWF ensemble)'),
     ('p_dry_spell', 'county bulletin', 'chance of a 7-day dry spell within 15 days (0-1)'),
@@ -79,9 +82,10 @@ VARIABLES = [
     ('pop_flood_prone', 'county bulletin', 'people on ground that has flooded before'),
     ('dry_spell_days', 'county bulletin', 'observed days since the last wet county-day (GSMaP)'),
     ('p_soil_recovery', 'county bulletin', 'chance that 2 weeks of rain refill the soil deficit (0-1, ECMWF ensemble)'),
-    ('news_flood', 'county bulletin', 'True when news reported flooding or heavy rainfall in the county (last 21 days)'),
-    ('news_drought', 'county bulletin', 'True when news reported drought or a dry spell in the county (last 21 days)'),
-    ('red_needs_news', 'county bulletin', "hazard whose red rule is met except the news report ('' if none)"),
+    ('news_flood', 'county bulletin', 'True when news reported flooding or heavy rainfall in the county (last 21 '
+                                      'days); supports a red alert but is not required for one'),
+    ('news_drought', 'county bulletin', 'True when news reported drought or a dry spell in the county (last 21 '
+                                        'days); supports a red alert but is not required for one'),
     ('river_level_m', 'station_status.csv', 'latest satellite water level at the county gauge (m)'),
     ('river_age_days', 'station_status.csv', 'days since that satellite pass'),
     ('river_rate_m_per_day', 'station_status.csv', 'rise (+) or fall (-) at the last pass (m per day)'),
@@ -387,8 +391,9 @@ def build_values(as_of):
         sources['bulletin'] = 'county_bulletin_latest.csv'
         for r in bul.to_dict('records'):
             lvl = None if isnull(r.get('alert_level')) else str(r.get('alert_level')).lower()
+            stage = None if isnull(r.get('alert_stage')) else str(r.get('alert_stage')).lower()
             vals.setdefault(ckey(r['county']), {}).update({
-                'county': r['county'], 'state': r.get('state'), 'alert_level': lvl,
+                'county': r['county'], 'state': r.get('state'), 'alert_level': lvl, 'alert_stage': stage,
                 'alert_rank': ALERT_RANK.get(lvl), 'alert_hazard': None if isnull(r.get('alert_hazard')) else r.get('alert_hazard'),
                 'p_heavy': num(r.get('p_heavy_50mm_week1')), 'p_dry_spell': num(r.get('p_dry_spell_7d_in_15d')),
                 'p_wet_spell': num(r.get('p_wet_spell_3d_week1')), 'week1_rain_mm': num(r.get('week1_rain_median_mm')),
@@ -398,7 +403,6 @@ def build_values(as_of):
                 'dry_spell_days': num(r.get('dry_spell_days')), 'p_soil_recovery': num(r.get('p_soil_recovery_2wk')),
                 'news_flood': not isnull(r.get('news_flood_report')) and str(r.get('news_flood_report')).strip() != '',
                 'news_drought': not isnull(r.get('news_drought_report')) and str(r.get('news_drought_report')).strip() != '',
-                'red_needs_news': '' if isnull(r.get('red_needs_news')) else str(r.get('red_needs_news')),
                 '_bulletin': str(r.get('run_utc') or r.get('data_end_date') or '')})
     lpath = first_existing(os.path.join(BUL_DIR, 'county_station_link.csv'), os.path.join(HERE, 'county_station_link.csv'))
     link = read_csv(lpath)

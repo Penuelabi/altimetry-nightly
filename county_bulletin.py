@@ -231,12 +231,22 @@ def observed_dry_spell(last_day, lookback=DRY_SPELL_LOOKBACK_DAYS):
     return dry_spell_from_obs(cache[cache['date'].astype(str).isin(days)], days, COUNTIES)
 
 
-def recovery_chance(rain_2wk, deficit):
-    """Share of ensemble members whose 2-week rain refills the root-zone soil deficit; NaN when the deficit is under
-    DEFICIT_MIN_MM. Evaporation is ignored (as in the advisory), so the chance errs towards recovery."""
+RECOVERY_ET_DAYS = 14                      # the "2wk" window the recovery chance is computed over
+
+
+def recovery_chance(rain_2wk, deficit, et_30d_mm=None, days_ahead=RECOVERY_ET_DAYS):
+    """Share of ensemble members whose 2-week rain, net of expected evapotranspiration, refills the root-zone soil
+    deficit; NaN when the deficit is under DEFICIT_MIN_MM. Expected evaporation over the 2 weeks ahead is
+    approximated from the observed 30-day SMAP L4 ET rate (et_30d_mm / 30 * days_ahead): there is no ET forecast per
+    ensemble member, so the recent observed rate stands in and is held constant over the window. Without an ET
+    figure, evaporation is ignored and the chance errs towards recovery, as before."""
     if deficit is None or pd.isna(deficit) or deficit < DEFICIT_MIN_MM:
         return np.nan
-    return float(np.mean(np.asarray(rain_2wk, dtype=float) >= deficit))
+    loss = 0.0
+    if et_30d_mm is not None and not pd.isna(et_30d_mm) and et_30d_mm > 0:
+        loss = float(et_30d_mm) / 30.0 * days_ahead
+    net = np.asarray(rain_2wk, dtype=float) - loss
+    return float(np.mean(net >= deficit))
 
 
 # =========================================================================== #
@@ -538,10 +548,12 @@ if RUN_OUTLOOK:
                 i = j + 1
             return '; '.join(parts)
 
-        DEFICIT = {}                                          # soil deficit from Part A, for the chance of recovery
+        DEFICIT, ET30 = {}, {}                                 # soil deficit / recent ET from Part A, for recovery
         if ante is not None:
             try:
                 DEFICIT = pd.to_numeric(ante.set_index('county')['soil_deficit_mm'], errors='coerce').to_dict()
+                if 'et_30d_mm' in ante:
+                    ET30 = pd.to_numeric(ante.set_index('county')['et_30d_mm'], errors='coerce').to_dict()
             except Exception as _e:
                 print(f"WARNING: chance of soil recovery skipped ({type(_e).__name__}: {_e})")
 
@@ -562,7 +574,7 @@ if RUN_OUTLOOK:
                 P_DRY: np.mean([longest_run(~wet[k]) >= DRY_SPELL_DAYS for k in range(m)]),
                 P_WSP: np.mean([longest_run(wet[k, :7]) >= WET_SPELL_DAYS for k in range(m)]),
                 P_HEAVY: np.mean(w1 >= HEAVY_7D_MM),
-                'p_soil_recovery_2wk': recovery_chance(w1 + w2, DEFICIT.get(county)),
+                'p_soil_recovery_2wk': recovery_chance(w1 + w2, DEFICIT.get(county), ET30.get(county)),
                 'spell_windows': windows_text(p_wet),
             }
             for i, p in enumerate(p_wet):
@@ -654,20 +666,9 @@ def advisory(r):
 bulletin['advisory_flags'] = bulletin.apply(advisory, axis=1)
 bulletin = bulletin.sort_values(['state', 'county']).reset_index(drop=True)
 
-# Impact layer + alert levels (optional: a failure here must never stop the bulletin)
-EXTRAS_OK = False
-try:
-    import bulletin_extras as bx
-    bulletin = bx.add_exposure(bulletin, counties, ee, OUT_DIR)
-    bulletin = bx.add_alert_levels(bulletin, P_HEAVY, P_DRY, P_WSP, Z_WET, RECOVERY_SEVERE, RECOVERY_MODERATE)
-    bulletin['advisory_flags'] = bx.append_exposure_to_advisory(bulletin)
-    EXTRAS_OK = True
-except Exception as _e:
-    import traceback
-    print(f"WARNING: impact/alert layer skipped: {type(_e).__name__}: {_e}")
-    print('\n'.join('WARNING:   ' + l for l in traceback.format_exc().splitlines()[-8:]))
-
+# Sudd river trigger (computed first: the alert layer uses it as a Nov-Jan post-rains flood signal, see below)
 SUDD_TRIGGER = None
+SUDD_COUNTIES = ()
 try:
     import sudd_trigger as _st
     _alt = os.path.join(os.environ.get('ALTIMETRY_OUT_DIR', 'data'), 'merged_altimetry_stations.csv')
@@ -677,6 +678,9 @@ try:
         SUDD_TRIGGER, _ = _st.compute(_alt, _cg, _dp)
         _st.append_log(SUDD_TRIGGER, OUT_DIR)
         print('RIVER TRIGGER:', SUDD_TRIGGER['text'])
+        if os.path.exists(_dp):
+            _disp = pd.read_csv(_dp)
+            SUDD_COUNTIES = tuple(_disp.loc[_disp.flood > 0, 'county'].unique())
     else:
         print('River trigger skipped: merged_altimetry_stations.csv not found')
 except Exception as _e:
@@ -684,12 +688,28 @@ except Exception as _e:
     print(f"WARNING: river trigger skipped: {type(_e).__name__}: {_e}")
     print('\n'.join('WARNING:   ' + l for l in traceback.format_exc().splitlines()[-8:]))
 
+# Impact layer + alert levels (optional: a failure here must never stop the bulletin)
+EXTRAS_OK = False
+try:
+    import bulletin_extras as bx
+    bulletin = bx.add_exposure(bulletin, counties, ee, OUT_DIR)
+    _sudd_arg = ({'counties': SUDD_COUNTIES, 'status': SUDD_TRIGGER.get('status'),
+                 'value': SUDD_TRIGGER.get('upstream_pct')} if SUDD_TRIGGER else None)
+    bulletin = bx.add_alert_levels(bulletin, P_HEAVY, P_DRY, P_WSP, Z_WET, RECOVERY_SEVERE, RECOVERY_MODERATE,
+                                   sudd=_sudd_arg)
+    bulletin['advisory_flags'] = bx.append_exposure_to_advisory(bulletin)
+    EXTRAS_OK = True
+except Exception as _e:
+    import traceback
+    print(f"WARNING: impact/alert layer skipped: {type(_e).__name__}: {_e}")
+    print('\n'.join('WARNING:   ' + l for l in traceback.format_exc().splitlines()[-8:]))
+
 KEY_COLS = ['state', 'county', 'data_end_date', 'data_source', 'soil_rootzone_class', 'sm_rootzone_z',
             'sm_rootzone_pctile', 'soil_deficit_mm', 'rain_30d_mm', 'rain_30d_pct_of_normal', 'rain_30d_class',
             'runoff_30d_class', 'et_30d_mm', 'wb_30d_mm', 'run_utc', 'n_members', 'week1_rain_median_mm',
             'week1_rain_p20_mm', 'week1_rain_p80_mm', 'week2_rain_median_mm', P_DRY, P_WSP, P_HEAVY,
-            'spell_windows', 'alert_level', 'alert_hazard', 'alert_likelihood', 'alert_impact',
-            'dry_spell_days', 'p_soil_recovery_2wk', 'red_needs_news', 'news_flood_report', 'news_drought_report',
+            'spell_windows', 'alert_level', 'alert_stage', 'alert_hazard', 'alert_likelihood', 'alert_impact',
+            'dry_spell_days', 'p_soil_recovery_2wk', 'news_flood_report', 'news_drought_report',
             'pop_total', 'pop_flood_prone', 'cropland_km2', 'advisory_flags']
 key = bulletin[[c for c in KEY_COLS if c in bulletin.columns]]
 
@@ -717,8 +737,10 @@ notes = pd.DataFrame([
     ('p_dry_spell / p_wet_spell / p_heavy', 'Share of ensemble members showing the event'),
     ('dry_spell_days', f'Observed days since the last wet county-day, up to the last complete GSMaP day (wet day as '
                        f'above); a missing day ends the count. Counted up to {DRY_SPELL_LOOKBACK_DAYS} days.'),
-    ('p_soil_recovery_2wk', f'Share of ensemble members whose 2-week rain refills the root-zone soil deficit (only for '
-                            f'deficits of at least {DEFICIT_MIN_MM} mm; evaporation ignored, so it errs towards recovery)'),
+    ('p_soil_recovery_2wk', f'Share of ensemble members whose 2-week rain, net of expected evapotranspiration (the '
+                            f'observed 30-day SMAP L4 ET rate held constant over the 2 weeks), refills the root-zone '
+                            f'soil deficit (only for deficits of at least {DEFICIT_MIN_MM} mm). Without an ET figure, '
+                            f'evaporation is ignored and it errs towards recovery.'),
     ('spell_windows', 'Likely wet / likely dry / uncertain, with confidence from member agreement'),
     ('certainty caveat', 'Member agreement is not verified accuracy; forecast_log_ens.csv is kept for verification.'),
     ('advisory rules', f'Deficit when root-zone z <= {DEFICIT_Z} and >= {DEFICIT_MIN_MM} mm below median; graded by '

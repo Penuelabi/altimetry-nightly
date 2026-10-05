@@ -30,26 +30,31 @@ LIKELIHOOD_BANDS = [(0.50, 'high'), (0.20, 'medium'), (0.0, 'low')]      # proba
 #             flood-prone ground, or a payam with more than FLOOD_PAYAM_SHARE of its buildings, settlements, schools,
 #             health facilities or people on flood-prone ground (data/exposure_cache.json,
 #             data/flood_settlements_sept2025.csv)
-#   severe    more than FLOOD_PEOPLE_SEVERE people, or a payam with at least FLOOD_PAYAM_SHARE_SEVERE of its buildings,
-#             listed settlements, schools or health facilities on flood-prone ground, AND a news report of flooding in
-#             the county (data/news.json, last NEWS_CONFIRM_DAYS days). Without the report the impact stays moderate,
-#             so red (high likelihood x severe) needs the news confirmation.
+#   severe    more than FLOOD_PEOPLE_SEVERE people, or AT COUNTY LEVEL (not one payam) at least FLOOD_COUNTY_SHARE_SEVERE
+#             of the county's buildings (JRC GHS-OBAT 2020, falling back to VIDA combined buildings), schools, health
+#             facilities or built-up/settlement area (GHSL built-up surface) on flood-prone ground. A confirming news
+#             report of flooding in the county (data/news.json, last NEWS_CONFIRM_DAYS days) is an alternative, equally
+#             sufficient route to severe on its own -- ground reports of an actual flood are evidence the exposure
+#             layers may miss or lag. News adds to and strengthens the reasons given either way, but its absence never
+#             holds back a red alert the exposure data or the Sudd river trigger (below) already earns.
 # A payam share counts only when the payam has at least PAYAM_MIN_ITEMS of that item (PAYAM_MIN_PEOPLE people),
-# so 1 of 2 schools does not decide a county's impact.
+# so 1 of 2 schools does not decide a county's impact (used for the 'moderate' tier only).
 FLOOD_PEOPLE_MODERATE = 3_000
 FLOOD_PEOPLE_SEVERE = 10_000
 FLOOD_BUILDINGS_MIN = 500
 FLOOD_PAYAM_SHARE = 0.30
-FLOOD_PAYAM_SHARE_SEVERE = 0.50
+FLOOD_COUNTY_SHARE_SEVERE = 0.50
 PAYAM_MIN_ITEMS = 3
 PAYAM_MIN_PEOPLE = 500
 IMPACT_ORDER = {'minor': 0, 'moderate': 1, 'significant': 2, 'severe': 3}
 # Drought impact by county population. There is no population tier for 'severe': a drought alert is red only by the
 # rule below, so the matrix alone stops at orange.
 DROUGHT_IMPACT_TIERS = [(200_000, 'significant'), (75_000, 'moderate'), (0, 'minor')]
-# Drought red: an observed dry spell of more than DROUGHT_RED_DRY_DAYS days (no wet county-day in GSMaP), less than
-# DROUGHT_RED_P_RECOVERY chance that the next 2 weeks of rain (ECMWF ensemble) refill the soil deficit, AND a news
-# report of drought or a dry spell in the county within NEWS_CONFIRM_DAYS days.
+# Drought red: an observed dry spell of more than DROUGHT_RED_DRY_DAYS days (no wet county-day in GSMaP) AND less than
+# DROUGHT_RED_P_RECOVERY chance that the next 2 weeks of rain (ECMWF ensemble, net of expected evapotranspiration)
+# refill the soil deficit -- this alone is enough for red. A confirming news report of drought or a dry spell in the
+# county (within NEWS_CONFIRM_DAYS days) is an alternative route to red on its own, and strengthens the reasons when
+# both are met; it is never required.
 DROUGHT_RED_DRY_DAYS = 21
 DROUGHT_RED_P_RECOVERY = 0.60
 # News confirmation (data/news.json, kept by the climate-news monitor): an item that names the county, dated within
@@ -59,6 +64,14 @@ NEWS_CONFIRM_DAYS = 21                     # as NEWS_DAYS in county_report_pdf.p
 NEWS_HAZARD_WORDS = {'flood / waterlogging': ('flood', 'heavy rain'),
                      'drought / dry spell': ('drought', 'dry spell')}
 NEWS_NOT_CONFIRMING = ('outlook', 'forecast', 'warning')
+# Special case: river flooding in the Sudd often continues for weeks to months after the rains stop (drainage lags
+# through the wetland), so rain-based likelihood can miss it. Nov-Jan, for the counties with recorded flood
+# displacement, the experimental Sudd river trigger (sudd_trigger.py / sudd_trigger_log.csv) stands in as an
+# additional flood-likelihood signal when it is at watch or elevated.
+SUDD_MONTHS = (11, 12, 1)
+SUDD_LIKELIHOOD = {'watch': 0.35, 'elevated': 0.60}        # -> medium / high on LIKELIHOOD_BANDS
+# Alert level -> the Pillar 3 AA stage it corresponds to, so the bulletin and the AAP engine use the same words.
+ALERT_STAGE = {'green': 'monitoring', 'yellow': 'warning', 'orange': 'readiness', 'red': 'activation'}
 MATRIX = {                                    # likelihood x impact -> level
     'low':    {'minor': 'green',  'moderate': 'green',  'significant': 'yellow', 'severe': 'yellow'},
     'medium': {'minor': 'green',  'moderate': 'yellow', 'significant': 'orange', 'severe': 'orange'},
@@ -151,11 +164,14 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 def flood_exposure_detail(data_dir=DATA_DIR):
-    """Per county: buildings on flood-prone ground, the payam with the largest share of buildings, settlements,
-    schools, health facilities or people on flood-prone ground, and the largest share leaving out people (used for
-    the severe tier) ('at risk' in exposure_cache.json = flooded now or in >= 15% of same-season Sentinel-1 baseline
-    years; settlements = Sept 2025 flooded-settlement list; payam people = people around the river gauges, as the
-    cache has no payam population totals)."""
+    """Per county: buildings on flood-prone ground; the payam with the largest share of buildings, settlements,
+    schools, health facilities or people on flood-prone ground (and the largest share leaving out people), used for
+    the 'moderate' tier; and COUNTY-LEVEL shares of buildings, schools, health facilities and built-up/settlement
+    area (GHSL built-up surface) on flood-prone ground, used for the 'severe' tier -- a single exposed payam should
+    not decide severe for a whole county. ('at risk' in exposure_cache.json = flooded now or in >= 15% of same-season
+    Sentinel-1 baseline years; settlements = Sept 2025 flooded-settlement list; payam people = people around the
+    river gauges, as the cache has no payam population totals; buildings come from JRC GHS-OBAT 2020 where
+    exposure_cache.py could read it, else VIDA combined buildings -- see exposure_cache.json's buildings_basis.)"""
     with open(os.path.join(data_dir, 'exposure_cache.json'), encoding='utf-8') as fh:
         ex = json.load(fh)
     shares = {}                                              # (county, payam) -> [(share, label, item)]
@@ -164,6 +180,10 @@ def flood_exposure_detail(data_dir=DATA_DIR):
         if n is None or r is None or n < minimum or r < 0:
             return
         shares.setdefault((county, payam), []).append((r / n, f"{payam}: {r:,.0f} of {n:,.0f} {item}", item))
+
+    def share(d, total_key, risk_key):
+        t, r = d.get(total_key), d.get(risk_key)
+        return (r / t) if t and r is not None and r >= 0 else np.nan
 
     bld = {}
     for county, plist in (ex.get('payams') or {}).items():
@@ -186,14 +206,20 @@ def flood_exposure_detail(data_dir=DATA_DIR):
         for (county, payam), g in st.groupby(['county', 'payam']):
             add(county, payam, 'listed settlements', len(g), int((g['source'] == 'Other Flooded Settlements').sum()),
                 PAYAM_MIN_ITEMS)
+    county_ex = ex.get('county') or {}
     rows = []
-    for county in sorted(set(bld) | {c for c, _ in shares}):
+    for county in sorted(set(bld) | {c for c, _ in shares} | set(county_ex)):
         mine = [x for (c, _), v in shares.items() if c == county for x in v]
         best = max(mine, default=(np.nan, '', ''))
         fac = max((x for x in mine if x[2] != 'people'), default=(np.nan, '', ''))
+        cd = county_ex.get(county, {})
         rows.append({'county': county, 'bld_flood_prone': bld.get(county, np.nan),
                      'payam_max_share': best[0], 'payam_max_share_item': best[1],
-                     'payam_max_facility_share': fac[0], 'payam_max_facility_share_item': fac[1]})
+                     'payam_max_facility_share': fac[0], 'payam_max_facility_share_item': fac[1],
+                     'county_buildings_share': share(cd, 'buildings', 'buildings_risk'),
+                     'county_schools_share': share(cd, 'schools', 'schools_risk'),
+                     'county_health_share': share(cd, 'health', 'health_risk'),
+                     'county_settlement_share': share(cd, 'built_km2', 'built_risk_km2')})
     return pd.DataFrame(rows)
 
 
@@ -203,12 +229,14 @@ def _known(v):
 
 def flood_impact(r, news_item=None):
     """(impact tier, reasons) for floods. People on flood-prone ground give minor or moderate, raised to at least
-    moderate by buildings or a payam share; severe needs the severe exposure bar AND a news report of flooding."""
+    moderate by buildings or a payam share. Severe: the county-level exposure bar (see severe_flood_exposure), OR a
+    confirming news report of flooding on its own -- either is sufficient; having both just adds to the reasons."""
     people = r.get('pop_flood_prone')
     imp = None if not _known(people) else 'moderate' if people >= FLOOD_PEOPLE_MODERATE else 'minor'
     severe = severe_flood_exposure(r)
-    if severe and news_item:
-        return 'severe', severe + [news_phrase(news_item)]
+    if severe or news_item:
+        why = severe + ([news_phrase(news_item)] if news_item else [])
+        return 'severe', why
     why = []
     b, s = r.get('bld_flood_prone'), r.get('payam_max_share')
     if _known(b) and b > FLOOD_BUILDINGS_MIN:
@@ -221,25 +249,32 @@ def flood_impact(r, news_item=None):
 
 
 def severe_flood_exposure(r):
-    """Reasons the county meets the severe flood exposure bar (people or payam facility share), news aside; [] if not."""
-    people, fs = r.get('pop_flood_prone'), r.get('payam_max_facility_share')
+    """Reasons the county meets the severe flood exposure bar, news aside; [] if not. More than FLOOD_PEOPLE_SEVERE
+    people on flood-prone ground, or at least FLOOD_COUNTY_SHARE_SEVERE of the COUNTY's (not one payam's) buildings,
+    schools, health facilities or built-up/settlement area on flood-prone ground."""
     why = []
+    people = r.get('pop_flood_prone')
     if _known(people) and people > FLOOD_PEOPLE_SEVERE:
         why.append(f'{people:,.0f} people on flood-prone ground')
-    if _known(fs) and fs >= FLOOD_PAYAM_SHARE_SEVERE:
-        why.append(f"{fs:.0%} in {r.get('payam_max_facility_share_item')}")
+    for col, item in (('county_buildings_share', 'buildings'), ('county_schools_share', 'schools'),
+                      ('county_health_share', 'health facilities'),
+                      ('county_settlement_share', 'built-up (settlement) area')):
+        s = r.get(col)
+        if _known(s) and s >= FLOOD_COUNTY_SHARE_SEVERE:
+            why.append(f"{s:.0%} of the county's {item} on flood-prone ground")
     return why
 
 
 def drought_red(r, news_item=None):
-    """('red' | 'unconfirmed' | None, reasons) for the drought red rule: dry spell, recovery chance, news report."""
+    """('red' | None, reasons) for the drought red rule: the dry-spell/recovery-chance bar on its own, OR a
+    confirming news report of drought/dry spell on its own -- either is sufficient; both just adds to the reasons."""
     days, p_rec = r.get('dry_spell_days'), r.get('p_soil_recovery_2wk')
-    if not (_known(days) and _known(p_rec)) or not (days > DROUGHT_RED_DRY_DAYS and p_rec < DROUGHT_RED_P_RECOVERY):
-        return None, []
-    why = [f"no wet day for {days:.0f} days", f"{p_rec:.0%} chance that 2 weeks of rain refill the soil deficit"]
-    if news_item:
-        return 'red', why + [news_phrase(news_item)]
-    return 'unconfirmed', why
+    why = []
+    if _known(days) and _known(p_rec) and days > DROUGHT_RED_DRY_DAYS and p_rec < DROUGHT_RED_P_RECOVERY:
+        why = [f"no wet day for {days:.0f} days", f"{p_rec:.0%} chance that 2 weeks of rain refill the soil deficit"]
+    if why or news_item:
+        return 'red', why + ([news_phrase(news_item)] if news_item else [])
+    return None, []
 
 
 # --------------------------------------------------------------------------- #
@@ -336,22 +371,42 @@ def impact_class(people, tiers):
 FLOOD, DROUGHT = 'flood / waterlogging', 'drought / dry spell'
 
 
-def county_alert(r, p_heavy_col, p_dry_col, p_wsp_col, z_wet, recovery_severe, recovery_moderate, news=None):
-    """(level, hazard, likelihood, impact, text, red_needs_news) for one bulletin row.
-    news: {hazard: newest news item confirming that hazard in this county} (see news_confirmations)."""
+def county_alert(r, p_heavy_col, p_dry_col, p_wsp_col, z_wet, recovery_severe, recovery_moderate, news=None,
+                 sudd=None, today=None):
+    """(level, hazard, likelihood, impact, text) for one bulletin row.
+    news: {hazard: newest news item confirming that hazard in this county} (see news_confirmations).
+    sudd: {'counties': counties with recorded flood displacement, 'status': 'normal'/'watch'/'elevated' (Sudd river
+    trigger), 'value': upstream percentile}, for the Nov-Jan post-rains special case below; '' or None if unavailable.
+    Red needs no news report: the exposure/dry-spell rules (see severe_flood_exposure, drought_red) are sufficient on
+    their own, and a confirming news report is an equally sufficient alternative route on its own -- having both
+    just adds to the reasons given. News never holds back a red the data has already earned."""
     news = news or {}
+    sudd = sudd or {}
+    today = today or datetime.date.today()
+    today = today.date() if isinstance(today, datetime.datetime) else today
     cands = []
     p_heavy, p_dry, p_wsp = r.get(p_heavy_col), r.get(p_dry_col), r.get(p_wsp_col)
     z, deficit = r.get('sm_rootzone_z'), r.get('soil_deficit_mm')
 
-    # flood / waterlogging: heavy rain, or a long wet spell on already wet soils
-    if pd.notna(p_heavy):
-        p = p_heavy
-        if pd.notna(z) and pd.notna(p_wsp) and z >= z_wet and p_wsp >= 0.6:
-            p = max(p, 0.35)
-        cands.append((FLOOD, p, r, None))
+    # flood / waterlogging: heavy rain, a long wet spell on already-wet soils, or -- Nov-Jan, in the Sudd counties --
+    # the river trigger still at watch/elevated after the rains have stopped. River flooding in the Sudd lags the
+    # rain by weeks to months, so rain likelihood alone can miss it; the experimental Sudd river trigger stands in.
+    p, sudd_note = (p_heavy if pd.notna(p_heavy) else None), ''
+    if pd.notna(z) and pd.notna(p_wsp) and z >= z_wet and p_wsp >= 0.6:
+        p = max(p or 0.0, 0.35)
+    if today.month in SUDD_MONTHS and str(r.get('county')) in (sudd.get('counties') or ()) \
+            and sudd.get('status') in SUDD_LIKELIHOOD:
+        p_sudd = SUDD_LIKELIHOOD[sudd['status']]
+        if p_sudd > (p or 0.0):
+            pct = sudd.get('value')
+            sudd_note = (f" Sudd river trigger {sudd['status']} after the rains" +
+                        (f" (upstream levels at the {pct:.0%} percentile)" if _known(pct) else '') + '.')
+        p = max(p or 0.0, p_sudd)
+    if p is not None:
+        cands.append((FLOOD, p, r, None, sudd_note))
 
-    # drought: observed deficit (already happening) or a likely dry spell
+    # drought: observed deficit (already happening), a likely dry spell, or the red rule (dry spell + recovery
+    # chance, or a confirming news report) stands on its own
     p_dr = None
     w1, w2 = r.get('week1_rain_median_mm'), r.get('week2_rain_median_mm')
     if pd.notna(deficit) and deficit >= 20 and pd.notna(z) and z <= -1.0 and pd.notna(w1) and pd.notna(w2):
@@ -360,58 +415,48 @@ def county_alert(r, p_heavy_col, p_dry_col, p_wsp_col, z_wet, recovery_severe, r
     if pd.notna(p_dry):
         p_dr = max(p_dr or 0.0, p_dry if (p_dry >= 0.3 and pd.notna(z) and z <= -0.75) else 0.0) or p_dr
     dr_state, dr_why = drought_red(r, news.get(DROUGHT))
-    if dr_state == 'red' and p_dr is None:                   # the red rule stands on its own
-        p_dr = 1.0 - float(r.get('p_soil_recovery_2wk'))
+    if dr_state == 'red':
+        p_rec = r.get('p_soil_recovery_2wk')
+        p_dr = max(p_dr or 0.0, 1.0 - float(p_rec) if _known(p_rec) else 0.9)
     if p_dr is not None:
-        cands.append((DROUGHT, p_dr, r.get('pop_total'), DROUGHT_IMPACT_TIERS))
+        cands.append((DROUGHT, p_dr, r.get('pop_total'), DROUGHT_IMPACT_TIERS, ''))
 
     best = None
-    for hazard, p, people, tiers in cands:
+    for hazard, p, people, tiers, extra_note in cands:
         lk = likelihood_class(p)
-        why, note, pending = [], '', ''
-        if tiers is None:                                    # flood: people, buildings, payam shares, news
+        if tiers is None:                                    # flood: people, buildings, county shares, news
             imp, why = flood_impact(people, news.get(FLOOD))
         else:
-            imp = impact_class(people, tiers)
+            imp, why = impact_class(people, tiers), (dr_why if hazard == DROUGHT and dr_state == 'red' else [])
         assumed = imp is None
         imp = imp or 'moderate'
-        level = MATRIX[lk][imp]
         if hazard == DROUGHT and dr_state == 'red':
-            level, lk, imp, why = 'red', 'high', 'severe', dr_why
-        elif hazard == DROUGHT and dr_state == 'unconfirmed':
-            why, note, pending = dr_why, ' Red if news confirms drought or a dry spell in the county.', DROUGHT
-        elif hazard == FLOOD and lk == 'high' and imp != 'severe' and severe_flood_exposure(people):
-            note = f" Red if news confirms flooding in the county ({'; '.join(severe_flood_exposure(people))})."
-            pending = FLOOD
-        if level == 'red' and not ((hazard == FLOOD and imp == 'severe') or (hazard == DROUGHT and dr_state == 'red')):
-            level = 'orange'                                 # red only by the confirmed rules above
-        item = (LEVEL_ORDER[level], p, level, hazard, lk, imp if not assumed else imp + ' (assumed)', why, note,
-                pending)
+            lk, imp = 'high', 'severe'                       # the red rule stands on its own
+        level = MATRIX[lk][imp]
+        item = (LEVEL_ORDER[level], p, level, hazard, lk, imp if not assumed else imp + ' (assumed)', why, extra_note)
         if best is None or item[:2] > best[:2]:
             best = item
     if best is None:
-        return ('n/a', 'n/a', 'n/a', 'n/a', 'not available (needs both antecedent and outlook data)', '')
-    _, p, level, hazard, lk, imp, why, note, pending = best
+        return ('n/a', 'n/a', 'n/a', 'n/a', 'not available (needs both antecedent and outlook data)')
+    _, p, level, hazard, lk, imp, why, note = best
     detail = f" ({'; '.join(why)})" if why else ''
-    if hazard == DROUGHT and level == 'red':
-        text = f"RED: {hazard}; {'; '.join(why)}. {LEVEL_MEANING[level]}."
-    else:
-        text = f"{level.upper()}: {hazard}; likelihood {lk} ({p:.0%}), impact {imp}{detail}. {LEVEL_MEANING[level]}.{note}"
-    return (level, hazard, lk, imp, text, pending)
+    text = f"{level.upper()}: {hazard}; likelihood {lk} ({p:.0%}), impact {imp}{detail}. {LEVEL_MEANING[level]}.{note}"
+    return (level, hazard, lk, imp, text)
 
 
 def add_alert_levels(bulletin, p_heavy_col, p_dry_col, p_wsp_col, z_wet, recovery_severe, recovery_moderate,
-                     today=None):
+                     today=None, sudd=None):
     conf = news_confirmations(today)
     res = bulletin.apply(lambda r: county_alert(r, p_heavy_col, p_dry_col, p_wsp_col, z_wet, recovery_severe,
-                                                recovery_moderate, conf.get(_nkey(r['county']), {})), axis=1)
+                                                recovery_moderate, conf.get(_nkey(r['county']), {}), sudd, today),
+                         axis=1)
     out = bulletin.copy()
     out['alert_level'] = [x[0] for x in res]
     out['alert_hazard'] = [x[1] for x in res]
     out['alert_likelihood'] = [x[2] for x in res]
     out['alert_impact'] = [x[3] for x in res]
     out['alert_text'] = [x[4] for x in res]
-    out['red_needs_news'] = [x[5] for x in res]              # hazard whose red rule is met except the news report
+    out['alert_stage'] = out['alert_level'].map(ALERT_STAGE)        # AA Pillar 3 stage the level corresponds to
     for hazard, col in ((FLOOD, 'news_flood_report'), (DROUGHT, 'news_drought_report')):
         out[col] = [news_phrase(conf[_nkey(c)][hazard]) if hazard in conf.get(_nkey(c), {}) else ''
                     for c in out['county']]
@@ -441,27 +486,40 @@ def append_exposure_to_advisory(bulletin):
 def notes_rows(recovery_note=''):
     rows = [('alert_level', 'Green / Yellow / Orange / Red from hazard likelihood x impact on people '
                             '(WMO-No. 1150 approach). ' + ' '.join(f'{k.title()}: {v}.' for k, v in LEVEL_MEANING.items())),
+            ('alert_stage',
+             'The Pillar 3 anticipatory-action stage each level corresponds to, so the bulletin and the AAP engine '
+             '(aa_p3_aap_engine.py) use the same words: ' +
+             ', '.join(f'{k} = {v}' for k, v in ALERT_STAGE.items()) + '.'),
             ('alert scales (provisional)',
              f'Likelihood: low < 20%, medium 20-50%, high >= 50%. Flood impact by people living on ground mapped as water '
              f'or flooded at least once (1984-2021): minor below {FLOOD_PEOPLE_MODERATE:,}, moderate from {FLOOD_PEOPLE_MODERATE:,}; '
              f'at least moderate when more than {FLOOD_BUILDINGS_MIN} buildings are on flood-prone ground or more than '
-             f'{FLOOD_PAYAM_SHARE:.0%} of a payam\'s buildings, settlements, schools, health facilities or people are '
+             f'{FLOOD_PAYAM_SHARE:.0%} of one payam\'s buildings, settlements, schools, health facilities or people are '
              f'(payams with at least {PAYAM_MIN_ITEMS} of the item or {PAYAM_MIN_PEOPLE} people). Severe when more than '
-             f'{FLOOD_PEOPLE_SEVERE:,} people, or at least {FLOOD_PAYAM_SHARE_SEVERE:.0%} of a payam\'s buildings, listed '
-             f'settlements, schools or health facilities, are on flood-prone ground AND news reported flooding or heavy '
-             f'rainfall in the county within {NEWS_CONFIRM_DAYS} days; without the report the impact stays moderate. '
-             f'Drought impact by county population (minor < 75,000; moderate < 200,000; significant above). A severe soil '
-             f'deficit counts as high likelihood (already happening).'),
+             f'{FLOOD_PEOPLE_SEVERE:,} people are on flood-prone ground, or at least {FLOOD_COUNTY_SHARE_SEVERE:.0%} of '
+             f'the COUNTY\'s (not one payam\'s) buildings, schools, health facilities or built-up/settlement area are -- '
+             f'OR a news report of flooding or heavy rainfall in the county within {NEWS_CONFIRM_DAYS} days, on its own; '
+             f'either route is enough, and both just add to the reasons given. Drought impact by county population '
+             f'(minor < 75,000; moderate < 200,000; significant above). A severe soil deficit counts as high likelihood '
+             f'(already happening).'),
             ('red (take action; anticipatory action activation)',
-             f'Flood: high likelihood x severe impact, so a high chance of heavy rain, the severe exposure bar and a news '
-             f'report of flooding. Drought: more than {DROUGHT_RED_DRY_DAYS} days without a wet county-day (GSMaP), less '
-             f'than {DROUGHT_RED_P_RECOVERY:.0%} chance that the next 2 weeks of rain refill the soil deficit (ECMWF '
-             f'ensemble) and a news report of drought or a dry spell in the county within {NEWS_CONFIRM_DAYS} days. '
-             f'Otherwise the level stops at orange; red_needs_news names the hazard when only the news report is missing.'),
+             f'Flood: high likelihood x severe impact (see above -- the county-level exposure bar or a news report, '
+             f'either is enough; no longer gated on having both). Drought: more than {DROUGHT_RED_DRY_DAYS} days without '
+             f'a wet county-day (GSMaP) AND less than {DROUGHT_RED_P_RECOVERY:.0%} chance that the next 2 weeks of rain, '
+             f'net of expected evapotranspiration, refill the soil deficit (ECMWF ensemble) -- OR a news report of '
+             f'drought or a dry spell in the county within {NEWS_CONFIRM_DAYS} days, on its own. A news report never '
+             f'holds back a red the exposure or dry-spell data has already earned; it only adds to the reasons, and can '
+             f'equally raise an alert on its own when the modelled data is thin or lags the ground situation.'),
             ('news_flood_report / news_drought_report',
              f'Newest item in data/news.json (climate-news monitor) that names the county and reports flooding or heavy '
              f'rainfall / drought or a dry spell, within {NEWS_CONFIRM_DAYS} days. State-wide or countrywide items and '
-             f'news of forecasts or outlooks do not count.'),
+             f'news of forecasts or outlooks do not count. A report here is sufficient on its own for red (see above), '
+             f'as well as supporting a red already reached from the exposure or dry-spell data.'),
+            ('county_buildings_share / county_schools_share / county_health_share / county_settlement_share',
+             'Share of the COUNTY\'s buildings, schools, health facilities and built-up (settlement) area on flood-prone '
+             'ground (exposure_cache.json, aggregated across all the county\'s payams -- not a single payam\'s share). '
+             'Buildings: JRC GHS-OBAT 2020 where the service account could read it, else VIDA combined buildings '
+             '(exposure_cache.json\'s buildings_basis says which). Settlement area: GHSL built-up surface, 2020.'),
             ('pop_total / pop_flood_prone / cropland_km2',
              '2025 county population estimates; population on ground mapped as water at least once (JRC Global Surface Water) or flooded in a Global Flood Database event (WorldPop 2020 shares scaled to the 2025 county totals); '
              'cropland area from ESA WorldCover 2021 (sampled at 100 m, approximate). Static: refreshed only if the '
@@ -469,7 +527,10 @@ def notes_rows(recovery_note=''):
     rows += [('sudd river trigger (experimental)',
               'Mean percentile of the monthly maximum level at the 3 nearest upstream altimetry stations of the counties with recorded '
               'flood displacement. Watch from the 55th, elevated from the 70th percentile. Derived from 6 flood onsets in 2020-2025: '
-              'to be scored in 2026, not a validated warning. Logged in sudd_trigger_log.csv.')]
+              'to be scored in 2026, not a validated warning. Logged in sudd_trigger_log.csv. '
+              'Nov-Jan, for the counties with recorded flood displacement, a watch/elevated reading also raises the '
+              'flood likelihood in the bulletin itself, since river flooding in the Sudd often continues for weeks to '
+              'months after the rains stop and a rain-based likelihood alone would miss it.')]
     rows += [('attribution', a) for a in ATTRIBUTION]
     return rows
 
@@ -498,9 +559,9 @@ def build_json(bulletin, p_cols, run_utc, data_end, verification=None, river_tri
     for r in bulletin.to_dict('records'):
         counties.append({
             'county': r['county'], 'state': r['state'],
-            'alert': {'level': r.get('alert_level'), 'hazard': r.get('alert_hazard'),
+            'alert': {'level': r.get('alert_level'), 'stage': r.get('alert_stage'), 'hazard': r.get('alert_hazard'),
                       'likelihood': r.get('alert_likelihood'), 'impact': r.get('alert_impact'),
-                      'text': r.get('alert_text'), 'red_needs_news': _txt(r.get('red_needs_news')),
+                      'text': r.get('alert_text'),
                       'news_flood_report': _txt(r.get('news_flood_report')),
                       'news_drought_report': _txt(r.get('news_drought_report'))},
             'antecedent': {k: _num(r.get(k)) for k in
@@ -523,7 +584,11 @@ def build_json(bulletin, p_cols, run_utc, data_end, verification=None, river_tri
                          'largest_payam_share_on_flood_prone_ground': _num(r.get('payam_max_share')),
                          'largest_payam_share_detail': _txt(r.get('payam_max_share_item')),
                          'largest_payam_facility_share_on_flood_prone_ground': _num(r.get('payam_max_facility_share')),
-                         'largest_payam_facility_share_detail': _txt(r.get('payam_max_facility_share_item'))},
+                         'largest_payam_facility_share_detail': _txt(r.get('payam_max_facility_share_item')),
+                         'county_buildings_share_on_flood_prone_ground': _num(r.get('county_buildings_share')),
+                         'county_schools_share_on_flood_prone_ground': _num(r.get('county_schools_share')),
+                         'county_health_share_on_flood_prone_ground': _num(r.get('county_health_share')),
+                         'county_settlement_share_on_flood_prone_ground': _num(r.get('county_settlement_share'))},
             'advisory': [a.strip() for a in str(r.get('advisory_flags', '')).split(' | ') if a.strip()],
         })
     return {
@@ -609,7 +674,7 @@ def write_pdf(bulletin, p_cols, run_utc, data_end, out_dir, river_trigger=None):
     # cover: counts + county table by alert level
     counts = bulletin['alert_level'].value_counts()
     legend = [[Paragraph(f'<font color="white"><b>{k.upper()}</b></font>', body),
-               Paragraph(f'{int(counts.get(k, 0))} counties. {LEVEL_MEANING[k]}', body)] for k in
+               Paragraph(f'{int(counts.get(k, 0))} counties ({ALERT_STAGE[k]}). {LEVEL_MEANING[k]}', body)] for k in
               ('red', 'orange', 'yellow', 'green')]
     lt = Table(legend, colWidths=[24 * mm, 150 * mm])
     lt.setStyle(TableStyle([('BACKGROUND', (0, i), (0, i), colors.HexColor(COLORS[k])) for i, k in
@@ -642,9 +707,11 @@ def write_pdf(bulletin, p_cols, run_utc, data_end, out_dir, river_trigger=None):
     for r in bulletin.sort_values(['state', 'county']).to_dict('records'):
         story.append(PageBreak())
         lvl = r.get('alert_level') if r.get('alert_level') in COLORS else 'green'
+        stage = ALERT_STAGE.get(r.get('alert_level'))
+        badge = str(r.get('alert_level')).upper() + (f" &mdash; {stage.upper()}" if stage else '')
         head = Table([[Paragraph(f'<font color="white" size="15"><b>{r["county"]}</b></font><font color="white" size="9">'
                                  f' &nbsp; {r["state"]}</font>', body),
-                       Paragraph(f'<font color="white"><b>{str(r.get("alert_level")).upper()}</b></font>', body)]],
+                       Paragraph(f'<font color="white"><b>{badge}</b></font>', body)]],
                      colWidths=[145 * mm, 29 * mm])
         head.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, -1), colors.HexColor(COLORS[lvl])),
                                   ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('TOPPADDING', (0, 0), (-1, -1), 6),

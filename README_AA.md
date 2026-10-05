@@ -68,21 +68,35 @@ Rules are short expressions over named values, for example:
 river_level_m >= activation_level_m or (alert_level == 'red' and alert_hazard == 'flood / waterlogging')
 ```
 
-`python aa_p3_aap_engine.py --list-variables` prints every name (bulletin alert, rain and soil values, river level,
-age and rate, seasonal percentile `river_pctile`, rise since the dry-season low `river_rise_m`, 2/5/10-year levels,
-the county's `readiness_value` / `activation_value` / `regional_value` from the scorecard, the Sudd trigger
-`sudd_upstream_pct`, flooded area now, days since a wet day `dry_spell_days`, chance of soil recovery
-`p_soil_recovery`, news reports `news_flood` / `news_drought`) with today's values. Only comparisons, `and` / `or` /
-`not`, numbers, text and arithmetic are accepted. `aa_triggers.csv` gives each county a suggested readiness and
-activation rule; example plans follow those suggestions until the TWG-AA edits them, and a draft plan restarts from
-normal when its rules change.
+`python aa_p3_aap_engine.py --list-variables` prints every name (bulletin alert `alert_level` / `alert_rank` /
+`alert_stage`, rain and soil values, river level, age and rate, seasonal percentile `river_pctile`, rise since the
+dry-season low `river_rise_m`, 2/5/10-year levels, the county's `readiness_value` / `activation_value` /
+`regional_value` from the scorecard, the Sudd trigger `sudd_upstream_pct`, flooded area now, days since a wet day
+`dry_spell_days`, chance of soil recovery `p_soil_recovery`, news reports `news_flood` / `news_drought`) with today's
+values. Only comparisons, `and` / `or` / `not`, numbers, text and arithmetic are accepted. `aa_triggers.csv` gives
+each county a suggested readiness and activation rule; example plans follow those suggestions until the TWG-AA
+edits them, and a draft plan restarts from normal when its rules change.
 
-A red bulletin alert means activation in every suggested rule. Red needs confirmation by a news report in the
-county (`data/news.json`, last 21 days): for floods, a high chance of heavy rain, more than 10,000 people or at least
-50% of a payam's buildings, listed settlements, schools or health facilities on flood-prone ground, and a flood
-report; for drought, more than 21 days without a wet day, less than 60% chance that 2 weeks of rain refill the soil
-deficit, and a drought or dry-spell report. A drought plan can use
-`alert_hazard == 'drought / dry spell' and alert_level == 'red'`.
+`alert_stage` spells out, in the Roadmap's own words, the AA stage each bulletin level corresponds to: green =
+monitoring, yellow = warning, orange = readiness, red = activation -- the readiness/activation names line up with
+this engine's own plan stages, so a rule can read `alert_stage == 'activation'` as a more readable alternative to
+`alert_level == 'red'`.
+
+A red bulletin alert means activation in every suggested rule. Red is reached either way, whichever comes first --
+a news report is supporting evidence, never a requirement, and its absence never holds back a red the data has
+already earned:
+- **Flood**: a high chance of heavy rain (or, Nov-Jan, the experimental Sudd river trigger at watch/elevated after
+  the rains have stopped -- river flooding in the Sudd lags the rain by weeks to months, so rain likelihood alone
+  can miss it) together with **either** (a) more than 10,000 people, or at least 50% of the **county's** (not one
+  payam's) buildings, schools, health facilities or built-up/settlement area, on flood-prone ground -- buildings
+  from JRC GHS-OBAT 2020 where readable, else VIDA combined buildings; settlement extent from GHSL built-up surface
+  -- **or** (b) a news report of flooding or heavy rainfall in the county (`data/news.json`, last 21 days) on its
+  own.
+- **Drought**: **either** (a) more than 21 days without a wet day and less than 60% chance that 2 weeks of rain, net
+  of expected evapotranspiration (the observed 30-day SMAP L4 rate held constant over the window), refill the soil
+  deficit, **or** (b) a news report of drought or a dry spell in the county on its own.
+
+A drought plan can use `alert_hazard == 'drought / dry spell' and alert_level == 'red'`.
 
 ## Safeguards
 
