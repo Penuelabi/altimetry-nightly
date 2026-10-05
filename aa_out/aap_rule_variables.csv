@@ -23,8 +23,8 @@ lvl_5yr_m,station_status.csv,5-year flood level (m),Abyei Region,395.471
 lvl_10yr_m,station_status.csv,10-year flood level (m),Abyei Region,395.611
 readiness_level_m,aa_triggers.csv,"readiness water level, when the county rule uses levels (else 2-year level - 0.25 m if the county has no aa_triggers.csv row)",Abyei Region,
 activation_level_m,aa_triggers.csv,"activation water level, when the county rule uses levels (else the 2-year level)",Abyei Region,
-readiness_value,aa_triggers.csv,readiness value of the county's trigger signal (units depend on trigger_family),Abyei Region,0.7
-activation_value,aa_triggers.csv,activation value of the county's trigger signal,Abyei Region,0.75
+readiness_value,aa_triggers.csv,readiness value of the county's trigger signal (units depend on trigger_family),Abyei Region,
+activation_value,aa_triggers.csv,activation value of the county's trigger signal,Abyei Region,
 regional_value,aa_triggers.csv,regional index needed together with the county signal (combined rules),Abyei Region,
 sudd_upstream_pct,sudd_trigger_log.csv,experimental Sudd river trigger: upstream percentile (0-1),Abyei Region,0.3777
 sudd_status,sudd_trigger_log.csv,"'normal', 'watch' or 'elevated'",Abyei Region,normal

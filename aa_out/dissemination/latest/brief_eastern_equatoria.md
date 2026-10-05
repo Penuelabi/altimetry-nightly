@@ -1,6 +1,6 @@
 # Eastern Equatoria - anticipatory action situation brief
 
-Prepared 2026-10-05 14:30 UTC for the Eastern Equatoria state TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-04 00 UTC.
+Prepared 2026-10-05 14:34 UTC for the Eastern Equatoria state TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-04 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 

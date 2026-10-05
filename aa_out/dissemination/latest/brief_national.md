@@ -1,6 +1,6 @@
 # South Sudan - anticipatory action situation brief
 
-Prepared 2026-10-05 14:30 UTC for the national TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-04 00 UTC.
+Prepared 2026-10-05 14:34 UTC for the national TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-04 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -41,3 +41,6 @@ Prepared 2026-10-05 14:30 UTC for the national TWG-AA. Rain and soil data to 202
 ## Decisions for the group
 - Agree the warning for the 25 counties with an alert and the channels (radio hubs, chiefs, SMS).
 - Ask intermediaries to translate and validate templates for: Bari, Dinka (Thuongjang), Juba Arabic, Nuer (Thok Naath), Shilluk (Dhok Cøllø).
+
+## Notes
+- 4 county gauges have no satellite pass in the last weeks: Manyo, Aweil West, Nyirol, Abiemnhom

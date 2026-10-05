@@ -1,12 +1,12 @@
 # River triggers - design note (proposal for validation)
 
-Generated 2026-10-05 14:30 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-10-05 14:34 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
-- **Activation: U75** (best CSI among rules with FAR <= 50%).
-- **Readiness: U70** (a lower rule of the same kind that catches at least 60% of flood seasons on time and as many as activation; best TSS).
+- **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 36 days before displacement).
+- **Readiness: S85** (a lower rule of the same kind that catches at least 60% of flood seasons on time and as many as activation; best TSS; median 44 days before displacement).
 - Names: P = percentile of the gauge record; 2yr/5yr/10yr = return levels; S = seasonal percentile (how unusual for the time of year); R = rise since the dry-season low against the gauge's usual rise; U = Sudd regional upstream index x100; A+U = both.
-- Counties without a reliable gauge use the regional rule if they are Sudd counties (readiness U70, activation U75), otherwise the bulletin flood alert. Each county's values and suggested plan rules are in aa_triggers.csv.
+- Counties without a reliable gauge use the regional rule if they are Sudd counties (readiness U55, activation U70), otherwise the bulletin flood alert. Each county's values and suggested plan rules are in aa_triggers.csv.
 
 ## Evidence
 169 county-seasons with a recorded flood impact, seasons 2020-2025 (July-January); 144 county-seasons scored at 24 counties with a reliable gauge. Regional index: 21 Sudd counties with recorded flood displacement, 47 upstream gauges.
@@ -53,11 +53,11 @@ Generated 2026-10-05 14:30 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 ### The chosen rules, impact = flood displacement only
 | candidate | events | hits | late | misses | false_alarms | POD | FAR | CSI | TSS | median_lead_days |
 |---|---|---|---|---|---|---|---|---|---|---|
-| U70 | 32 | 19 | 12 | 1 | 89 | 59% | 74% | 0.16 | -0.20 | 30 |
-| U75 | 32 | 12 | 13 | 7 | 71 | 38% | 74% | 0.12 | -0.26 | 0 |
+| S85 | 32 | 16 | 5 | 11 | 54 | 50% | 72% | 0.19 | 0.02 | 44 |
+| S85+U55 | 32 | 15 | 6 | 11 | 50 | 47% | 70% | 0.18 | 0.02 | 36 |
 
 ## Counties
-Rule used: regional 79.
+Rule used: bulletin flood alert 46, seasonal + regional 24, regional 9.
 At or above a proposed value now: 0.
 
 ## How to read and validate

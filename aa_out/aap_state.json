@@ -30,7 +30,7 @@
   "activations": 0,
   "last_sig": null,
   "readiness_since": null,
-  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
+  "rules": "river_pctile >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || (river_pctile >= activation_value and sudd_upstream_pct >= regional_value) or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-AYOD": {
   "stage": "normal",
@@ -41,7 +41,7 @@
   "activations": 0,
   "last_sig": null,
   "readiness_since": null,
-  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
+  "rules": "river_pctile >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || (river_pctile >= activation_value and sudd_upstream_pct >= regional_value) or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-TWICEAST": {
   "stage": "normal",
@@ -52,7 +52,7 @@
   "activations": 0,
   "last_sig": null,
   "readiness_since": null,
-  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
+  "rules": "river_pctile >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || (river_pctile >= activation_value and sudd_upstream_pct >= regional_value) or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-GUIT": {
   "stage": "normal",

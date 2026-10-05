@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261005_1430",
+ "name": "south-sudan-hydroclimate-aa-20261005_1434",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261005_1430",
- "created": "2026-10-05T14:30:22Z",
+ "version": "20261005_1434",
+ "created": "2026-10-05T14:34:14Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -911,7 +911,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 24722,
-   "hash": "sha256:f6bbdc108f0e2c749aeebbb11234191b06637a630d1e991f708edc57c4342a6f",
+   "hash": "sha256:3f982888be0c1c64ff6c0ca0c8d63ea3e022875c3e972f8851341983e46c11b4",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1154,8 +1154,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 39765,
-   "hash": "sha256:91f2191fc9e2719a2fab5086a25351592abf1fa98d48bc43d710dfbd59efbb9f",
+   "bytes": 41142,
+   "hash": "sha256:5ec391f8d964c8c637b9a43f2c5319a7915148bf3cc07d6fa2cc6bfc1884cdaa",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1365,8 +1365,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1517,
-   "hash": "sha256:4cdbe071adce34bf58032d9f5e55e800c6fe589425d752c00765578119e3d4dd",
+   "bytes": 1524,
+   "hash": "sha256:ae06d5d68c5ceb1df1dd6298d33d252a00ece5dd243fb11aaca099b674104663",
    "rows": 6,
    "schema": {
     "fields": [
@@ -1412,7 +1412,7 @@
      },
      {
       "name": "readiness_now",
-      "type": "boolean"
+      "type": "string"
      },
      {
       "name": "activation_now",
@@ -1420,7 +1420,7 @@
      },
      {
       "name": "missing_or_stale",
-      "type": "number"
+      "type": "string"
      },
      {
       "name": "river_level_m",
