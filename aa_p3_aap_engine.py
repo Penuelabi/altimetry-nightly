@@ -77,6 +77,11 @@ VARIABLES = [
     ('rain_30d_pct', 'county bulletin', 'last 30 days of rain as % of normal'),
     ('pop_total', 'county bulletin', 'county population (2025 estimate)'),
     ('pop_flood_prone', 'county bulletin', 'people on ground that has flooded before'),
+    ('dry_spell_days', 'county bulletin', 'observed days since the last wet county-day (GSMaP)'),
+    ('p_soil_recovery', 'county bulletin', 'chance that 2 weeks of rain refill the soil deficit (0-1, ECMWF ensemble)'),
+    ('news_flood', 'county bulletin', 'True when news reported flooding or heavy rainfall in the county (last 21 days)'),
+    ('news_drought', 'county bulletin', 'True when news reported drought or a dry spell in the county (last 21 days)'),
+    ('red_needs_news', 'county bulletin', "hazard whose red rule is met except the news report ('' if none)"),
     ('river_level_m', 'station_status.csv', 'latest satellite water level at the county gauge (m)'),
     ('river_age_days', 'station_status.csv', 'days since that satellite pass'),
     ('river_rate_m_per_day', 'station_status.csv', 'rise (+) or fall (-) at the last pass (m per day)'),
@@ -390,6 +395,10 @@ def build_values(as_of):
                 'week2_rain_mm': num(r.get('week2_rain_median_mm')), 'soil_z': num(r.get('sm_rootzone_z')),
                 'soil_deficit_mm': num(r.get('soil_deficit_mm')), 'rain_30d_pct': num(r.get('rain_30d_pct_of_normal')),
                 'pop_total': num(r.get('pop_total')), 'pop_flood_prone': num(r.get('pop_flood_prone')),
+                'dry_spell_days': num(r.get('dry_spell_days')), 'p_soil_recovery': num(r.get('p_soil_recovery_2wk')),
+                'news_flood': not isnull(r.get('news_flood_report')) and str(r.get('news_flood_report')).strip() != '',
+                'news_drought': not isnull(r.get('news_drought_report')) and str(r.get('news_drought_report')).strip() != '',
+                'red_needs_news': '' if isnull(r.get('red_needs_news')) else str(r.get('red_needs_news')),
                 '_bulletin': str(r.get('run_utc') or r.get('data_end_date') or '')})
     lpath = first_existing(os.path.join(BUL_DIR, 'county_station_link.csv'), os.path.join(HERE, 'county_station_link.csv'))
     link = read_csv(lpath)

@@ -53,6 +53,7 @@ RAIN_CLIM_YEARS = (2001, 2025)                    # comparison years for rainfal
 LAND_CLIM_YEARS = (2015, 2025)                    # comparison years for SMAP (record starts 2015)
 WINDOWS = [7, 15, 30]
 SCALE = 5000
+DRY_SPELL_LOOKBACK_DAYS = 45                      # observed dry spell (days since a wet county-day) counted up to this
 
 # Soil classes from the root-zone z-score
 Z_VERY_DRY = -1.5
@@ -179,6 +180,63 @@ def zclass(z):
     if z < Z_VERY_WET:
         return 'wet'
     return 'very wet'
+
+
+def dry_spell_from_obs(obs, days, counties):
+    """Days since the last wet county-day, from observed county-days (columns date, county, obs_wet); `days` runs
+    newest first. A missing day ends the count (so the result is a lower bound), no wet day in the window gives
+    len(days), and no observation for the newest day gives NaN."""
+    wet = {(str(d), c): w for d, c, w in zip(obs['date'].astype(str), obs['county'], obs['obs_wet'])}
+    rows = []
+    for c in counties:
+        n, last = 0, None
+        for d in days:
+            w = wet.get((d, c))
+            if w is None or pd.isna(w):
+                break
+            if w >= 1:
+                last = d
+                break
+            n += 1
+        first_missing = wet.get((days[0], c)) is None or pd.isna(wet.get((days[0], c)))
+        rows.append({'county': c, 'dry_spell_days': np.nan if first_missing else n, 'last_wet_day': last})
+    return pd.DataFrame(rows)
+
+
+def observed_dry_spell(last_day, lookback=DRY_SPELL_LOOKBACK_DAYS):
+    """Observed dry spell per county up to last_day (GSMaP, with the outlook's wet-day definition). County-days come
+    from verify_forecasts.fetch_observed and are kept in forecast_obs_cache.csv (shared with verify_forecasts.py),
+    so each day is fetched from Earth Engine once."""
+    import verify_forecasts as vf
+    path = os.path.join(OUT_DIR, 'forecast_obs_cache.csv')
+    cols = ['date', 'county', 'obs_mm', 'obs_wet_frac', 'obs_wet']
+    cache = pd.read_csv(path) if os.path.exists(path) and os.path.getsize(path) > 5 else pd.DataFrame(columns=cols)
+    days = [(last_day - datetime.timedelta(days=i)).isoformat() for i in range(lookback)]
+    have = set(cache['date'].astype(str))
+    need = [d for d in days if d not in have]
+    if need:
+        print(f"Observed rain for the dry-spell count: fetching {len(need)} days from GSMaP (kept for later runs)")
+        new = []
+        for k in range(0, len(need), 5):
+            try:
+                part = vf.fetch_observed(need[k:k + 5], COUNTY_CACHE)
+                if len(part):
+                    new.append(part)
+            except Exception as e:
+                print(f"  days from {need[k]}: not fetched ({type(e).__name__}: {str(e)[:100]})")
+        if new:
+            cache = pd.concat(([cache] if len(cache) else []) + new, ignore_index=True)
+            cache = cache.drop_duplicates(['date', 'county'], keep='last')
+            cache.to_csv(path, index=False)
+    return dry_spell_from_obs(cache[cache['date'].astype(str).isin(days)], days, COUNTIES)
+
+
+def recovery_chance(rain_2wk, deficit):
+    """Share of ensemble members whose 2-week rain refills the root-zone soil deficit; NaN when the deficit is under
+    DEFICIT_MIN_MM. Evaporation is ignored (as in the advisory), so the chance errs towards recovery."""
+    if deficit is None or pd.isna(deficit) or deficit < DEFICIT_MIN_MM:
+        return np.nan
+    return float(np.mean(np.asarray(rain_2wk, dtype=float) >= deficit))
 
 
 # =========================================================================== #
@@ -372,6 +430,15 @@ if RUN_ANTECEDENT:
     print("30-day rain classes:              " +
           ', '.join(f"{k} {v}" for k, v in ante['rain_30d_class'].value_counts().items()))
 
+    # Observed dry spell, for the drought red rule in bulletin_extras.py. A failure here never stops the bulletin.
+    try:
+        ante = ante.merge(observed_dry_spell(gs_last), on='county', how='left')
+        _ds = ante['dry_spell_days']
+        print(f"Days since a wet county-day (to {gs_last}): median {_ds.median():.0f}, max {_ds.max():.0f}, "
+              f"{int((_ds > 21).sum())} counties above 21, {int(_ds.isna().sum())} unknown")
+    except Exception as _e:
+        print(f"WARNING: observed dry spell skipped ({type(_e).__name__}: {_e})")
+
 # =========================================================================== #
 # PART B - WET / DRY SPELL OUTLOOK WITH CERTAINTY (ECMWF ENS)                 #
 # =========================================================================== #
@@ -471,6 +538,13 @@ if RUN_OUTLOOK:
                 i = j + 1
             return '; '.join(parts)
 
+        DEFICIT = {}                                          # soil deficit from Part A, for the chance of recovery
+        if ante is not None:
+            try:
+                DEFICIT = pd.to_numeric(ante.set_index('county')['soil_deficit_mm'], errors='coerce').to_dict()
+            except Exception as _e:
+                print(f"WARNING: chance of soil recovery skipped ({type(_e).__name__}: {_e})")
+
         rows, log = [], []
         for county, (iy, ix) in sorted(cells.items()):
             cellrain = arr[:, :, iy, ix]                          # members x days x cells
@@ -488,6 +562,7 @@ if RUN_OUTLOOK:
                 P_DRY: np.mean([longest_run(~wet[k]) >= DRY_SPELL_DAYS for k in range(m)]),
                 P_WSP: np.mean([longest_run(wet[k, :7]) >= WET_SPELL_DAYS for k in range(m)]),
                 P_HEAVY: np.mean(w1 >= HEAVY_7D_MM),
+                'p_soil_recovery_2wk': recovery_chance(w1 + w2, DEFICIT.get(county)),
                 'spell_windows': windows_text(p_wet),
             }
             for i, p in enumerate(p_wet):
@@ -614,6 +689,7 @@ KEY_COLS = ['state', 'county', 'data_end_date', 'data_source', 'soil_rootzone_cl
             'runoff_30d_class', 'et_30d_mm', 'wb_30d_mm', 'run_utc', 'n_members', 'week1_rain_median_mm',
             'week1_rain_p20_mm', 'week1_rain_p80_mm', 'week2_rain_median_mm', P_DRY, P_WSP, P_HEAVY,
             'spell_windows', 'alert_level', 'alert_hazard', 'alert_likelihood', 'alert_impact',
+            'dry_spell_days', 'p_soil_recovery_2wk', 'red_needs_news', 'news_flood_report', 'news_drought_report',
             'pop_total', 'pop_flood_prone', 'cropland_km2', 'advisory_flags']
 key = bulletin[[c for c in KEY_COLS if c in bulletin.columns]]
 
@@ -639,6 +715,10 @@ notes = pd.DataFrame([
     ('wet day', f'At least {WET_AREA_FRACTION:.0%} of the county\'s 0.25 deg cells get >= {WET_DAY_MM} mm in 24 h '
                 '(00-24 UTC = 02:00-02:00 South Sudan time)'),
     ('p_dry_spell / p_wet_spell / p_heavy', 'Share of ensemble members showing the event'),
+    ('dry_spell_days', f'Observed days since the last wet county-day, up to the last complete GSMaP day (wet day as '
+                       f'above); a missing day ends the count. Counted up to {DRY_SPELL_LOOKBACK_DAYS} days.'),
+    ('p_soil_recovery_2wk', f'Share of ensemble members whose 2-week rain refills the root-zone soil deficit (only for '
+                            f'deficits of at least {DEFICIT_MIN_MM} mm; evaporation ignored, so it errs towards recovery)'),
     ('spell_windows', 'Likely wet / likely dry / uncertain, with confidence from member agreement'),
     ('certainty caveat', 'Member agreement is not verified accuracy; forecast_log_ens.csv is kept for verification.'),
     ('advisory rules', f'Deficit when root-zone z <= {DEFICIT_Z} and >= {DEFICIT_MIN_MM} mm below median; graded by '

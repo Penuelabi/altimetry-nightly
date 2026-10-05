@@ -71,9 +71,18 @@ river_level_m >= activation_level_m or (alert_level == 'red' and alert_hazard ==
 `python aa_p3_aap_engine.py --list-variables` prints every name (bulletin alert, rain and soil values, river level,
 age and rate, seasonal percentile `river_pctile`, rise since the dry-season low `river_rise_m`, 2/5/10-year levels,
 the county's `readiness_value` / `activation_value` / `regional_value` from the scorecard, the Sudd trigger
-`sudd_upstream_pct`, flooded area now) with today's values. Only comparisons, `and` / `or` / `not`, numbers, text and
-arithmetic are accepted. `aa_triggers.csv` gives each county a suggested readiness and activation rule; example plans
-follow those suggestions until the TWG-AA edits them, and a draft plan restarts from normal when its rules change.
+`sudd_upstream_pct`, flooded area now, days since a wet day `dry_spell_days`, chance of soil recovery
+`p_soil_recovery`, news reports `news_flood` / `news_drought`) with today's values. Only comparisons, `and` / `or` /
+`not`, numbers, text and arithmetic are accepted. `aa_triggers.csv` gives each county a suggested readiness and
+activation rule; example plans follow those suggestions until the TWG-AA edits them, and a draft plan restarts from
+normal when its rules change.
+
+A red bulletin alert means activation in every suggested rule. Red needs confirmation by a news report in the
+county (`data/news.json`, last 21 days): for floods, a high chance of heavy rain, more than 10,000 people or at least
+50% of a payam's buildings, listed settlements, schools or health facilities on flood-prone ground, and a flood
+report; for drought, more than 21 days without a wet day, less than 60% chance that 2 weeks of rain refill the soil
+deficit, and a drought or dry-spell report. A drought plan can use
+`alert_hazard == 'drought / dry spell' and alert_level == 'red'`.
 
 ## Safeguards
 
