@@ -1,0 +1,14 @@
+group_id,group_name,level,state,county,channel,languages,min_alert,active,members,notes
+NTWG-AA,National Technical Working Group on Anticipatory Action,national,,,email,en,yellow,yes,,chaired by MHADM
+TWG-ABYEI_REGION,Abyei Region state TWG-AA,state,Abyei Region,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-CENTRAL_EQUATORIA,Central Equatoria state TWG-AA,state,Central Equatoria,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-EASTERN_EQUATORIA,Eastern Equatoria state TWG-AA,state,Eastern Equatoria,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-JONGLEI,Jonglei state TWG-AA,state,Jonglei,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-LAKES,Lakes state TWG-AA,state,Lakes,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-NORTHERN_BAHR_EL_GHA,Northern Bahr el Ghazal state TWG-AA,state,Northern Bahr el Ghazal,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-UNITY,Unity state TWG-AA,state,Unity,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-UPPER_NILE,Upper Nile state TWG-AA,state,Upper Nile,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-WARRAP,Warrap state TWG-AA,state,Warrap,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-WESTERN_BAHR_EL_GHAZ,Western Bahr el Ghazal state TWG-AA,state,Western Bahr el Ghazal,,email,en,yellow,no,,set active=yes once the state group is established
+TWG-WESTERN_EQUATORIA,Western Equatoria state TWG-AA,state,Western Equatoria,,email,en,yellow,no,,set active=yes once the state group is established
+HUB-EXAMPLE,Example radio listening hub (replace),community,,,radio_hub,en,yellow,no,,"one row per hub: fill state, county, languages (e.g. en;din)"

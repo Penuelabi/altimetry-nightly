@@ -1,0 +1,1535 @@
+{
+ "profile": "tabular-data-package",
+ "name": "south-sudan-hydroclimate-aa-20261005_1358",
+ "title": "South Sudan hydro-climate and anticipatory action data package",
+ "version": "20261005_1358",
+ "created": "2026-10-05T13:58:38Z",
+ "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
+ "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
+ "licenses": [
+  {
+   "name": "CC-BY-4.0",
+   "path": "https://creativecommons.org/licenses/by/4.0/",
+   "title": "Creative Commons Attribution 4.0 (attribute the sources below)"
+  }
+ ],
+ "sources": [
+  {
+   "title": "Rainfall: GSMaP v8 (JAXA), gauge-corrected, via Google Earth Engine"
+  },
+  {
+   "title": "Soil moisture, evapotranspiration, runoff: NASA SMAP Level-4 (SPL4SMGP)"
+  },
+  {
+   "title": "Forecast: ECMWF IFS ensemble open data, CC BY 4.0"
+  },
+  {
+   "title": "River levels: DAHITI (DGFI-TUM) and Hydroweb.Next (Theia / CNES, LEGOS) satellite altimetry"
+  },
+  {
+   "title": "Population: 2025 county estimates; WorldPop 2020 shares (CC BY 4.0); cropland: ESA WorldCover 2021 (CC BY 4.0)"
+  },
+  {
+   "title": "Flood-prone ground: JRC Global Surface Water; Global Flood Database; Sentinel-1 flood extent (Copernicus)"
+  },
+  {
+   "title": "Displacement: IOM Displacement Tracking Matrix records compiled in data/flood_displacement_county_month.csv"
+  }
+ ],
+ "keywords": [
+  "South Sudan",
+  "anticipatory action",
+  "early warning",
+  "flood",
+  "drought",
+  "altimetry",
+  "HXL"
+ ],
+ "roadmap": {
+  "document": "South Sudan Roadmap on Anticipatory Action 2025-2030",
+  "pillar": "2 - Trigger and Early Warning Systems",
+  "activity": "Centralized repository for multi-hazard IbF, EW and trigger-threshold data",
+  "indicator": "Number of datasets uploaded and validated"
+ },
+ "validation_summary": [
+  {
+   "dataset": "county-bulletin",
+   "status": "pass",
+   "detail": "all checks passed"
+  },
+  {
+   "dataset": "station-status",
+   "status": "pass",
+   "detail": "all checks passed"
+  },
+  {
+   "dataset": "county-gauge-link",
+   "status": "pass",
+   "detail": "all checks passed"
+  },
+  {
+   "dataset": "county-flood-risk-profile",
+   "status": "pass",
+   "detail": "all checks passed"
+  },
+  {
+   "dataset": "aa-river-triggers",
+   "status": "pass",
+   "detail": "all checks passed"
+  },
+  {
+   "dataset": "aap-status",
+   "status": "pass",
+   "detail": "all checks passed"
+  },
+  {
+   "dataset": "forecast-verification",
+   "status": "pass",
+   "detail": "all checks passed"
+  }
+ ],
+ "resources": [
+  {
+   "name": "county-bulletin",
+   "title": "County hydro-climate bulletin: antecedent rain and soil, 15-day ensemble outlook, impact-based alert",
+   "source_file": "county_bulletin_latest.csv",
+   "validation": {
+    "status": "pass",
+    "checks": [
+     {
+      "check": "readable and not empty",
+      "status": "pass",
+      "detail": "79 rows, 112 columns"
+     },
+     {
+      "check": "required columns",
+      "status": "pass",
+      "detail": "county, state, alert_level"
+     },
+     {
+      "check": "unique county",
+      "status": "pass",
+      "detail": "unique"
+     },
+     {
+      "check": "p_heavy_50mm_week1 within 0-1",
+      "status": "pass",
+      "detail": "79 values"
+     },
+     {
+      "check": "p_dry_spell_7d_in_15d within 0-1",
+      "status": "pass",
+      "detail": "79 values"
+     },
+     {
+      "check": "p_wet_spell_3d_week1 within 0-1",
+      "status": "pass",
+      "detail": "79 values"
+     },
+     {
+      "check": "alert_level categories",
+      "status": "pass",
+      "detail": "green, orange, yellow"
+     },
+     {
+      "check": "data_end_date freshness",
+      "status": "pass",
+      "detail": "latest 2026-10-01 (4 days old, limit 7)"
+     },
+     {
+      "check": "county coverage",
+      "status": "pass",
+      "detail": "79/79 counties"
+     }
+    ]
+   },
+   "included": true,
+   "path": "county_bulletin_latest.csv",
+   "hxl_path": "county_bulletin_latest_hxl.csv",
+   "format": "csv",
+   "mediatype": "text/csv",
+   "encoding": "utf-8",
+   "bytes": 158185,
+   "hash": "sha256:85ca9b7833d5649699ee079149ccc918ded4caa616cdc1ddbc023ad4bf21bee8",
+   "rows": 79,
+   "schema": {
+    "fields": [
+     {
+      "name": "county",
+      "type": "string",
+      "hxl": "#adm2+name"
+     },
+     {
+      "name": "state",
+      "type": "string",
+      "hxl": "#adm1+name"
+     },
+     {
+      "name": "data_end_date",
+      "type": "date",
+      "hxl": "#date+data_end"
+     },
+     {
+      "name": "data_source",
+      "type": "string"
+     },
+     {
+      "name": "rain_7d_mm",
+      "type": "number"
+     },
+     {
+      "name": "rain_15d_mm",
+      "type": "number"
+     },
+     {
+      "name": "rain_30d_mm",
+      "type": "number"
+     },
+     {
+      "name": "et_7d_mm",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_7d_mm",
+      "type": "number"
+     },
+     {
+      "name": "runoff_7d_mm",
+      "type": "number"
+     },
+     {
+      "name": "et_15d_mm",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_15d_mm",
+      "type": "number"
+     },
+     {
+      "name": "runoff_15d_mm",
+      "type": "number"
+     },
+     {
+      "name": "et_30d_mm",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_30d_mm",
+      "type": "number"
+     },
+     {
+      "name": "runoff_30d_mm",
+      "type": "number"
+     },
+     {
+      "name": "sm_surface",
+      "type": "number"
+     },
+     {
+      "name": "sm_rootzone",
+      "type": "number"
+     },
+     {
+      "name": "wb_30d_mm",
+      "type": "number"
+     },
+     {
+      "name": "rain_7d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "rain_7d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "rain_7d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "rain_15d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "rain_15d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "rain_15d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "rain_30d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "rain_30d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "rain_30d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "et_7d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "et_7d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "et_7d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_7d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_7d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_7d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "runoff_7d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "runoff_7d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "runoff_7d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "et_15d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "et_15d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "et_15d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_15d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_15d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_15d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "runoff_15d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "runoff_15d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "runoff_15d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "et_30d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "et_30d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "et_30d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_30d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_30d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "surf_runoff_30d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "runoff_30d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "runoff_30d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "runoff_30d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "sm_surface_pctile",
+      "type": "number"
+     },
+     {
+      "name": "sm_surface_median",
+      "type": "number"
+     },
+     {
+      "name": "sm_surface_anom",
+      "type": "number"
+     },
+     {
+      "name": "sm_rootzone_pctile",
+      "type": "number"
+     },
+     {
+      "name": "sm_rootzone_median",
+      "type": "number"
+     },
+     {
+      "name": "sm_rootzone_anom",
+      "type": "number"
+     },
+     {
+      "name": "wb_30d_mm_pctile",
+      "type": "number"
+     },
+     {
+      "name": "wb_30d_mm_median",
+      "type": "number"
+     },
+     {
+      "name": "wb_30d_mm_anom",
+      "type": "number"
+     },
+     {
+      "name": "rain_7d_pct_of_normal",
+      "type": "number"
+     },
+     {
+      "name": "rain_15d_pct_of_normal",
+      "type": "number"
+     },
+     {
+      "name": "rain_30d_pct_of_normal",
+      "type": "number"
+     },
+     {
+      "name": "sm_rootzone_z",
+      "type": "number"
+     },
+     {
+      "name": "sm_rootzone_nyears",
+      "type": "integer"
+     },
+     {
+      "name": "soil_rootzone_class",
+      "type": "string"
+     },
+     {
+      "name": "soil_surface_class",
+      "type": "string"
+     },
+     {
+      "name": "soil_deficit_mm",
+      "type": "number"
+     },
+     {
+      "name": "rain_30d_class",
+      "type": "string"
+     },
+     {
+      "name": "runoff_30d_class",
+      "type": "string"
+     },
+     {
+      "name": "et_30d_class",
+      "type": "string"
+     },
+     {
+      "name": "antecedent_summary",
+      "type": "string"
+     },
+     {
+      "name": "run_utc",
+      "type": "datetime"
+     },
+     {
+      "name": "n_members",
+      "type": "integer"
+     },
+     {
+      "name": "week1_rain_median_mm",
+      "type": "number",
+      "hxl": "#indicator+rain_week1_mm+num"
+     },
+     {
+      "name": "week1_rain_p20_mm",
+      "type": "number"
+     },
+     {
+      "name": "week1_rain_p80_mm",
+      "type": "number"
+     },
+     {
+      "name": "week2_rain_median_mm",
+      "type": "number"
+     },
+     {
+      "name": "week2_rain_p20_mm",
+      "type": "number"
+     },
+     {
+      "name": "week2_rain_p80_mm",
+      "type": "number"
+     },
+     {
+      "name": "p_dry_spell_7d_in_15d",
+      "type": "number",
+      "hxl": "#indicator+p_dry_spell+num"
+     },
+     {
+      "name": "p_wet_spell_3d_week1",
+      "type": "number"
+     },
+     {
+      "name": "p_heavy_50mm_week1",
+      "type": "number",
+      "hxl": "#indicator+p_heavy+num"
+     },
+     {
+      "name": "spell_windows",
+      "type": "string"
+     },
+     {
+      "name": "p_wet_1004",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1005",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1006",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1007",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1008",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1009",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1010",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1011",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1012",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1013",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1014",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1015",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1016",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1017",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1018",
+      "type": "number"
+     },
+     {
+      "name": "advisory_flags",
+      "type": "string"
+     },
+     {
+      "name": "pop_total",
+      "type": "number",
+      "hxl": "#population+total"
+     },
+     {
+      "name": "pop_flood_prone",
+      "type": "number",
+      "hxl": "#population+flood_prone"
+     },
+     {
+      "name": "cropland_km2",
+      "type": "number"
+     },
+     {
+      "name": "alert_level",
+      "type": "string",
+      "hxl": "#severity+alert"
+     },
+     {
+      "name": "alert_hazard",
+      "type": "string",
+      "hxl": "#crisis+type"
+     },
+     {
+      "name": "alert_likelihood",
+      "type": "string"
+     },
+     {
+      "name": "alert_impact",
+      "type": "string"
+     },
+     {
+      "name": "alert_text",
+      "type": "string"
+     }
+    ],
+    "primaryKey": "county"
+   }
+  },
+  {
+   "name": "station-status",
+   "title": "Satellite altimetry stations: 2-, 5- and 10-year flood levels and latest status",
+   "source_file": "station_status.csv",
+   "validation": {
+    "status": "pass",
+    "checks": [
+     {
+      "check": "readable and not empty",
+      "status": "pass",
+      "detail": "696 rows, 22 columns"
+     },
+     {
+      "check": "required columns",
+      "status": "pass",
+      "detail": "station_uid, lvl_2yr_m, lvl_5yr_m, lvl_10yr_m, last_level_m, last_date"
+     },
+     {
+      "check": "unique station_uid",
+      "status": "pass",
+      "detail": "unique"
+     },
+     {
+      "check": "lvl_2yr_m <= lvl_5yr_m",
+      "status": "pass",
+      "detail": "ok"
+     },
+     {
+      "check": "lvl_5yr_m <= lvl_10yr_m",
+      "status": "pass",
+      "detail": "ok"
+     },
+     {
+      "check": "updated_utc freshness",
+      "status": "pass",
+      "detail": "latest 2026-10-05 (0 days old, limit 3)"
+     }
+    ]
+   },
+   "included": true,
+   "path": "station_status.csv",
+   "hxl_path": "station_status_hxl.csv",
+   "format": "csv",
+   "mediatype": "text/csv",
+   "encoding": "utf-8",
+   "bytes": 159470,
+   "hash": "sha256:e030109b058c9874a5669ddcc0034cce9741b68305e6907c17d61140a8226e51",
+   "rows": 696,
+   "schema": {
+    "fields": [
+     {
+      "name": "station_uid",
+      "type": "string",
+      "hxl": "#site+code"
+     },
+     {
+      "name": "type",
+      "type": "string"
+     },
+     {
+      "name": "name",
+      "type": "string",
+      "hxl": "#site+name"
+     },
+     {
+      "name": "latitude",
+      "type": "number",
+      "hxl": "#geo+lat"
+     },
+     {
+      "name": "longitude",
+      "type": "number",
+      "hxl": "#geo+lon"
+     },
+     {
+      "name": "n_obs",
+      "type": "integer"
+     },
+     {
+      "name": "n_years",
+      "type": "integer"
+     },
+     {
+      "name": "lvl_2yr_m",
+      "type": "number",
+      "hxl": "#indicator+level_2yr_m+num"
+     },
+     {
+      "name": "lvl_5yr_m",
+      "type": "number",
+      "hxl": "#indicator+level_5yr_m+num"
+     },
+     {
+      "name": "lvl_10yr_m",
+      "type": "number",
+      "hxl": "#indicator+level_10yr_m+num"
+     },
+     {
+      "name": "thr_method",
+      "type": "string"
+     },
+     {
+      "name": "thr_confidence",
+      "type": "string"
+     },
+     {
+      "name": "last_date",
+      "type": "date",
+      "hxl": "#date+observed"
+     },
+     {
+      "name": "days_since_obs",
+      "type": "integer"
+     },
+     {
+      "name": "last_level_m",
+      "type": "number",
+      "hxl": "#indicator+water_level_m+num"
+     },
+     {
+      "name": "vs_2yr_m",
+      "type": "number"
+     },
+     {
+      "name": "flood_status",
+      "type": "string"
+     },
+     {
+      "name": "flood_status_raw",
+      "type": "string"
+     },
+     {
+      "name": "level_class",
+      "type": "string"
+     },
+     {
+      "name": "seasonal_pctile",
+      "type": "number"
+     },
+     {
+      "name": "rate_m_per_day",
+      "type": "number"
+     },
+     {
+      "name": "updated_utc",
+      "type": "datetime",
+      "hxl": "#date+updated"
+     }
+    ],
+    "primaryKey": "station_uid"
+   }
+  },
+  {
+   "name": "county-gauge-link",
+   "title": "County to river gauge link (upstream / local / downstream)",
+   "source_file": "county_station_link.csv",
+   "validation": {
+    "status": "pass",
+    "checks": [
+     {
+      "check": "readable and not empty",
+      "status": "pass",
+      "detail": "79 rows, 13 columns"
+     },
+     {
+      "check": "required columns",
+      "status": "pass",
+      "detail": "county, station_uid, relation"
+     },
+     {
+      "check": "unique county",
+      "status": "pass",
+      "detail": "unique"
+     },
+     {
+      "check": "county coverage",
+      "status": "pass",
+      "detail": "79/79 counties"
+     }
+    ]
+   },
+   "included": true,
+   "path": "county_station_link.csv",
+   "hxl_path": "county_station_link_hxl.csv",
+   "format": "csv",
+   "mediatype": "text/csv",
+   "encoding": "utf-8",
+   "bytes": 11007,
+   "hash": "sha256:f150b948fdedc1367d6617a763dce3962e4c4f3edc49997a09655223f1f34fd9",
+   "rows": 79,
+   "schema": {
+    "fields": [
+     {
+      "name": "county",
+      "type": "string",
+      "hxl": "#adm2+name"
+     },
+     {
+      "name": "state",
+      "type": "string",
+      "hxl": "#adm1+name"
+     },
+     {
+      "name": "station_uid",
+      "type": "string",
+      "hxl": "#site+code"
+     },
+     {
+      "name": "station_name",
+      "type": "string",
+      "hxl": "#site+name"
+     },
+     {
+      "name": "river",
+      "type": "string"
+     },
+     {
+      "name": "relation",
+      "type": "string"
+     },
+     {
+      "name": "confidence",
+      "type": "string"
+     },
+     {
+      "name": "distance_km",
+      "type": "number"
+     },
+     {
+      "name": "last_date",
+      "type": "date",
+      "hxl": "#date+observed"
+     },
+     {
+      "name": "last_level_m",
+      "type": "number",
+      "hxl": "#indicator+water_level_m+num"
+     },
+     {
+      "name": "flood_status",
+      "type": "string"
+     },
+     {
+      "name": "seasonal_pctile",
+      "type": "number"
+     },
+     {
+      "name": "rate_m_per_day",
+      "type": "number"
+     }
+    ],
+    "primaryKey": "county"
+   }
+  },
+  {
+   "name": "county-flood-risk-profile",
+   "title": "County flood risk profile (INFORM-style, relative 0-10)",
+   "source_file": "p1_county_risk_profile.csv",
+   "validation": {
+    "status": "pass",
+    "checks": [
+     {
+      "check": "readable and not empty",
+      "status": "pass",
+      "detail": "79 rows, 47 columns"
+     },
+     {
+      "check": "required columns",
+      "status": "pass",
+      "detail": "county, risk_score, risk_class"
+     },
+     {
+      "check": "unique county",
+      "status": "pass",
+      "detail": "unique"
+     },
+     {
+      "check": "risk_score within 0-10",
+      "status": "pass",
+      "detail": "ok"
+     },
+     {
+      "check": "county coverage",
+      "status": "pass",
+      "detail": "79/79 counties"
+     }
+    ]
+   },
+   "included": true,
+   "path": "p1_county_risk_profile.csv",
+   "hxl_path": "p1_county_risk_profile_hxl.csv",
+   "format": "csv",
+   "mediatype": "text/csv",
+   "encoding": "utf-8",
+   "bytes": 24722,
+   "hash": "sha256:1cedbb549fb745da4dd69ca6ba4c86b18292dbd6e052abaa2dfdbf9c17636f59",
+   "rows": 79,
+   "schema": {
+    "fields": [
+     {
+      "name": "risk_rank",
+      "type": "integer"
+     },
+     {
+      "name": "state",
+      "type": "string",
+      "hxl": "#adm1+name"
+     },
+     {
+      "name": "county",
+      "type": "string",
+      "hxl": "#adm2+name"
+     },
+     {
+      "name": "pcode",
+      "type": "string",
+      "hxl": "#adm2+code"
+     },
+     {
+      "name": "risk_score",
+      "type": "number",
+      "hxl": "#indicator+risk_score+num"
+     },
+     {
+      "name": "risk_class",
+      "type": "string",
+      "hxl": "#indicator+risk_class"
+     },
+     {
+      "name": "hazard_exposure",
+      "type": "number"
+     },
+     {
+      "name": "hazard",
+      "type": "number"
+     },
+     {
+      "name": "exposure",
+      "type": "number"
+     },
+     {
+      "name": "vulnerability",
+      "type": "number"
+     },
+     {
+      "name": "lack_of_coping",
+      "type": "number"
+     },
+     {
+      "name": "data_completeness",
+      "type": "number"
+     },
+     {
+      "name": "data_flag",
+      "type": "number"
+     },
+     {
+      "name": "pop_total",
+      "type": "number",
+      "hxl": "#population+total"
+     },
+     {
+      "name": "pop_flood_prone",
+      "type": "number",
+      "hxl": "#population+flood_prone"
+     },
+     {
+      "name": "flood_prone_share",
+      "type": "number"
+     },
+     {
+      "name": "cropland_km2",
+      "type": "number"
+     },
+     {
+      "name": "assessments_listed",
+      "type": "integer"
+     },
+     {
+      "name": "affected_pct_mean",
+      "type": "number"
+     },
+     {
+      "name": "displaced_total",
+      "type": "number"
+     },
+     {
+      "name": "displaced_per_1000",
+      "type": "number"
+     },
+     {
+      "name": "displacement_years",
+      "type": "number"
+     },
+     {
+      "name": "area_risk_share",
+      "type": "number"
+     },
+     {
+      "name": "facilities_at_risk",
+      "type": "integer"
+     },
+     {
+      "name": "facilities_risk_share",
+      "type": "number"
+     },
+     {
+      "name": "roads_risk_km",
+      "type": "number"
+     },
+     {
+      "name": "flooded_settlement_pop",
+      "type": "number"
+     },
+     {
+      "name": "high_ground_sites",
+      "type": "integer"
+     },
+     {
+      "name": "flooded_now_km2",
+      "type": "number"
+     },
+     {
+      "name": "flooded_now_share",
+      "type": "number"
+     },
+     {
+      "name": "facilities_flooded_now",
+      "type": "integer"
+     },
+     {
+      "name": "pop_2025",
+      "type": "integer"
+     },
+     {
+      "name": "flood_years_share",
+      "type": "number"
+     },
+     {
+      "name": "area_km2",
+      "type": "number"
+     },
+     {
+      "name": "facilities_total",
+      "type": "integer"
+     },
+     {
+      "name": "s_flood_years_share",
+      "type": "number"
+     },
+     {
+      "name": "s_affected_pct_mean",
+      "type": "number"
+     },
+     {
+      "name": "s_pop_flood_prone",
+      "type": "number"
+     },
+     {
+      "name": "s_flood_prone_share",
+      "type": "number"
+     },
+     {
+      "name": "s_cropland_km2",
+      "type": "number"
+     },
+     {
+      "name": "s_area_risk_share",
+      "type": "number"
+     },
+     {
+      "name": "s_facilities_risk_share",
+      "type": "number"
+     },
+     {
+      "name": "s_roads_risk_km",
+      "type": "number"
+     },
+     {
+      "name": "s_flooded_settlement_pop",
+      "type": "number"
+     },
+     {
+      "name": "s_displaced_per_1000",
+      "type": "number"
+     },
+     {
+      "name": "s_displacement_years",
+      "type": "number"
+     },
+     {
+      "name": "generated_utc",
+      "type": "datetime"
+     }
+    ],
+    "primaryKey": "county"
+   }
+  },
+  {
+   "name": "aa-river-triggers",
+   "title": "Proposed river-level readiness and activation triggers per county (for validation)",
+   "source_file": "aa_triggers.csv",
+   "validation": {
+    "status": "pass",
+    "checks": [
+     {
+      "check": "readable and not empty",
+      "status": "pass",
+      "detail": "79 rows, 31 columns"
+     },
+     {
+      "check": "required columns",
+      "status": "pass",
+      "detail": "county, station_uid, readiness_level_m, activation_level_m"
+     },
+     {
+      "check": "unique county",
+      "status": "pass",
+      "detail": "unique"
+     },
+     {
+      "check": "readiness_level_m <= activation_level_m",
+      "status": "pass",
+      "detail": "ok"
+     }
+    ]
+   },
+   "included": true,
+   "path": "aa_triggers.csv",
+   "hxl_path": "aa_triggers_hxl.csv",
+   "format": "csv",
+   "mediatype": "text/csv",
+   "encoding": "utf-8",
+   "bytes": 20705,
+   "hash": "sha256:440854f4177b99f792acaf8ab0b45a1ee819d63b2268b49f8aaa61114f31266e",
+   "rows": 79,
+   "schema": {
+    "fields": [
+     {
+      "name": "county",
+      "type": "string",
+      "hxl": "#adm2+name"
+     },
+     {
+      "name": "state",
+      "type": "string",
+      "hxl": "#adm1+name"
+     },
+     {
+      "name": "station_uid",
+      "type": "string",
+      "hxl": "#site+code"
+     },
+     {
+      "name": "station_name",
+      "type": "string",
+      "hxl": "#site+name"
+     },
+     {
+      "name": "relation",
+      "type": "string"
+     },
+     {
+      "name": "link_confidence",
+      "type": "string"
+     },
+     {
+      "name": "readiness_rule",
+      "type": "string"
+     },
+     {
+      "name": "activation_rule",
+      "type": "string"
+     },
+     {
+      "name": "readiness_level_m",
+      "type": "number",
+      "hxl": "#indicator+readiness_level_m+num"
+     },
+     {
+      "name": "activation_level_m",
+      "type": "number",
+      "hxl": "#indicator+activation_level_m+num"
+     },
+     {
+      "name": "lvl_2yr_m",
+      "type": "number",
+      "hxl": "#indicator+level_2yr_m+num"
+     },
+     {
+      "name": "lvl_5yr_m",
+      "type": "number",
+      "hxl": "#indicator+level_5yr_m+num"
+     },
+     {
+      "name": "lvl_10yr_m",
+      "type": "number",
+      "hxl": "#indicator+level_10yr_m+num"
+     },
+     {
+      "name": "thr_confidence",
+      "type": "string"
+     },
+     {
+      "name": "thr_source",
+      "type": "string"
+     },
+     {
+      "name": "record_start",
+      "type": "date"
+     },
+     {
+      "name": "last_date",
+      "type": "date",
+      "hxl": "#date+observed"
+     },
+     {
+      "name": "last_level_m",
+      "type": "number",
+      "hxl": "#indicator+water_level_m+num"
+     },
+     {
+      "name": "days_since_obs",
+      "type": "integer"
+     },
+     {
+      "name": "current_state",
+      "type": "string"
+     },
+     {
+      "name": "seasons_tested",
+      "type": "integer"
+     },
+     {
+      "name": "hits_on_time",
+      "type": "integer"
+     },
+     {
+      "name": "misses_or_late",
+      "type": "integer"
+     },
+     {
+      "name": "false_alarms",
+      "type": "integer"
+     },
+     {
+      "name": "median_lead_days",
+      "type": "number"
+     },
+     {
+      "name": "note",
+      "type": "number"
+     },
+     {
+      "name": "status",
+      "type": "string"
+     },
+     {
+      "name": "validated_by",
+      "type": "number"
+     },
+     {
+      "name": "validated_date",
+      "type": "number"
+     },
+     {
+      "name": "risk_rank",
+      "type": "integer"
+     },
+     {
+      "name": "risk_class",
+      "type": "string",
+      "hxl": "#indicator+risk_class"
+     }
+    ],
+    "primaryKey": "county"
+   }
+  },
+  {
+   "name": "aap-status",
+   "title": "Anticipatory action plan status (normal / readiness / activated)",
+   "source_file": "aap_status_latest.csv",
+   "validation": {
+    "status": "pass",
+    "checks": [
+     {
+      "check": "readable and not empty",
+      "status": "pass",
+      "detail": "6 rows, 25 columns"
+     },
+     {
+      "check": "required columns",
+      "status": "pass",
+      "detail": "plan_id, county, stage"
+     },
+     {
+      "check": "unique plan_id",
+      "status": "pass",
+      "detail": "unique"
+     },
+     {
+      "check": "stage categories",
+      "status": "pass",
+      "detail": "activated, normal, readiness"
+     }
+    ]
+   },
+   "included": true,
+   "path": "aap_status_latest.csv",
+   "hxl_path": "aap_status_latest_hxl.csv",
+   "format": "csv",
+   "mediatype": "text/csv",
+   "encoding": "utf-8",
+   "bytes": 1660,
+   "hash": "sha256:2099001942c9f0946f6f46bc482b5781f5622b95fc5b2a034a800bba25ca3f4b",
+   "rows": 6,
+   "schema": {
+    "fields": [
+     {
+      "name": "plan_id",
+      "type": "string",
+      "hxl": "#activity+code"
+     },
+     {
+      "name": "county",
+      "type": "string",
+      "hxl": "#adm2+name"
+     },
+     {
+      "name": "state",
+      "type": "string",
+      "hxl": "#adm1+name"
+     },
+     {
+      "name": "hazard",
+      "type": "string"
+     },
+     {
+      "name": "plan_status",
+      "type": "string"
+     },
+     {
+      "name": "stage",
+      "type": "string",
+      "hxl": "#status"
+     },
+     {
+      "name": "stage_since",
+      "type": "datetime"
+     },
+     {
+      "name": "season",
+      "type": "integer"
+     },
+     {
+      "name": "activations_this_season",
+      "type": "integer"
+     },
+     {
+      "name": "readiness_now",
+      "type": "string"
+     },
+     {
+      "name": "activation_now",
+      "type": "string"
+     },
+     {
+      "name": "missing_or_stale",
+      "type": "string"
+     },
+     {
+      "name": "river_level_m",
+      "type": "number"
+     },
+     {
+      "name": "river_obs_date",
+      "type": "date"
+     },
+     {
+      "name": "river_age_days",
+      "type": "integer"
+     },
+     {
+      "name": "readiness_level_m",
+      "type": "number",
+      "hxl": "#indicator+readiness_level_m+num"
+     },
+     {
+      "name": "activation_level_m",
+      "type": "number",
+      "hxl": "#indicator+activation_level_m+num"
+     },
+     {
+      "name": "alert_level",
+      "type": "string",
+      "hxl": "#severity+alert"
+     },
+     {
+      "name": "alert_hazard",
+      "type": "string",
+      "hxl": "#crisis+type"
+     },
+     {
+      "name": "p_heavy",
+      "type": "number"
+     },
+     {
+      "name": "soil_z",
+      "type": "number"
+     },
+     {
+      "name": "people_target",
+      "type": "number"
+     },
+     {
+      "name": "budget_usd",
+      "type": "number"
+     },
+     {
+      "name": "lead_agency",
+      "type": "number"
+     },
+     {
+      "name": "evaluated_utc",
+      "type": "datetime"
+     }
+    ],
+    "primaryKey": "plan_id"
+   }
+  },
+  {
+   "name": "forecast-verification",
+   "title": "Verification of the ensemble rain outlook against observed rain",
+   "source_file": "forecast_verification.csv",
+   "validation": {
+    "status": "pass",
+    "checks": [
+     {
+      "check": "readable and not empty",
+      "status": "pass",
+      "detail": "11 rows, 13 columns"
+     },
+     {
+      "check": "required columns",
+      "status": "pass",
+      "detail": "none required"
+     }
+    ]
+   },
+   "included": true,
+   "path": "forecast_verification.csv",
+   "hxl_path": "forecast_verification_hxl.csv",
+   "format": "csv",
+   "mediatype": "text/csv",
+   "encoding": "utf-8",
+   "bytes": 861,
+   "hash": "sha256:904bf0e77b1b60354074f4bd7775f12e0079639d97346c56f49ccb3264016a9e",
+   "rows": 11,
+   "schema": {
+    "fields": [
+     {
+      "name": "run_hour_utc",
+      "type": "integer"
+     },
+     {
+      "name": "lead_day",
+      "type": "integer"
+     },
+     {
+      "name": "n",
+      "type": "integer"
+     },
+     {
+      "name": "base_rate_wet",
+      "type": "number"
+     },
+     {
+      "name": "brier",
+      "type": "number"
+     },
+     {
+      "name": "brier_skill_vs_base_rate",
+      "type": "number"
+     },
+     {
+      "name": "POD",
+      "type": "number"
+     },
+     {
+      "name": "FAR",
+      "type": "number"
+     },
+     {
+      "name": "CSI",
+      "type": "number"
+     },
+     {
+      "name": "accuracy",
+      "type": "number"
+     },
+     {
+      "name": "rain_MAE_mm",
+      "type": "number"
+     },
+     {
+      "name": "rain_bias_mm",
+      "type": "number"
+     },
+     {
+      "name": "p20_p80_coverage",
+      "type": "number"
+     }
+    ]
+   }
+  }
+ ]
+}

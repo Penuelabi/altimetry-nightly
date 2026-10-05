@@ -1,0 +1,4 @@
+time_utc,plan_id,county,state,hazard,plan_status,from_stage,to_stage,reason,river_level_m,river_obs_date,readiness_level_m,activation_level_m,alert_level,alert_hazard,p_heavy,report
+2026-10-05 13:58,AAP-FL-AYOD,Ayod,Jonglei,riverine and flash flood,draft (example) - not validated,normal,activated,activation rule met,393.28,2026-09-25,392.677,392.927,green,flood / waterlogging,0.0,AAP-FL-AYOD_20261005_1358_activated.md
+2026-10-05 13:58,AAP-FL-TWICEAST,Twic East,Jonglei,riverine and flash flood,draft (example) - not validated,normal,activated,activation rule met,393.28,2026-09-25,392.677,392.927,green,flood / waterlogging,0.0,AAP-FL-TWICEAST_20261005_1358_activated.md
+2026-10-05 13:58,AAP-FL-GUIT,Guit,Unity,riverine and flash flood,draft (example) - not validated,normal,readiness,readiness rule met,407.54,2026-09-24,407.484,407.734,green,flood / waterlogging,0.0,AAP-FL-GUIT_20261005_1358_readiness.md

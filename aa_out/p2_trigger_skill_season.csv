@@ -1,0 +1,43 @@
+impact_definition,timing,candidate,county_seasons,events,hits,misses,false_alarms,correct_negatives,POD,FAR,CSI,TSS,median_lead_days
+flood displacement,on time,P50,438,55,39,16,380,3,0.709,0.907,0.09,-0.283,43.0
+flood displacement,any time in season,P50,438,55,54,1,380,3,0.982,0.876,0.124,-0.01,
+displacement or listed in flood assessment,any time in season,P50,438,154,153,1,281,3,0.994,0.647,0.352,0.004,
+flood displacement,on time,P60,438,55,37,18,375,8,0.673,0.91,0.086,-0.306,30.0
+flood displacement,any time in season,P60,438,55,51,4,375,8,0.927,0.88,0.119,-0.052,
+displacement or listed in flood assessment,any time in season,P60,438,154,150,4,276,8,0.974,0.648,0.349,0.002,
+flood displacement,on time,P70,438,55,34,21,363,20,0.618,0.914,0.081,-0.33,30.0
+flood displacement,any time in season,P70,438,55,47,8,363,20,0.855,0.885,0.112,-0.093,
+displacement or listed in flood assessment,any time in season,P70,438,154,143,11,267,17,0.929,0.651,0.34,-0.012,
+flood displacement,on time,2yr-0.50m,438,55,40,15,365,18,0.727,0.901,0.095,-0.226,41.5
+flood displacement,any time in season,2yr-0.50m,438,55,52,3,365,18,0.945,0.875,0.124,-0.008,
+displacement or listed in flood assessment,any time in season,2yr-0.50m,438,154,147,7,270,14,0.955,0.647,0.347,0.004,
+flood displacement,on time,P75,438,55,31,24,343,40,0.564,0.917,0.078,-0.332,30.0
+flood displacement,any time in season,P75,438,55,45,10,343,40,0.818,0.884,0.113,-0.077,
+displacement or listed in flood assessment,any time in season,P75,438,154,137,17,251,33,0.89,0.647,0.338,0.006,
+flood displacement,on time,2yr-0.25m,438,55,39,16,352,31,0.709,0.9,0.096,-0.21,30.0
+flood displacement,any time in season,2yr-0.25m,438,55,52,3,352,31,0.945,0.871,0.128,0.026,
+displacement or listed in flood assessment,any time in season,2yr-0.25m,438,154,145,9,259,25,0.942,0.641,0.351,0.03,
+flood displacement,on time,P80,438,55,25,30,314,69,0.455,0.926,0.068,-0.365,32.0
+flood displacement,any time in season,P80,438,55,41,14,314,69,0.745,0.885,0.111,-0.074,
+displacement or listed in flood assessment,any time in season,P80,438,154,130,24,225,59,0.844,0.634,0.343,0.052,
+flood displacement,on time,P85,438,55,21,34,274,109,0.382,0.929,0.064,-0.334,32.0
+flood displacement,any time in season,P85,438,55,37,18,274,109,0.673,0.881,0.112,-0.043,
+displacement or listed in flood assessment,any time in season,P85,438,154,122,32,189,95,0.792,0.608,0.356,0.127,
+flood displacement,on time,2yr,438,55,28,27,280,103,0.509,0.909,0.084,-0.222,30.0
+flood displacement,any time in season,2yr,438,55,43,12,280,103,0.782,0.867,0.128,0.051,
+displacement or listed in flood assessment,any time in season,2yr,438,154,127,27,196,88,0.825,0.607,0.363,0.135,
+flood displacement,on time,P90,438,55,19,36,235,148,0.345,0.925,0.066,-0.268,30.0
+flood displacement,any time in season,P90,438,55,33,22,235,148,0.6,0.877,0.114,-0.014,
+displacement or listed in flood assessment,any time in season,P90,438,154,111,43,157,127,0.721,0.586,0.357,0.168,
+flood displacement,on time,2yr+0.25m,438,55,12,43,151,232,0.218,0.926,0.058,-0.176,16.5
+flood displacement,any time in season,2yr+0.25m,438,55,20,35,151,232,0.364,0.883,0.097,-0.031,
+displacement or listed in flood assessment,any time in season,2yr+0.25m,438,154,59,95,112,172,0.383,0.655,0.222,-0.011,
+flood displacement,on time,P95,438,55,14,41,165,218,0.255,0.922,0.064,-0.176,28.0
+flood displacement,any time in season,P95,438,55,30,25,165,218,0.545,0.846,0.136,0.115,
+displacement or listed in flood assessment,any time in season,P95,438,154,84,70,111,173,0.545,0.569,0.317,0.155,
+flood displacement,on time,5yr,438,55,9,46,142,241,0.164,0.94,0.046,-0.207,16.0
+flood displacement,any time in season,5yr,438,55,24,31,142,241,0.436,0.855,0.122,0.066,
+displacement or listed in flood assessment,any time in season,5yr,438,154,71,83,95,189,0.461,0.572,0.285,0.127,
+flood displacement,on time,10yr,438,55,0,55,41,342,0.0,1.0,0.0,-0.107,
+flood displacement,any time in season,10yr,438,55,5,50,41,342,0.091,0.891,0.052,-0.016,
+displacement or listed in flood assessment,any time in season,10yr,438,154,15,139,31,253,0.097,0.674,0.081,-0.012,

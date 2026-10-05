@@ -1,0 +1,62 @@
+{
+ "AAP-FL-PANYIJIAR": {
+  "stage": "normal",
+  "since": null,
+  "confirm": 0,
+  "quiet": 0,
+  "season": 2026,
+  "activations": 0,
+  "last_sig": null,
+  "readiness_since": null
+ },
+ "AAP-FL-FANGAK": {
+  "stage": "normal",
+  "since": null,
+  "confirm": 0,
+  "quiet": 0,
+  "season": 2026,
+  "activations": 0,
+  "last_sig": null,
+  "readiness_since": null
+ },
+ "AAP-FL-LEER": {
+  "stage": "normal",
+  "since": null,
+  "confirm": 0,
+  "quiet": 0,
+  "season": 2026,
+  "activations": 0,
+  "last_sig": null,
+  "readiness_since": null
+ },
+ "AAP-FL-AYOD": {
+  "stage": "activated",
+  "since": "2026-10-05 13:58",
+  "confirm": 0,
+  "quiet": 0,
+  "season": 2026,
+  "activations": 1,
+  "last_sig": "2026-09-25|2026-10-04 00",
+  "readiness_since": "2026-10-05 13:58"
+ },
+ "AAP-FL-TWICEAST": {
+  "stage": "activated",
+  "since": "2026-10-05 13:58",
+  "confirm": 0,
+  "quiet": 0,
+  "season": 2026,
+  "activations": 1,
+  "last_sig": "2026-09-25|2026-10-04 00",
+  "readiness_since": "2026-10-05 13:58"
+ },
+ "AAP-FL-GUIT": {
+  "stage": "readiness",
+  "since": "2026-10-05 13:58",
+  "confirm": 0,
+  "quiet": 0,
+  "season": 2026,
+  "activations": 0,
+  "last_sig": null,
+  "readiness_since": "2026-10-05 13:58"
+ }
+}

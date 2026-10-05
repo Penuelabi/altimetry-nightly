@@ -1,0 +1,12 @@
+zone_type,zone,n_counties,population,pop_flood_prone,cropland_km2,displaced_2020_2025,risk_score_pop_weighted,risk_class,counties_very_high_or_high,highest_risk_counties
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Unity,9,1212628,54464,14.4,226534,5.96,High,6,"Panyijiar, Leer, Guit"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Jonglei,11,2138577,39053,0.5,366857,5.45,High,6,"Fangak, Ayod, Twic East"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Warrap,6,1367156,65461,152.7,0,4.48,Medium,0,"Gogrial West, Gogrial East, Tonj North"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Upper Nile,12,1692781,44683,1838.0,201094,4.32,Medium,4,"Renk, Manyo, Panyikang"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Lakes,8,1251318,17877,6.6,34774,4.1,Medium,0,"Yirol East, Awerial, Cueibet"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Northern Bahr el Ghazal,5,1035433,31931,70.8,0,4.08,Medium,0,"Aweil East, Aweil South, Aweil Centre"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Abyei Administrative Area,1,145358,283,13.2,0,3.12,Low,0,Abyei Region
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Central Equatoria,6,1678970,8138,14.2,41247,3.09,Low,1,"Juba, Terekeka, Yei"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Western Bahr el Ghazal,3,716421,6502,52.5,0,3.05,Low,0,"Jur River, Wau, Raja"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Eastern Equatoria,8,1206089,3735,119.2,0,2.17,Low,0,"Lafon, Magwi, Kapoeta North"
+state (add aa_config/county_livelihood_zones.csv for livelihood zones),Western Equatoria,10,997822,388,0.4,0,1.77,Very low,0,"Mvolo, Mundri West, Mundri East"
