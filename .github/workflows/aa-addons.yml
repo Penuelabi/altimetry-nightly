@@ -1,0 +1,91 @@
+name: Anticipatory action add-ons (after each county bulletin)
+
+# Optional. Copy to .github/workflows/aa-addons.yml. It runs after the county bulletin workflow finishes,
+# reuses the same secrets, never edits the existing scripts, and commits only the add-on folders.
+
+on:
+  workflow_run:
+    workflows: ['County hydro-climate bulletin (twice daily, after ECMWF 00 and 12 UTC releases)']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      weekly:
+        description: 'Also rebuild the risk profile, trigger scorecard and indicator report'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aa-addons
+  cancel-in-progress: false
+
+jobs:
+  aa:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+      BULLETIN_FOLDER_ID: ${{ secrets.BULLETIN_FOLDER_ID }}
+      BULLETIN_OUT_DIR: ${{ github.workspace }}/bulletin
+      ALTIMETRY_OUT_DIR: ${{ github.workspace }}/altdata
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+
+      - name: Install packages
+        run: pip install pandas numpy matplotlib google-api-python-client google-auth
+
+      - name: Pull bulletin and altimetry files from Drive
+        run: |
+          mkdir -p "$BULLETIN_OUT_DIR" "$ALTIMETRY_OUT_DIR"
+          python drive_sync.py pull bulletin || echo "WARNING: bulletin pull failed"
+          python drive_sync.py pull || echo "WARNING: altimetry pull failed; river values will be missing"
+
+      - name: Weekly (Mondays, first run, or on request) - risk profile, trigger scorecard, indicator report
+        run: |
+          if [ "$(date -u +%u)" = "1" ] || [ "${{ github.event.inputs.weekly }}" = "true" ] || [ ! -f aa_out/aa_triggers.csv ]; then
+            python aa_p1_risk_profile.py      || echo "WARNING: risk profile skipped"
+            python aa_p2_trigger_scorecard.py || echo "WARNING: trigger scorecard skipped"
+            python aa_p5_indicator_tracker.py || echo "WARNING: indicator report skipped"
+          else
+            echo "Not Monday: weekly add-ons skipped"
+          fi
+
+      - name: Every run - plan engine, TWG-AA briefs and messages, validated data package
+        run: |
+          python aa_p3_aap_engine.py   2>&1 | tee "$RUNNER_TEMP/aa.log" || true
+          python aa_p5_dissemination.py || echo "WARNING: briefs skipped"
+          python aa_p2_data_package.py  || echo "WARNING: data package skipped"
+
+      - name: Show plan status in the run summary
+        if: always()
+        run: |
+          { echo '### Anticipatory action plans'; cat aa_out/aap_checklist_latest.md 2>/dev/null || echo 'no status';
+            echo; echo '### Stage changes'; echo '```'; grep -a 'STAGE CHANGE' "$RUNNER_TEMP/aa.log" 2>/dev/null || echo none; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the data package as a run artifact (not committed, to keep the repository small)
+        uses: actions/upload-artifact@v4
+        with:
+          name: aa-data-package
+          path: aa_out/aa_data_package_latest.zip
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: Commit add-on outputs
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -d aa_config ]; then git add aa_config; fi
+          if [ -d aa_out ]; then git add aa_out ':!aa_out/repository' ':!aa_out/*.zip' ':!aa_out/dissemination/2*'; fi
+          git diff --cached --quiet || { git commit -m "Update anticipatory action add-on outputs [skip ci]"; git pull --rebase -q origin main || true; git push origin HEAD:main; }
