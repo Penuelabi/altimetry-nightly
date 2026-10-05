@@ -1,11 +1,11 @@
 # Central Equatoria - anticipatory action situation brief
 
-Prepared 2026-10-05 17:46 UTC for the Central Equatoria state TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-05 00 UTC.
+Prepared 2026-10-05 18:59 UTC for the Central Equatoria state TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-05 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
-- Counties by alert level: red 0, orange 0, yellow 3, green 3.
+- Counties by alert level: red 0, orange 0, yellow 2, green 4.
 - No anticipatory action plan is in readiness or activated.
 - River gauges at a proposed trigger level: 0 counties (0 at activation level).
 
@@ -14,8 +14,7 @@ Prepared 2026-10-05 17:46 UTC for the Central Equatoria state TWG-AA. Rain and s
 |---|---|---|---|---|---|---|
 | Juba | Central Equatoria | **YELLOW** | flood / waterlogging | 28 | 6% | 2,953 |
 | Kajo-keji | Central Equatoria | **YELLOW** | flood / waterlogging | 31 | 24% | 190 |
-| Terekeka | Central Equatoria | **YELLOW** | flood / waterlogging | 28 | 10% | 4,725 |
 
 ## Decisions for the group
-- Agree the warning for the 3 counties with an alert and the channels (radio hubs, chiefs, SMS).
+- Agree the warning for the 2 counties with an alert and the channels (radio hubs, chiefs, SMS).
 - Ask intermediaries to translate and validate templates for: Bari, Dinka (Thuongjang), Juba Arabic, Nuer (Thok Naath), Shilluk (Dhok Cøllø).

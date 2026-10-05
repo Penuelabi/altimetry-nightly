@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261005_1746",
+ "name": "south-sudan-hydroclimate-aa-20261005_1859",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261005_1746",
- "created": "2026-10-05T17:46:40Z",
+ "version": "20261005_1859",
+ "created": "2026-10-05T18:59:10Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 178197,
-   "hash": "sha256:56be67b7492c3671745bdedeff69933fb8fd5161de055466e72b2bb3934da36c",
+   "bytes": 167364,
+   "hash": "sha256:cd7b0484a06efbcbf525a84dfe5ccce4656d88feeee0ddb7ad079693ab4b7e90",
    "rows": 79,
    "schema": {
     "fields": [
@@ -604,7 +604,7 @@
      },
      {
       "name": "bld_flood_prone",
-      "type": "integer"
+      "type": "number"
      },
      {
       "name": "payam_max_share",
@@ -940,7 +940,7 @@
      {
       "check": "readable and not empty",
       "status": "pass",
-      "detail": "79 rows, 47 columns"
+      "detail": "79 rows, 43 columns"
      },
      {
       "check": "required columns",
@@ -970,8 +970,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 24722,
-   "hash": "sha256:2e295de97d158a5bf32bb13d43f0745fef1a188aba3ee79eb9f770b3d8bcc78e",
+   "bytes": 16883,
+   "hash": "sha256:f07139b5333dc2335c7a9e3b1039a3b6af6bedc409653520d681fb4faced8371",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1076,7 +1076,7 @@
      },
      {
       "name": "facilities_at_risk",
-      "type": "integer"
+      "type": "number"
      },
      {
       "name": "facilities_risk_share",
@@ -1104,7 +1104,7 @@
      },
      {
       "name": "facilities_flooded_now",
-      "type": "integer"
+      "type": "number"
      },
      {
       "name": "pop_2025",
@@ -1117,10 +1117,6 @@
      {
       "name": "area_km2",
       "type": "number"
-     },
-     {
-      "name": "facilities_total",
-      "type": "integer"
      },
      {
       "name": "s_flood_years_share",
@@ -1140,18 +1136,6 @@
      },
      {
       "name": "s_cropland_km2",
-      "type": "number"
-     },
-     {
-      "name": "s_area_risk_share",
-      "type": "number"
-     },
-     {
-      "name": "s_facilities_risk_share",
-      "type": "number"
-     },
-     {
-      "name": "s_roads_risk_km",
       "type": "number"
      },
      {
@@ -1214,8 +1198,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 41142,
-   "hash": "sha256:112ab7932adb3e6be376fe38460852bc9750fb32a5f3479e22294f42807feb2a",
+   "bytes": 41177,
+   "hash": "sha256:517cfb773e7d8561c3679a924ffa77def1b2a17bfbde3dd3f6524924c329fd3e",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1425,8 +1409,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1534,
-   "hash": "sha256:bf8512452d4f0f79779b6fcf43cc9639d1aff8a42df06886b456f232165a9d7f",
+   "bytes": 1528,
+   "hash": "sha256:a5d2e14ab283ac051802f8afd954e0e69763dc12cf51f908e5ddf80c8249ae6c",
    "rows": 6,
    "schema": {
     "fields": [
