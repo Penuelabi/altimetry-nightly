@@ -152,7 +152,7 @@ def log_indicators(rows, script):
         if c not in new:
             new[c] = ''
     old = read_csv(path)
-    df = new[cols] if old is None else pd.concat([old, new[cols]], ignore_index=True)
+    df = new[cols] if old is None else pd.concat([old.astype(object), new[cols].astype(object)], ignore_index=True)
     day = text(df['run_utc']).str[:10]
     dup = pd.DataFrame({'d': day, 's': df['script'], 'i': df['indicator']}).duplicated(keep='last')
     df = df[~(df['kind'].eq('snapshot') & dup)]
@@ -514,12 +514,17 @@ def plot_map(profile, geojson_path, out_png):
                 if best is None or ar > best[2]:
                     best = (cx, cy, ar)
             if best and k in look.index and pd.notna(look['risk_rank'].get(k)) and int(look['risk_rank'][k]) <= TOP_LABELS:
-                labels.append((best[0], best[1], f"{int(look['risk_rank'][k])}. {name}"))
+                labels.append((best[0], best[1], int(look['risk_rank'][k]), name))
         ax.autoscale_view()
         ax.set_aspect(1 / np.cos(np.radians(7.5)))
-        for x, y, t in labels:
-            ax.annotate(t, (x, y), fontsize=7, color=INK, ha='center', va='center',
-                        bbox=dict(boxstyle='round,pad=0.2', fc=SURFACE, ec='none', alpha=0.85))
+        for x, y, rk, _ in labels:                     # rank numbers on the map, names in a list beside it
+            ax.annotate(str(rk), (x, y), fontsize=6.5, color=INK, ha='center', va='center', fontweight='bold',
+                        bbox=dict(boxstyle='circle,pad=0.18', fc=SURFACE, ec=INK2, lw=0.4, alpha=0.95))
+        if labels:
+            st = dict(zip(profile['county'], profile['state']))
+            ranked = '\n'.join(f"{rk:>2}. {nm} ({st.get(nm, '')})" for _, _, rk, nm in sorted(labels, key=lambda t: t[2]))
+            ax.text(1.02, 0.34, 'Highest-ranked counties\n' + ranked, transform=ax.transAxes, fontsize=7.5,
+                    color=INK, va='top', ha='left', linespacing=1.45)
         ax.set_axis_off()
         title = 'Relative flood risk by county'
     else:

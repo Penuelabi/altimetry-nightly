@@ -57,7 +57,10 @@ DEFAULTS = {'confirm_runs': 1,              # distinct observations the activati
             'season_start': '07-01', 'season_end': '01-31'}
 EXAMPLE_PLANS = 6                           # draft plans written on the first run, highest-risk counties first
 ALERT_RANK = {'green': 0, 'yellow': 1, 'orange': 2, 'red': 3}
-RIVER_VARS = ('river_level_m', 'river_rate_m_per_day', 'river_pctile', 'river_rising')
+RIVER_VARS = ('river_level_m', 'river_rate_m_per_day', 'river_pctile', 'river_rising', 'river_rise_m')
+LEVEL_COL = 'Water Surface Elevation - values(m)'
+DRY_MONTHS = (2, 3, 4, 5)                   # dry-season low for river_rise_m (as in aa_p2_trigger_scorecard.py)
+EXAMPLE_NOTE = 'Example written by aa_p3_aap_engine.py'
 ALIASES = {'abyeiadministrativearea': 'abyeiregion'}
 
 VARIABLES = [
@@ -78,12 +81,16 @@ VARIABLES = [
     ('river_age_days', 'station_status.csv', 'days since that satellite pass'),
     ('river_rate_m_per_day', 'station_status.csv', 'rise (+) or fall (-) at the last pass (m per day)'),
     ('river_rising', 'station_status.csv', 'True when the rate is above zero'),
-    ('river_pctile', 'station_status.csv', 'seasonal percentile of the last level (0-100)'),
+    ('river_pctile', 'station_status.csv', 'seasonal percentile of the last pass: how unusual for the time of year (0-100)'),
+    ('river_rise_m', 'merged_altimetry_stations.csv', "rise since this year's dry-season low (February-May) at the gauge (m)"),
     ('lvl_2yr_m', 'station_status.csv', '2-year flood level at the gauge (m)'),
     ('lvl_5yr_m', 'station_status.csv', '5-year flood level (m)'),
     ('lvl_10yr_m', 'station_status.csv', '10-year flood level (m)'),
-    ('readiness_level_m', 'aa_triggers.csv', 'readiness level for the county (else 2-year level - 0.25 m)'),
-    ('activation_level_m', 'aa_triggers.csv', 'activation level for the county (else the 2-year level)'),
+    ('readiness_level_m', 'aa_triggers.csv', 'readiness water level, when the county rule uses levels (else 2-year level - 0.25 m if the county has no aa_triggers.csv row)'),
+    ('activation_level_m', 'aa_triggers.csv', 'activation water level, when the county rule uses levels (else the 2-year level)'),
+    ('readiness_value', 'aa_triggers.csv', "readiness value of the county's trigger signal (units depend on trigger_family)"),
+    ('activation_value', 'aa_triggers.csv', "activation value of the county's trigger signal"),
+    ('regional_value', 'aa_triggers.csv', 'regional index needed together with the county signal (combined rules)'),
     ('sudd_upstream_pct', 'sudd_trigger_log.csv', 'experimental Sudd river trigger: upstream percentile (0-1)'),
     ('sudd_status', 'sudd_trigger_log.csv', "'normal', 'watch' or 'elevated'"),
     ('flooded_now_km2', 'exposure_cache.json', 'area flooded now (latest Sentinel-1 extent, km2)'),
@@ -146,7 +153,7 @@ def log_indicators(rows, script):
         if c not in new:
             new[c] = ''
     old = read_csv(path)
-    df = new[cols] if old is None else pd.concat([old, new[cols]], ignore_index=True)
+    df = new[cols] if old is None else pd.concat([old.astype(object), new[cols].astype(object)], ignore_index=True)
     dup = pd.DataFrame({'d': text(df['run_utc']).str[:10], 's': df['script'], 'i': df['indicator']}).duplicated(keep='last')
     df = df[~(df['kind'].eq('snapshot') & dup)]
     df.to_csv(path, index=False)
@@ -389,6 +396,9 @@ def build_values(as_of):
     status = read_csv(os.path.join(ALT_DIR, 'station_status.csv'))
     trig = read_csv(os.path.join(AA_OUT, 'aa_triggers.csv'))
     st_by = status.set_index('station_uid').to_dict('index') if status is not None and 'station_uid' in status else {}
+    rises = rise_now(as_of)
+    if rises:
+        sources['river rise'] = 'merged_altimetry_stations.csv'
     tr_by = {ckey(r['county']): r for r in trig.to_dict('records')} if trig is not None else {}
     if link is not None:
         sources['gauges'] = os.path.basename(lpath) + (' + station_status.csv' if st_by else '')
@@ -413,6 +423,10 @@ def build_values(as_of):
                       'lvl_2yr_m': l2, 'lvl_5yr_m': num(s.get('lvl_5yr_m')), 'lvl_10yr_m': num(s.get('lvl_10yr_m')),
                       'readiness_level_m': num(t.get('readiness_level_m')) if t else (None if l2 is None else l2 - 0.25),
                       'activation_level_m': num(t.get('activation_level_m')) if t else l2,
+                      'readiness_value': num(t.get('readiness_value')) if t else None,
+                      'activation_value': num(t.get('activation_value')) if t else None,
+                      'regional_value': num(t.get('regional_value')) if t else None,
+                      'river_rise_m': rises.get(uid, num(t.get('last_rise_m')) if t else None),
                       '_levels_from': 'aa_triggers.csv' if t else '2-year level (no aa_triggers.csv row)'})
     sud = read_csv(os.path.join(BUL_DIR, 'sudd_trigger_log.csv'))
     sudd = {}
@@ -443,6 +457,38 @@ def build_values(as_of):
     return vals, sources
 
 
+def rise_now(as_of):
+    """{station: latest level minus this year's dry-season (February-May) low}, from the merged altimetry file."""
+    path = os.path.join(ALT_DIR, 'merged_altimetry_stations.csv')
+    if not os.path.exists(path):
+        return {}
+    try:
+        want = {'date', LEVEL_COL, 'station_uid', 'source', 'station_id', 'qc_status'}
+        d = pd.read_csv(path, low_memory=False, usecols=lambda c: c in want)
+        if 'station_uid' not in d.columns:
+            sid = pd.to_numeric(d['station_id'], errors='coerce')
+            d['station_uid'] = (d['source'].astype(str).str.lower() + ':' +
+                                sid.round().astype('Int64').astype(str)).where(sid.notna())
+        d['date'] = pd.to_datetime(d['date'], errors='coerce')
+        d['level'] = pd.to_numeric(d[LEVEL_COL], errors='coerce')
+        d = d.dropna(subset=['date', 'level', 'station_uid'])
+        d = d[d['date'] <= pd.Timestamp(as_of)]
+        if 'qc_status' in d.columns:
+            ok = text(d['qc_status']).str.lower().eq('ok')
+            if ok.mean() > 0.5:
+                d = d[ok]
+        out = {}
+        for uid, g in d.sort_values('date').groupby('station_uid'):
+            last = g.iloc[-1]
+            dry = g[(g['date'].dt.year == last['date'].year) & g['date'].dt.month.isin(DRY_MONTHS)]
+            if len(dry):
+                out[uid] = float(last['level'] - dry['level'].min())
+        return out
+    except Exception as e:
+        print(f"WARNING: river rise not computed ({type(e).__name__}: {e})")
+        return {}
+
+
 # =========================================================================== #
 # PLANS                                                                       #
 # =========================================================================== #
@@ -464,6 +510,47 @@ EXAMPLE_ACTIONS = [
     ('activation', 'Distribute water treatment supplies and ORS; cholera prevention messages', 'WASH / health', 7),
     ('activation', 'Reinforce and patrol dykes with community groups', 'DRR', 5),
 ]
+
+
+DEFAULT_RULES = ("river_level_m >= readiness_level_m or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2)",
+                 "river_level_m >= activation_level_m or (alert_hazard == 'flood / waterlogging' and "
+                 "alert_level == 'red' and soil_z >= 0.75)")
+
+
+def suggested_rules():
+    """{county key: (readiness rule, activation rule)} from aa_triggers.csv (aa_p2_trigger_scorecard.py)."""
+    trig = read_csv(os.path.join(AA_OUT, 'aa_triggers.csv'))
+    if trig is None or 'suggested_readiness_rule' not in trig:
+        return {}
+    out = {}
+    for r in trig.to_dict('records'):
+        if not isnull(r.get('suggested_readiness_rule')) and not isnull(r.get('suggested_activation_rule')):
+            out[ckey(r['county'])] = (str(r['suggested_readiness_rule']), str(r['suggested_activation_rule']))
+    return out
+
+
+def refresh_examples():
+    """Untouched example plans follow the scorecard's latest suggested rules. Returns the plan ids changed.
+    A plan stops being refreshed as soon as its status or notes are edited."""
+    path = os.path.join(AA_CONFIG, 'aap_plans.csv')
+    df = read_csv(path, dtype=str)
+    sug = suggested_rules()
+    if df is None or not sug:
+        return set()
+    changed = set()
+    for i, r in df.iterrows():
+        if str(r.get('status', '')).startswith('draft (example)') and str(r.get('notes', '')).startswith(EXAMPLE_NOTE):
+            rr, ar = sug.get(ckey(r['county']), (None, None))
+            if rr and (r.get('readiness_rule') != rr or r.get('activation_rule') != ar):
+                df.at[i, 'readiness_rule'], df.at[i, 'activation_rule'] = rr, ar
+                if not str(r.get('notes', '')).startswith(EXAMPLE_NOTE + '. Rules follow'):
+                    df.at[i, 'notes'] = (EXAMPLE_NOTE + '. Rules follow aa_triggers.csv and are refreshed while the plan '
+                                         'is an untouched example. ' + str(r.get('notes', ''))[len(EXAMPLE_NOTE) + 2:])
+                changed.add(r['plan_id'])
+    if changed:
+        df.to_csv(path, index=False)
+        print(f"Example plans now follow the latest suggested rules: {', '.join(sorted(changed))}")
+    return changed
 
 
 def write_examples():
@@ -491,25 +578,23 @@ def write_examples():
         pool['order'] = range(len(pool))
     pool = pool.sort_values('order').head(EXAMPLE_PLANS)
     people = dict(zip(scen['county'].map(ckey), scen['scenario2_planning'])) if scen is not None else {}
+    suggested = suggested_rules()
     plans, acts = [], []
     for r in pool.itertuples():
         pid = 'AAP-FL-' + re.sub(r'[^A-Z0-9]+', '', str(r.county).upper())[:14]
+        rr, ar = suggested.get(r.key, DEFAULT_RULES)
         plans.append({
             'plan_id': pid, 'status': 'draft (example) - not validated', 'hazard': 'riverine and flash flood',
-            'state': r.state, 'county': r.county,
-            'readiness_rule': "river_level_m >= readiness_level_m or (alert_hazard == 'flood / waterlogging' "
-                              "and alert_rank >= 2)",
-            'activation_rule': "river_level_m >= activation_level_m or (alert_hazard == 'flood / waterlogging' "
-                               "and alert_level == 'red' and soil_z >= 0.75)",
+            'state': r.state, 'county': r.county, 'readiness_rule': rr, 'activation_rule': ar,
             'confirm_runs': 1, 'max_data_age_days': DEFAULTS['max_data_age_days'],
             'stand_down_runs': DEFAULTS['stand_down_runs'], 'max_activations_per_season': 1,
             'season_start': DEFAULTS['season_start'], 'season_end': DEFAULTS['season_end'], 'lead_time_days': 30,
             'people_target': people.get(r.key, ''), 'households_target': '', 'budget_usd': '', 'funding_source': '',
             'fund_release_rule': 'e.g. pre-arranged release within 72 hours of activation', 'lead_agency': '',
             'partners': '', 'mne_reference': '', 'validated_by': '', 'validated_date': '',
-            'notes': 'Example written by aa_p3_aap_engine.py. people_target = planning scenario in '
-                     'data/flood_scenarios_2026_county.csv. Replace rules, targets, budget and leads with the plan '
-                     'the TWG-AA validates.'})
+            'notes': EXAMPLE_NOTE + '. Rules follow aa_triggers.csv and are refreshed while the plan is an '
+                     'untouched example. people_target = planning scenario in data/flood_scenarios_2026_county.csv. '
+                     'Replace rules, targets, budget and leads with the plan the TWG-AA validates.'})
         for i, (stage, action, sector, days) in enumerate(EXAMPLE_ACTIONS, start=1):
             acts.append({'plan_id': pid, 'stage': stage, 'action_no': i, 'action': action, 'sector': sector,
                          'lead': '', 'partners': '', 'beneficiaries': '', 'budget_usd': '', 'deadline_days': days,
@@ -623,6 +708,7 @@ def write_report(p, st, ev, env, actions, when, folder):
 def run(as_of=None, dry_run=False):
     when = pd.Timestamp(as_of).to_pydatetime() if as_of else now_utc().replace(tzinfo=None)
     write_examples()
+    refreshed = set() if dry_run else refresh_examples()
     plans, errors = load_plans()
     for e in errors:
         print(f"WARNING: plan skipped - {e}")
@@ -638,7 +724,18 @@ def run(as_of=None, dry_run=False):
         env = values.get(p['key'], {})
         if not env:
             print(f"WARNING: {p['plan_id']}: no data for county '{p['county']}' (check the name)")
-        st, trans, ev = step(p, states.get(p['plan_id']), env, when)
+        sig = f"{p.get('readiness_rule')} || {p.get('activation_rule')}"
+        st0 = states.get(p['plan_id'])
+        validated = str(p.get('status', '')).lower().startswith('validated')
+        reset = []
+        if st0 is not None and not validated and (p['plan_id'] in refreshed or st0.get('rules') not in (None, sig)):
+            if st0.get('stage') in ('readiness', 'activated'):
+                reset = [{'from_stage': st0.get('stage'), 'to_stage': 'normal',
+                          'reason': 'plan rules changed: draft plan restarted'}]
+            st0 = None
+        st, trans, ev = step(p, st0, env, when)
+        trans = reset + trans
+        st['rules'] = sig
         states[p['plan_id']] = st
         for t in trans:
             rep = ''
@@ -676,7 +773,7 @@ def run(as_of=None, dry_run=False):
             lp = os.path.join(AA_OUT, 'aap_activation_log.csv')
             old = read_csv(lp)
             new = pd.DataFrame(log_rows)
-            (new if old is None else pd.concat([old, new], ignore_index=True)).to_csv(lp, index=False)
+            (new if old is None else pd.concat([old.astype(object), new.astype(object)], ignore_index=True)).to_csv(lp, index=False)
         write_variables(values)
         n_valid = sum(1 for p in plans if str(p.get('status', '')).lower().startswith('validated'))
         ind = [dict(pillar='3', activity='Develop standardised AAPs for multi-hazard',

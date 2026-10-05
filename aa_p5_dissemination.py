@@ -138,7 +138,7 @@ def log_indicators(rows, script):
         if c not in new:
             new[c] = ''
     old = read_csv(path)
-    df = new[cols] if old is None else pd.concat([old, new[cols]], ignore_index=True)
+    df = new[cols] if old is None else pd.concat([old.astype(object), new[cols].astype(object)], ignore_index=True)
     dup = pd.DataFrame({'d': text(df['run_utc']).str[:10], 's': df['script'], 'i': df['indicator']}).duplicated(keep='last')
     df = df[~(df['kind'].eq('snapshot') & dup)]
     df.to_csv(path, index=False)
@@ -312,8 +312,14 @@ def brief(scope, items, bul, plans, checklist, trig, when, missing_langs, state=
     act = plans[(plans['stage'].isin(['readiness', 'activated']))] if plans is not None and len(plans) else pd.DataFrame()
     if state is not None and len(act):
         act = act[act['state'] == state]
-    lines.append(f"- Anticipatory action plans in readiness: {int((act['stage'] == 'readiness').sum()) if len(act) else 0}; "
-                 f"activated: {int((act['stage'] == 'activated').sum()) if len(act) else 0}.")
+    if len(act):
+        val = text(act['plan_status']).str.lower().str.startswith('validated')
+        lines.append(f"- Validated plans in readiness: {int(((act['stage'] == 'readiness') & val).sum())}; "
+                     f"activated: {int(((act['stage'] == 'activated') & val).sum())}.")
+        if (~val).any():
+            lines.append(f"- Draft plans whose rules are met: {int((~val).sum())} (for review, not activations).")
+    else:
+        lines.append('- No anticipatory action plan is in readiness or activated.')
     if trig is not None and len(trig):
         tsub = trig if state is None else trig[trig['state'] == state]
         hi = tsub[tsub['current_state'].isin(['readiness', 'activation'])]
@@ -359,8 +365,12 @@ def brief(scope, items, bul, plans, checklist, trig, when, missing_langs, state=
     lines += ['', '## Decisions for the group']
     dec = []
     for r in act.itertuples() if len(act) else []:
-        dec.append(f"- {r.plan_id}: confirm the {r.stage} decision, record it in the activation log"
-                   + (' and the fund release time' if r.stage == 'activated' else '') + '.')
+        if str(r.plan_status).lower().startswith('validated'):
+            dec.append(f"- {r.plan_id}: confirm the {r.stage} decision, record it in the activation log"
+                       + (' and the fund release time' if r.stage == 'activated' else '') + '.')
+        else:
+            dec.append(f"- {r.plan_id} (draft plan): its {'activation' if r.stage == 'activated' else 'readiness'} "
+                       'rule is met. Review the plan and its trigger; this is not an activation.')
     if shown:
         dec.append(f"- Agree the warning for the {shown} counties with an alert and the channels (radio hubs, chiefs, SMS).")
     if missing_langs:
@@ -454,7 +464,7 @@ def run(when=None):
     if len(dist):
         lp = os.path.join(AA_OUT, 'dissemination_log.csv')
         old = read_csv(lp)
-        (dist if old is None else pd.concat([old, dist], ignore_index=True)).to_csv(lp, index=False)
+        (dist if old is None else pd.concat([old.astype(object), dist.astype(object)], ignore_index=True)).to_csv(lp, index=False)
     latest = os.path.join(base, 'latest')
     shutil.rmtree(latest, ignore_errors=True)
     shutil.copytree(folder, latest)

@@ -65,9 +65,10 @@ DATASETS = [
          title='County flood risk profile (INFORM-style, relative 0-10)', key='county',
          required=['county', 'risk_score', 'risk_class'], ranges={'risk_score': (0, 10)}, all_counties=True),
     dict(id='aa-river-triggers', where=('AA',), file='aa_triggers.csv',
-         title='Proposed river-level readiness and activation triggers per county (for validation)', key='county',
-         required=['county', 'station_uid', 'readiness_level_m', 'activation_level_m'],
-         ordered=[('readiness_level_m', 'activation_level_m')]),
+         title='Proposed readiness and activation trigger rules per county (river level, seasonal anomaly, rise, '
+               'Sudd regional index or bulletin alert; for validation)', key='county',
+         required=['county', 'trigger_family', 'readiness_value', 'activation_value', 'suggested_activation_rule'],
+         ordered=[('readiness_value', 'activation_value'), ('readiness_level_m', 'activation_level_m')]),
     dict(id='aap-status', where=('AA',), file='aap_status_latest.csv',
          title='Anticipatory action plan status (normal / readiness / activated)', key='plan_id',
          required=['plan_id', 'county', 'stage'], cats={'stage': ['normal', 'readiness', 'activated', 'out of season']}),
@@ -82,6 +83,8 @@ HXL = {'state': '#adm1+name', 'county': '#adm2+name', 'pcode': '#adm2+code', 'st
        'lvl_2yr_m': '#indicator+level_2yr_m+num', 'lvl_5yr_m': '#indicator+level_5yr_m+num',
        'lvl_10yr_m': '#indicator+level_10yr_m+num', 'readiness_level_m': '#indicator+readiness_level_m+num',
        'activation_level_m': '#indicator+activation_level_m+num', 'plan_id': '#activity+code', 'stage': '#status',
+       'readiness_value': '#indicator+readiness_value+num', 'activation_value': '#indicator+activation_value+num',
+       'trigger_family': '#indicator+trigger_type',
        'data_end_date': '#date+data_end', 'last_date': '#date+observed', 'updated_utc': '#date+updated',
        'week1_rain_median_mm': '#indicator+rain_week1_mm+num', 'p_heavy_50mm_week1': '#indicator+p_heavy+num',
        'p_dry_spell_7d_in_15d': '#indicator+p_dry_spell+num'}
@@ -134,7 +137,7 @@ def log_indicators(rows, script):
         if c not in new:
             new[c] = ''
     old = read_csv(path)
-    df = new[cols] if old is None else pd.concat([old, new[cols]], ignore_index=True)
+    df = new[cols] if old is None else pd.concat([old.astype(object), new[cols].astype(object)], ignore_index=True)
     dup = pd.DataFrame({'d': text(df['run_utc']).str[:10], 's': df['script'], 'i': df['indicator']}).duplicated(keep='last')
     df = df[~(df['kind'].eq('snapshot') & dup)]
     df.to_csv(path, index=False)

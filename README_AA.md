@@ -9,7 +9,7 @@ Pillars 1, 2, 3 and 5. They read the files the app already produces and never mo
 | File | Pillar | Actions (roadmap activities served) | Indicators logged | Main outputs |
 |---|---|---|---|---|
 | `aa_p1_risk_profile.py` | 1 Risk knowledge | County flood-risk profile (INFORM-style: hazard and impact history, exposure, vulnerability, lack of coping); profile by livelihood zone; risk map; HXL export for the IMS | Counties with a risk profile; livelihood zones analysed; vulnerability indicators in use; risk maps produced; risk datasets exported in HXL | `p1_county_risk_profile.csv`, `_hxl.csv`, `p1_zone_profile.csv`, `p1_risk_map.png`, method notes with a validation checklist |
-| `aa_p2_trigger_scorecard.py` | 2 Triggers and EWS | Proposes a readiness and an activation river level for every county gauge, scored against recorded flood displacement (hit rate, false alarms, CSI, TSS, lead time); trigger design note for SSMS / MWRI | Hazards with defined thresholds; counties with proposed and with validated trigger levels; skill evaluations | `aa_triggers.csv`, skill tables, county track record, `p2_trigger_design_note.md`, hydrographs |
+| `aa_p2_trigger_scorecard.py` | 2 Triggers and EWS | Scores five kinds of river signal as flood triggers: water level, seasonal anomaly (how unusual for the time of year), rise since the dry-season low, the Sudd regional upstream index, and county signal + regional index. Only upstream or local gauges with medium/high-confidence thresholds are used. Impacts = flood displacement or listing in a flood assessment, on time where the onset month is known. Proposes a readiness and an activation rule per county, with suggested plan rules; trigger design note for SSMS / MWRI | Hazards with defined thresholds; counties with proposed and with validated triggers; skill evaluations | `aa_triggers.csv`, season skill table, county track record, `p2_trigger_design_note.md`, signal charts |
 | `aa_p2_data_package.py` | 2 Triggers and EWS (also 1) | Checks every table (columns, keys, ranges, ordered thresholds, freshness, 79-county coverage) and builds a documented package for the national EW repository: CSV + HXL copies, Frictionless `datapackage.json` with checksums, README | Datasets packaged and validated; datasets failing validation; risk and trigger datasets in HXL | `aa_out/repository/aa_data_package_<stamp>.zip`, `aa_data_package_latest.zip` |
 | `aa_p3_aap_engine.py` | 3 Anticipatory action | Anticipatory action plans kept in two spreadsheets (rules, season, targets, budget, funding and release rule, leads, M&E, validation); checks them at every run; moves plans normal -> readiness -> activated; checklists with due dates; activation reports | AAPs developed; AAPs validated; plans in readiness or activated; readiness stages reached; AAPs activated (validated plans only) | `aap_status_latest.csv`, `aap_checklist_latest.md`, `aap_activation_log.csv`, `aap_reports/*.md` |
 | `aa_p3_simulation.py` | 3 Anticipatory action | Replays past seasons through a plan (same rules as the engine), drills with a raised river or injected alerts, multi-season review of hits, late, misses and false alarms; exercise packs with injects and an evaluation sheet | Simulation packs prepared; exercises conducted (once `conducted_date` is filled); retrospective plan tests | `aa_out/simulations/SIM-.../` (exercise_pack.md, timeline.csv, evaluation.csv, hydrograph.png) |
@@ -69,8 +69,11 @@ river_level_m >= activation_level_m or (alert_level == 'red' and alert_hazard ==
 ```
 
 `python aa_p3_aap_engine.py --list-variables` prints every name (bulletin alert, rain and soil values, river level,
-age and rate, 2/5/10-year levels, readiness and activation levels, Sudd trigger, flooded area now) with today's values.
-Only comparisons, `and` / `or` / `not`, numbers, text and arithmetic are accepted.
+age and rate, seasonal percentile `river_pctile`, rise since the dry-season low `river_rise_m`, 2/5/10-year levels,
+the county's `readiness_value` / `activation_value` / `regional_value` from the scorecard, the Sudd trigger
+`sudd_upstream_pct`, flooded area now) with today's values. Only comparisons, `and` / `or` / `not`, numbers, text and
+arithmetic are accepted. `aa_triggers.csv` gives each county a suggested readiness and activation rule; example plans
+follow those suggestions until the TWG-AA edits them, and a draft plan restarts from normal when its rules change.
 
 ## Safeguards
 

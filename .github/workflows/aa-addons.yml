@@ -43,7 +43,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install packages
-        run: pip install pandas numpy matplotlib google-api-python-client google-auth
+        run: pip install pandas numpy matplotlib geopandas google-api-python-client google-auth
 
       - name: Pull bulletin and altimetry files from Drive
         run: |

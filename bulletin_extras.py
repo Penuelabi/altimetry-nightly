@@ -26,7 +26,17 @@ import pandas as pd
 LIKELIHOOD_BANDS = [(0.50, 'high'), (0.20, 'medium'), (0.0, 'low')]      # probability >= edge
 # impact tiers by people exposed (flood: people living in historically flooded ground of the county;
 # drought: county population)
-FLOOD_IMPACT_TIERS = [(300_000, 'severe'), (100_000, 'significant'), (20_000, 'moderate'), (0, 'minor')]
+FLOOD_IMPACT_TIERS = [(300_000, 'severe'), (100_000, 'significant'), (3_000, 'moderate'), (0, 'minor')]
+# A flood impact is at least 'moderate', whatever the people count, when the county has more than
+# FLOOD_BUILDINGS_MIN buildings on flood-prone ground, or when any payam has more than FLOOD_PAYAM_SHARE of its
+# buildings, settlements, schools, health facilities or people on flood-prone ground (data/exposure_cache.json,
+# data/flood_settlements_sept2025.csv). A payam share counts only when the payam has at least
+# PAYAM_MIN_ITEMS of that item (PAYAM_MIN_PEOPLE people), so 1 of 2 schools does not decide a county's impact.
+FLOOD_BUILDINGS_MIN = 500
+FLOOD_PAYAM_SHARE = 0.30
+PAYAM_MIN_ITEMS = 3
+PAYAM_MIN_PEOPLE = 500
+IMPACT_ORDER = {'minor': 0, 'moderate': 1, 'significant': 2, 'severe': 3}
 DROUGHT_IMPACT_TIERS = [(400_000, 'severe'), (200_000, 'significant'), (75_000, 'moderate'), (0, 'minor')]
 MATRIX = {                                    # likelihood x impact -> level
     'low':    {'minor': 'green',  'moderate': 'green',  'significant': 'yellow', 'severe': 'yellow'},
@@ -108,7 +118,71 @@ def add_exposure(bulletin, counties, ee, out_dir, batch=8):
         cache['method'] = EXPOSURE_METHOD
         cache.to_csv(path, index=False)
     cache = apply_official_population(cache)
-    return bulletin.merge(cache[['county'] + EXPOSURE_COLS], on='county', how='left')
+    out = bulletin.merge(cache[['county'] + EXPOSURE_COLS], on='county', how='left')
+    try:
+        out = out.merge(flood_exposure_detail(), on='county', how='left')
+    except Exception as e:                                   # the people-based tier still works without it
+        print(f"WARNING: building / payam flood exposure not added ({type(e).__name__}: {e})")
+    return out
+
+
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
+
+def flood_exposure_detail(data_dir=DATA_DIR):
+    """Per county: buildings on flood-prone ground and the payam with the largest share of buildings, settlements,
+    schools, health facilities or people on flood-prone ground ('at risk' in exposure_cache.json = flooded now or in
+    >= 15% of same-season Sentinel-1 baseline years; settlements = Sept 2025 flooded-settlement list)."""
+    with open(os.path.join(data_dir, 'exposure_cache.json'), encoding='utf-8') as fh:
+        ex = json.load(fh)
+    shares = {}                                              # (county, payam) -> [(share, label)]
+
+    def add(county, payam, item, n, r, minimum):
+        if n is None or r is None or n < minimum or r < 0:
+            return
+        shares.setdefault((county, payam), []).append((r / n, f"{payam}: {r:,.0f} of {n:,.0f} {item}"))
+
+    bld = {}
+    for county, plist in (ex.get('payams') or {}).items():
+        bld[county] = sum(max(p.get('buildings_risk') or 0, 0) for p in plist)
+        for p in plist:
+            for item in ('buildings', 'schools', 'health'):
+                add(county, p.get('payam'), 'health facilities' if item == 'health' else item,
+                    p.get(item), p.get(item + '_risk'), PAYAM_MIN_ITEMS)
+    people = {}
+    for st in (ex.get('stations') or {}).values():
+        for p in st.get('payams') or []:
+            key = (p.get('county'), p.get('payam'))
+            if p.get('pop'):
+                people[key] = max(people.get(key, (0, 0)), (p['pop'], p.get('pop_risk') or 0))
+    for (county, payam), (n, r) in people.items():
+        add(county, payam, 'people', round(n), round(r), PAYAM_MIN_PEOPLE)
+    sp = os.path.join(data_dir, 'flood_settlements_sept2025.csv')
+    if os.path.exists(sp):
+        st = pd.read_csv(sp)
+        for (county, payam), g in st.groupby(['county', 'payam']):
+            add(county, payam, 'listed settlements', len(g), int((g['source'] == 'Other Flooded Settlements').sum()),
+                PAYAM_MIN_ITEMS)
+    rows = []
+    for county in sorted(set(bld) | {c for c, _ in shares}):
+        best = max((x for (c, _), v in shares.items() if c == county for x in v), default=(np.nan, ''))
+        rows.append({'county': county, 'bld_flood_prone': bld.get(county, np.nan),
+                     'payam_max_share': best[0], 'payam_max_share_item': best[1]})
+    return pd.DataFrame(rows)
+
+
+def flood_impact(r):
+    """(impact tier, reason) for floods: people tier, raised to at least 'moderate' by buildings or a payam share."""
+    imp = impact_class(r.get('pop_flood_prone'), FLOOD_IMPACT_TIERS)
+    why = []
+    b, s = r.get('bld_flood_prone'), r.get('payam_max_share')
+    if b is not None and pd.notna(b) and b > FLOOD_BUILDINGS_MIN:
+        why.append(f'{b:,.0f} buildings on flood-prone ground')
+    if s is not None and pd.notna(s) and s > FLOOD_PAYAM_SHARE:
+        why.append(f"{s:.0%} in {r.get('payam_max_share_item')}")
+    if why and (imp is None or IMPACT_ORDER[imp] < IMPACT_ORDER['moderate']):
+        return 'moderate', why
+    return imp, []
 
 
 POP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'ssd_county_population_2025.csv')
@@ -166,7 +240,7 @@ def county_alert(r, p_heavy_col, p_dry_col, p_wsp_col, z_wet, recovery_severe, r
         p = p_heavy
         if pd.notna(z) and pd.notna(p_wsp) and z >= z_wet and p_wsp >= 0.6:
             p = max(p, 0.35)
-        cands.append(('flood / waterlogging', p, r.get('pop_flood_prone'), FLOOD_IMPACT_TIERS))
+        cands.append(('flood / waterlogging', p, r, None))
 
     # drought: observed deficit (already happening) or a likely dry spell
     p_dr = None
@@ -182,17 +256,22 @@ def county_alert(r, p_heavy_col, p_dry_col, p_wsp_col, z_wet, recovery_severe, r
     best = None
     for hazard, p, people, tiers in cands:
         lk = likelihood_class(p)
-        imp = impact_class(people, tiers)
+        why = []
+        if tiers is None:                                    # flood: people, buildings and payam shares
+            imp, why = flood_impact(people)
+        else:
+            imp = impact_class(people, tiers)
         assumed = imp is None
         imp = imp or 'moderate'
         level = MATRIX[lk][imp]
-        item = (LEVEL_ORDER[level], p, level, hazard, lk, imp if not assumed else imp + ' (assumed)')
+        item = (LEVEL_ORDER[level], p, level, hazard, lk, imp if not assumed else imp + ' (assumed)', why)
         if best is None or item[:2] > best[:2]:
             best = item
     if best is None:
         return ('n/a', 'n/a', 'n/a', 'n/a', 'not available (needs both antecedent and outlook data)')
-    _, p, level, hazard, lk, imp = best
-    text = f"{level.upper()}: {hazard}; likelihood {lk} ({p:.0%}), impact {imp}. {LEVEL_MEANING[level]}."
+    _, p, level, hazard, lk, imp, why = best
+    detail = f" ({'; '.join(why)})" if why else ''
+    text = f"{level.upper()}: {hazard}; likelihood {lk} ({p:.0%}), impact {imp}{detail}. {LEVEL_MEANING[level]}."
     return (level, hazard, lk, imp, text)
 
 
@@ -233,7 +312,10 @@ def notes_rows(recovery_note=''):
                             '(WMO-No. 1150 approach). ' + ' '.join(f'{k.title()}: {v}.' for k, v in LEVEL_MEANING.items())),
             ('alert scales (provisional)',
              'Likelihood: low < 20%, medium 20-50%, high >= 50%. Flood impact tier by people living on ground mapped as water '
-             'or flooded at least once (1984-2021) (minor < 20,000; moderate < 100,000; significant < 300,000; severe above). '
+             'or flooded at least once (1984-2021) (minor < 3,000; moderate < 100,000; significant < 300,000; severe above), '
+             'and at least moderate when more than 500 buildings are on flood-prone ground or more than 30% of a payam\'s '
+             'buildings, settlements, schools, health facilities or people are (payams with at least 3 of the item or 500 '
+             'people). '
              'Drought impact tier by county population (minor < 75,000; moderate < 200,000; significant < 400,000; '
              'severe above). A severe soil deficit counts as high likelihood (already happening).'),
             ('pop_total / pop_flood_prone / cropland_km2',
@@ -285,7 +367,10 @@ def build_json(bulletin, p_cols, run_utc, data_end, verification=None, river_tri
                         'p_wet_daily': {c[-4:]: _num(r.get(c)) for c in day_cols}},
             'exposure': {'population': _num(r.get('pop_total'), 0),
                          'population_on_flood_prone_ground': _num(r.get('pop_flood_prone'), 0),
-                         'cropland_km2': _num(r.get('cropland_km2'), 0)},
+                         'cropland_km2': _num(r.get('cropland_km2'), 0),
+                         'buildings_on_flood_prone_ground': _num(r.get('bld_flood_prone'), 0),
+                         'largest_payam_share_on_flood_prone_ground': _num(r.get('payam_max_share')),
+                         'largest_payam_share_detail': r.get('payam_max_share_item') or None},
             'advisory': [a.strip() for a in str(r.get('advisory_flags', '')).split(' | ') if a.strip()],
         })
     return {
