@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261005_1434",
+ "name": "south-sudan-hydroclimate-aa-20261005_1746",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261005_1434",
- "created": "2026-10-05T14:34:14Z",
+ "version": "20261005_1746",
+ "created": "2026-10-05T17:46:40Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -99,7 +99,7 @@
      {
       "check": "readable and not empty",
       "status": "pass",
-      "detail": "79 rows, 112 columns"
+      "detail": "79 rows, 127 columns"
      },
      {
       "check": "required columns",
@@ -129,7 +129,7 @@
      {
       "check": "alert_level categories",
       "status": "pass",
-      "detail": "green, orange, yellow"
+      "detail": "green, orange, red, yellow"
      },
      {
       "check": "data_end_date freshness",
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 158185,
-   "hash": "sha256:85ca9b7833d5649699ee079149ccc918ded4caa616cdc1ddbc023ad4bf21bee8",
+   "bytes": 178197,
+   "hash": "sha256:56be67b7492c3671745bdedeff69933fb8fd5161de055466e72b2bb3934da36c",
    "rows": 79,
    "schema": {
     "fields": [
@@ -462,6 +462,14 @@
       "type": "string"
      },
      {
+      "name": "dry_spell_days",
+      "type": "integer"
+     },
+     {
+      "name": "last_wet_day",
+      "type": "date"
+     },
+     {
       "name": "run_utc",
       "type": "datetime"
      },
@@ -509,12 +517,12 @@
       "hxl": "#indicator+p_heavy+num"
      },
      {
-      "name": "spell_windows",
-      "type": "string"
+      "name": "p_soil_recovery_2wk",
+      "type": "number"
      },
      {
-      "name": "p_wet_1004",
-      "type": "number"
+      "name": "spell_windows",
+      "type": "string"
      },
      {
       "name": "p_wet_1005",
@@ -573,6 +581,10 @@
       "type": "number"
      },
      {
+      "name": "p_wet_1019",
+      "type": "number"
+     },
+     {
       "name": "advisory_flags",
       "type": "string"
      },
@@ -588,6 +600,42 @@
      },
      {
       "name": "cropland_km2",
+      "type": "number"
+     },
+     {
+      "name": "bld_flood_prone",
+      "type": "integer"
+     },
+     {
+      "name": "payam_max_share",
+      "type": "number"
+     },
+     {
+      "name": "payam_max_share_item",
+      "type": "string"
+     },
+     {
+      "name": "payam_max_facility_share",
+      "type": "number"
+     },
+     {
+      "name": "payam_max_facility_share_item",
+      "type": "string"
+     },
+     {
+      "name": "county_buildings_share",
+      "type": "number"
+     },
+     {
+      "name": "county_schools_share",
+      "type": "number"
+     },
+     {
+      "name": "county_health_share",
+      "type": "number"
+     },
+     {
+      "name": "county_settlement_share",
       "type": "number"
      },
      {
@@ -610,6 +658,18 @@
      },
      {
       "name": "alert_text",
+      "type": "string"
+     },
+     {
+      "name": "alert_stage",
+      "type": "string"
+     },
+     {
+      "name": "news_flood_report",
+      "type": "string"
+     },
+     {
+      "name": "news_drought_report",
       "type": "string"
      }
     ],
@@ -911,7 +971,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 24722,
-   "hash": "sha256:3f982888be0c1c64ff6c0ca0c8d63ea3e022875c3e972f8851341983e46c11b4",
+   "hash": "sha256:2e295de97d158a5bf32bb13d43f0745fef1a188aba3ee79eb9f770b3d8bcc78e",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1155,7 +1215,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 41142,
-   "hash": "sha256:5ec391f8d964c8c637b9a43f2c5319a7915148bf3cc07d6fa2cc6bfc1884cdaa",
+   "hash": "sha256:112ab7932adb3e6be376fe38460852bc9750fb32a5f3479e22294f42807feb2a",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1365,8 +1425,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1524,
-   "hash": "sha256:ae06d5d68c5ceb1df1dd6298d33d252a00ece5dd243fb11aaca099b674104663",
+   "bytes": 1534,
+   "hash": "sha256:bf8512452d4f0f79779b6fcf43cc9639d1aff8a42df06886b456f232165a9d7f",
    "rows": 6,
    "schema": {
     "fields": [
