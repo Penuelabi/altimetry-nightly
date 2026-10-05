@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261005_1358",
+ "name": "south-sudan-hydroclimate-aa-20261005_1430",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261005_1358",
- "created": "2026-10-05T13:58:38Z",
+ "version": "20261005_1430",
+ "created": "2026-10-05T14:30:22Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -911,7 +911,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 24722,
-   "hash": "sha256:1cedbb549fb745da4dd69ca6ba4c86b18292dbd6e052abaa2dfdbf9c17636f59",
+   "hash": "sha256:f6bbdc108f0e2c749aeebbb11234191b06637a630d1e991f708edc57c4342a6f",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1116,7 +1116,7 @@
   },
   {
    "name": "aa-river-triggers",
-   "title": "Proposed river-level readiness and activation triggers per county (for validation)",
+   "title": "Proposed readiness and activation trigger rules per county (river level, seasonal anomaly, rise, Sudd regional index or bulletin alert; for validation)",
    "source_file": "aa_triggers.csv",
    "validation": {
     "status": "pass",
@@ -1124,17 +1124,22 @@
      {
       "check": "readable and not empty",
       "status": "pass",
-      "detail": "79 rows, 31 columns"
+      "detail": "79 rows, 38 columns"
      },
      {
       "check": "required columns",
       "status": "pass",
-      "detail": "county, station_uid, readiness_level_m, activation_level_m"
+      "detail": "county, trigger_family, readiness_value, activation_value, suggested_activation_rule"
      },
      {
       "check": "unique county",
       "status": "pass",
       "detail": "unique"
+     },
+     {
+      "check": "readiness_value <= activation_value",
+      "status": "pass",
+      "detail": "ok"
      },
      {
       "check": "readiness_level_m <= activation_level_m",
@@ -1149,8 +1154,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 20705,
-   "hash": "sha256:440854f4177b99f792acaf8ab0b45a1ee819d63b2268b49f8aaa61114f31266e",
+   "bytes": 39765,
+   "hash": "sha256:91f2191fc9e2719a2fab5086a25351592abf1fa98d48bc43d710dfbd59efbb9f",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1183,11 +1188,46 @@
       "type": "string"
      },
      {
-      "name": "readiness_rule",
+      "name": "thr_confidence",
       "type": "string"
      },
      {
-      "name": "activation_rule",
+      "name": "gauge_used",
+      "type": "boolean"
+     },
+     {
+      "name": "trigger_family",
+      "type": "string",
+      "hxl": "#indicator+trigger_type"
+     },
+     {
+      "name": "readiness_rule_name",
+      "type": "string"
+     },
+     {
+      "name": "activation_rule_name",
+      "type": "string"
+     },
+     {
+      "name": "readiness_value",
+      "type": "number",
+      "hxl": "#indicator+readiness_value+num"
+     },
+     {
+      "name": "activation_value",
+      "type": "number",
+      "hxl": "#indicator+activation_value+num"
+     },
+     {
+      "name": "regional_value",
+      "type": "number"
+     },
+     {
+      "name": "suggested_readiness_rule",
+      "type": "string"
+     },
+     {
+      "name": "suggested_activation_rule",
       "type": "string"
      },
      {
@@ -1216,18 +1256,6 @@
       "hxl": "#indicator+level_10yr_m+num"
      },
      {
-      "name": "thr_confidence",
-      "type": "string"
-     },
-     {
-      "name": "thr_source",
-      "type": "string"
-     },
-     {
-      "name": "record_start",
-      "type": "date"
-     },
-     {
       "name": "last_date",
       "type": "date",
       "hxl": "#date+observed"
@@ -1238,6 +1266,18 @@
       "hxl": "#indicator+water_level_m+num"
      },
      {
+      "name": "last_seasonal_pctile",
+      "type": "number"
+     },
+     {
+      "name": "last_rise_m",
+      "type": "number"
+     },
+     {
+      "name": "regional_now",
+      "type": "number"
+     },
+     {
       "name": "days_since_obs",
       "type": "integer"
      },
@@ -1246,28 +1286,8 @@
       "type": "string"
      },
      {
-      "name": "seasons_tested",
-      "type": "integer"
-     },
-     {
-      "name": "hits_on_time",
-      "type": "integer"
-     },
-     {
-      "name": "misses_or_late",
-      "type": "integer"
-     },
-     {
-      "name": "false_alarms",
-      "type": "integer"
-     },
-     {
-      "name": "median_lead_days",
-      "type": "number"
-     },
-     {
       "name": "note",
-      "type": "number"
+      "type": "string"
      },
      {
       "name": "status",
@@ -1280,6 +1300,22 @@
      {
       "name": "validated_date",
       "type": "number"
+     },
+     {
+      "name": "seasons_hit",
+      "type": "integer"
+     },
+     {
+      "name": "seasons_late",
+      "type": "integer"
+     },
+     {
+      "name": "seasons_miss",
+      "type": "integer"
+     },
+     {
+      "name": "seasons_false_alarm",
+      "type": "integer"
      },
      {
       "name": "risk_rank",
@@ -1319,7 +1355,7 @@
      {
       "check": "stage categories",
       "status": "pass",
-      "detail": "activated, normal, readiness"
+      "detail": "normal"
      }
     ]
    },
@@ -1329,8 +1365,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1660,
-   "hash": "sha256:2099001942c9f0946f6f46bc482b5781f5622b95fc5b2a034a800bba25ca3f4b",
+   "bytes": 1517,
+   "hash": "sha256:4cdbe071adce34bf58032d9f5e55e800c6fe589425d752c00765578119e3d4dd",
    "rows": 6,
    "schema": {
     "fields": [
@@ -1364,7 +1400,7 @@
      },
      {
       "name": "stage_since",
-      "type": "datetime"
+      "type": "number"
      },
      {
       "name": "season",
@@ -1376,15 +1412,15 @@
      },
      {
       "name": "readiness_now",
-      "type": "string"
+      "type": "boolean"
      },
      {
       "name": "activation_now",
-      "type": "string"
+      "type": "boolean"
      },
      {
       "name": "missing_or_stale",
-      "type": "string"
+      "type": "number"
      },
      {
       "name": "river_level_m",

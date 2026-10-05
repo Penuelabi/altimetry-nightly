@@ -1,4 +1,4 @@
-# Radio scripts - 2026-10-05 13:58 UTC
+# Radio scripts - 2026-10-05 14:30 UTC
 
 > Drafts for SSMS / MHADM validation before broadcast. Read slowly; repeat the key action twice.
 
@@ -101,75 +101,3 @@ Good day, listeners in Abiemnhom. This is a yellow dry-spell message for Abiemnh
 ## Panyikang (Upper Nile) - English
 
 Good day, listeners in Panyikang. This is a yellow dry-spell message for Panyikang, Upper Nile. About 14 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
-
-## Kajo-keji (Central Equatoria) - English
-
-Good day, listeners in Kajo-keji. The river gauge serving Kajo-keji shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Morobo (Central Equatoria) - English
-
-Good day, listeners in Morobo. The river gauge serving Morobo shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Ayod (Jonglei) - English
-
-Good day, listeners in Ayod. The river gauge serving Ayod shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Duk (Jonglei) - English
-
-Good day, listeners in Duk. The river gauge serving Duk shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Fangak (Jonglei) - English
-
-Good day, listeners in Fangak. The river gauge serving Fangak shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Twic East (Jonglei) - English
-
-Good day, listeners in Twic East. The river gauge serving Twic East shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Rumbek East (Lakes) - English
-
-Good day, listeners in Rumbek East. The river gauge serving Rumbek East shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Yirol East (Lakes) - English
-
-Good day, listeners in Yirol East. The river gauge serving Yirol East shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Aweil North (Northern Bahr el Ghazal) - English
-
-Good day, listeners in Aweil North. The river gauge serving Aweil North shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Guit (Unity) - English
-
-Good day, listeners in Guit. The river gauge serving Guit shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Koch (Unity) - English
-
-Good day, listeners in Koch. The river gauge serving Koch shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Leer (Unity) - English
-
-Good day, listeners in Leer. The river gauge serving Leer shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Mayendit (Unity) - English
-
-Good day, listeners in Mayendit. The river gauge serving Mayendit shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Baliet (Upper Nile) - English
-
-Good day, listeners in Baliet. The river gauge serving Baliet shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Melut (Upper Nile) - English
-
-Good day, listeners in Melut. The river gauge serving Melut shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Renk (Upper Nile) - English
-
-Good day, listeners in Renk. The river gauge serving Renk shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Tonj North (Warrap) - English
-
-Good day, listeners in Tonj North. The river gauge serving Tonj North shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
-
-## Mvolo (Western Equatoria) - English
-
-Good day, listeners in Mvolo. The river gauge serving Mvolo shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).

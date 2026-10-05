@@ -7,7 +7,8 @@
   "season": 2026,
   "activations": 0,
   "last_sig": null,
-  "readiness_since": null
+  "readiness_since": null,
+  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-FANGAK": {
   "stage": "normal",
@@ -17,7 +18,8 @@
   "season": 2026,
   "activations": 0,
   "last_sig": null,
-  "readiness_since": null
+  "readiness_since": null,
+  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-LEER": {
   "stage": "normal",
@@ -27,36 +29,40 @@
   "season": 2026,
   "activations": 0,
   "last_sig": null,
-  "readiness_since": null
+  "readiness_since": null,
+  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-AYOD": {
-  "stage": "activated",
-  "since": "2026-10-05 13:58",
-  "confirm": 0,
-  "quiet": 0,
-  "season": 2026,
-  "activations": 1,
-  "last_sig": "2026-09-25|2026-10-04 00",
-  "readiness_since": "2026-10-05 13:58"
- },
- "AAP-FL-TWICEAST": {
-  "stage": "activated",
-  "since": "2026-10-05 13:58",
-  "confirm": 0,
-  "quiet": 0,
-  "season": 2026,
-  "activations": 1,
-  "last_sig": "2026-09-25|2026-10-04 00",
-  "readiness_since": "2026-10-05 13:58"
- },
- "AAP-FL-GUIT": {
-  "stage": "readiness",
-  "since": "2026-10-05 13:58",
+  "stage": "normal",
+  "since": null,
   "confirm": 0,
   "quiet": 0,
   "season": 2026,
   "activations": 0,
   "last_sig": null,
-  "readiness_since": "2026-10-05 13:58"
+  "readiness_since": null,
+  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
+ },
+ "AAP-FL-TWICEAST": {
+  "stage": "normal",
+  "since": null,
+  "confirm": 0,
+  "quiet": 0,
+  "season": 2026,
+  "activations": 0,
+  "last_sig": null,
+  "readiness_since": null,
+  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
+ },
+ "AAP-FL-GUIT": {
+  "stage": "normal",
+  "since": null,
+  "confirm": 0,
+  "quiet": 0,
+  "season": 2026,
+  "activations": 0,
+  "last_sig": null,
+  "readiness_since": null,
+  "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  }
 }

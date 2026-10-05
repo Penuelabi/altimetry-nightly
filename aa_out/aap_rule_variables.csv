@@ -16,12 +16,16 @@ river_level_m,station_status.csv,latest satellite water level at the county gaug
 river_age_days,station_status.csv,days since that satellite pass,Abyei Region,7
 river_rate_m_per_day,station_status.csv,rise (+) or fall (-) at the last pass (m per day),Abyei Region,-0.0019
 river_rising,station_status.csv,True when the rate is above zero,Abyei Region,False
-river_pctile,station_status.csv,seasonal percentile of the last level (0-100),Abyei Region,0.0
+river_pctile,station_status.csv,seasonal percentile of the last pass: how unusual for the time of year (0-100),Abyei Region,0.0
+river_rise_m,merged_altimetry_stations.csv,rise since this year's dry-season low (February-May) at the gauge (m),Abyei Region,-0.02
 lvl_2yr_m,station_status.csv,2-year flood level at the gauge (m),Abyei Region,395.26
 lvl_5yr_m,station_status.csv,5-year flood level (m),Abyei Region,395.471
 lvl_10yr_m,station_status.csv,10-year flood level (m),Abyei Region,395.611
-readiness_level_m,aa_triggers.csv,readiness level for the county (else 2-year level - 0.25 m),Abyei Region,394.76
-activation_level_m,aa_triggers.csv,activation level for the county (else the 2-year level),Abyei Region,395.01
+readiness_level_m,aa_triggers.csv,"readiness water level, when the county rule uses levels (else 2-year level - 0.25 m if the county has no aa_triggers.csv row)",Abyei Region,
+activation_level_m,aa_triggers.csv,"activation water level, when the county rule uses levels (else the 2-year level)",Abyei Region,
+readiness_value,aa_triggers.csv,readiness value of the county's trigger signal (units depend on trigger_family),Abyei Region,0.7
+activation_value,aa_triggers.csv,activation value of the county's trigger signal,Abyei Region,0.75
+regional_value,aa_triggers.csv,regional index needed together with the county signal (combined rules),Abyei Region,
 sudd_upstream_pct,sudd_trigger_log.csv,experimental Sudd river trigger: upstream percentile (0-1),Abyei Region,0.3777
 sudd_status,sudd_trigger_log.csv,"'normal', 'watch' or 'elevated'",Abyei Region,normal
 flooded_now_km2,exposure_cache.json,"area flooded now (latest Sentinel-1 extent, km2)",Abyei Region,5395.25

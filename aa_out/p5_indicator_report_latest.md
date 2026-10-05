@@ -1,6 +1,6 @@
 # Anticipatory action roadmap - progress report 2026Q4
 
-Prepared 2026-10-05 13:58 UTC by aa_p5_indicator_tracker.py for the quarterly TWG-AA meeting (South Sudan Roadmap on Anticipatory Action 2025-2030, Pillars 1, 2, 3 and 5).
+Prepared 2026-10-05 14:30 UTC by aa_p5_indicator_tracker.py for the quarterly TWG-AA meeting (South Sudan Roadmap on Anticipatory Action 2025-2030, Pillars 1, 2, 3 and 5).
 
 Snapshot indicators show the latest value in the quarter; event indicators are counts in the quarter.
 
@@ -11,8 +11,9 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 | Counties with a flood risk profile |  |  |  | 79 | 79 |  |  | p1_county_risk_profile.csv |
 | Livelihood zones with exposure analysis |  |  |  | 0 | 0 |  |  | p1_zone_profile.csv |
 | Vulnerability and coping indicators in use |  |  |  | 0 | 0 |  |  | aa_config/county_vulnerability.csv |
-| Risk maps produced |  |  |  | 1 | 1 |  |  | p1_risk_map.png |
-| Risk datasets exported in HXL for the IMS |  |  |  | 1 | 1 |  |  | p1_county_risk_profile_hxl.csv |
+| Risk maps produced |  |  |  | 2 | 2 |  |  | p1_risk_map.png |
+| Risk datasets exported in HXL for the IMS |  |  |  | 2 | 2 |  |  | p1_county_risk_profile_hxl.csv |
+| Risk and trigger datasets in HXL for the IMS |  |  |  | 2 | 2 |  |  | aa_indicator_ledger.csv |
 
 ## Pillar 2 - Trigger and early warning systems
 
@@ -21,38 +22,45 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 | Hazards with defined thresholds and data requirements |  |  |  | 3 | 3 |  |  | p2_trigger_design_note.md |
 | Counties with proposed river trigger levels |  |  |  | 79 | 79 |  |  | aa_triggers.csv |
 | Counties with validated river trigger levels |  |  |  | 0 | 0 |  |  | aa_triggers.csv |
-| Trigger skill evaluations against recorded impacts |  |  |  | 1 | 1 |  |  | p2_trigger_skill_season.csv |
-| Datasets packaged and validated for the repository |  |  |  |  |  |  |  | aa_data_package_*.zip |
-| Languages with validated warning templates |  |  |  |  |  |  |  | aa_config/message_templates.csv |
+| Trigger skill evaluations against recorded impacts |  |  |  | 2 | 2 |  |  | p2_trigger_skill_season.csv |
+| Datasets packaged and validated for the repository |  |  |  | 7 | 7 |  |  | aa_data_package_*.zip |
+| Languages with validated warning templates |  |  |  | 1 | 1 |  |  | aa_config/message_templates.csv |
+| Datasets failing validation |  |  |  | 0 | 0 |  |  | aa_indicator_ledger.csv |
 
 ## Pillar 3 - Anticipatory action
 
 | Indicator | 2026Q1 | 2026Q2 | 2026Q3 | 2026Q4 | Year to date | Target | Achieved | Verification |
 |---|---|---|---|---|---|---|---|---|
-| Anticipatory action plans developed |  |  |  |  |  |  |  | aa_config/aap_plans.csv |
-| Anticipatory action plans validated |  |  |  |  |  |  |  | aa_config/aap_plans.csv |
+| Anticipatory action plans developed |  |  |  | 6 | 6 |  |  | aa_config/aap_plans.csv |
+| Anticipatory action plans validated |  |  |  | 0 | 0 |  |  | aa_config/aap_plans.csv |
 | Simulation exercise packs prepared |  |  |  |  |  |  |  | aa_out/simulations |
 | Simulation exercises conducted |  |  |  |  |  |  |  | simulations/*/evaluation.csv (conducted_date) |
-| Readiness stages reached |  |  |  |  |  |  |  | aap_activation_log.csv |
+| Readiness stages reached |  |  |  | 1 | 1 |  |  | aap_activation_log.csv |
 | AAPs activated |  |  |  |  |  |  |  | aap_activation_log.csv; aap_reports |
+| Draft-plan activation levels reached (not counted as activations) |  |  |  | 2 | 2 |  |  | aa_indicator_ledger.csv |
+| Plans in readiness or activated now |  |  |  | 3 | 3 |  |  | aa_indicator_ledger.csv |
 
 ## Pillar 5 - Coordination and legal framework
 
 | Indicator | 2026Q1 | 2026Q2 | 2026Q3 | 2026Q4 | Year to date | Target | Achieved | Verification |
 |---|---|---|---|---|---|---|---|---|
-| Subnational TWG-AA groups active (state / county) |  |  |  |  |  |  |  | aa_config/recipient_groups.csv |
+| Subnational TWG-AA groups active (state / county) |  |  |  | 0 | 0 |  |  | aa_config/recipient_groups.csv |
 | TWG-AA meetings held |  |  |  |  |  |  |  | aa_config/meetings_log.csv |
-| TWG-AA situation briefs prepared |  |  |  |  |  |  |  | aa_out/dissemination |
-| Community groups / radio listening hubs registered |  |  |  |  |  |  |  | aa_config/recipient_groups.csv |
-| Early warning messages prepared |  |  |  |  |  |  |  | dissemination/*/messages.csv |
+| TWG-AA situation briefs prepared |  |  |  | 11 | 11 |  |  | aa_out/dissemination |
+| Community groups / radio listening hubs registered |  |  |  | 0 | 0 |  |  | aa_config/recipient_groups.csv |
+| Early warning messages prepared |  |  |  | 86 | 86 |  |  | dissemination/*/messages.csv |
 | Early warning items sent |  |  |  |  |  |  |  | dissemination_log.csv (status sent) |
 | Community feedback records |  |  |  |  |  |  |  | aa_config/feedback_log.csv |
 
 ## Plan decisions in 2026Q4
-No readiness or activation decisions this quarter.
+| Date | Plan | County | Change | Plan status |
+|---|---|---|---|---|
+| 2026-10-05 13:58 | AAP-FL-AYOD | Ayod | normal -> activated | draft (example) - not validated |
+| 2026-10-05 13:58 | AAP-FL-TWICEAST | Twic East | normal -> activated | draft (example) - not validated |
+| 2026-10-05 13:58 | AAP-FL-GUIT | Guit | normal -> readiness | draft (example) - not validated |
 
 ## No data yet
-Datasets packaged and validated for the repository, Languages with validated warning templates, Anticipatory action plans developed, Anticipatory action plans validated, Simulation exercise packs prepared, Simulation exercises conducted, Readiness stages reached, AAPs activated, Subnational TWG-AA groups active (state / county), TWG-AA meetings held, TWG-AA situation briefs prepared, Community groups / radio listening hubs registered, Early warning messages prepared, Early warning items sent, Community feedback records
+Simulation exercise packs prepared, Simulation exercises conducted, AAPs activated, TWG-AA meetings held, Early warning items sent, Community feedback records
 
 ## Suggested next steps
 - Agree vulnerability indicators (e.g. IPC phase, IDP share) and fill aa_config/county_vulnerability.csv.

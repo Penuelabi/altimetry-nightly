@@ -1,68 +1,67 @@
-# River-level triggers - design note (proposal for validation)
+# River triggers - design note (proposal for validation)
 
-Generated 2026-10-05 13:58 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-10-05 14:30 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
-- **Activation**: water level at the county's gauge at or above its **2yr-0.25m** level (no level kept FAR <= 50%; the lowest FAR was used).
-- **Readiness**: at or above its **2yr-0.50m** level (a lower level that caught at least 60% of displacement seasons on time, and at least as many as activation; best TSS).
-- On time = crossed no later than 15 days after the first displacement month began. Both levels are judged per flood season (July-January), as a plan activates once per season.
-- Levels in metres for every county are in aa_triggers.csv.
-
-> **Warning:** 2yr-0.50m, 2yr-0.25m shows no skill over chance in this record (TSS <= 0). Treat the level as a placeholder until SSMS/MWRI and the TWG-AA agree a level from local flood marks or bankfull data.
+- **Activation: U75** (best CSI among rules with FAR <= 50%).
+- **Readiness: U70** (a lower rule of the same kind that catches at least 60% of flood seasons on time and as many as activation; best TSS).
+- Names: P = percentile of the gauge record; 2yr/5yr/10yr = return levels; S = seasonal percentile (how unusual for the time of year); R = rise since the dry-season low against the gauge's usual rise; U = Sudd regional upstream index x100; A+U = both.
+- Counties without a reliable gauge use the regional rule if they are Sudd counties (readiness U70, activation U75), otherwise the bulletin flood alert. Each county's values and suggested plan rules are in aa_triggers.csv.
 
 ## Evidence
-Impact record: 107 county-months with flood displacement, 2020-2025 (IOM DTM; flood + unspecified natural disaster). River signal: satellite levels at the linked gauge.
+169 county-seasons with a recorded flood impact, seasons 2020-2025 (July-January); 144 county-seasons scored at 24 counties with a reliable gauge. Regional index: 21 Sudd counties with recorded flood displacement, 47 upstream gauges.
 
-### Per season, on time (used for the choice)
-| candidate | county_seasons | events | hits | misses | false_alarms | POD | FAR | CSI | TSS | median_lead_days |
+### Every rule (impact = displacement or listed in a flood assessment; used for the choice)
+| family | candidate | county_seasons | events | hits | late | misses | false_alarms | POD | FAR | CSI | TSS | median_lead_days |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| level | 2yr+0.25m | 144 | 76 | 40 | 7 | 29 | 23 | 53% | 33% | 0.40 | 0.19 | 12 |
+| level | P95 | 144 | 76 | 34 | 11 | 31 | 21 | 45% | 32% | 0.35 | 0.14 | 18 |
+| level | 5yr | 144 | 76 | 25 | 9 | 42 | 14 | 33% | 29% | 0.28 | 0.12 | 9 |
+| level | P90 | 144 | 76 | 45 | 9 | 22 | 34 | 59% | 39% | 0.41 | 0.09 | 16 |
+| level | 2yr | 144 | 76 | 58 | 8 | 10 | 48 | 76% | 42% | 0.47 | 0.06 | 30 |
+| level | P80 | 144 | 76 | 54 | 10 | 12 | 47 | 71% | 42% | 0.44 | 0.02 | 32 |
+| level | 10yr | 144 | 76 | 3 | 3 | 70 | 3 | 4% | 33% | 0.04 | -0.00 |  |
+| level | 2yr-0.25m | 144 | 76 | 66 | 5 | 5 | 61 | 87% | 46% | 0.48 | -0.03 | 23 |
+| level | P70 | 144 | 76 | 64 | 5 | 7 | 61 | 84% | 47% | 0.47 | -0.05 | 26 |
+| level | P60 | 144 | 76 | 67 | 6 | 3 | 65 | 88% | 47% | 0.48 | -0.07 | 30 |
+| level | 2yr-0.50m | 144 | 76 | 66 | 5 | 5 | 66 | 87% | 48% | 0.46 | -0.10 | 40 |
+| regional | U75 | 144 | 76 | 55 | 13 | 8 | 28 | 72% | 29% | 0.53 | 0.31 | 0 |
+| regional | U80 | 144 | 76 | 49 | 19 | 8 | 28 | 64% | 29% | 0.47 | 0.23 | 0 |
+| regional | U70 | 144 | 76 | 63 | 12 | 1 | 45 | 83% | 38% | 0.52 | 0.17 | 30 |
+| regional | U50 | 144 | 76 | 73 | 3 | 0 | 68 | 96% | 47% | 0.51 | -0.04 | 61 |
+| regional | U55 | 144 | 76 | 73 | 3 | 0 | 68 | 96% | 47% | 0.51 | -0.04 | 61 |
+| regional | U60 | 144 | 76 | 70 | 6 | 0 | 68 | 92% | 47% | 0.49 | -0.08 | 31 |
+| regional | U65 | 144 | 76 | 64 | 12 | 0 | 68 | 84% | 47% | 0.44 | -0.16 | 30 |
+| rise | R50 | 144 | 76 | 44 | 9 | 23 | 30 | 58% | 36% | 0.42 | 0.14 | 54 |
+| rise | R90 | 144 | 76 | 10 | 3 | 63 | 7 | 13% | 35% | 0.12 | 0.03 | -2 |
+| rise | R75 | 144 | 76 | 18 | 3 | 55 | 16 | 24% | 43% | 0.20 | 0.00 | 54 |
+| seasonal | S85 | 144 | 76 | 46 | 5 | 25 | 24 | 61% | 32% | 0.46 | 0.25 | 44 |
+| seasonal | S90 | 144 | 76 | 38 | 6 | 32 | 18 | 50% | 29% | 0.40 | 0.24 | 36 |
+| seasonal | S80 | 144 | 76 | 52 | 3 | 21 | 32 | 68% | 37% | 0.48 | 0.21 | 48 |
+| seasonal | S70 | 144 | 76 | 61 | 3 | 12 | 44 | 80% | 41% | 0.51 | 0.16 | 53 |
+| seasonal | S95 | 144 | 76 | 24 | 4 | 48 | 15 | 32% | 35% | 0.26 | 0.10 | 21 |
+| seasonal+regional | S85+U70 | 144 | 76 | 35 | 11 | 30 | 11 | 46% | 19% | 0.40 | 0.30 | -1 |
+| seasonal+regional | S85+U55 | 144 | 76 | 45 | 6 | 25 | 20 | 59% | 28% | 0.47 | 0.30 | 36 |
+| seasonal+regional | S85+U60 | 144 | 76 | 42 | 8 | 26 | 19 | 55% | 28% | 0.44 | 0.27 | 24 |
+| seasonal+regional | S90+U55 | 144 | 76 | 37 | 7 | 32 | 17 | 49% | 28% | 0.40 | 0.24 | 30 |
+| seasonal+regional | S80+U70 | 144 | 76 | 39 | 11 | 26 | 19 | 51% | 28% | 0.41 | 0.23 | -2 |
+| seasonal+regional | S80+U55 | 144 | 76 | 50 | 5 | 21 | 29 | 66% | 35% | 0.48 | 0.23 | 40 |
+| seasonal+regional | S90+U70 | 144 | 76 | 26 | 10 | 40 | 8 | 34% | 18% | 0.31 | 0.22 | -1 |
+| seasonal+regional | S80+U60 | 144 | 76 | 48 | 7 | 21 | 29 | 63% | 35% | 0.46 | 0.21 | 24 |
+| seasonal+regional | S90+U60 | 144 | 76 | 32 | 8 | 36 | 16 | 42% | 29% | 0.35 | 0.19 | 20 |
+
+### The chosen rules, impact = flood displacement only
+| candidate | events | hits | late | misses | false_alarms | POD | FAR | CSI | TSS | median_lead_days |
 |---|---|---|---|---|---|---|---|---|---|---|
-| P50 | 438 | 55 | 39 | 16 | 380 | 71% | 91% | 0.09 | -0.28 | 43 |
-| P60 | 438 | 55 | 37 | 18 | 375 | 67% | 91% | 0.09 | -0.31 | 30 |
-| P70 | 438 | 55 | 34 | 21 | 363 | 62% | 91% | 0.08 | -0.33 | 30 |
-| 2yr-0.50m | 438 | 55 | 40 | 15 | 365 | 73% | 90% | 0.10 | -0.23 | 42 |
-| P75 | 438 | 55 | 31 | 24 | 343 | 56% | 92% | 0.08 | -0.33 | 30 |
-| 2yr-0.25m | 438 | 55 | 39 | 16 | 352 | 71% | 90% | 0.10 | -0.21 | 30 |
-| P80 | 438 | 55 | 25 | 30 | 314 | 45% | 93% | 0.07 | -0.37 | 32 |
-| P85 | 438 | 55 | 21 | 34 | 274 | 38% | 93% | 0.06 | -0.33 | 32 |
-| 2yr | 438 | 55 | 28 | 27 | 280 | 51% | 91% | 0.08 | -0.22 | 30 |
-| P90 | 438 | 55 | 19 | 36 | 235 | 35% | 93% | 0.07 | -0.27 | 30 |
-| 2yr+0.25m | 438 | 55 | 12 | 43 | 151 | 22% | 93% | 0.06 | -0.18 | 16 |
-| P95 | 438 | 55 | 14 | 41 | 165 | 25% | 92% | 0.06 | -0.18 | 28 |
-| 5yr | 438 | 55 | 9 | 46 | 142 | 16% | 94% | 0.05 | -0.21 | 16 |
-| 10yr | 438 | 55 | 0 | 55 | 41 | 0% | 100% | 0.00 | -0.11 |  |
+| U70 | 32 | 19 | 12 | 1 | 89 | 59% | 74% | 0.16 | -0.20 | 30 |
+| U75 | 32 | 12 | 13 | 7 | 71 | 38% | 74% | 0.12 | -0.26 | 0 |
 
-### Per season, other impact definitions (chosen levels)
-| impact_definition | timing | candidate | county_seasons | events | hits | misses | false_alarms | POD | FAR | CSI |
-|---|---|---|---|---|---|---|---|---|---|---|
-| flood displacement | any time in season | 2yr-0.50m | 438 | 55 | 52 | 3 | 365 | 95% | 88% | 0.12 |
-| displacement or listed in flood assessment | any time in season | 2yr-0.50m | 438 | 154 | 147 | 7 | 270 | 95% | 65% | 0.35 |
-| flood displacement | any time in season | 2yr-0.25m | 438 | 55 | 52 | 3 | 352 | 95% | 87% | 0.13 |
-| displacement or listed in flood assessment | any time in season | 2yr-0.25m | 438 | 154 | 145 | 9 | 259 | 94% | 64% | 0.35 |
-
-### Monthly (flood-season county-months, river signal 1 month earlier)
-Monthly scores look poor by design: a level stays high for months while displacement is recorded in one or two of them. Use them to compare lead times, not to judge a level.
-| candidate | n | events | hits | misses | false_alarms | POD | FAR | CSI | TSS |
-|---|---|---|---|---|---|---|---|---|---|
-| P50 | 2699 | 72 | 55 | 17 | 1961 | 76% | 97% | 0.03 | 0.02 |
-| P60 | 2699 | 72 | 51 | 21 | 1690 | 71% | 97% | 0.03 | 0.07 |
-| P70 | 2699 | 72 | 42 | 30 | 1377 | 58% | 97% | 0.03 | 0.06 |
-| 2yr-0.50m | 2699 | 72 | 60 | 12 | 1686 | 83% | 97% | 0.03 | 0.19 |
-| P75 | 2699 | 72 | 39 | 33 | 1204 | 54% | 97% | 0.03 | 0.08 |
-| 2yr-0.25m | 2699 | 72 | 52 | 20 | 1320 | 72% | 96% | 0.04 | 0.22 |
-| P80 | 2699 | 72 | 34 | 38 | 1019 | 47% | 97% | 0.03 | 0.08 |
-| P85 | 2699 | 72 | 30 | 42 | 818 | 42% | 96% | 0.03 | 0.11 |
-| 2yr | 2699 | 72 | 35 | 37 | 836 | 49% | 96% | 0.04 | 0.17 |
-| P90 | 2699 | 72 | 23 | 49 | 596 | 32% | 96% | 0.03 | 0.09 |
-| 2yr+0.25m | 2699 | 72 | 17 | 55 | 397 | 24% | 96% | 0.04 | 0.08 |
-| P95 | 2699 | 72 | 11 | 61 | 345 | 15% | 97% | 0.03 | 0.02 |
-| 5yr | 2699 | 72 | 8 | 64 | 281 | 11% | 97% | 0.02 | 0.00 |
-| 10yr | 2699 | 72 | 0 | 72 | 56 | 0% | 100% | 0.00 | -0.02 |
-
-## Status now: 26 counties at or above a proposed level
-Fangak (activation), Leer (activation), Ayod (activation), Twic East (activation), Guit (readiness), Mayendit (activation), Renk (readiness), Bor South (activation), Koch (readiness), Duk (activation), Canal/Pigi (activation), Melut (activation), Yirol East (activation), Gogrial East (readiness), Aweil East (readiness) and 11 more (see aa_triggers.csv)
+## Counties
+Rule used: regional 79.
+At or above a proposed value now: 0.
 
 ## How to read and validate
-- POD: share of displacement months the level caught. FAR: share of crossings with no displacement recorded. CSI and TSS combine both; higher is better. Lead time: days from first crossing to the first displacement month (see p2_trigger_track_record.csv).
-- Small samples: one or two seasons can swing the numbers. Prefer rules that also make physical sense (bankfull levels known to MWRI, local flood marks).
-- Satellite levels are sampled every 10-35 days, so a peak can be missed; displacement records miss floods where nobody moved or nobody counted.
-- Confirm per county with SSMS / MWRI and the state TWG-AA; record the decision (date, who, levels) in aa_triggers.csv (columns validated_by, validated_date) before using the levels in an anticipatory action plan.
+- POD: share of flood seasons caught on time. FAR: share of the seasons a rule fired with no impact recorded. CSI and TSS combine both; higher is better. Late = fired after displacement had begun (counted as a miss).
+- Small samples: one or two seasons can swing the numbers. Prefer rules that also make physical sense.
+- Satellite passes are 10-35 days apart; displacement and assessment records miss floods nobody counted.
+- Confirm per county with SSMS / MWRI and the state TWG-AA; record the decision in aa_triggers.csv (validated_by, validated_date) before using the values in an anticipatory action plan.

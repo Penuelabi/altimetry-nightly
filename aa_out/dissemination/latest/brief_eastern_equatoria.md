@@ -1,12 +1,12 @@
 # Eastern Equatoria - anticipatory action situation brief
 
-Prepared 2026-10-05 13:58 UTC for the Eastern Equatoria state TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-04 00 UTC.
+Prepared 2026-10-05 14:30 UTC for the Eastern Equatoria state TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-04 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
 - Counties by alert level: red 0, orange 0, yellow 1, green 7.
-- Anticipatory action plans in readiness: 0; activated: 0.
+- No anticipatory action plan is in readiness or activated.
 - River gauges at a proposed trigger level: 0 counties (0 at activation level).
 
 ## Counties with an alert
