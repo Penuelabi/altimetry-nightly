@@ -76,7 +76,8 @@ def load_stations():
     agg = {'latitude': ('latitude', 'median'), 'longitude': ('longitude', 'median')}
     if 'river_key' in df.columns:
         agg['river_key'] = ('river_key', 'first')
-    name_col = next((c for c in ('location', 'name', 'Target Name', 'station_name') if c in df.columns), None)
+    name_col = next((c for c in ('location/river_name', 'location', 'river_name', 'name',
+                                 'Target Name', 'station_name') if c in df.columns), None)
     if name_col:
         agg['station_name'] = (name_col, 'first')
     st = df.groupby('station_uid').agg(**agg).reset_index()
@@ -85,8 +86,10 @@ def load_stations():
     if 'station_name' not in st.columns:
         st['station_name'] = st['station_uid']
     st['river_key'] = st['river_key'].fillna('')
+    st['station_name'] = st['station_name'].fillna(st['station_uid']).astype(str).str.strip()
+    # river label: from river_key (BASIN|RIVER) when present, else the station's own name/river text
     st['river'] = st['river_key'].map(_river_name)
-    st['station_name'] = st['station_name'].fillna(st['station_uid']).astype(str)
+    st.loc[st['river'].eq(''), 'river'] = st['station_name']
 
     status_path = os.path.join(ALT_DIR, 'station_status.csv')
     if os.path.exists(status_path):
@@ -285,6 +288,27 @@ def match(stations, counties, sets):
 
 
 # --------------------------------------------------------------------------- #
+def export_link_asset(out, counties):
+    """Publish the county->gauge link as a public Earth Engine table asset for the GEE app popup."""
+    import ee
+    from ee_util import ASSET_FOLDER, export_table
+    reps = counties.to_crs(4326).copy()
+    reps['geometry'] = reps.geometry.representative_point()
+    cen = {r.county: (float(r.geometry.x), float(r.geometry.y)) for r in reps.itertuples()}
+    feats = []
+    for r in out.to_dict('records'):
+        if not r.get('station_uid'):
+            continue
+        props = {k: (None if (isinstance(v, float) and v != v) else v) for k, v in r.items()}
+        xy = cen.get(r['county'])
+        feats.append(ee.Feature(ee.Geometry.Point(list(xy)) if xy else None, props))
+    if not feats:
+        return
+    asset_id = f"{ASSET_FOLDER}/county_gauge_link"
+    if export_table(ee.FeatureCollection(feats), asset_id, 'county to gauge link', public=True):
+        print(f"county_station_link: exported EE asset {asset_id} ({len(feats)} counties)")
+
+
 def build():
     stations = load_stations()
     counties = load_counties()
@@ -299,6 +323,11 @@ def build():
     out.to_csv(path, index=False)
     tier = out['relation'].value_counts().to_dict()
     print(f"county_station_link: wrote {path}  ({tier})")
+    if sets is not None:                      # EE is up -> publish the app asset
+        try:
+            export_link_asset(out, counties)
+        except Exception as e:
+            print(f"county_station_link: EE asset export skipped ({type(e).__name__}: {e})")
     return out, path
 
 

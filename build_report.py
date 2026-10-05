@@ -17,8 +17,22 @@ def _num(v):
     return None if pd.isna(v) else int(round(float(v)))
 
 
+def load_links():
+    """county_station_link.csv -> {county_key: gauge dict} (nearest/upstream gauge per county)."""
+    p = os.path.join(OUT, 'county_station_link.csv')
+    if not os.path.exists(p):
+        return {}
+    out = {}
+    for r in pd.read_csv(p).to_dict('records'):
+        if not r.get('station_uid') or str(r.get('relation')) in ('none', 'nan'):
+            continue
+        out[_key(r['county'])] = {k: (None if (isinstance(v, float) and pd.isna(v)) else v) for k, v in r.items()}
+    return out
+
+
 def county_dicts(doc, cache=None, stations=None, today=None):
     cache, stations = cache or {}, stations or {}
+    links = load_links()
     by_county = {}
     for uid, ex in (cache.get('stations') or {}).items():
         if uid in stations and ex.get('county'):
@@ -68,7 +82,7 @@ def county_dicts(doc, cache=None, stations=None, today=None):
             sts.append(si)
         out.append({'county': name, 'state': state, 'population': popn, 'advisory': adv, 'previous': prev,
                     'scenarios': scen, 'settlements': sett or None, 'infra_payam': ip or None, 'infra_county': cc if ip else None, 'infra_now': inow or None, 'news': news.get(_key(name)),
-                    'stations': sts})
+                    'stations': sts, 'linked_gauge': links.get(_key(name))})
     return out
 
 

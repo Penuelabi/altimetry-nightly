@@ -206,6 +206,8 @@ def county_story(c, today=None):
     s.extend(news_story(c))
     for g in c.get('stations', []):
         s.extend(station_story(g))
+    if not c.get('stations') and c.get('linked_gauge'):
+        s.extend(linked_gauge_story(c['linked_gauge']))
     return s
 
 
@@ -260,6 +262,31 @@ def news_story(c):
     for it in items[:4]:
         s.append(P(_news_line(it, it.get('hazard'))))
     s.append(P('From local media and ReliefWeb; single-source items are unverified. Counties are as named in the article, or inferred from the place where stated.', SMALL))
+    return s
+
+
+def linked_gauge_story(g):
+    """Compact river-level readout for counties with no altimetry station within 25 km:
+    the nearest / upstream gauge on the county's own river network."""
+    rel_txt = {'upstream': 'upstream of the county', 'downstream': 'downstream of the county',
+               'local': 'in the county’s own sub-basin', 'same-river': 'on the same river',
+               'nearest': 'nearest gauge (different sub-basin)'}.get(str(g.get('relation')), str(g.get('relation')))
+    name = g.get('river') or g.get('station_name') or g.get('station_uid')
+    km = g.get('distance_km')
+    km_txt = f"about {km:.0f} km away" if isinstance(km, (int, float)) and km == km else 'distance n/a'
+    conf = g.get('confidence') or 'indicative'
+    s = [P(f"River level — nearest gauge: {name}", H2)]
+    s.append(P(f"No altimetry station falls within 25 km of this county, so this is the most relevant gauge on its "
+               f"river network: {rel_txt}, {km_txt} ({conf} confidence). Altimetry levels are “as seen by satellite” "
+               f"— an indicator of the river's state, not a local reading for the county.", SMALL))
+    f2 = lambda v, d=2, suf='': '—' if not isinstance(v, (int, float)) or v != v else f'{v:.{d}f}{suf}'
+    rows = [['Gauge', 'Status (latest pass)', 'Water level', 'Seasonal pct.', 'Trend', 'Last pass'],
+            [str(g.get('station_uid')), g.get('flood_status') or '—', f2(g.get('last_level_m'), 2, ' m'),
+             ('—' if not isinstance(g.get('seasonal_pctile'), (int, float)) or g.get('seasonal_pctile') != g.get('seasonal_pctile')
+              else f"{g.get('seasonal_pctile'):.0f}th"),
+             f2(g.get('rate_m_per_day'), 3, ' m/day') if not isinstance(g.get('rate_m_per_day'), (int, float)) or g.get('rate_m_per_day') != g.get('rate_m_per_day')
+             else f"{g.get('rate_m_per_day'):+.3f} m/day", g.get('last_date') or '—']]
+    s.append(table(rows, [32 * mm, 40 * mm, 24 * mm, 22 * mm, 28 * mm, 22 * mm]))
     return s
 
 
