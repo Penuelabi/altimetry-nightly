@@ -22,8 +22,10 @@ What it does
   Impact record: flood displacement (IOM DTM, by month) OR being listed in a flood assessment (2021, 2022, 2024,
   2025). When displacement gives an onset month, the signal must come no later than 15 days after it began (else
   it is 'late', counted as a miss); assessment-only events count at any time in the season (July-January).
-  Activation: best CSI among rules with FAR <= 50% (else best TSS among rules catching >= 30% on time).
-  Readiness: a lower rule of the same kind that catches at least 60% on time and as many as activation; best TSS.
+  Activation: best TSS among rules with FAR <= 35% (else 50%) that catch >= 30% of flood seasons on time and come a
+  median of >= 14 days before displacement began. Readiness: a lower rule of the same kind that catches at least 60%
+  on time and as many as activation; best TSS. County rules (level, seasonal, rise, county + regional) are chosen for
+  counties with a reliable gauge; the regional pair is chosen separately for Sudd counties without one.
 
   Altimetry samples rivers every 10-35 days, the impact records are incomplete and the sample is small: the output is
   a PROPOSAL for validation with SSMS, MWRI and the national TWG-AA, never an automatic trigger.
@@ -62,8 +64,9 @@ ON_TIME_DAYS = 15                             # signal up to 15 days after the f
 GAUGE_RELATIONS = ('upstream', 'local')       # gauges used for county triggers
 GAUGE_CONFIDENCE = ('medium', 'high')         # threshold confidence required
 READINESS_MIN_POD = 0.60
-ACTIVATION_MAX_FAR = 0.50
-ACTIVATION_MIN_POD = 0.30                     # fallback: never propose an activation rule that catches less than this
+ACTIVATION_MAX_FAR = (0.35, 0.50)             # activation: at most ~1 season in 3 without a recorded impact (else 1 in 2)
+ACTIVATION_MIN_POD = 0.30                     # ... catching at least 30% of flood seasons on time
+MIN_LEAD_DAYS = 14                            # ... and coming a median of at least 2 weeks before displacement began
 GAP = {'level': 0.25, 'rise': 0.25, 'seasonal': 10.0, 'regional': 0.10}   # readiness this far below activation
                                               # when no lower rule of the same kind qualifies (m, m, pctile, index)
 MIN_PASSES = 3                                # passes in a season for it to be scored
@@ -402,22 +405,27 @@ def skill(long):
 
 
 def choose(sk, cands):
-    """Activation first (the funding decision), then a lower readiness rule of the same kind."""
+    """Activation first (the funding decision), then a lower readiness rule of the same kind. `sk` may be limited to
+    some families (county rules, or the regional index)."""
     s = sk[sk['impact_definition'].str.startswith('displacement or')].set_index('candidate')
     s = s[s['events'] > 0]
     if s.empty:
         return None, None, 'no impact records to test against'
     byname = {c['name']: c for c in cands}
-    good = s[s['FAR'] <= ACTIVATION_MAX_FAR]
-    if len(good) and good['CSI'].notna().any():
-        act = good.sort_values(['CSI', 'TSS'], ascending=False).index[0]
-        why = f'best CSI among rules with FAR <= {ACTIVATION_MAX_FAR:.0%}'
-    else:
+    lead_ok = s['median_lead_days'].isna() | (s['median_lead_days'] >= MIN_LEAD_DAYS)
+    act = None
+    for far in ACTIVATION_MAX_FAR:
+        pool = s[(s['FAR'] <= far) & lead_ok & (s['POD'] >= ACTIVATION_MIN_POD)]
+        if len(pool) and pool['TSS'].notna().any():
+            act = pool.sort_values(['TSS', 'CSI'], ascending=False).index[0]
+            why = (f'best TSS among rules with FAR <= {far:.0%} that caught >= {ACTIVATION_MIN_POD:.0%} of flood '
+                   f'seasons on time, a median of >= {MIN_LEAD_DAYS} days before displacement')
+            break
+    if act is None:
         pool = s[s['POD'] >= ACTIVATION_MIN_POD]
         pool = pool if len(pool) else s
         act = pool.sort_values(['TSS', 'CSI'], ascending=False).index[0]
-        why = (f'no rule kept FAR <= {ACTIVATION_MAX_FAR:.0%}; best TSS among rules catching at least '
-               f'{ACTIVATION_MIN_POD:.0%} on time')
+        why = 'no rule met the false-alarm and lead-time limits; best TSS used'
     ca = byname[act]
     base = ca.get('county', ca)
     lower = [n for n, c in byname.items() if c['family'] == base['family'] and 'county' not in c and n in s.index and
@@ -451,7 +459,6 @@ def county_rules(lk, thr, cands, ready, act, reg, sudd_keys, today, reg_pair=Non
     cr, ca = byname.get(ready), byname.get(act)
     rr_name, ra_name = reg_pair or ('U55', 'U70')
     reg_now = float(reg.iloc[-1]) if reg is not None and len(reg) else np.nan
-    regional_only = ca is not None and ca['family'] == 'regional'
     rows = []
     for r in lk.itertuples():
         st = thr.loc[r.station_uid].to_dict() if r.station_uid in thr.index else {}
@@ -461,7 +468,7 @@ def county_rules(lk, thr, cands, ready, act, reg, sudd_keys, today, reg_pair=Non
                'link_confidence': getattr(r, 'confidence', ''), 'thr_confidence': st.get('thr_confidence'),
                'gauge_used': gauge_ok}
         note = ''
-        if ca is not None and gauge_ok and not regional_only:
+        if ca is not None and gauge_ok:
             base = ca.get('county', ca)
             fam = base['family']
             rv, av = value_for(cr, st), value_for(base, st)
@@ -481,8 +488,8 @@ def county_rules(lk, thr, cands, ready, act, reg, sudd_keys, today, reg_pair=Non
             if cr['name'] == base['name'] and 'county' not in ca:
                 rec['readiness_rule_name'] = f"{cr['name']}-{GAP[fam]:g}"
             now_val = {'level': st.get('last_level_m'), 'seasonal': st.get('last_spct'), 'rise': st.get('last_rise_m')}[fam]
-        elif reg is not None and (r.key in sudd_keys or regional_only):
-            rn, an = (ready, act) if regional_only else (rr_name, ra_name)
+        elif reg is not None and r.key in sudd_keys:
+            rn, an = rr_name, ra_name
             rv, av = byname[rn]['value'], byname[an]['value']
             if rn == an:
                 rv = av - GAP['regional']
@@ -491,7 +498,7 @@ def county_rules(lk, thr, cands, ready, act, reg, sudd_keys, today, reg_pair=Non
                         'activation_value': av, 'regional_value': np.nan,
                         'suggested_readiness_rule': f'sudd_upstream_pct >= readiness_value or {FLOOD_ALERT_READY}',
                         'suggested_activation_rule': f'sudd_upstream_pct >= activation_value or {FLOOD_ALERT_ACT}'})
-            note = 'regional rule chosen' if regional_only else 'no reliable county gauge: regional index used'
+            note = 'Sudd county without a reliable gauge: regional index used'
             now_val, fam = reg_now, 'regional'
         else:
             rec.update({'trigger_family': 'bulletin flood alert', 'readiness_rule_name': 'flood alert orange or red',
@@ -622,9 +629,11 @@ def write_note(path, R, trig):
         lines += ['No rule could be scored: ' + why]
     else:
         main = sk[sk['impact_definition'].str.startswith('displacement or')]
-        lines += [f"- **Activation: {act}** ({why}).",
+        lead = main.set_index('candidate')['median_lead_days']
+        lt = lambda c: '' if pd.isna(lead.get(c, np.nan)) else f"; median {lead.get(c):.0f} days before displacement"
+        lines += [f"- **Activation (counties with a reliable gauge): {act}** ({why}{lt(act)}).",
                   f"- **Readiness: {ready}** (a lower rule of the same kind that catches at least {READINESS_MIN_POD:.0%} "
-                  'of flood seasons on time and as many as activation; best TSS).',
+                  f"of flood seasons on time and as many as activation; best TSS{lt(ready)}).",
                   '- Names: P = percentile of the gauge record; 2yr/5yr/10yr = return levels; S = seasonal percentile '
                   '(how unusual for the time of year); R = rise since the dry-season low against the gauge\'s usual rise; '
                   'U = Sudd regional upstream index x100; A+U = both.',
@@ -698,7 +707,7 @@ def run(merged, status, link, disp, affected, reg=None, reg_note='not built', to
             long = pd.concat([long, evaluate(combos, panel, thr, seasons, lows, reg, ev)], ignore_index=True)
             cands = cands + combos
             sk = skill(long)
-        ready, act, why = choose(sk, cands)
+        ready, act, why = choose(sk[sk['family'] != 'regional'], cands)
     reg_pair = None
     if reg is not None and len(sk) and (sk['family'] == 'regional').any():
         rp = choose(sk[sk['family'] == 'regional'], cands)
