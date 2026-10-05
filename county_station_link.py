@@ -63,18 +63,28 @@ def _river_name(river_key):
 
 
 def load_stations():
-    """One row per river gauge: uid, name, lat, lon, river_key, + latest reading."""
+    """One row per river gauge: uid, name, lat, lon, river_key, + latest reading.
+    Tolerant of optional columns (river_key / location / type may be absent in the CSV)."""
     master = os.path.join(ALT_DIR, 'merged_altimetry_stations.csv')
     df = pd.read_csv(master, low_memory=False)
+    print('county_station_link: merged columns ->', list(df.columns)[:40])
     df = df.dropna(subset=['latitude', 'longitude'])
-    is_lake = df.get('type', pd.Series('', index=df.index)).astype(str).str.lower().eq('lake')
-    df = df[~is_lake]
-    st = (df.sort_values('date')
-            .groupby('station_uid')
-            .agg(latitude=('latitude', 'median'), longitude=('longitude', 'median'),
-                 river_key=('river_key', 'first'),
-                 station_name=('location', 'first') if 'location' in df.columns else ('station_uid', 'first'))
-            .reset_index())
+    if 'type' in df.columns:
+        df = df[~df['type'].astype(str).str.lower().eq('lake')]
+    if 'date' in df.columns:
+        df = df.sort_values('date')
+    agg = {'latitude': ('latitude', 'median'), 'longitude': ('longitude', 'median')}
+    if 'river_key' in df.columns:
+        agg['river_key'] = ('river_key', 'first')
+    name_col = next((c for c in ('location', 'name', 'Target Name', 'station_name') if c in df.columns), None)
+    if name_col:
+        agg['station_name'] = (name_col, 'first')
+    st = df.groupby('station_uid').agg(**agg).reset_index()
+    if 'river_key' not in st.columns:
+        st['river_key'] = ''
+    if 'station_name' not in st.columns:
+        st['station_name'] = st['station_uid']
+    st['river_key'] = st['river_key'].fillna('')
     st['river'] = st['river_key'].map(_river_name)
     st['station_name'] = st['station_name'].fillna(st['station_uid']).astype(str)
 
