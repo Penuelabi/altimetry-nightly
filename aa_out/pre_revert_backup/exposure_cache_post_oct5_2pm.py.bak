@@ -4,14 +4,21 @@ Earth Engine job behind the "infrastructure at risk" and "25 km exposure" sectio
 Same definitions as the GEE app (gee.js): at risk = flooded now OR flooded in >= 15% of the same-season Sentinel-1 baseline years.
 
 Writes data/exposure_cache.json:
-  payams   {county: [ {payam, area_km2, area_risk_km2, schools, schools_risk, health, health_risk, buildings, buildings_risk,
-                       roads_km, roads_risk_km} ]}
+  payams   {county: [ {payam, area_km2, area_risk_km2, built_km2, built_risk_km2, schools, schools_risk, health,
+                       health_risk, buildings, buildings_risk, roads_km, roads_risk_km} ]}
   county   {county: {schools, schools_risk, health, health_risk}}
   stations {station_uid: {county, payam, pop, pop_risk, schools, schools_risk, health, health_risk, buildings, buildings_risk,
                           counties, payams: [ {payam, county, pop, pop_risk, bld, sch, sch_r, hl, hl_r} ]}}
 
+built_km2 / built_risk_km2 = GHSL built-up surface (settlement extent), total and on flood-prone ground; buildings /
+buildings_risk come from JRC GHS-OBAT 2020 where the service account can read it, else VIDA combined buildings
+(sat-io) -- see buildings_basis in the cache. bulletin_extras.py aggregates these to county level for the severe
+flood-impact rule (>= 50% of a county's buildings, schools, health facilities or built-up area on flood-prone ground).
+
 Incremental: stations already in the cache are skipped (set EXPOSURE_REFRESH=1 to recompute everything), the file is saved after
 every step, and the run stops cleanly when EXPOSURE_BUDGET_MIN minutes are used, so a re-run continues where it stopped.
+The payam table is rebuilt once more automatically when PAYAM_SCHEMA_VERSION is bumped (so a new field like built_km2
+is backfilled without needing EXPOSURE_REFRESH=1).
 Every layer is optional: a failure is logged and that figure stays empty. Needs GEE_SERVICE_ACCOUNT_KEY.
 """
 import datetime as dt
@@ -38,11 +45,14 @@ PAYAM = 'users/penuelabi/ssd_payam'
 SCHOOLS = 'projects/ee-penuelabi/assets/SDD_Schools'
 HEALTH = 'projects/ee-penuelabi/assets/SSD_Health'
 ROADS = 'projects/sat-io/open-datasets/GRIP4/Africa'
-BUILD_A = 'projects/sat-io/open-datasets/VIDA_COMBINED/SSD'
+BUILD_GHSOBAT = 'projects/sat-io/open-datasets/JRC/GHS-OBAT/GHS_OBAT_GPKG_SSD_E2020_R2024A_V1_0'   # JRC GHS-OBAT 2020
+BUILD_A = 'projects/sat-io/open-datasets/VIDA_COMBINED/SSD'                                        # fallback
+GHSL_BUILT_S = 'JRC/GHSL/P2023A/GHS_BUILT_S/2020'          # settlement extent: GHSL built-up surface, 2020
 FLOOD_EXTENT_ASSET = os.environ.get('FLOOD_EXTENT_ASSET') or 'projects/sudan-1575919084043/assets/maximum_flood_extent'
 BASELINE_ASSET = 'projects/wajaras-remote-s-1565857510402/assets/flood_baseline_s1_0915_0926_2017_2025'
 FREQ_RARE, MIN_FLOOD_YEARS, BUF_M = 0.15, 3, 25000
 A2, A3, A1 = 'ADM2_EN', 'ADM3_EN', 'ADM1_EN'
+PAYAM_SCHEMA_VERSION = 2                    # bump to force a one-time recompute of the payam table (new fields)
 
 
 def left():
@@ -100,10 +110,25 @@ risk30 = risk.reproject('EPSG:4326', None, 30)
 schools, health = ee.FeatureCollection(SCHOOLS), ee.FeatureCollection(HEALTH)
 schools_r = risk30.reduceRegions(schools, ee.Reducer.max(), 30, tileScale=4)
 health_r = risk30.reduceRegions(health, ee.Reducer.max(), 30, tileScale=4)
-bld = ee.FeatureCollection(BUILD_A)
+try:
+    ee.data.getAsset(BUILD_GHSOBAT)
+    bld = ee.FeatureCollection(BUILD_GHSOBAT)
+    buildings_basis = 'JRC GHS-OBAT 2020 (sat-io)'
+except Exception as e:
+    print('GHS-OBAT buildings not readable by the service account, using VIDA combined buildings instead:', str(e)[:150])
+    bld = ee.FeatureCollection(BUILD_A)
+    buildings_basis = 'VIDA combined buildings (sat-io) - GHS-OBAT not accessible'
+print('buildings basis:', buildings_basis)
 wp = (ee.ImageCollection('WorldPop/GP/100m/pop').filter(ee.Filter.date('2020-01-01', '2020-12-31'))
       .mosaic().select('population'))
 area = ee.Image.pixelArea().divide(1e6)
+# settlement extent: GHSL built-up surface (m2 per 100 m cell -> km2); optional, as in infrastructure_exposure.py
+try:
+    ghsl_bu = ee.Image(GHSL_BUILT_S).select('built_surface').divide(1e6)
+    have_ghsl = True
+except Exception as e:
+    print('GHSL built-up surface not available:', str(e)[:150])
+    ghsl_bu, have_ghsl = None, False
 
 
 def cnt(fc_r, g):
@@ -113,7 +138,7 @@ def cnt(fc_r, g):
 
 # --- 1. payam table ----------------------------------------------------------------------------------------------
 c = load()
-if not c.get('payams_complete') or REFRESH:
+if not c.get('payams_complete') or REFRESH or c.get('payam_schema') != PAYAM_SCHEMA_VERSION:
     n = payam.size().getInfo()
     lst = payam.toList(n)
     rows = []
@@ -130,13 +155,18 @@ if not c.get('payams_complete') or REFRESH:
 
         def per(f):
             g = f.geometry()
-            a = area.rename('a').addBands(area.multiply(risk).rename('ar')).reduceRegion(
-                ee.Reducer.sum(), g, 100, maxPixels=1e10, tileScale=8)
+            bands = area.rename('a').addBands(area.multiply(risk).rename('ar'))
+            if have_ghsl:
+                bands = bands.addBands(ghsl_bu.rename('bu')).addBands(ghsl_bu.multiply(risk).rename('bur'))
+            a = bands.reduceRegion(ee.Reducer.sum(), g, 100, maxPixels=1e10, tileScale=8)
             st, sr = cnt(schools_r, g)
             ht, hr = cnt(health_r, g)
             props = {'payam': f.get(A3), 'county': f.get(A2), 'state': f.get(A1),
                      'area_km2': a.get('a'), 'area_risk_km2': a.get('ar'),
                      'schools': st, 'schools_risk': sr, 'health': ht, 'health_risk': hr}
+            if have_ghsl:
+                props['built_km2'] = a.get('bu')
+                props['built_risk_km2'] = a.get('bur')
             b = bld.filterBounds(g)
             nb = b.size()
             props['buildings'] = nb
@@ -164,10 +194,14 @@ if not c.get('payams_complete') or REFRESH:
             by.setdefault(r['county'], []).append({k: (round(v, 2) if isinstance(v, float) else v) for k, v in r.items()
                                                    if k not in ('county', 'state')})
         c['payams'] = by
-        c['county'] = {k: {m: sum((p.get(m) or 0) for p in v if (p.get(m) or 0) >= 0) for m in ('schools', 'schools_risk', 'health', 'health_risk')}
+        c['county'] = {k: {m: sum((p.get(m) or 0) for p in v if (p.get(m) or 0) >= 0) for m in
+                           ('schools', 'schools_risk', 'health', 'health_risk', 'buildings', 'buildings_risk',
+                            'built_km2', 'built_risk_km2')}
                        for k, v in by.items()}
         c['risk_basis'] = risk_basis
+        c['buildings_basis'] = buildings_basis
         c['payams_complete'] = len(rows) >= 0.98 * n
+        c['payam_schema'] = PAYAM_SCHEMA_VERSION
         save(c)
         print('payam table saved:', len(rows), 'payams')
 
