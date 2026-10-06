@@ -82,19 +82,33 @@ monitoring, yellow = warning, orange = readiness, red = activation -- the readin
 this engine's own plan stages, so a rule can read `alert_stage == 'activation'` as a more readable alternative to
 `alert_level == 'red'`.
 
+`dry_spell_days` and `p_soil_recovery` are listed as variables but the county bulletin does not currently produce
+them (see "not currently wired into the live bulletin" above), so a rule using either always evaluates to unknown
+until that's reinstated; `sudd_upstream_pct` is unaffected since it comes straight from `sudd_trigger_log.csv`.
+
 A red bulletin alert means activation in every suggested rule. Red is reached either way, whichever comes first --
 a news report is supporting evidence, never a requirement, and its absence never holds back a red the data has
-already earned:
-- **Flood**: a high chance of heavy rain (or, Nov-Jan, the experimental Sudd river trigger at watch/elevated after
-  the rains have stopped -- river flooding in the Sudd lags the rain by weeks to months, so rain likelihood alone
-  can miss it) together with **either** (a) more than 10,000 people, or at least 50% of the **county's** (not one
-  payam's) buildings, schools, health facilities or built-up/settlement area, on flood-prone ground -- buildings
-  from JRC GHS-OBAT 2020 where readable, else VIDA combined buildings; settlement extent from GHSL built-up surface
-  -- **or** (b) a news report of flooding or heavy rainfall in the county (`data/news.json`, last 21 days) on its
-  own.
-- **Drought**: **either** (a) more than 21 days without a wet day and less than 60% chance that 2 weeks of rain, net
-  of expected evapotranspiration (the observed 30-day SMAP L4 rate held constant over the window), refill the soil
-  deficit, **or** (b) a news report of drought or a dry spell in the county on its own.
+already earned. This either/or design lives entirely in `bulletin_extras.py` (one of the add-ons' read-only inputs,
+never modified by the add-ons themselves) and is live now:
+- **Flood**: a high chance of heavy rain together with **either** (a) more than 10,000 people, or at least 50% of
+  the **county's** (not one payam's) schools or health facilities, on flood-prone ground, **or** (b) a news report
+  of flooding or heavy rainfall in the county (`data/news.json`, last 21 days) on its own.
+- **Drought**: a news report of drought or a dry spell in the county (`data/news.json`, last 21 days) on its own.
+
+Three pieces designed alongside this round are **not currently wired into the live bulletin**, pending the
+repository owner's decision on whether/how to reinstate them as genuine standalone add-ons (they touched
+`county_bulletin.py` and `exposure_cache.py` directly, which was out of scope, so those two files were reverted to
+their pre-existing state; `bulletin_extras.py` kept the logic that uses their output, which is why it degrades
+safely rather than erroring):
+- County-level buildings and settlement-extent shares (JRC GHS-OBAT 2020 buildings, GHSL built-up-surface
+  settlement extent) for the severe flood-exposure bar -- only schools and health facilities are aggregated at
+  county level right now, so flood red by exposure alone is currently reachable only through those two.
+- The numeric drought-red path (more than 21 days without a wet day and less than 60% chance that 2 weeks of rain,
+  net of expected evapotranspiration, refill the soil deficit) -- `dry_spell_days` and `p_soil_recovery_2wk` are not
+  currently produced by the bulletin, so drought red is reachable only via a confirming news report for now.
+- The Nov-Jan Sudd post-rains special case (river flooding lags the rain by weeks to months, so the experimental
+  Sudd river trigger at watch/elevated can stand in for rain likelihood after the rains stop) -- the rule exists in
+  `bulletin_extras.py` (`county_alert`'s `sudd` argument) but the bulletin does not currently pass it a value.
 
 A drought plan can use `alert_hazard == 'drought / dry spell' and alert_level == 'red'`.
 
