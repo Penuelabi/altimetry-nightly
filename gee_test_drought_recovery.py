@@ -246,7 +246,10 @@ with open(os.path.join(OUT_DIR, 'drought_recovery_summary.md'), 'w', encoding='u
     fh.write(f"- Counties tested: {len(ante)}; "
              f"{int(ante['dry_spell_days'].gt(DROUGHT_RED_DRY_DAYS).sum())} above the {DROUGHT_RED_DRY_DAYS}-day dry "
              f"spell bar on GEE-observed rain alone\n\n")
-    fh.write(ante.to_markdown(index=False) if hasattr(ante, 'to_markdown') else ante.to_string(index=False))
+    try:
+        fh.write(ante.to_markdown(index=False))        # needs the optional 'tabulate' package
+    except ImportError:
+        fh.write('```\n' + ante.to_string(index=False) + '\n```')
 print("wrote drought_recovery_summary.md")
 print("\nThis script and its output are standalone: nothing here was written to county_bulletin.py, "
       "county_bulletin_latest.csv, forecast_obs_cache.csv, or any file the live app reads.")
