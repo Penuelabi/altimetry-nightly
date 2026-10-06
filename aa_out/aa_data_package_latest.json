@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261005_1859",
+ "name": "south-sudan-hydroclimate-aa-20261006_0303",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261005_1859",
- "created": "2026-10-05T18:59:10Z",
+ "version": "20261006_0303",
+ "created": "2026-10-06T03:03:13Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -134,7 +134,7 @@
      {
       "check": "data_end_date freshness",
       "status": "pass",
-      "detail": "latest 2026-10-01 (4 days old, limit 7)"
+      "detail": "latest 2026-10-01 (5 days old, limit 7)"
      },
      {
       "check": "county coverage",
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 167364,
-   "hash": "sha256:cd7b0484a06efbcbf525a84dfe5ccce4656d88feeee0ddb7ad079693ab4b7e90",
+   "bytes": 165754,
+   "hash": "sha256:9c8104dd1ba0302bc417a7d628d635f948ff7469808c03d606e89f1c7b1dd659",
    "rows": 79,
    "schema": {
     "fields": [
@@ -711,7 +711,7 @@
      {
       "check": "updated_utc freshness",
       "status": "pass",
-      "detail": "latest 2026-10-05 (0 days old, limit 3)"
+      "detail": "latest 2026-10-05 (1 days old, limit 3)"
      }
     ]
    },
@@ -1410,7 +1410,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 1528,
-   "hash": "sha256:a5d2e14ab283ac051802f8afd954e0e69763dc12cf51f908e5ddf80c8249ae6c",
+   "hash": "sha256:7a006758150b2ceccf26aa2c4fea5b706af8fdaea87542eb5d5f187bd111575c",
    "rows": 6,
    "schema": {
     "fields": [
@@ -1536,7 +1536,7 @@
      {
       "check": "readable and not empty",
       "status": "pass",
-      "detail": "11 rows, 13 columns"
+      "detail": "13 rows, 13 columns"
      },
      {
       "check": "required columns",
@@ -1551,9 +1551,9 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 861,
-   "hash": "sha256:904bf0e77b1b60354074f4bd7775f12e0079639d97346c56f49ccb3264016a9e",
-   "rows": 11,
+   "bytes": 993,
+   "hash": "sha256:c6d6a5de011912d2af3a7bf1aaad7a3e5419c19639794a8792e26a01f6eee6b8",
+   "rows": 13,
    "schema": {
     "fields": [
      {
