@@ -1,0 +1,32 @@
+name: GEE test - drought recovery (evaporation-adjusted) (manual, no repo writes)
+on:
+  workflow_dispatch:
+    inputs:
+      counties:
+        description: 'Comma-separated county names to limit the test to (blank = all 79)'
+        required: false
+        default: ''
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      GEE_TEST_OUT_DIR: ${{ github.workspace }}/gee_test_out
+      GEE_TEST_COUNTIES: ${{ github.event.inputs.counties }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - run: pip install earthengine-api pandas numpy ecmwf-opendata
+      - run: python gee_test_drought_recovery.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gee-test-drought-recovery
+          path: gee_test_out/
+# This workflow only uploads a run artifact for download -- it never commits anything to the repository,
+# never emails, and never posts to Facebook/LinkedIn. gee_test_drought_recovery.py does not touch
+# county_bulletin.py, county_bulletin_latest.csv, forecast_obs_cache.csv, or any file the live app reads.
