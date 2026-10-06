@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261006_0816",
+ "name": "south-sudan-hydroclimate-aa-20261006_1651",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261006_0816",
- "created": "2026-10-06T08:16:03Z",
+ "version": "20261006_1651",
+ "created": "2026-10-06T16:51:04Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -99,7 +99,7 @@
      {
       "check": "readable and not empty",
       "status": "pass",
-      "detail": "79 rows, 127 columns"
+      "detail": "79 rows, 124 columns"
      },
      {
       "check": "required columns",
@@ -134,7 +134,7 @@
      {
       "check": "data_end_date freshness",
       "status": "pass",
-      "detail": "latest 2026-10-01 (5 days old, limit 7)"
+      "detail": "latest 2026-10-02 (4 days old, limit 7)"
      },
      {
       "check": "county coverage",
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 165754,
-   "hash": "sha256:9c8104dd1ba0302bc417a7d628d635f948ff7469808c03d606e89f1c7b1dd659",
+   "bytes": 164265,
+   "hash": "sha256:34f96d4f22a497339221f59d5459da9c28f03390b552200ce9463d7295d275ed",
    "rows": 79,
    "schema": {
     "fields": [
@@ -462,14 +462,6 @@
       "type": "string"
      },
      {
-      "name": "dry_spell_days",
-      "type": "integer"
-     },
-     {
-      "name": "last_wet_day",
-      "type": "date"
-     },
-     {
       "name": "run_utc",
       "type": "datetime"
      },
@@ -517,16 +509,8 @@
       "hxl": "#indicator+p_heavy+num"
      },
      {
-      "name": "p_soil_recovery_2wk",
-      "type": "number"
-     },
-     {
       "name": "spell_windows",
       "type": "string"
-     },
-     {
-      "name": "p_wet_1005",
-      "type": "number"
      },
      {
       "name": "p_wet_1006",
@@ -582,6 +566,10 @@
      },
      {
       "name": "p_wet_1019",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1020",
       "type": "number"
      },
      {
@@ -1426,7 +1414,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 1528,
-   "hash": "sha256:03391641f3dab5d4f803deb2fdb0c1a3fdfd9b20dd9a72078cecaeed8489e20f",
+   "hash": "sha256:9f1ae02b041e6e4e0fb91c260ba469e83be03f3ee55c416003469340b922944a",
    "rows": 6,
    "schema": {
     "fields": [

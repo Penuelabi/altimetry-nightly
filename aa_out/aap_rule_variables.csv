@@ -3,18 +3,18 @@ alert_level,county bulletin,"impact-based alert: 'green', 'yellow', 'orange' or 
 alert_rank,county bulletin,"alert as a number: 0 green, 1 yellow, 2 orange, 3 red",Abyei Region,2
 alert_stage,county bulletin,"the AA stage alert_level corresponds to: 'monitoring', 'warning', 'readiness' or 'activation' -- readiness/activation line up with this engine's own plan stages ('readiness', 'activated')",Abyei Region,readiness
 alert_hazard,county bulletin,'flood / waterlogging' or 'drought / dry spell',Abyei Region,drought / dry spell
-p_heavy,county bulletin,"chance of >= 50 mm of rain in week 1 (0-1, ECMWF ensemble)",Abyei Region,0.0
+p_heavy,county bulletin,"chance of >= 50 mm of rain in week 1 (0-1, ECMWF ensemble)",Abyei Region,0.02
 p_dry_spell,county bulletin,chance of a 7-day dry spell within 15 days (0-1),Abyei Region,0.0
-p_wet_spell,county bulletin,chance of a 3-day wet spell in week 1 (0-1),Abyei Region,0.64
-week1_rain_mm,county bulletin,median rain expected in week 1 (mm),Abyei Region,17.9198
-week2_rain_mm,county bulletin,median rain expected in week 2 (mm),Abyei Region,24.2233
-soil_z,county bulletin,"root-zone soil moisture z-score (>= 0.75 wet, <= -0.75 dry)",Abyei Region,-2.379
-soil_deficit_mm,county bulletin,root-zone soil water below the seasonal median (mm),Abyei Region,59.6444
-rain_30d_pct,county bulletin,last 30 days of rain as % of normal,Abyei Region,158.6953
+p_wet_spell,county bulletin,chance of a 3-day wet spell in week 1 (0-1),Abyei Region,0.84
+week1_rain_mm,county bulletin,median rain expected in week 1 (mm),Abyei Region,19.9285
+week2_rain_mm,county bulletin,median rain expected in week 2 (mm),Abyei Region,19.1187
+soil_z,county bulletin,"root-zone soil moisture z-score (>= 0.75 wet, <= -0.75 dry)",Abyei Region,-2.4357
+soil_deficit_mm,county bulletin,root-zone soil water below the seasonal median (mm),Abyei Region,56.9045
+rain_30d_pct,county bulletin,last 30 days of rain as % of normal,Abyei Region,143.0847
 pop_total,county bulletin,county population (2025 estimate),Abyei Region,145358.0
 pop_flood_prone,county bulletin,people on ground that has flooded before,Abyei Region,283.0
-dry_spell_days,county bulletin,observed days since the last wet county-day (GSMaP),Abyei Region,4.0
-p_soil_recovery,county bulletin,"chance that 2 weeks of rain refill the soil deficit (0-1, ECMWF ensemble)",Abyei Region,0.0
+dry_spell_days,county bulletin,observed days since the last wet county-day (GSMaP),Abyei Region,
+p_soil_recovery,county bulletin,"chance that 2 weeks of rain refill the soil deficit (0-1, ECMWF ensemble)",Abyei Region,
 news_flood,county bulletin,True when news reported flooding or heavy rainfall in the county (last 21 days); supports a red alert but is not required for one,Abyei Region,False
 news_drought,county bulletin,True when news reported drought or a dry spell in the county (last 21 days); supports a red alert but is not required for one,Abyei Region,False
 river_level_m,station_status.csv,latest satellite water level at the county gauge (m),Abyei Region,394.42

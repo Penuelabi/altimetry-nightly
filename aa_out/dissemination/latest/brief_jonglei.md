@@ -1,6 +1,6 @@
 # Jonglei - anticipatory action situation brief
 
-Prepared 2026-10-06 08:16 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-10-01; ECMWF run 2026-10-05 12 UTC.
+Prepared 2026-10-06 16:51 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-10-02; ECMWF run 2026-10-06 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,11 +12,11 @@ Prepared 2026-10-06 08:16 UTC for the Jonglei state TWG-AA. Rain and soil data t
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Akobo | Jonglei | **RED** | drought / dry spell | 20 | 0% | 1,673 |
-| Bor South | Jonglei | **ORANGE** | drought / dry spell | 29 | 8% | 7,498 |
-| Canal/Pigi | Jonglei | **ORANGE** | drought / dry spell | 20 | 0% | 2,399 |
-| Nyirol | Jonglei | **ORANGE** | drought / dry spell | 20 | 0% | 814 |
-| Uror | Jonglei | **ORANGE** | drought / dry spell | 23 | 2% | 1,768 |
+| Akobo | Jonglei | **RED** | drought / dry spell | 25 | 0% | 1,673 |
+| Bor South | Jonglei | **ORANGE** | drought / dry spell | 27 | 6% | 7,498 |
+| Canal/Pigi | Jonglei | **ORANGE** | drought / dry spell | 24 | 4% | 2,399 |
+| Nyirol | Jonglei | **ORANGE** | drought / dry spell | 23 | 0% | 814 |
+| Uror | Jonglei | **ORANGE** | drought / dry spell | 24 | 0% | 1,768 |
 
 ## Decisions for the group
 - Agree the warning for the 5 counties with an alert and the channels (radio hubs, chiefs, SMS).
