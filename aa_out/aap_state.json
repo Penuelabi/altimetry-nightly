@@ -1,24 +1,24 @@
 {
  "AAP-FL-PANYIJIAR": {
-  "stage": "normal",
-  "since": null,
+  "stage": "activated",
+  "since": "2026-10-07 10:25",
   "confirm": 0,
   "quiet": 0,
   "season": 2026,
-  "activations": 0,
-  "last_sig": null,
-  "readiness_since": null,
+  "activations": 1,
+  "last_sig": "2026-09-07|2026-10-06 12",
+  "readiness_since": "2026-10-07 10:25",
   "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-FANGAK": {
-  "stage": "normal",
-  "since": null,
+  "stage": "activated",
+  "since": "2026-10-07 10:25",
   "confirm": 0,
   "quiet": 0,
   "season": 2026,
-  "activations": 0,
-  "last_sig": null,
-  "readiness_since": null,
+  "activations": 1,
+  "last_sig": "2026-09-11|2026-10-06 12",
+  "readiness_since": "2026-10-07 10:25",
   "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-LEER": {
@@ -55,14 +55,14 @@
   "rules": "river_pctile >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || (river_pctile >= activation_value and sudd_upstream_pct >= regional_value) or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  },
  "AAP-FL-GUIT": {
-  "stage": "normal",
-  "since": null,
+  "stage": "activated",
+  "since": "2026-10-07 10:25",
   "confirm": 0,
   "quiet": 0,
   "season": 2026,
-  "activations": 0,
-  "last_sig": null,
-  "readiness_since": null,
+  "activations": 1,
+  "last_sig": "2026-09-24|2026-10-06 12",
+  "readiness_since": "2026-10-07 10:25",
   "rules": "sudd_upstream_pct >= readiness_value or (alert_hazard == 'flood / waterlogging' and alert_rank >= 2) || sudd_upstream_pct >= activation_value or (alert_hazard == 'flood / waterlogging' and alert_level == 'red')"
  }
 }

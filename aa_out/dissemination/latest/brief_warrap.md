@@ -1,6 +1,6 @@
 # Warrap - anticipatory action situation brief
 
-Prepared 2026-10-06 16:51 UTC for the Warrap state TWG-AA. Rain and soil data to 2026-10-02; ECMWF run 2026-10-06 00 UTC.
+Prepared 2026-10-07 10:25 UTC for the Warrap state TWG-AA. Rain and soil data to 2026-10-03; ECMWF run 2026-10-06 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,9 +12,9 @@ Prepared 2026-10-06 16:51 UTC for the Warrap state TWG-AA. Rain and soil data to
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Tonj East | Warrap | **ORANGE** | drought / dry spell | 31 | 8% | 105 |
-| Twic | Warrap | **ORANGE** | drought / dry spell | 25 | 2% | 11,366 |
-| Gogrial West | Warrap | **YELLOW** | flood / waterlogging | 26 | 0% | 34,800 |
+| Tonj East | Warrap | **ORANGE** | drought / dry spell | 31 | 4% | 105 |
+| Twic | Warrap | **ORANGE** | drought / dry spell | 22 | 2% | 11,366 |
+| Gogrial West | Warrap | **YELLOW** | flood / waterlogging | 24 | 0% | 34,800 |
 
 ## Decisions for the group
 - Agree the warning for the 3 counties with an alert and the channels (radio hubs, chiefs, SMS).

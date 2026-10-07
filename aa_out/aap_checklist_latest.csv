@@ -1,1 +1,25 @@
-
+plan_id,county,plan_stage,action_stage,action_no,action,sector,lead,beneficiaries,budget_usd,due,status
+AAP-FL-PANYIJIAR,Panyijiar,activated,readiness,1,Verify the trigger reading with SSMS / MWRI; notify the state TWG-AA and the county commissioner,coordination,,,,2026-10-08,open
+AAP-FL-PANYIJIAR,Panyijiar,activated,readiness,2,"Issue the early warning through radio listening hubs, chiefs and community groups in local languages",early warning,,,,2026-10-09,open
+AAP-FL-PANYIJIAR,Panyijiar,activated,readiness,3,"Confirm beneficiary lists, payment and distribution channels; check pre-positioned stocks",logistics,,,,2026-10-12,open
+AAP-FL-PANYIJIAR,Panyijiar,activated,activation,4,Release pre-arranged funds according to the release rule,finance,,,,2026-10-10,open
+AAP-FL-PANYIJIAR,Panyijiar,activated,activation,5,Anticipatory cash transfers to targeted households,cash,,,,2026-10-14,open
+AAP-FL-PANYIJIAR,Panyijiar,activated,activation,6,"Move livestock, seed and food stocks to high ground; support livestock vaccination",livelihoods,,,,2026-10-14,open
+AAP-FL-PANYIJIAR,Panyijiar,activated,activation,7,Distribute water treatment supplies and ORS; cholera prevention messages,WASH / health,,,,2026-10-14,open
+AAP-FL-PANYIJIAR,Panyijiar,activated,activation,8,Reinforce and patrol dykes with community groups,DRR,,,,2026-10-12,open
+AAP-FL-FANGAK,Fangak,activated,readiness,1,Verify the trigger reading with SSMS / MWRI; notify the state TWG-AA and the county commissioner,coordination,,,,2026-10-08,open
+AAP-FL-FANGAK,Fangak,activated,readiness,2,"Issue the early warning through radio listening hubs, chiefs and community groups in local languages",early warning,,,,2026-10-09,open
+AAP-FL-FANGAK,Fangak,activated,readiness,3,"Confirm beneficiary lists, payment and distribution channels; check pre-positioned stocks",logistics,,,,2026-10-12,open
+AAP-FL-FANGAK,Fangak,activated,activation,4,Release pre-arranged funds according to the release rule,finance,,,,2026-10-10,open
+AAP-FL-FANGAK,Fangak,activated,activation,5,Anticipatory cash transfers to targeted households,cash,,,,2026-10-14,open
+AAP-FL-FANGAK,Fangak,activated,activation,6,"Move livestock, seed and food stocks to high ground; support livestock vaccination",livelihoods,,,,2026-10-14,open
+AAP-FL-FANGAK,Fangak,activated,activation,7,Distribute water treatment supplies and ORS; cholera prevention messages,WASH / health,,,,2026-10-14,open
+AAP-FL-FANGAK,Fangak,activated,activation,8,Reinforce and patrol dykes with community groups,DRR,,,,2026-10-12,open
+AAP-FL-GUIT,Guit,activated,readiness,1,Verify the trigger reading with SSMS / MWRI; notify the state TWG-AA and the county commissioner,coordination,,,,2026-10-08,open
+AAP-FL-GUIT,Guit,activated,readiness,2,"Issue the early warning through radio listening hubs, chiefs and community groups in local languages",early warning,,,,2026-10-09,open
+AAP-FL-GUIT,Guit,activated,readiness,3,"Confirm beneficiary lists, payment and distribution channels; check pre-positioned stocks",logistics,,,,2026-10-12,open
+AAP-FL-GUIT,Guit,activated,activation,4,Release pre-arranged funds according to the release rule,finance,,,,2026-10-10,open
+AAP-FL-GUIT,Guit,activated,activation,5,Anticipatory cash transfers to targeted households,cash,,,,2026-10-14,open
+AAP-FL-GUIT,Guit,activated,activation,6,"Move livestock, seed and food stocks to high ground; support livestock vaccination",livelihoods,,,,2026-10-14,open
+AAP-FL-GUIT,Guit,activated,activation,7,Distribute water treatment supplies and ORS; cholera prevention messages,WASH / health,,,,2026-10-14,open
+AAP-FL-GUIT,Guit,activated,activation,8,Reinforce and patrol dykes with community groups,DRR,,,,2026-10-12,open

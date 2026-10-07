@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261006_1651",
+ "name": "south-sudan-hydroclimate-aa-20261007_1025",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261006_1651",
- "created": "2026-10-06T16:51:04Z",
+ "version": "20261007_1025",
+ "created": "2026-10-07T10:25:26Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -134,7 +134,7 @@
      {
       "check": "data_end_date freshness",
       "status": "pass",
-      "detail": "latest 2026-10-02 (4 days old, limit 7)"
+      "detail": "latest 2026-10-03 (4 days old, limit 7)"
      },
      {
       "check": "county coverage",
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 164265,
-   "hash": "sha256:34f96d4f22a497339221f59d5459da9c28f03390b552200ce9463d7295d275ed",
+   "bytes": 165518,
+   "hash": "sha256:0e512f5f885ef9edc0f1cfaaeae7f03958e31e4593c5f92614a10107735db464",
    "rows": 79,
    "schema": {
     "fields": [
@@ -699,7 +699,7 @@
      {
       "check": "updated_utc freshness",
       "status": "pass",
-      "detail": "latest 2026-10-06 (0 days old, limit 3)"
+      "detail": "latest 2026-10-07 (0 days old, limit 3)"
      }
     ]
    },
@@ -709,8 +709,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 159524,
-   "hash": "sha256:af45b280ee119098be894010008671d57eda5e9b34063f0730c8afd23cfbfe9f",
+   "bytes": 159583,
+   "hash": "sha256:67345df73711e9016f0055bb0eae518955649699275f198ed197e5d312b8ae11",
    "rows": 696,
    "schema": {
     "fields": [
@@ -1403,7 +1403,7 @@
      {
       "check": "stage categories",
       "status": "pass",
-      "detail": "normal"
+      "detail": "activated, normal"
      }
     ]
    },
@@ -1413,8 +1413,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1528,
-   "hash": "sha256:9f1ae02b041e6e4e0fb91c260ba469e83be03f3ee55c416003469340b922944a",
+   "bytes": 1572,
+   "hash": "sha256:e6b0e8551e7d38333cac2617c716743b36194297293a87a5644875c187a1fb20",
    "rows": 6,
    "schema": {
     "fields": [
@@ -1448,7 +1448,7 @@
      },
      {
       "name": "stage_since",
-      "type": "number"
+      "type": "datetime"
      },
      {
       "name": "season",
@@ -1464,7 +1464,7 @@
      },
      {
       "name": "activation_now",
-      "type": "boolean"
+      "type": "string"
      },
      {
       "name": "missing_or_stale",
@@ -1540,7 +1540,7 @@
      {
       "check": "readable and not empty",
       "status": "pass",
-      "detail": "13 rows, 13 columns"
+      "detail": "15 rows, 13 columns"
      },
      {
       "check": "required columns",
@@ -1555,9 +1555,9 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 993,
-   "hash": "sha256:c6d6a5de011912d2af3a7bf1aaad7a3e5419c19639794a8792e26a01f6eee6b8",
-   "rows": 13,
+   "bytes": 1142,
+   "hash": "sha256:adceb8692d1851b545f17b55b1ae66556c1f693dcfbf13c189385fe037d2c681",
+   "rows": 15,
    "schema": {
     "fields": [
      {
