@@ -39,7 +39,7 @@ DATA = os.environ.get("AA_DATA_DIR") or os.path.join(HERE, "data")
 OUT_DIR = os.environ.get("NEWS_HISTORY_OUT") or os.path.join(DATA, "news_history")
 POP = os.path.join(DATA, "ssd_county_population_2025.csv")
 UA = "SuddClimateNewsArchive/1.0 (research; contact: penuelabi@gmail.com)"
-MAX_SITE_SECONDS = 50 * 60   # per-site time budget
+MAX_SITE_SECONDS = 35 * 60   # per-site time budget
 PAUSE = 0.8          # seconds between requests to any one site
 
 SITES = {  # key: (display name, base url)
@@ -53,7 +53,7 @@ SITES = {  # key: (display name, base url)
     "nyamilepedia": ("Nyamilepedia", "https://www.nyamilepedia.com"),
     "cityreview": ("The City Review", "https://cityreviewss.com"),
 }
-SEARCH_TERMS = ["flood", "flooding", "drought", "dry spell", "heavy rain", "rainfall", "waterlogged"]
+SEARCH_TERMS = ["flood", "drought", "dry spell", "heavy rain", "rainfall"]   # WordPress search is substring-based: "flood" also finds flooding/floods
 HAZARDS = [("Flood", ("flood", "waterlog", "inundat", "submerged", "overflow", "dyke", "dike breach")),
            ("Heavy rainfall", ("heavy rain", "torrential", "downpour", "rainstorm")),
            ("Drought", ("drought", "dry spell", "dry-spell", "crop failure", "water shortage")),
@@ -137,32 +137,50 @@ def load_geo():
     return county_state, pats
 
 
+TOWN_TO_COUNTY = {"Bentiu": "Rubkona", "Bor": "Bor South", "Nimule": "Magwi", "Kuajok": "Gogrial West",
+                  "Rumbek": "Rumbek Centre", "Mingkaman": "Awerial", "Yida": "Pariang", "Aweil": "Aweil Centre",
+                  "Torit": "Torit", "Yambio": "Yambio", "Wau": "Wau", "Malakal": "Malakal"}
+
+
 def locate(title, body, geo):
+    """-> (state, county, other counties, basis). Title match wins; a body-only county needs >=2 mentions
+    (>=3 for Juba, which is often just 'the capital') or a mention in the opening lines."""
     county_state, pats = geo
     t = SELF_NAMES.sub(" ", title or "")
     b = SELF_NAMES.sub(" ", body or "")
-    in_title, counts = [], Counter()
+    head = b[:350]
+    in_title, counts, in_head = [], Counter(), set()
     for c, p in pats.items():
         if p.search(t):
             in_title.append(c)
         n = len(p.findall(b))
         if n:
             counts[c] = n
+        if p.search(head):
+            in_head.add(c)
+    for town, c in TOWN_TO_COUNTY.items():
+        if c in county_state and c not in counts or c not in in_title:
+            rx = re.compile(rf"(?<![A-Za-z]){town}(?![A-Za-z])")
+            if c in county_state and rx.search(t) and c not in in_title:
+                in_title.append(c)
+            elif c in county_state and (n := len(rx.findall(b))):
+                counts[c] += n
 
     def drop_sub(lst):
         return [c for c in lst if not any(c != o and c.lower() in o.lower() for o in lst)]
 
     in_title = drop_sub(in_title)
-    allc = drop_sub(list(dict.fromkeys(in_title + [c for c, _ in counts.most_common()])))
-    primary = in_title[0] if in_title else (counts.most_common(1)[0][0] if counts else "")
-    if primary and primary not in allc:
-        allc.insert(0, primary)
+    body_ok = [c for c, n in counts.most_common()
+               if (n >= 3) or (c != "Juba" and (n >= 2 or c in in_head))]
+    allc = drop_sub(list(dict.fromkeys(in_title + body_ok)))
+    primary = in_title[0] if in_title else (allc[0] if allc else "")
     state = county_state.get(primary, "")
     if not state:
         blob = f"{t} {b[:1500]}"
         hit = [s for s in STATES if re.search(rf"(?<![A-Za-z]){re.escape(s)}(?![A-Za-z])", blob, re.I)]
         state = hit[0] if hit else ""
-    return state, primary, "; ".join(allc[:8])
+    basis = "title" if in_title else ("body" if primary else ("state only" if state else "not found"))
+    return state, primary, "; ".join(c for c in allc[:8] if c != primary), basis
 
 
 # ------------------------------------------------------------------ numbers
@@ -191,11 +209,14 @@ def sentences(text):
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+|\n+", text) if s.strip()]
 
 
-def extract_numbers(text):
-    """-> dict(households, individuals, measure, figure_context, all_figures)."""
-    best_hh = best_ind = None
+def extract_numbers(text, county="", state=""):
+    """-> dict(households, individuals, measure, scope, figure_context, all_figures).
+    Figures in a sentence that names the article's county rank first, then its state, then the rest."""
     figs = []
     for sent in sentences(text):
+        low = sent.lower()
+        scope = 2 if county and re.search(re.escape(county), sent, re.I) else (
+            1 if state and re.search(re.escape(state), sent, re.I) else 0)
         for rx, kind in ((HH_RE, "HH"), (HH_RE2, "HH"), (IND_RE, "Ind")):
             for m in rx.finditer(sent):
                 num, unit = m.group(1), m.group(2)
@@ -207,22 +228,25 @@ def extract_numbers(text):
                     continue
                 if v < 5 or v > 40_000_000:
                     continue
-                low = sent.lower()
                 meas = next((n for n, p in MEASURE if re.search(p, low)), "reported")
-                figs.append((kind, v, meas, sent))
-    hh = [f for f in figs if f[0] == "HH"]
-    ind = [f for f in figs if f[0] == "Ind"]
-    # prefer figures tied to a measure; largest of those = the headline figure of the article
-    def pick(lst):
-        pri = [f for f in lst if f[2] in ("displaced", "affected")] or lst
-        return max(pri, key=lambda f: f[1]) if pri else None
-    best_hh, best_ind = pick(hh), pick(ind)
-    ctx = [f[3] for f in (best_ind, best_hh) if f]
+                figs.append((kind, v, meas, sent, scope))
+
+    def pick(kind):
+        lst = [f for f in figs if f[0] == kind]
+        if not lst:
+            return None
+        return max(lst, key=lambda f: (f[4], f[2] in ("displaced", "affected"), f[1]))
+
+    best_hh, best_ind = pick("HH"), pick("Ind")
+    chosen = [f for f in (best_ind, best_hh) if f]
+    top = max((f[4] for f in chosen), default=-1)
     return {
         "households": best_hh[1] if best_hh else None,
         "individuals": best_ind[1] if best_ind else None,
         "measure": (best_ind or best_hh or (None, None, ""))[2],
-        "figure_context": " | ".join(dict.fromkeys(ctx))[:500],
+        "scope": {2: "county named in same sentence", 1: "state named in same sentence", 0: "wider / not specified",
+                  -1: ""}[top],
+        "figure_context": " | ".join(dict.fromkeys(f[3] for f in chosen))[:500],
         "all_figures": "; ".join(f"{f[1]:,} {'HH' if f[0]=='HH' else 'ind'} ({f[2]})" for f in figs[:8]),
     }
 
@@ -234,7 +258,7 @@ def hazard_of(title, body):
         if any(w in t for w in ws):
             return label
     for label, ws in HAZARDS:
-        if sum(b.count(w) for w in ws) >= 2:
+        if sum(b.count(w) for w in ws) >= 3:
             return label
     return ""
 
@@ -251,17 +275,16 @@ def make_row(source, date_iso, title, body, url, geo):
     if not haz:
         return None
     d = dt.date.fromisoformat(date_iso[:10])
-    state, county, counties_all = locate(title, body, geo)
-    nums = extract_numbers(f"{title}. {body}")
+    state, county, counties_all, basis = locate(title, body, geo)
+    nums = extract_numbers(f"{title}. {body}", county, state)
     return {
         "state": state, "county": county, "year": d.year, "month": d.month, "month_name": MONTHS[d.month - 1],
         "date": d.isoformat(), "hazard": haz, "title": (title or "").strip(),
         "narrative": narrative(title, body), "households_HH": nums["households"],
-        "individuals": nums["individuals"], "figure_measure": nums["measure"],
+        "individuals": nums["individuals"], "figure_measure": nums["measure"], "figure_scope": nums["scope"],
         "figure_context": nums["figure_context"], "all_figures_found": nums["all_figures"],
         "other_counties_named": counties_all, "source": source, "link": url,
-        "location_basis": "title" if county and re.search(re.escape(county), title or "", re.I)
-                          else ("body" if county else "not found"),
+        "location_basis": basis,
     }
 
 
@@ -375,7 +398,7 @@ def fetch_reliefweb(since, until, geo, stats):
 
 # ------------------------------------------------------------------ output
 COLS = ["state", "county", "year", "month", "month_name", "date", "hazard", "title", "narrative", "households_HH",
-        "individuals", "figure_measure", "figure_context", "all_figures_found", "other_counties_named",
+        "individuals", "figure_measure", "figure_scope", "figure_context", "all_figures_found", "other_counties_named",
         "source", "link", "location_basis", "possible_duplicate_of"]
 
 METHOD = [
@@ -435,7 +458,7 @@ def write_outputs(rows, stats, out_dir, since, until):
 
     ws = wb.active
     ws.title = "Events"
-    widths = {"title": 50, "narrative": 70, "figure_context": 55, "all_figures_found": 38, "link": 50,
+    widths = {"title": 50, "narrative": 70, "figure_context": 55, "figure_scope": 26, "all_figures_found": 38, "link": 50,
               "other_counties_named": 28, "source": 24, "state": 22, "county": 16}
     sheet(ws, COLS, [[r.get(c) for c in COLS] for r in rows], widths)
     for row in ws.iter_rows(min_row=2):
@@ -508,7 +531,9 @@ def selftest():
     assert r["county"] == "Fangak" and r["state"] == "Jonglei", r
     assert r["households_HH"] == 12000 and r["individuals"] == 72000, r
     assert r["year"] == 2021 and r["month"] == 10 and r["hazard"] == "Flood"
-    assert locate("News from Radio Yei", "Radio Yei says", geo)[1] == ""          # site name is not the county Yei
+    assert locate("News from Radio Yei", "Radio Yei says", geo)[1] == ""
+    assert locate("Warrap appeal", "Warrap needs help. Aid reached Juba once.", geo)[1] == ""
+    assert locate("Bentiu flood crisis", "x", geo)[1] == "Rubkona"          # site name is not the county Yei
     assert extract_numbers("About 1.2 million people are facing hunger.")["individuals"] == 1_200_000
     assert extract_numbers("In 2019 people moved.")["individuals"] is None
     assert extract_numbers("25k households were affected")["households"] == 25000
