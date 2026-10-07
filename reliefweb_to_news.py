@@ -39,6 +39,7 @@ POP = os.path.join(DATA, "ssd_county_population_2025.csv")
 NOT_CONFIRMING = ("outlook", "forecast", "warning", "alert", "appeal", "preparedness", "scenario")
 # order matters: first match wins
 HAZARDS = [
+    ("El Niño / seasonal outlook", ("el niño", "el nino", "enso", "seasonal monitor", "seasonal outlook")),
     ("Flood", ("flood", "waterlog", "inundat", "overflow")),
     ("Heavy rainfall", ("heavy rain", "rainfall", "torrential")),
     ("Drought", ("drought",)),
@@ -81,13 +82,22 @@ def classify(title, excerpt):
     if hz is None:
         return None, False
     if any(w in blob_t for w in NOT_CONFIRMING):
-        return f"{hz} outlook", False
+        return (hz if "outlook" in hz.lower() else f"{hz} outlook"), False
     return hz, True
 
 
 def one_line(excerpt, title):
-    s = re.sub(r"\s+", " ", excerpt or "").strip()
+    s = re.sub(r"[#*]+|(?<=\s)[-\u2022]\s", " ", excerpt or "")
+    s = re.sub(r"\s+", " ", s).strip()
     s = re.sub(r"\.\.\.$", "", s)
+    s = re.sub(r"^(Key [Mm]essages|OVERVIEW)\s*", "", s)
+    s = re.sub(r"^\w+ \d{4}\s*\|\s*South Sudan\s*", "", s)
+    if "South Sudan" in s[MAX_TEXT:] or ("South Sudan" in s and not s.startswith("September")):
+        # prefer the clause that names South Sudan
+        for part in re.split(r"(?<=[.;])\s+|\s+(?=Below-|Pasture|Harvesting)", s):
+            if "South Sudan" in part:
+                s = part
+                break
     if not s:
         s = title
     if len(s) > MAX_TEXT:
@@ -109,6 +119,8 @@ def stage(reports, counties, today, days):
             continue
         cs = find_counties(r.get("title", ""), counties)
         src = r.get("source") or "ReliefWeb"
+        if len(src) > 60:
+            src = src.split(";")[0].strip() + " et al."
         items.append({
             "date": r["date"],
             "counties": cs,
@@ -126,15 +138,24 @@ def stage(reports, counties, today, days):
 
 def merge(news, staged):
     have = {i.get("url") for i in news.get("items", [])}
+    seen = {(i.get("date"), tuple(i.get("counties", [])), i.get("hazard")) for i in news.get("items", [])}
     added = []
     for it in staged:
-        if it["url"] in have:
+        if it["url"] in have or (it["date"], tuple(it["counties"]), it["hazard"]) in seen:
             continue
         clean = {k: v for k, v in it.items() if k != "_review"}
         news.setdefault("items", []).append(clean)
         added.append(clean)
-    news["items"].sort(key=lambda i: str(i.get("date")), reverse=True)
     return added
+
+
+def write_news(news, path):
+    """Same layout as the monitor's file: _note on its own line, one compact item per line (small diffs)."""
+    j = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":"))
+    lines = [f" {j('_note')}: {j(news.get('_note', ''))},", ' "items": [']
+    lines += [f"  {j(i)}," for i in news["items"]]
+    lines[-1] = lines[-1].rstrip(",")
+    open(path, "w", encoding="utf-8").write("{\n" + "\n".join(lines) + "\n ]\n}\n")
 
 
 def selftest():
@@ -175,7 +196,7 @@ def main():
     if a.apply:
         news = json.load(open(NEWS, encoding="utf-8"))
         added = merge(news, items)
-        json.dump(news, open(NEWS, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        write_news(news, NEWS)
         print(f"APPLIED: {len(added)} new item(s) added to {NEWS}")
     else:
         print("Not applied. Re-run with --apply to merge into data/news.json.")
