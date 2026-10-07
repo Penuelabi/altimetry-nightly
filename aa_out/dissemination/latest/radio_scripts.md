@@ -1,4 +1,4 @@
-# Radio scripts - 2026-10-07 10:40 UTC
+# Radio scripts - 2026-10-07 17:03 UTC
 
 > Drafts for SSMS / MHADM validation before broadcast. Read slowly; repeat the key action twice.
 
