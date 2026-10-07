@@ -1,0 +1,26 @@
+{
+ "_note": "Staged ReliefWeb items. Review, then run reliefweb_to_news.py --apply.",
+ "items": [
+  {
+   "date": "2026-09-23",
+   "counties": [
+    "Lafon"
+   ],
+   "hazard": "Drought",
+   "text": "**September 2026 | South Sudan** This situation overview provides an update on conditions in Lafon County in August 2026, following reports of extreme health outcomes. Data collection involved key informant interviews and focus group discussions in three of...",
+   "source": "ReliefWeb (REACH Initiative)",
+   "url": "https://reliefweb.int/report/south-sudan/south-sudan-rapid-drought-impact-assessment-lafon-county-eastern-equatoria-september-2026",
+   "_review": "COUNTY-CONFIRMING: would count toward red for Lafon"
+  },
+  {
+   "date": "2026-09-17",
+   "counties": [],
+   "scope": "National / state",
+   "hazard": "Flood outlook",
+   "text": "**OVERVIEW** El Niño is firmly established and is forecast to reach very strong intensity. WMO forecasts indicate a nearly 100 per cent likelihood that it will persist through February 2027, with the event expected to strengthen further and peak towards the...",
+   "source": "ReliefWeb (International Federation of Red Cross and Red Crescent Societies; Save the Children; UN Office for the Coordination of Humanitarian Affairs; World Food Programme)",
+   "url": "https://reliefweb.int/report/world/global-update-september-2026-inter-agency-report-global-enso-analysis-cell-el-nino-status-humanitarian-outlook",
+   "_review": "no effect on alerts (outlook/forecast or no county named in title)"
+  }
+ ]
+}

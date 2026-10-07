@@ -1,0 +1,41 @@
+{
+  "country": "South Sudan",
+  "window_days": 30,
+  "pulled_utc": "2026-10-07T11:57:56+00:00",
+  "count": 3,
+  "reports": [
+    {
+      "id": "4231198",
+      "date": "2026-09-23",
+      "title": "South Sudan: Rapid Drought Impact Assessment in Lafon County, Eastern Equatoria (September 2026)",
+      "source": "REACH Initiative",
+      "disaster_type": "Drought",
+      "theme": "Agriculture; Food and Nutrition; Health; Protection and Human Rights; Water Sanitation Hygiene",
+      "format": "Assessment",
+      "url": "https://reliefweb.int/report/south-sudan/south-sudan-rapid-drought-impact-assessment-lafon-county-eastern-equatoria-september-2026",
+      "excerpt": "**September 2026 | South Sudan** This situation overview provides an update on conditions in Lafon County in August 2026, following reports of extreme health outcomes. Data collection involved key informant interviews and focus group discussions in three of the worst-affected payams between August 17-24. **Key messages** • A large-deficit harvest in 2025 and a prolonged dry spell from May 2026 precipitated an exceptionally severe lean season in Lafon County in 2026. It is possible a combination of food shortages, limited functionality of WASH infrastructure, and stockouts of health and nutriti..."
+    },
+    {
+      "id": "4230218",
+      "date": "2026-09-17",
+      "title": "Global Update | September 2026: An Inter-Agency Report of the Global ENSO Analysis Cell - El Niño Status & Humanitarian Outlook",
+      "source": "International Federation of Red Cross and Red Crescent Societies; Save the Children; UN Office for the Coordination of Humanitarian Affairs; World Food Programme",
+      "disaster_type": "Drought; Flash Flood; Flood; Land Slide; Other",
+      "theme": "Education; Food and Nutrition; Health; Humanitarian Financing; Protection and Human Rights; Water Sanitation Hygiene",
+      "format": "Analysis",
+      "url": "https://reliefweb.int/report/world/global-update-september-2026-inter-agency-report-global-enso-analysis-cell-el-nino-status-humanitarian-outlook",
+      "excerpt": "**OVERVIEW** El Niño is firmly established and is forecast to reach very strong intensity. WMO forecasts indicate a nearly 100 per cent likelihood that it will persist through February 2027, with the event expected to strengthen further and peak towards the end of 2026. Its effects may lag and persist beyond the peak. A very strong El Niño is likely to bring major shifts in rainfall and temperature patterns, increasing the risk of drought, flooding, extreme heat and other weather and climate hazards. These effects will not be felt everywhere at the same time or in the same way. Their severity ..."
+    },
+    {
+      "id": "4229552",
+      "date": "2026-09-11",
+      "title": "East Africa Seasonal Monitor: El Niño impacts lead to poor production across East Africa’s high potential zones, September 11, 2026",
+      "source": "Famine Early Warning System Network",
+      "disaster_type": "Drought",
+      "theme": "Agriculture; Food and Nutrition",
+      "format": "Situation Report",
+      "url": "https://reliefweb.int/report/kenya/east-africa-seasonal-monitor-el-nino-impacts-lead-poor-production-across-east-africas-high-potential-zones-september-11-2026",
+      "excerpt": "## Key Messages - Harvesting is complete across the bimodal regions of Kenya, Uganda, Rwanda, and Burundi, with average to below-average production. - Below-average crop production is expected across western Kenya, Karamoja region of Uganda, Sudan, South Sudan, and the Kiremt-growing regions of western Ethiopia. - Pasture and surface water remain available across eastern Kenya, much of Somalia, and southeastern Ethiopia, but rapidly deteriorating following rainfall cessation and above-average temperatures. - A well-established El Niño is expected to enhance the October–December rainfall season..."
+    }
+  ]
+}
