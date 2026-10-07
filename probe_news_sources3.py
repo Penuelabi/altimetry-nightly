@@ -51,7 +51,9 @@ def sec2():
         time.sleep(1.5); c, ct, b2 = get(posts[1][0]); u = loc(b2)
         art = next((x[0] for x in u if "/news/article/" in x[0] or re.search(r"flood|drought", x[0])), u[0][0] if u else "")
         time.sleep(1.5); c, ct, h = get(art, 400_000)
-        P(f"\narticle {art}: HTTP {c}, {len(h)} bytes; og:title={re.findall(r'og:title.{0,10}content=.([^\"]+)', h)[:1]}; published={re.findall(r'article:published_time.{0,10}content=.([^\"]+)', h)[:1]}; jsonld={'ld+json' in h}; <article>={'<article' in h}")
+        OG = re.compile(r'og:title.{0,10}content=.([^"]+)'); PUB = re.compile(r'article:published_time.{0,10}content=.([^"]+)')
+    og = OG.findall(h)[:1]; pub = PUB.findall(h)[:1]
+    P("article", art, "HTTP", c, len(h), "bytes; og:title=", og, "published=", pub, "jsonld=", "ld+json" in h, "<article>=", "<article" in h)
 try:
     sec2()
 except Exception as e:
