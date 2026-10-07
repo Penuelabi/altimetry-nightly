@@ -40,18 +40,34 @@ OUT_DIR = os.environ.get("NEWS_HISTORY_OUT") or os.path.join(DATA, "news_history
 POP = os.path.join(DATA, "ssd_county_population_2025.csv")
 UA = "SuddClimateNewsArchive/1.0 (research; contact: penuelabi@gmail.com)"
 MAX_SITE_SECONDS = 35 * 60   # per-site time budget
+PAUSE_PAGE = 1.3     # seconds between article-page requests
 PAUSE = 0.8          # seconds between requests to any one site
 
-SITES = {  # key: (display name, base url)
-    "radioyei": ("Radio Yei", "https://radioyei.org"),
-    "eyeradio": ("Eye Radio", "https://www.eyeradio.org"),
-    "sudanspost": ("Sudans Post", "https://www.sudanspost.com"),
-    "tamazuj": ("Radio Tamazuj", "https://www.radiotamazuj.org"),
-    "miraya": ("Radio Miraya", "https://radiomiraya.org"),
-    "gurtong": ("Gurtong", "https://www.gurtong.net"),
-    "jubamonitor": ("Juba Monitor", "https://www.jubamonitor.com"),
-    "nyamilepedia": ("Nyamilepedia", "https://www.nyamilepedia.com"),
-    "cityreview": ("The City Review", "https://cityreviewss.com"),
+SITES = {  # key: (display name, base url, modes)   modes: wp = WordPress feed with text; wplist = feed list only, then read pages;
+    #                                                         sitemap = read article pages found through sitemap + link keywords
+    "radioyei": ("Radio Yei", "https://radioyei.org", ["wp", "sitemap"]),
+    "eyeradio": ("Eye Radio", "https://www.eyeradio.org", ["wp"]),
+    "sudanspost": ("Sudans Post", "https://www.sudanspost.com", ["wplist"]),
+    "tamazuj": ("Radio Tamazuj", "https://www.radiotamazuj.org", ["sitemap"]),
+}
+SITEMAP_CFG = {  # sitemap index, child-sitemap regex, article-URL regex
+    "radioyei": ("https://radioyei.org/sitemap.xml", r"/sitemap-\d+\.xml$", r"radioyei\.org/news/"),
+    "tamazuj": ("https://www.radiotamazuj.org/wp-sitemap.xml", r"/post-sitemap\d*\.xml$", r"/en/news/article/"),
+}
+SLUG_RX = re.compile(r"(?<![a-z])(flood\w*|drought\w*|dry-spell|rains?|rainfall|rainy|rainstorm|waterlog\w*|inundat\w*|"
+                     r"submerg\w*|dykes?|dikes?|el-nino|lake-victoria|downpour\w*)(?![a-z])")
+SITE_BUDGET = {"tamazuj": 100 * 60, "sudanspost": 70 * 60, "radioyei": 40 * 60}
+# sources checked on 2026-10-07 that cannot be collected (see news_probe_out/): shown on the Coverage sheet
+NOT_COLLECTED = {
+    "Radio Miraya": "radiomiraya.org now redirects to an unrelated gambling/sports site; no news archive to read",
+    "Gurtong": "domain shows a parked 'lander' page; no news feed",
+    "Juba Monitor": "no RSS, sitemap or WordPress feed",
+    "Nyamilepedia": "site returns a bot challenge (HTTP 503) to automated visitors; not bypassed",
+    "Sudan Tribune": "site refuses automated visitors (HTTP 403); not bypassed",
+    "South Sudan News Agency": "site refuses automated feed requests (HTTP 403); not bypassed",
+    "The City Review": "no feed or sitemap",
+    "The Niles": "feed reachable but empty",
+    "Radio Bakhita / Upper Nile Times": "domains do not resolve",
 }
 SEARCH_TERMS = ["flood", "drought", "dry spell", "heavy rain", "rainfall"]   # WordPress search is substring-based: "flood" also finds flooding/floods
 HAZARDS = [("Flood", ("flood", "waterlog", "inundat", "submerged", "overflow", "dyke", "dike breach")),
@@ -288,9 +304,160 @@ def make_row(source, date_iso, title, body, url, geo):
     }
 
 
+def http_text(url, host_key, tries=3, timeout=30):
+    for k in range(tries):
+        wait = PAUSE_PAGE - (time.time() - _last[host_key])
+        if wait > 0:
+            time.sleep(wait)
+        _last[host_key] = time.time()
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html,application/xml,*/*"})
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read(3_000_000).decode("utf-8", "replace")
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 500, 502, 503, 504) and k < tries - 1:
+                time.sleep(6 * (k + 1))
+                continue
+            return None
+        except (urllib.error.URLError, TimeoutError):
+            if k < tries - 1:
+                time.sleep(4 * (k + 1))
+                continue
+            return None
+    return None
+
+
+_OG_T = re.compile(r'<meta[^>]+property=["\']og:title["\'][^>]+content=["\']([^"\']+)', re.I)
+_PUB = re.compile(r'<meta[^>]+property=["\']article:published_time["\'][^>]+content=["\']([^"\']+)', re.I)
+_LD = re.compile(r'"datePublished"\s*:\s*"([^"]+)"')
+_TIME = re.compile(r'<time[^>]+datetime=["\']([^"\']+)', re.I)
+
+
+def parse_article(h):
+    """-> (title, iso date, body text) from an article page (no JavaScript needed), or (None, None, None)."""
+    if not h:
+        return None, None, None
+    t = _OG_T.search(h)
+    title = html.unescape(t.group(1)).strip() if t else ""
+    title = re.sub(r"\s+[-|\u2013]\s+(Radio Tamazuj|Radio Yei|Sudans Post)\s*$", "", title)
+    d = (_PUB.search(h) or _LD.search(h) or _TIME.search(h))
+    date = d.group(1)[:10] if d else None
+    art = re.search(r"(?is)<article\b.*?</article>", h)
+    seg = art.group(0) if art else h
+    paras = re.findall(r"(?is)<p\b[^>]*>(.*?)</p>", seg)
+    body = strip_html("\n".join(paras)) if paras else strip_html(seg)
+    return title, date, body[:20000]
+
+
+def _locs(xml):
+    return re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", xml or "")
+
+
+def _robots(base):
+    rp = urllib.robotparser.RobotFileParser()
+    try:
+        req = urllib.request.Request(base + "/robots.txt", headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            rp.parse(r.read().decode("utf-8", "replace").splitlines())
+    except Exception:
+        return None
+    return rp
+
+
+def read_pages(urls, name, key, base, since, until, geo, st, rows, seen_links, budget, hint_dates=None):
+    """Fetch each article page (newest first when dates are known), keep hazard articles inside the window."""
+    rp = _robots(base)
+    t0, done = time.time(), 0
+    for u in urls:
+        if u in seen_links:
+            continue
+        if time.time() - t0 > budget:
+            st["status"] = (st["status"] + "; " if st["status"] else "") + f"stopped at time budget after {done} pages ({len(urls) - done} not read)"
+            break
+        if rp and not rp.can_fetch(UA, u):
+            continue
+        seen_links.add(u)
+        title, date, body = parse_article(http_text(u, key))
+        done += 1
+        st["fetched"] += 1
+        if not date or not title:
+            continue
+        try:
+            d = dt.date.fromisoformat(date)
+        except ValueError:
+            continue
+        if d < since or d > until:
+            continue
+        r = make_row(name, date, title, body, u, geo)
+        if r:
+            rows.append(r)
+
+
+def fetch_sitemap(key, since, until, geo, stats, existing=None):
+    name, base, _ = SITES[key]
+    idx, child_rx, art_rx = SITEMAP_CFG[key]
+    st = stats.setdefault(name, {"status": "", "fetched": 0, "kept": 0, "earliest": "", "latest": ""})
+    rows, seen = [], set(existing or [])
+    rp = _robots(base)
+    if rp and not rp.can_fetch(UA, base + "/sitemap.xml"):
+        st["status"] = "sitemap route skipped: robots.txt"
+        return rows
+    kids = [k for k in _locs(http_text(idx, key)) if re.search(child_rx, k)]
+    urls = []
+    for k in kids:
+        urls += [u for u in _locs(http_text(k, key)) if re.search(art_rx, u)]
+    urls = list(dict.fromkeys(urls))
+    cand = [u for u in urls if SLUG_RX.search(u.rstrip("/").rsplit("/", 1)[-1].lower())]
+    log(name, f"sitemap: {len(urls)} article links, {len(cand)} with flood/drought/rain words in the link")
+    st["status"] = (st["status"] + "; " if st["status"] else "") + f"sitemap: {len(urls)} links, {len(cand)} matched by link words"
+    before = len(rows)
+    read_pages(cand, name, key, base, since, until, geo, st, rows, seen, SITE_BUDGET.get(key, 2400))
+    return rows
+
+
+def fetch_wplist(key, since, until, geo, stats):
+    """WordPress feed without the text field (the site refuses it), then read each article page."""
+    name, base, _ = SITES[key]
+    st = stats.setdefault(name, {"status": "", "fetched": 0, "kept": 0, "earliest": "", "latest": ""})
+    if not robots_ok(base):
+        st["status"] = "skipped: robots.txt disallows automated access"
+        return []
+    posts, fails = {}, 0
+    for term in SEARCH_TERMS:
+        for y in range(since.year, until.year + 1):
+            if fails >= 4:
+                break
+            after = max(since, dt.date(y, 1, 1)).isoformat() + "T00:00:00"
+            before = min(until, dt.date(y, 12, 31)).isoformat() + "T23:59:59"
+            page = 1
+            while page <= 40:
+                q = urllib.parse.urlencode({"search": term, "per_page": 100, "page": page, "after": after, "before": before,
+                                            "_fields": "id,date,link,title"})
+                try:
+                    data, _ = http_json(f"{base}/wp-json/wp/v2/posts?{q}", host_key=key)
+                except Exception as e:
+                    fails += 1
+                    st["status"] = st["status"] or f"list partial: {type(e).__name__} {e}"[:100]
+                    break
+                fails = 0
+                if not data:
+                    break
+                for p in data:
+                    posts[p["link"]] = p["date"]
+                if len(data) < 100:
+                    break
+                page += 1
+    urls = [u for u, _d in sorted(posts.items(), key=lambda kv: kv[1], reverse=True)]       # newest first
+    log(name, f"feed list: {len(urls)} posts matched the search words")
+    st["status"] = (st["status"] + "; " if st["status"] else "") + f"feed list: {len(urls)} posts, pages read for text"
+    rows = []
+    read_pages(urls, name, key, base, since, until, geo, st, rows, set(), SITE_BUDGET.get(key, 2400))
+    return rows
+
+
 # ------------------------------------------------------------------ fetchers
 def fetch_wp(key, since, until, geo, stats):
-    name, base = SITES[key]
+    name, base, _modes = SITES[key]
     st = stats[name] = {"status": "", "fetched": 0, "kept": 0, "earliest": "", "latest": ""}
     if not robots_ok(base):
         st["status"] = "skipped: robots.txt disallows automated access"
@@ -413,6 +580,8 @@ METHOD = [
     "Possible_duplicate_of: rows with the same county, month and individuals/HH figure from another link.",
     "Media coverage differs by year (many outlets started after 2016) and search only returns posts the site's own search finds. "
     "See the Coverage sheet for what each source returned and any site skipped (robots.txt, no feed, errors).",
+    "Radio Tamazuj (and Radio Yei before mid-2025) have no usable search feed, so their articles were found through the site's sitemap "
+    "and only pages whose link contains flood/drought/rain-type words were read. Articles whose headline lacks those words are missed there.",
     "Check every number against the link before using it in a report.",
 ]
 
@@ -569,7 +738,23 @@ def main():
         if key not in SITES:
             log("unknown site", key)
             continue
-        rows += fetch_wp(key, since, until, geo, stats)
+        modes = SITES[key][2]
+        got = []
+        if "wp" in modes:
+            got += fetch_wp(key, since, until, geo, stats)
+        if "wplist" in modes:
+            got += fetch_wplist(key, since, until, geo, stats)
+        if "sitemap" in modes:
+            got += fetch_sitemap(key, since, until, geo, stats, existing={r["link"] for r in got})
+        rows += got
+        nm = SITES[key][0]
+        mine = [r for r in rows if r["source"] == nm]
+        stats[nm]["kept"] = len(mine)
+        ds = sorted(r["date"] for r in mine)
+        stats[nm]["earliest"], stats[nm]["latest"] = (ds[0], ds[-1]) if ds else ("", "")
+        log(nm, stats[nm])
+    for n, why in NOT_COLLECTED.items():
+        stats[n] = {"status": "not collected: " + why, "fetched": 0, "kept": 0, "earliest": "", "latest": ""}
     path = write_outputs(rows, stats, a.out_dir, since, until)
     print(f"{len(rows)} rows -> {path}")
     for n, s in stats.items():
