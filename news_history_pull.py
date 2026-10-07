@@ -39,6 +39,7 @@ DATA = os.environ.get("AA_DATA_DIR") or os.path.join(HERE, "data")
 OUT_DIR = os.environ.get("NEWS_HISTORY_OUT") or os.path.join(DATA, "news_history")
 POP = os.path.join(DATA, "ssd_county_population_2025.csv")
 UA = "SuddClimateNewsArchive/1.0 (research; contact: penuelabi@gmail.com)"
+MAX_SITE_SECONDS = 50 * 60   # per-site time budget
 PAUSE = 0.8          # seconds between requests to any one site
 
 SITES = {  # key: (display name, base url)
@@ -73,7 +74,7 @@ def log(*a):
 _last = defaultdict(float)
 
 
-def http_json(url, post=None, host_key=None, tries=4, timeout=60):
+def http_json(url, post=None, host_key=None, tries=3, timeout=25):
     for k in range(tries):
         wait = PAUSE - (time.time() - _last[host_key])
         if wait > 0:
@@ -274,8 +275,15 @@ def fetch_wp(key, since, until, geo, stats):
         return []
     rows, seen = [], set()
     year0, year1 = since.year, until.year
+    fails = 0
+    t_start = time.time()
     for term in SEARCH_TERMS:
+        if fails >= 3 or time.time() - t_start > MAX_SITE_SECONDS:
+            st["status"] = st["status"] or ("stopped: repeated errors" if fails >= 3 else "stopped: time budget reached")
+            break
         for y in range(year0, year1 + 1):
+            if fails >= 3 or time.time() - t_start > MAX_SITE_SECONDS:
+                break
             after = max(since, dt.date(y, 1, 1)).isoformat() + "T00:00:00"
             before = min(until, dt.date(y, 12, 31)).isoformat() + "T23:59:59"
             page = 1
@@ -286,9 +294,11 @@ def fetch_wp(key, since, until, geo, stats):
                 try:
                     data, hdr = http_json(f"{base}/wp-json/wp/v2/posts?{q}", host_key=key)
                 except Exception as e:
+                    fails += 1
                     st["status"] = st["status"] or f"partial: {type(e).__name__} {e}"[:120]
                     log(name, term, y, "error", e)
                     break
+                fails = 0
                 if not data:
                     break
                 for p in data:
