@@ -90,11 +90,11 @@ UA: `SuddClimateNewsArchive/1.0 (research; contact: penuelabi@gmail.com)`
 - home `https://www.nyamilepedia.com/` -> BLOCKED/challenge (503) (HTTP 503)
 - robots.txt: HTTP 503 (no restriction)
 - `/wp-json/wp/v2/posts?per_page=1&_fields=id,date,link` -> HTTP 0
-- `/feed/` -> HTTP 0
-- `/rss` -> HTTP 0
-- `/rss.xml` -> HTTP 0
-- `/sitemap.xml` -> HTTP 0
-- `/wp-sitemap.xml` -> HTTP 0
+- `/feed/` -> BLOCKED/challenge (503)
+- `/rss` -> BLOCKED/challenge (503)
+- `/rss.xml` -> BLOCKED/challenge (503)
+- `/sitemap.xml` -> BLOCKED/challenge (503)
+- `/wp-sitemap.xml` -> BLOCKED/challenge (503)
 - `/sitemap_index.xml` -> HTTP 0
 - `/news-sitemap.xml` -> HTTP 0
 
