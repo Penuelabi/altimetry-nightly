@@ -1,0 +1,44 @@
+name: ReliefWeb climate pull
+
+on:
+  push:
+    branches: [reliefweb-news-pull]   # test trigger; remove before merging
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Look-back window in days"
+        default: "30"
+  schedule:
+    - cron: "30 4 * * 1"   # Mondays 04:30 UTC, ahead of the weekly pieces
+
+permissions:
+  contents: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pull South Sudan climate reports from ReliefWeb
+        env:
+          RELIEFWEB_APPNAME: ${{ secrets.RELIEFWEB_APPNAME }}
+        run: python reliefweb_climate_pull.py --days "${{ github.event.inputs.days || '30' }}" --out-dir data
+      - name: Stage ReliefWeb items for news.json (review only, not merged)
+        run: python reliefweb_to_news.py
+      - name: Upload as run artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reliefweb-climate
+          path: |
+            data/reliefweb_climate.*
+            data/news_reliefweb_staged.json
+      - name: Commit results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add data/reliefweb_climate.json data/reliefweb_climate.csv data/news_reliefweb_staged.json
+          git diff --cached --quiet || git commit -m "ReliefWeb climate pull"
+          git push
