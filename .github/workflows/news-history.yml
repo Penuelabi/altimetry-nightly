@@ -42,5 +42,12 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
           git add news_history_out
-          git diff --cached --quiet || git commit -m "News history harvest output"
-          git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"
+          git diff --cached --quiet && { echo "nothing to commit"; exit 0; }
+          git commit -m "News history harvest output"
+          for i in 1 2 3 4 5 6; do
+            git fetch origin "${GITHUB_REF_NAME}" || true
+            git rebase "origin/${GITHUB_REF_NAME}" && git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}" && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 10))
+          done
+          echo "push failed after retries"; exit 1
