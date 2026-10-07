@@ -1,36 +1,25 @@
 ReliefWeb {'status': 'ok', 'fetched': 982, 'kept': 493, 'earliest': '2016-01-22', 'latest': '2026-09-23'}
 Radio Yei {'status': 'ok', 'fetched': 182, 'kept': 48, 'earliest': '2025-06-22', 'latest': '2026-10-07'}
-Eye Radio {'status': 'ok', 'fetched': 1291, 'kept': 514, 'earliest': '2016-06-13', 'latest': '2026-10-07'}
-Sudans Post flood 2016 error Expecting value: line 1 column 1 (char 0)
-Sudans Post flood 2017 error Expecting value: line 1 column 1 (char 0)
-Sudans Post flood 2018 error Expecting value: line 1 column 1 (char 0)
-Sudans Post {'status': 'partial: JSONDecodeError Expecting value: line 1 column 1 (char 0)', 'fetched': 0, 'kept': 0, 'earliest': '', 'latest': ''}
-Radio Tamazuj skipped: robots.txt disallows automated access
-Radio Miraya {'status': 'no posts returned (feed missing or empty)', 'fetched': 0, 'kept': 0, 'earliest': '', 'latest': ''}
-Gurtong flood 2016 error Expecting value: line 1 column 1 (char 0)
-Gurtong flood 2017 error Expecting value: line 1 column 1 (char 0)
-Gurtong flood 2018 error Expecting value: line 1 column 1 (char 0)
-Gurtong {'status': 'partial: JSONDecodeError Expecting value: line 1 column 1 (char 0)', 'fetched': 0, 'kept': 0, 'earliest': '', 'latest': ''}
-Juba Monitor flood 2016 error Expecting value: line 1 column 1 (char 0)
-Juba Monitor flood 2017 error Expecting value: line 1 column 1 (char 0)
-Juba Monitor flood 2018 error Expecting value: line 1 column 1 (char 0)
-Juba Monitor {'status': 'partial: JSONDecodeError Expecting value: line 1 column 1 (char 0)', 'fetched': 0, 'kept': 0, 'earliest': '', 'latest': ''}
-Nyamilepedia flood 2016 error Remote end closed connection without response
-Nyamilepedia flood 2017 error Remote end closed connection without response
-Nyamilepedia flood 2018 error Remote end closed connection without response
-Nyamilepedia {'status': 'partial: RemoteDisconnected Remote end closed connection without response', 'fetched': 0, 'kept': 0, 'earliest': '', 'latest': ''}
-The City Review flood 2016 error HTTP Error 404: Not Found
-The City Review flood 2017 error HTTP Error 404: Not Found
-The City Review flood 2018 error HTTP Error 404: Not Found
-The City Review {'status': 'partial: HTTPError HTTP Error 404: Not Found', 'fetched': 0, 'kept': 0, 'earliest': '', 'latest': ''}
-1055 rows -> out/south_sudan_climate_news_2016_2026.xlsx
+Radio Yei sitemap: 0 article links, 0 with flood/drought/rain words in the link
+Radio Yei {'status': 'ok; sitemap: 0 links, 0 matched by link words', 'fetched': 182, 'kept': 48, 'earliest': '2025-06-22', 'latest': '2026-10-07'}
+Eye Radio {'status': 'ok', 'fetched': 1292, 'kept': 515, 'earliest': '2016-06-13', 'latest': '2026-10-07'}
+Eye Radio {'status': 'ok', 'fetched': 1292, 'kept': 515, 'earliest': '2016-06-13', 'latest': '2026-10-07'}
+Sudans Post feed list: 772 posts matched the search words
+Sudans Post {'status': 'feed list: 772 posts, pages read for text', 'fetched': 772, 'kept': 221, 'earliest': '2020-01-16', 'latest': '2026-09-22'}
+Radio Tamazuj sitemap: 37013 article links, 534 with flood/drought/rain words in the link
+Radio Tamazuj {'status': 'sitemap: 37013 links, 534 matched by link words', 'fetched': 534, 'kept': 405, 'earliest': '2016-06-21', 'latest': '2026-10-07'}
+1682 rows -> out/south_sudan_climate_news_2016_2026.xlsx
   ReliefWeb: ok | fetched 982 | kept 493 | 2016-01-22..2026-09-23
-  Radio Yei: ok | fetched 182 | kept 48 | 2025-06-22..2026-10-07
-  Eye Radio: ok | fetched 1291 | kept 514 | 2016-06-13..2026-10-07
-  Sudans Post: partial: JSONDecodeError Expecting value: line 1 column 1 (char 0) | fetched 0 | kept 0 | ..
-  Radio Tamazuj: skipped: robots.txt disallows automated access | fetched 0 | kept 0 | ..
-  Radio Miraya: no posts returned (feed missing or empty) | fetched 0 | kept 0 | ..
-  Gurtong: partial: JSONDecodeError Expecting value: line 1 column 1 (char 0) | fetched 0 | kept 0 | ..
-  Juba Monitor: partial: JSONDecodeError Expecting value: line 1 column 1 (char 0) | fetched 0 | kept 0 | ..
-  Nyamilepedia: partial: RemoteDisconnected Remote end closed connection without response | fetched 0 | kept 0 | ..
-  The City Review: partial: HTTPError HTTP Error 404: Not Found | fetched 0 | kept 0 | ..
+  Radio Yei: ok; sitemap: 0 links, 0 matched by link words | fetched 182 | kept 48 | 2025-06-22..2026-10-07
+  Eye Radio: ok | fetched 1292 | kept 515 | 2016-06-13..2026-10-07
+  Sudans Post: feed list: 772 posts, pages read for text | fetched 772 | kept 221 | 2020-01-16..2026-09-22
+  Radio Tamazuj: sitemap: 37013 links, 534 matched by link words | fetched 534 | kept 405 | 2016-06-21..2026-10-07
+  Radio Miraya: not collected: radiomiraya.org now redirects to an unrelated gambling/sports site; no news archive to read | fetched 0 | kept 0 | ..
+  Gurtong: not collected: domain shows a parked 'lander' page; no news feed | fetched 0 | kept 0 | ..
+  Juba Monitor: not collected: no RSS, sitemap or WordPress feed | fetched 0 | kept 0 | ..
+  Nyamilepedia: not collected: site returns a bot challenge (HTTP 503) to automated visitors; not bypassed | fetched 0 | kept 0 | ..
+  Sudan Tribune: not collected: site refuses automated visitors (HTTP 403); not bypassed | fetched 0 | kept 0 | ..
+  South Sudan News Agency: not collected: site refuses automated feed requests (HTTP 403); not bypassed | fetched 0 | kept 0 | ..
+  The City Review: not collected: no feed or sitemap | fetched 0 | kept 0 | ..
+  The Niles: not collected: feed reachable but empty | fetched 0 | kept 0 | ..
+  Radio Bakhita / Upper Nile Times: not collected: domains do not resolve | fetched 0 | kept 0 | ..
