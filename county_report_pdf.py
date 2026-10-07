@@ -411,7 +411,8 @@ def cover_from_bulletin(doc, gauges=None, today=None, n_monitor=5, n_gauges=5):
     import daily_brief as db
     today = today or dt.datetime.utcnow()
     df = db.county_frame(doc)
-    dw, fw = db.drought_watch(df), db.flood_watch(df, doc.get('sudd_river_trigger') or {})
+    dw = db.drought_watch(df)
+    fw = db.flood_watch(df, doc.get('sudd_river_trigger') or {}, exclude=dw['county'])
     counts = {k: int((df.level == k).sum()) for k in db.LEVEL_ORDER}
     f = db._f
     pct = lambda v: f(v * 100 if pd.notna(v) else np.nan, 0) + '%'

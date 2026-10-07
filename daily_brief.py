@@ -72,16 +72,23 @@ def county_frame(doc):
 
 
 def drought_watch(df, n=3):
-    """Lowest root-zone soil moisture that the coming 2 weeks of rain will not fix."""
+    """Lowest root-zone soil moisture that the coming 2 weeks of rain will not fix (dry soils only)."""
     d = df.dropna(subset=['sm_z']).copy()
+    d = d[d['sm_z'] < 0]
+    if d.empty:
+        return d
     d['score'] = d['sm_z'].rank(ascending=True) + d['rain2w'].fillna(d['rain2w'].median()).rank(ascending=True) \
         + d['p_dry'].fillna(0).rank(ascending=False) * 0.5
     return d.sort_values('score').head(n)
 
 
-def flood_watch(df, trigger=None, n=3):
-    """Wet soil + water surplus + heavy rain ahead, weighted by people living on flood-prone ground."""
+def flood_watch(df, trigger=None, n=3, exclude=()):
+    """Wet soil + water surplus + heavy rain ahead, weighted by people living on flood-prone ground.
+    Wet soils only, and never a county in `exclude` (the drought list)."""
     d = df.dropna(subset=['sm_z']).copy()
+    d = d[(d['sm_z'] > 0) & ~d['county'].isin(list(exclude))]
+    if d.empty:
+        return d
     wet = d['sm_z'].rank(ascending=False) + d['wb30'].fillna(d['wb30'].median()).rank(ascending=False) \
         + d['rain2w'].fillna(0).rank(ascending=False) + d['p_heavy'].fillna(0).rank(ascending=False)
     d['score'] = wet + d['pop_flood'].fillna(0).rank(ascending=False) * 0.5
@@ -189,7 +196,8 @@ def _footer(subscribe_url, unsubscribe_to):
 def build_daily(doc, gauges=None, subscribe_url='', reply_to='penuelabi@gmail.com', today=None):
     df = county_frame(doc)
     trig = doc.get('sudd_river_trigger') or {}
-    dw, fw = drought_watch(df), flood_watch(df, trig)
+    dw = drought_watch(df)
+    fw = flood_watch(df, trig, exclude=dw['county'])
     run = doc.get('ecmwf_run_utc') or 'n/a'
     counts = {k: int((df.level == k).sum()) for k in LEVEL_ORDER}
     date = (today or datetime.datetime.utcnow()).strftime('%d %b %Y')
