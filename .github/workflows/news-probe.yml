@@ -1,0 +1,24 @@
+name: News source probe
+on:
+  push:
+    branches: [reliefweb-news-pull]
+    paths: [probe_news_sources.py, .github/workflows/news-probe.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: python probe_news_sources.py
+      - name: Commit result
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add news_probe_out
+          git diff --cached --quiet || git commit -m "News source probe result"
+          git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"
