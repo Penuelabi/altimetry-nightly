@@ -412,12 +412,12 @@ def cover_from_bulletin(doc, gauges=None, today=None, n_monitor=5, n_gauges=5):
     today = today or dt.datetime.utcnow()
     df = db.county_frame(doc)
     dw = db.drought_watch(df)
-    fw = db.flood_watch(df, doc.get('sudd_river_trigger') or {}, exclude=dw['county'])
+    fw = db.flood_watch(df, doc.get('sudd_river_trigger') or {}, exclude=dw['county'], gauges=db.load_county_gauges())
     counts = {k: int((df.level == k).sum()) for k in db.LEVEL_ORDER}
     f = db._f
     pct = lambda v: f(v * 100 if pd.notna(v) else np.nan, 0) + '%'
     drows = [[f"<b>{r.county}</b> ({r.state})", badge(r.level), f(r.sm_z, 2), f(r.deficit) + ' mm', f(r.rain2w) + ' mm', pct(r.p_dry)] for r in dw.itertuples()]
-    frows = [[f"<b>{r.county}</b> ({r.state})", badge(r.level), f(r.sm_z, 2), f(r.wb30) + ' mm', f(r.rain2w) + ' mm', pct(r.p_heavy), f(r.pop_flood)]
+    frows = [[f"<b>{r.county}</b> ({r.state})" + (' <i>(river gauge)</i>' if r.basis == 'river' else ''), badge(r.level), f(r.sm_z, 2), f(r.wb30) + ' mm', f(r.rain2w) + ' mm', pct(r.p_heavy), f(r.pop_flood)]
              for r in fw.itertuples()]
     grows = []
     if gauges is not None and len(gauges):

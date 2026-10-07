@@ -82,17 +82,58 @@ def drought_watch(df, n=3):
     return d.sort_values('score').head(n)
 
 
-def flood_watch(df, trigger=None, n=3, exclude=()):
+RIVER_PCTILE_MIN = 60      # linked gauge must be at or above this seasonal percentile
+RIVER_RISE_M_DAY = 0.01    # ... and either rising faster than this, or at/above its 2-year level
+
+
+def load_county_gauges(path=None):
+    """county_station_link.csv (county -> upstream/local/downstream altimetry gauge); empty frame if missing."""
+    path = path or os.path.join(os.environ.get('BULLETIN_OUT_DIR', '.'), 'county_station_link.csv')
+    if not os.path.exists(path):
+        path = 'county_station_link.csv'
+    if not os.path.exists(path):
+        return pd.DataFrame()
+    g = pd.read_csv(path)
+    for c in ('seasonal_pctile', 'rate_m_per_day', 'last_level_m'):
+        g[c] = pd.to_numeric(g.get(c), errors='coerce')
+    return g
+
+
+def river_candidates(df, gauges, exclude=()):
+    """Counties whose linked river gauge is high for the season and rising or at/above its 2-year level."""
+    if gauges is None or len(gauges) == 0:
+        return df.iloc[0:0].assign(basis=pd.Series(dtype=object))
+    g = gauges.copy()
+    st = g['flood_status'].fillna('').astype(str)
+    ok = ~st.str.startswith('Stale') & (g['confidence'].fillna('') == 'high') \
+        & (g['seasonal_pctile'] >= RIVER_PCTILE_MIN) \
+        & (st.str.startswith(('Above 2-yr', 'Near 2-yr')) | (g['rate_m_per_day'] > RIVER_RISE_M_DAY))
+    g = g[ok & ~g['county'].isin(list(exclude))].copy()
+    if g.empty:
+        return df.iloc[0:0].assign(basis=pd.Series(dtype=object))
+    g['score'] = g['seasonal_pctile'].rank(ascending=False) + g['rate_m_per_day'].fillna(0).rank(ascending=False)
+    d = df.merge(g[['county', 'score']], on='county', how='inner')
+    d['basis'] = 'river'
+    return d.sort_values('score')
+
+
+def flood_watch(df, trigger=None, n=3, exclude=(), gauges=None):
     """Wet soil + water surplus + heavy rain ahead, weighted by people living on flood-prone ground.
-    Wet soils only, and never a county in `exclude` (the drought list)."""
+    Wet-soil counties come first; if fewer than n qualify, the list is topped up with counties whose linked
+    river gauge is high and rising (basis 'river'). Never a county in `exclude` (the drought list)."""
+    ex = list(exclude)
     d = df.dropna(subset=['sm_z']).copy()
-    d = d[(d['sm_z'] > 0) & ~d['county'].isin(list(exclude))]
-    if d.empty:
-        return d
-    wet = d['sm_z'].rank(ascending=False) + d['wb30'].fillna(d['wb30'].median()).rank(ascending=False) \
-        + d['rain2w'].fillna(0).rank(ascending=False) + d['p_heavy'].fillna(0).rank(ascending=False)
-    d['score'] = wet + d['pop_flood'].fillna(0).rank(ascending=False) * 0.5
-    return d.sort_values('score').head(n)
+    d = d[(d['sm_z'] > 0) & ~d['county'].isin(ex)]
+    if not d.empty:
+        wet = d['sm_z'].rank(ascending=False) + d['wb30'].fillna(d['wb30'].median()).rank(ascending=False) \
+            + d['rain2w'].fillna(0).rank(ascending=False) + d['p_heavy'].fillna(0).rank(ascending=False)
+        d['score'] = wet + d['pop_flood'].fillna(0).rank(ascending=False) * 0.5
+        d = d.sort_values('score').head(n)
+    d['basis'] = 'soil'
+    if len(d) < n:
+        r = river_candidates(df, gauges, exclude=ex + list(d['county']))
+        d = pd.concat([d, r.head(n - len(d))], ignore_index=True)
+    return d
 
 
 def gauge_watch(merged_csv, status_csv=None, today=None, max_rows=12):
@@ -197,7 +238,7 @@ def build_daily(doc, gauges=None, subscribe_url='', reply_to='penuelabi@gmail.co
     df = county_frame(doc)
     trig = doc.get('sudd_river_trigger') or {}
     dw = drought_watch(df)
-    fw = flood_watch(df, trig, exclude=dw['county'])
+    fw = flood_watch(df, trig, exclude=dw['county'], gauges=load_county_gauges())
     run = doc.get('ecmwf_run_utc') or 'n/a'
     counts = {k: int((df.level == k).sum()) for k in LEVEL_ORDER}
     date = (today or datetime.datetime.utcnow()).strftime('%d %b %Y')
@@ -213,13 +254,14 @@ def build_daily(doc, gauges=None, subscribe_url='', reply_to='penuelabi@gmail.co
         f"  {i}. {r.county} ({r.state}) soil z {_f(r.sm_z, 2)}, deficit {_f(r.deficit)} mm, next 2 wk rain {_f(r.rain2w)} mm"
         for i, r in enumerate(dw.itertuples(), 1)]
     # --- flood
-    frows = [[f"<b>{html.escape(r.county)}</b> ({html.escape(r.state)})", _badge(r.level), _f(r.sm_z, 2),
+    frows = [[f"<b>{html.escape(r.county)}</b> ({html.escape(r.state)})" + (' <i>(river gauge)</i>' if r.basis == 'river' else ''),
+              _badge(r.level), _f(r.sm_z, 2),
               _f(r.wb30, 0) + ' mm', _f(r.rain2w, 0) + ' mm', _f(r.p_heavy * 100 if pd.notna(r.p_heavy) else np.nan, 0) + '%',
               _f(r.pop_flood, 0)] for r in fw.itertuples()]
     fh = _table(['County', 'Alert', 'Soil z', '30-d water surplus', 'Rain next 2 wk (median)', 'Chance 50 mm day wk 1',
                  'People on flood-prone ground'], frows)
     ft = ['Flood watch (wettest soil, water surplus and heavy rain ahead, weighted by people on flood-prone ground):'] + [
-        f"  {i}. {r.county} ({r.state}) soil z {_f(r.sm_z, 2)}, surplus {_f(r.wb30)} mm, next 2 wk rain {_f(r.rain2w)} mm, "
+        f"  {i}. {r.county} ({r.state}){' [river gauge high/rising]' if r.basis == 'river' else ''} soil z {_f(r.sm_z, 2)}, surplus {_f(r.wb30)} mm, next 2 wk rain {_f(r.rain2w)} mm, "
         f"{_f(r.pop_flood)} people on flood-prone ground" for i, r in enumerate(fw.itertuples(), 1)]
     infra_note = ('Settlement area, buildings, roads, schools and health facilities at flood risk by payam will be added '
                   'here once the infrastructure layer is in place.')
