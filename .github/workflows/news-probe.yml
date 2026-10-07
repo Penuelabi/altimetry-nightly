@@ -2,7 +2,7 @@ name: News source probe
 on:
   push:
     branches: [reliefweb-news-pull]
-    paths: [probe_news_sources.py, probe_news_sources2.py, .github/workflows/news-probe.yml]
+    paths: [probe_news_sources.py, probe_news_sources2.py, probe_news_sources3.py, .github/workflows/news-probe.yml]
   workflow_dispatch:
 permissions:
   contents: write
@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
-      - run: python probe_news_sources.py && python probe_news_sources2.py
+      - run: python probe_news_sources.py && python probe_news_sources2.py && python probe_news_sources3.py
       - name: Commit result
         run: |
           git config user.name "github-actions"
