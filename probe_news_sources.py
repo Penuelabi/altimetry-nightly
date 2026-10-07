@@ -23,6 +23,7 @@ SITES = {
  "Upper Nile Times": ["https://uppernile.net", "https://www.uppernile.net"],
  "Dawn FM / Salam FM": ["https://www.radiodabanga.org"],
 }
+SM_RE = r"(?im)^sitemap:\s*(\S+)"
 PATHS = ["/wp-json/wp/v2/posts?per_page=1&_fields=id,date,link", "/feed/", "/rss", "/rss.xml", "/sitemap.xml",
          "/wp-sitemap.xml", "/sitemap_index.xml", "/news-sitemap.xml"]
 
@@ -71,7 +72,8 @@ for name, bases in SITES.items():
         rcode, _, rbody = get(live + "/robots.txt")
         if rcode == 200:
             rp.parse(rbody.splitlines())
-            out.append(f"- robots.txt found; sitemaps declared: {re.findall(r'(?im)^sitemap:\\s*(\\S+)', rbody)[:4]}")
+            sm = re.findall(SM_RE, rbody)[:4]
+            out.append(f"- robots.txt found; sitemaps declared: {sm}")
         else:
             rp = None
             out.append(f"- robots.txt: HTTP {rcode} (no restriction)")
