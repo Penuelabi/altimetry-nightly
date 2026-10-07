@@ -1,0 +1,14 @@
+Radio Yei {'status': 'ok', 'fetched': 180, 'kept': 67, 'earliest': '2025-06-21', 'latest': '2026-10-07'}
+Eye Radio {'status': 'ok', 'fetched': 228, 'kept': 111, 'earliest': '2025-06-02', 'latest': '2026-10-07'}
+Sudans Post flood 2025 error Expecting value: line 1 column 1 (char 0)
+Sudans Post flood 2026 error Expecting value: line 1 column 1 (char 0)
+Sudans Post flooding 2025 error Expecting value: line 1 column 1 (char 0)
+Sudans Post {'status': 'partial: JSONDecodeError Expecting value: line 1 column 1 (char 0)', 'fetched': 0, 'kept': 0, 'earliest': '', 'latest': ''}
+Radio Tamazuj skipped: robots.txt disallows automated access
+Radio Miraya {'status': 'no posts returned (feed missing or empty)', 'fetched': 0, 'kept': 0, 'earliest': '', 'latest': ''}
+178 rows -> out/south_sudan_climate_news_2025_2026.xlsx
+  Radio Yei: ok | fetched 180 | kept 67 | 2025-06-21..2026-10-07
+  Eye Radio: ok | fetched 228 | kept 111 | 2025-06-02..2026-10-07
+  Sudans Post: partial: JSONDecodeError Expecting value: line 1 column 1 (char 0) | fetched 0 | kept 0 | ..
+  Radio Tamazuj: skipped: robots.txt disallows automated access | fetched 0 | kept 0 | ..
+  Radio Miraya: no posts returned (feed missing or empty) | fetched 0 | kept 0 | ..
