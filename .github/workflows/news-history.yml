@@ -28,6 +28,8 @@ jobs:
           RELIEFWEB_APPNAME: ${{ secrets.RELIEFWEB_APPNAME }}
           ARGS: ${{ github.event.inputs.args }}
         run: |
+          mkdir -p out
+          set -o pipefail
           if [ -z "$ARGS" ]; then ARGS="$(cat news_history_args.txt)"; fi
           python news_history_pull.py $ARGS --out-dir out 2>&1 | tee out/run_log.txt
       - uses: actions/upload-artifact@v4
