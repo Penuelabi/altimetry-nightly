@@ -36,7 +36,7 @@ import ee
 # =========================================================================== #
 # SETTINGS                                                                    #
 # =========================================================================== #
-PROJECT_ID = 'ee-penuelabi'
+PROJECT_ID = 'sudan-1575919084043'
 AOI_ASSET = 'users/penuelabi/ssd_payam'
 ADM2_FIELD = 'ADM2_EN'
 ADM1_FIELD = 'ADM1_EN'
