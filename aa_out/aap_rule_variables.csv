@@ -1,13 +1,13 @@
 name,source,meaning,example_county,example_value
-alert_level,county bulletin,"impact-based alert: 'green', 'yellow', 'orange' or 'red'",Abyei Region,green
-alert_rank,county bulletin,"alert as a number: 0 green, 1 yellow, 2 orange, 3 red",Abyei Region,0
-alert_stage,county bulletin,"the AA stage alert_level corresponds to: 'monitoring', 'warning', 'readiness' or 'activation' -- readiness/activation line up with this engine's own plan stages ('readiness', 'activated')",Abyei Region,monitoring
-alert_hazard,county bulletin,'flood / waterlogging' or 'drought / dry spell',Abyei Region,flood / waterlogging
+alert_level,county bulletin,"impact-based alert: 'green', 'yellow', 'orange' or 'red'",Abyei Region,orange
+alert_rank,county bulletin,"alert as a number: 0 green, 1 yellow, 2 orange, 3 red",Abyei Region,2
+alert_stage,county bulletin,"the AA stage alert_level corresponds to: 'monitoring', 'warning', 'readiness' or 'activation' -- readiness/activation line up with this engine's own plan stages ('readiness', 'activated')",Abyei Region,readiness
+alert_hazard,county bulletin,'flood / waterlogging' or 'drought / dry spell',Abyei Region,drought / dry spell
 p_heavy,county bulletin,"chance of >= 50 mm of rain in week 1 (0-1, ECMWF ensemble)",Abyei Region,0.0
 p_dry_spell,county bulletin,chance of a 7-day dry spell within 15 days (0-1),Abyei Region,0.0
-p_wet_spell,county bulletin,chance of a 3-day wet spell in week 1 (0-1),Abyei Region,0.66
-week1_rain_mm,county bulletin,median rain expected in week 1 (mm),Abyei Region,18.8135
-week2_rain_mm,county bulletin,median rain expected in week 2 (mm),Abyei Region,23.6195
+p_wet_spell,county bulletin,chance of a 3-day wet spell in week 1 (0-1),Abyei Region,0.8
+week1_rain_mm,county bulletin,median rain expected in week 1 (mm),Abyei Region,23.14
+week2_rain_mm,county bulletin,median rain expected in week 2 (mm),Abyei Region,18.7819
 soil_z,county bulletin,"root-zone soil moisture z-score (>= 0.75 wet, <= -0.75 dry)",Abyei Region,-2.5182
 soil_deficit_mm,county bulletin,root-zone soil water below the seasonal median (mm),Abyei Region,56.0779
 rain_30d_pct,county bulletin,last 30 days of rain as % of normal,Abyei Region,144.736

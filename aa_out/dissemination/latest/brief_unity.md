@@ -1,6 +1,6 @@
 # Unity - anticipatory action situation brief
 
-Prepared 2026-10-07 10:25 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-03; ECMWF run 2026-10-06 12 UTC.
+Prepared 2026-10-07 10:40 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-03; ECMWF run 2026-10-07 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -13,10 +13,10 @@ Prepared 2026-10-07 10:25 UTC for the Unity state TWG-AA. Rain and soil data to 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Mayom | Unity | **ORANGE** | drought / dry spell | 24 | 4% | 22,600 |
-| Pariang | Unity | **ORANGE** | drought / dry spell | 21 | 0% | 4,128 |
-| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 21 | 0% | 165 |
-| Rubkona | Unity | **YELLOW** | flood / waterlogging | 24 | 2% | 16,480 |
+| Mayom | Unity | **ORANGE** | drought / dry spell | 31 | 4% | 22,600 |
+| Pariang | Unity | **ORANGE** | drought / dry spell | 27 | 2% | 4,128 |
+| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 27 | 8% | 165 |
+| Rubkona | Unity | **YELLOW** | flood / waterlogging | 29 | 8% | 16,480 |
 
 ## Anticipatory action plans
 | Plan | County | Stage | Since | Plan status | River / readiness / activation (m) |
