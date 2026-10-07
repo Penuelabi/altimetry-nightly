@@ -1,0 +1,36 @@
+name: News history harvest
+
+on:
+  push:
+    branches: [reliefweb-news-pull]   # test trigger; remove before merging
+    paths: [news_history_args.txt, news_history_pull.py, .github/workflows/news-history.yml]
+  workflow_dispatch:
+    inputs:
+      args:
+        description: "Arguments for news_history_pull.py (blank = file news_history_args.txt)"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install openpyxl
+      - name: Harvest
+        env:
+          RELIEFWEB_APPNAME: ${{ secrets.RELIEFWEB_APPNAME }}
+          ARGS: ${{ github.event.inputs.args }}
+        run: |
+          if [ -z "$ARGS" ]; then ARGS="$(cat news_history_args.txt)"; fi
+          python news_history_pull.py $ARGS --out-dir out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: south-sudan-climate-news
+          path: out/*
