@@ -11,7 +11,7 @@ on:
         default: ""
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   harvest:
@@ -29,8 +29,16 @@ jobs:
           ARGS: ${{ github.event.inputs.args }}
         run: |
           if [ -z "$ARGS" ]; then ARGS="$(cat news_history_args.txt)"; fi
-          python news_history_pull.py $ARGS --out-dir out
+          python news_history_pull.py $ARGS --out-dir out 2>&1 | tee out/run_log.txt
       - uses: actions/upload-artifact@v4
         with:
           name: south-sudan-climate-news
           path: out/*
+      - name: Commit output to the branch
+        run: |
+          mkdir -p news_history_out && cp out/* news_history_out/
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add news_history_out
+          git diff --cached --quiet || git commit -m "News history harvest output"
+          git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"
