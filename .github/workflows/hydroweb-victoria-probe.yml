@@ -1,6 +1,9 @@
 name: HydroWeb Victoria probe (read-only)
 on:
   workflow_dispatch:
+  push:
+    branches: [reliefweb-news-pull]
+    paths: [hydroweb_victoria_probe.py, .github/workflows/hydroweb-victoria-probe.yml]
 permissions:
   contents: write
 jobs:
