@@ -117,7 +117,7 @@ CLIM_REF_YEARS = (2016, 2025)
 UPDATE_MASTER_CLIMATE = True
 REFRESH_GAPFILLED_DAYS = 60
 
-HYDROWEB_BBOX = [25.9, -1.8, 36.4, 15.9]
+HYDROWEB_BBOX = [25.9, -3.8, 36.4, 15.9]
 
 # --- Seasonal baseline for level classification -------------------------------
 REF_YEARS = (2016, 2025)      # fixed reference period
@@ -145,8 +145,8 @@ MANUAL_LINKS = []
 
 # --- Upstream catchments ------------------------------------------------------
 BUILD_CATCHMENTS = True
-HYBAS_LEVEL = 10
-CATCHMENT_BBOX = [15.0, -5.0, 38.0, 23.5]   # Nile basin; catchments are cut at this box
+HYBAS_LEVEL = 6
+CATCHMENT_BBOX = [13.0, -3.0, 36.0, 23.5]   # Nile basin; catchments are cut at this box
 
 # --- STAGE 4: upload results to Earth Engine assets --------------------------
 UPLOAD_TO_GEE = True
