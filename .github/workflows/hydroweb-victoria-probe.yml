@@ -1,0 +1,25 @@
+name: HydroWeb Victoria probe (read-only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      HYDROWEB_API_KEY: ${{ secrets.HYDROWEB_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: reliefweb-news-pull}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: python hydroweb_victoria_probe.py
+      - name: Commit result
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add hydroweb_lake_check/victoria_probe.md
+          git diff --cached --quiet && exit 0
+          git commit -m "HydroWeb Victoria probe"
+          for i in 1 2 3 4; do git fetch origin reliefweb-news-pull && git rebase origin/reliefweb-news-pull && git push origin HEAD:refs/heads/reliefweb-news-pull && exit 0; sleep $((i*8)); done; exit 1
