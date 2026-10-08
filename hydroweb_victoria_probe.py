@@ -16,10 +16,12 @@ try:
 except Exception as e:
     L.append(f'inspect failed: {e}')
 client = py_hydroweb.Client(api_key=KEY)
-tests = [('bbox 31-35.5 x -3.5-1', dict(bbox=[31.0, -3.5, 35.5, 1.0])),
-         ('bbox 30-36 x -4-2', dict(bbox=[30.0, -4.0, 36.0, 2.0])),
-         ('bbox 23.9..36.4 x -4..12.9', dict(bbox=[23.9, -4.0, 36.4, 12.9])),
-         ('bbox around point 32.9-33.1 x -1.1..-0.9', dict(bbox=[32.9, -1.1, 33.1, -0.9]))]
+tests = [('intersects Point 33.0,-1.0', dict(intersects={'type': 'Point', 'coordinates': [33.0, -1.0]})),
+         ('intersects Polygon small', dict(intersects={'type': 'Polygon', 'coordinates': [[[32.9, -1.1], [33.1, -1.1], [33.1, -0.9], [32.9, -0.9], [32.9, -1.1]]]})),
+         ('bbox whole east Africa', dict(bbox=[20.0, -12.0, 42.0, 15.0])),
+         ('bbox 31.5-35 x -3.2-0.6', dict(bbox=[31.5, -3.2, 35.0, 0.6])),
+         ('query id contains victoria', dict(query={'id': {'contains': 'victoria'}})),
+         ('query lake eq L_victoria', dict(query={'lake': {'eq': 'victoria'}}))]
 for label, kw in tests:
     cwd = os.getcwd(); os.chdir(TMP)
     try:
