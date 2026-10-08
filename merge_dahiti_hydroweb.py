@@ -117,7 +117,7 @@ CLIM_REF_YEARS = (2016, 2025)
 UPDATE_MASTER_CLIMATE = True
 REFRESH_GAPFILLED_DAYS = 60
 
-HYDROWEB_BBOX = [25.9, -0.8, 33.4, 11.9]
+HYDROWEB_BBOX = [25.9, -1.8, 36.4, 15.9]
 
 # --- Seasonal baseline for level classification -------------------------------
 REF_YEARS = (2016, 2025)      # fixed reference period
@@ -145,8 +145,8 @@ MANUAL_LINKS = []
 
 # --- Upstream catchments ------------------------------------------------------
 BUILD_CATCHMENTS = True
-HYBAS_LEVEL = 6
-CATCHMENT_BBOX = [21.0, -5.0, 42.0, 24.5]   # Nile basin; catchments are cut at this box
+HYBAS_LEVEL = 10
+CATCHMENT_BBOX = [15.0, -5.0, 38.0, 23.5]   # Nile basin; catchments are cut at this box
 
 # --- STAGE 4: upload results to Earth Engine assets --------------------------
 UPLOAD_TO_GEE = True
@@ -186,7 +186,7 @@ DAHITI_API_KEY = (_secret('DAHITI_API_KEY') or '').strip()
 URL_LIST = 'https://dahiti.dgfi.tum.de/api/v2/list-targets/'
 URL_DOWNLOAD = 'https://dahiti.dgfi.tum.de/api/v2/download-water-level/'
 DAHITI_LIST_ARGS = {'api_key': DAHITI_API_KEY, 'min_lon': 23.2, 'max_lon': 36.1,
-                    'min_lat': -1.8, 'max_lat': 40.8}
+                    'min_lat': -1.8, 'max_lat': 12.8}
 
 DAHITI_IDS = [
     85, 213, 2686, 2687, 2688, 3246, 3247, 3764, 5959,
