@@ -325,7 +325,7 @@ def load_seed():
     return d
 
 
-def dahiti_post(url, payload, timeout=180):
+def dahiti_post(url, payload, timeout=60):
     """POST to the DAHITI API, backing off on HTTP 429 / 5xx / network errors."""
     wait = 15
     status = 'no response'
