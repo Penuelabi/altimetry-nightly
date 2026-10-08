@@ -5,12 +5,12 @@ alert_stage,county bulletin,"the AA stage alert_level corresponds to: 'monitorin
 alert_hazard,county bulletin,'flood / waterlogging' or 'drought / dry spell',Abyei Region,drought / dry spell
 p_heavy,county bulletin,"chance of >= 50 mm of rain in week 1 (0-1, ECMWF ensemble)",Abyei Region,0.0
 p_dry_spell,county bulletin,chance of a 7-day dry spell within 15 days (0-1),Abyei Region,0.0
-p_wet_spell,county bulletin,chance of a 3-day wet spell in week 1 (0-1),Abyei Region,0.68
-week1_rain_mm,county bulletin,median rain expected in week 1 (mm),Abyei Region,20.4528
-week2_rain_mm,county bulletin,median rain expected in week 2 (mm),Abyei Region,18.8637
-soil_z,county bulletin,"root-zone soil moisture z-score (>= 0.75 wet, <= -0.75 dry)",Abyei Region,-2.5182
-soil_deficit_mm,county bulletin,root-zone soil water below the seasonal median (mm),Abyei Region,56.0779
-rain_30d_pct,county bulletin,last 30 days of rain as % of normal,Abyei Region,144.736
+p_wet_spell,county bulletin,chance of a 3-day wet spell in week 1 (0-1),Abyei Region,0.78
+week1_rain_mm,county bulletin,median rain expected in week 1 (mm),Abyei Region,23.353
+week2_rain_mm,county bulletin,median rain expected in week 2 (mm),Abyei Region,17.5798
+soil_z,county bulletin,"root-zone soil moisture z-score (>= 0.75 wet, <= -0.75 dry)",Abyei Region,-2.5633
+soil_deficit_mm,county bulletin,root-zone soil water below the seasonal median (mm),Abyei Region,57.2312
+rain_30d_pct,county bulletin,last 30 days of rain as % of normal,Abyei Region,140.3392
 pop_total,county bulletin,county population (2025 estimate),Abyei Region,145358.0
 pop_flood_prone,county bulletin,people on ground that has flooded before,Abyei Region,283.0
 dry_spell_days,county bulletin,observed days since the last wet county-day (GSMaP),Abyei Region,
@@ -31,8 +31,8 @@ activation_level_m,aa_triggers.csv,"activation water level, when the county rule
 readiness_value,aa_triggers.csv,readiness value of the county's trigger signal (units depend on trigger_family),Abyei Region,
 activation_value,aa_triggers.csv,activation value of the county's trigger signal,Abyei Region,
 regional_value,aa_triggers.csv,regional index needed together with the county signal (combined rules),Abyei Region,
-sudd_upstream_pct,sudd_trigger_log.csv,experimental Sudd river trigger: upstream percentile (0-1),Abyei Region,0.7349
-sudd_status,sudd_trigger_log.csv,"'normal', 'watch' or 'elevated'",Abyei Region,elevated
+sudd_upstream_pct,sudd_trigger_log.csv,experimental Sudd river trigger: upstream percentile (0-1),Abyei Region,0.6953
+sudd_status,sudd_trigger_log.csv,"'normal', 'watch' or 'elevated'",Abyei Region,watch
 flooded_now_km2,exposure_cache.json,"area flooded now (latest Sentinel-1 extent, km2)",Abyei Region,
 flooded_now_share,exposure_cache.json,share of the county flooded now (0-1),Abyei Region,
 month,run date,"month of the run, 1-12",Abyei Region,10

@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261008_0119",
+ "name": "south-sudan-hydroclimate-aa-20261008_1712",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261008_0119",
- "created": "2026-10-08T01:19:30Z",
+ "version": "20261008_1712",
+ "created": "2026-10-08T17:12:14Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -134,7 +134,7 @@
      {
       "check": "data_end_date freshness",
       "status": "pass",
-      "detail": "latest 2026-10-03 (5 days old, limit 7)"
+      "detail": "latest 2026-10-04 (4 days old, limit 7)"
      },
      {
       "check": "county coverage",
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 164739,
-   "hash": "sha256:462965ecae80e4263dfaebe7a66a860df69116e7c1f4f39fc789f1dac5a741bb",
+   "bytes": 165835,
+   "hash": "sha256:9eeccb21a84cb6fa2ec1942205bda42ab9768fcc2d50808ff8ba47d59edb41b7",
    "rows": 79,
    "schema": {
     "fields": [
@@ -513,10 +513,6 @@
       "type": "string"
      },
      {
-      "name": "p_wet_1007",
-      "type": "number"
-     },
-     {
       "name": "p_wet_1008",
       "type": "number"
      },
@@ -570,6 +566,10 @@
      },
      {
       "name": "p_wet_1021",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1022",
       "type": "number"
      },
      {
@@ -674,7 +674,7 @@
      {
       "check": "readable and not empty",
       "status": "pass",
-      "detail": "696 rows, 22 columns"
+      "detail": "704 rows, 22 columns"
      },
      {
       "check": "required columns",
@@ -709,9 +709,9 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 159545,
-   "hash": "sha256:e0e97790f6a30c42b20de113200bf3d84653c43a4907c71cfa8ea348ddbd62da",
-   "rows": 696,
+   "bytes": 161330,
+   "hash": "sha256:e7cb317d2c110d5cb7249c9a21eb6f02435cc78c40f7a95e18e0fdfb07553813",
+   "rows": 704,
    "schema": {
     "fields": [
      {
@@ -1413,8 +1413,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1572,
-   "hash": "sha256:98d72a86d0b70cdbb135324fe1e351458764ab7f2bbfd310e9eb79a217cfe97f",
+   "bytes": 1578,
+   "hash": "sha256:b620d264364a825190228a911fe653c284d3d2c107d8848ba5d1204e8c304893",
    "rows": 6,
    "schema": {
     "fields": [
@@ -1540,7 +1540,7 @@
      {
       "check": "readable and not empty",
       "status": "pass",
-      "detail": "15 rows, 13 columns"
+      "detail": "17 rows, 13 columns"
      },
      {
       "check": "required columns",
@@ -1555,9 +1555,9 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1142,
-   "hash": "sha256:adceb8692d1851b545f17b55b1ae66556c1f693dcfbf13c189385fe037d2c681",
-   "rows": 15,
+   "bytes": 1296,
+   "hash": "sha256:8cd43d2a8ecdc482217231da4f2e81be1830d085080f596061de55d37b445e93",
+   "rows": 17,
    "schema": {
     "fields": [
      {
