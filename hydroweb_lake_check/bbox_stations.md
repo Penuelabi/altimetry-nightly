@@ -34,3 +34,14 @@ lake 1300000015950          Nakuru         nakuru -0.35 36.09  109 2026/09/14
 lake 1300000001543            Nile       roseires 11.62 34.38  293 2026/09/08
 lake 1300000180423            Nile           sudd  5.97 31.56   83 2026/08/29
 lake 1300000000158    Lake Turkana        turkana   3.5 36.28 1137 2026/10/01
+## Victoria search
+
+client attrs: delete_download, download_zip, get_download_info, get_downloads_info, headers, hydroweb_api_url, retry_policy, submit_and_download_zip, submit_download
+HYDROWEB_LAKES_OPE [32.5, -1.2, 33.5, -0.8]: 0 files: []
+HYDROWEB_LAKES_OPE [30.0, -3.0, 35.0, 0.5]: 4 files: ['HYDROWEB_LAKES_OPE/', 'HYDROWEB_LAKES_OPE/hydroprd_L_kijanebaloba.txt', 'HYDROWEB_LAKES_OPE/hydroprd_L_george.txt', 'HYDROWEB_LAKES_OPE/hydroprd_L_nabugabo.txt']
+HYDROWEB_LAKES_RESEARCH [32.5, -1.2, 33.5, -0.8]: 0 files: []
+HYDROWEB_LAKES_RESEARCH [30.0, -3.0, 35.0, 0.5]: 2 files: ['HYDROWEB_LAKES_RESEARCH/', 'HYDROWEB_LAKES_RESEARCH/hydroprd_L_ihema.txt']
+HYDROWEB_LAKES_V2 [32.5, -1.2, 33.5, -0.8]: 0 files: []
+HYDROWEB_LAKES_V2 [30.0, -3.0, 35.0, 0.5]: 0 files: []
+HYDROWEB_LAKES [32.5, -1.2, 33.5, -0.8]: 0 files: []
+HYDROWEB_LAKES [30.0, -3.0, 35.0, 0.5]: 0 files: []
