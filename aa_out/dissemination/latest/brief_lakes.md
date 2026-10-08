@@ -1,6 +1,6 @@
 # Lakes - anticipatory action situation brief
 
-Prepared 2026-10-07 17:03 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-10-03; ECMWF run 2026-10-07 00 UTC.
+Prepared 2026-10-08 01:19 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-10-03; ECMWF run 2026-10-07 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,9 +12,9 @@ Prepared 2026-10-07 17:03 UTC for the Lakes state TWG-AA. Rain and soil data to 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 33 | 8% | 1,661 |
-| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 31 | 10% | 6 |
-| Yirol West | Lakes | **ORANGE** | drought / dry spell | 32 | 6% | 2,910 |
+| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 34 | 10% | 1,661 |
+| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 33 | 8% | 6 |
+| Yirol West | Lakes | **ORANGE** | drought / dry spell | 33 | 12% | 2,910 |
 
 ## Decisions for the group
 - Agree the warning for the 3 counties with an alert and the channels (radio hubs, chiefs, SMS).
