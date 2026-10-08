@@ -117,19 +117,7 @@ CLIM_REF_YEARS = (2016, 2025)
 UPDATE_MASTER_CLIMATE = True
 REFRESH_GAPFILLED_DAYS = 60
 
-HYDROWEB_BBOX = [23.9, -1.8, 36.4, 12.9]
-
-# Stations inside the box that do NOT drain toward South Sudan are dropped before the merge.
-# HydroWeb gives each station a BASIN (rivers and lakes) and a RIVER/lake name.
-#  * Congo basin (Uele, Mbomou, Ituri, Lindi, Aruwimi ...)           -> Atlantic
-#  * Lake Turkana basin (Turkwel, Gibe/Omo ...) and Kenyan Rift lakes -> closed basins
-#  * Blue Nile system (Blue Nile, Dabus, Beles, Kusa, Hanger, Shinfa, Dinder, Roseires) -> joins the Nile
-#    at Khartoum, downstream of South Sudan
-# Kept: Victoria/Kyoga/Albert/Edward catchments incl. Kagera, Mara, Semliki, Rutshuru (they reach the Nile
-# and flow through South Sudan), Bahr el Ghazal, Sobat/Baro, White Nile, Sudd.
-EXCLUDE_BASIN_WORDS = ('CONGO', 'TURKANA', 'GREATRIFTVALLEY', 'GREAT RIFT', 'ELMENTEITA', 'NAKURU')
-EXCLUDE_RIVER_NAMES = ('BLUE NILE', 'DABUS', 'BELES', 'KUSA', 'HANGER', 'SHINFA', 'NAHIR AD DINDAR',
-                       'ROSEIRES', 'KHOWR ABU HOBL', 'NAIVASHA', 'BOGORIA')
+HYDROWEB_BBOX = [25.9, -1.8, 36.4, 15.9]
 
 # --- Seasonal baseline for level classification -------------------------------
 REF_YEARS = (2016, 2025)      # fixed reference period
@@ -157,8 +145,8 @@ MANUAL_LINKS = []
 
 # --- Upstream catchments ------------------------------------------------------
 BUILD_CATCHMENTS = True
-HYBAS_LEVEL = 6
-CATCHMENT_BBOX = [21.0, -5.0, 42.0, 24.5]   # Nile basin; catchments are cut at this box
+HYBAS_LEVEL = 10
+CATCHMENT_BBOX = [15.0, -5.0, 38.0, 23.5]   # Nile basin; catchments are cut at this box
 
 # --- STAGE 4: upload results to Earth Engine assets --------------------------
 UPLOAD_TO_GEE = True
@@ -198,7 +186,7 @@ DAHITI_API_KEY = (_secret('DAHITI_API_KEY') or '').strip()
 URL_LIST = 'https://dahiti.dgfi.tum.de/api/v2/list-targets/'
 URL_DOWNLOAD = 'https://dahiti.dgfi.tum.de/api/v2/download-water-level/'
 DAHITI_LIST_ARGS = {'api_key': DAHITI_API_KEY, 'min_lon': 23.2, 'max_lon': 36.1,
-                    'min_lat': -1.8, 'max_lat': 40.8}
+                    'min_lat': -1.8, 'max_lat': 12.8}
 
 DAHITI_IDS = [
     85, 213, 2686, 2687, 2688, 3246, 3247, 3764, 5959,
@@ -672,7 +660,6 @@ def load_hydroweb_rivers():
             'latitude': float(m['REFERENCE LATITUDE']),
             'longitude': float(m['REFERENCE LONGITUDE']),
             'river_key': f"{m.get('BASIN', '')}|{m.get('RIVER', '')}".upper().replace('-', ' '),
-            'hw_basin': m.get('BASIN', ''),
             'date_dt': parse_dt(d['date'], d['time']),
             'wse': pd.to_numeric(d['water_surface_elevation'], errors='coerce'),
             'uncertainty': pd.to_numeric(d['uncertainty'], errors='coerce'),
@@ -711,30 +698,12 @@ def load_hydroweb_lakes():
             'source': 'Hydroweb', 'station_id': int(h['id']), 'type': 'lake',
             'location': f"{name} Lake",
             'latitude': float(h.get('lat', 'nan')), 'longitude': float(h.get('lon', 'nan')),
-            'river_key': None, 'hw_basin': h.get('basin', ''),
+            'river_key': None,
             'date_dt': parse_dt(d['date'], d['time']),
             'wse': pd.to_numeric(d['height_m'], errors='coerce'),
             'uncertainty': pd.to_numeric(d['stdev_m'], errors='coerce'),
         }))
     return pd.concat(frames, ignore_index=True) if frames else empty_raw()
-
-
-def drop_non_south_sudan_drainage(hw):
-    """Remove stations whose water does not flow toward South Sudan (see EXCLUDE_* above); log what goes."""
-    if hw.empty:
-        return hw
-    basin = hw['hw_basin'].fillna('').astype(str).str.upper().str.replace('-', ' ')
-    name = hw['location'].fillna('').astype(str).str.upper().str.replace('-', ' ')
-    rk = hw['river_key'].fillna('').astype(str).str.split('|').str[-1]
-    bad = pd.Series(False, index=hw.index)
-    for w in EXCLUDE_BASIN_WORDS:
-        bad |= basin.str.contains(w, regex=False)
-    for w in EXCLUDE_RIVER_NAMES:
-        bad |= rk.str.startswith(w) | name.str.startswith(w)
-    dropped = hw[bad].groupby(['type', 'hw_basin']).station_id.nunique()
-    print(f"Hydroweb: dropped {hw[bad].groupby('type').station_id.nunique().to_dict()} stations "
-          f"that do not drain toward South Sudan; by basin: {dropped.to_dict()}")
-    return hw[~bad].drop(columns=['hw_basin'])
 
 
 def load_hydroweb():
@@ -746,7 +715,6 @@ def load_hydroweb():
     mn_lon, mn_lat, mx_lon, mx_lat = HYDROWEB_BBOX
     hw = hw[hw.longitude.between(mn_lon, mx_lon) & hw.latitude.between(mn_lat, mx_lat)
             & (hw.date_dt < END_EXCL)]
-    hw = drop_non_south_sudan_drainage(hw)
 
     with pd.ExcelWriter(HYDROWEB_RAW_XLSX, engine='openpyxl') as xw:
         stations_hw = (hw.groupby(['type', 'station_id'])
