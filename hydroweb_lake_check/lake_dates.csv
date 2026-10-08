@@ -1,0 +1,7 @@
+file,lake,id,lat,lon,observations,first_date,last_date,last_height_m,last_height_date,last_mission
+hydroprd_L_albert.txt,albert,1300000000159,1.67,30.92,645,1995-06-05,2026-09-27,621.220,2026-09-27,sentinel3B-184
+hydroprd_L_edouard.txt,edouard,1300000000162,-0.34,29.6,534,1995-05-26,2026-09-26,914.110,2026-09-26,sentinel3A-455
+hydroprd_L_george.txt,george,1300000001586,0,30.23,93,2019-02-28,2026-09-13,915.310,2026-09-13,sentinel3B-569
+hydroprd_L_kijanebaloba.txt,kijanebaloba,1300000015960,-0.74,31.31,99,2017-07-22,2026-08-25,1223.940,2026-08-25,sentinel3A-298
+hydroprd_L_nabugabo.txt,nabugabo,1300000015949,-0.35,31.94,97,2019-02-23,2026-09-08,1138.700,2026-09-08,sentinel3B-412
+hydroprd_L_sudd.txt,sudd,1300000180423,5.97,31.56,83,2019-02-13,2026-08-29,426.510,2026-08-29,sentinel3B-141
