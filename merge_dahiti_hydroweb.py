@@ -1749,9 +1749,18 @@ def wait_for(tasks, poll=30):
 def build_catchments():
     """Trace each station's upstream area through HydroBASINS and export station_catchments."""
     asset_id = f'{ASSET_FOLDER}/station_catchments'
-    cols = ['station_uid', 'hybas_ids', 'n_basins']
+    cols = ['station_uid', 'hybas_ids', 'n_basins', 'hybas_level']
     cache = (pd.read_csv(CATCHMENT_CACHE, dtype={'hybas_ids': str}) if os.path.exists(CATCHMENT_CACHE)
              else pd.DataFrame(columns=cols))
+    # HYBAS ids differ between levels: a cache built at another level (or before the level was stored)
+    # matches no basin at this level and produced empty geometries. Rebuild such rows.
+    if len(cache) and ('hybas_level' not in cache.columns
+                       or not (pd.to_numeric(cache['hybas_level'], errors='coerce') == HYBAS_LEVEL).all()):
+        keep = (cache[pd.to_numeric(cache.get('hybas_level'), errors='coerce') == HYBAS_LEVEL]
+                if 'hybas_level' in cache.columns else cache.iloc[0:0])
+        print(f"Catchment cache: {len(cache) - len(keep)} rows were built at another HydroBASINS level; "
+              f"rebuilding them at level {HYBAS_LEVEL}.")
+        cache = keep.reindex(columns=cols)
     todo_st = stations[~stations.station_uid.isin(cache.station_uid)]
     if todo_st.empty and asset_exists(asset_id):
         print("Station catchments: up to date.")
@@ -1782,7 +1791,8 @@ def build_catchments():
                         seen.add(child)
                         stack.append(child)
             rows.append({'station_uid': h['properties']['uid'],
-                         'hybas_ids': ';'.join(str(x) for x in sorted(seen)), 'n_basins': len(seen)})
+                         'hybas_ids': ';'.join(str(x) for x in sorted(seen)), 'n_basins': len(seen),
+                         'hybas_level': HYBAS_LEVEL})
         missing = set(todo_st.station_uid) - {r['station_uid'] for r in rows}
         if missing:
             print(f"  {len(missing)} stations fall outside HydroBASINS coverage in the box: "
@@ -1790,12 +1800,21 @@ def build_catchments():
         cache = pd.concat([cache, pd.DataFrame(rows, columns=cols)], ignore_index=True)
         cache.to_csv(CATCHMENT_CACHE, index=False)
     feats = []
+    valid = {int(x) for x in hb.aggregate_array('HYBAS_ID').getInfo()}
+    skipped = []
     for r in cache[cache.station_uid.isin(stations.station_uid)].itertuples():
         ids = [int(x) for x in str(r.hybas_ids).split(';') if x]
+        ids = [i for i in ids if i in valid]
+        if not ids:                      # would give an empty geometry, which Earth Engine refuses to export
+            skipped.append(r.station_uid)
+            continue
         geom = hb.filter(ee.Filter.inList('HYBAS_ID', ids)).geometry(500).dissolve(500)
         feats.append(ee.Feature(geom, {'station_uid': r.station_uid, 'n_basins': len(ids),
                                        'hybas_level': HYBAS_LEVEL})
                      .set('area_km2', geom.area(1000).divide(1e6)))
+    if skipped:
+        print(f"  {len(skipped)} stations skipped (no HydroBASINS polygon in the box): "
+              f"{', '.join(sorted(skipped)[:10])}{' ...' if len(skipped) > 10 else ''}")
     if not feats:
         return None
     task = start_export(ee.FeatureCollection(feats), asset_id, 'station_catchments')
