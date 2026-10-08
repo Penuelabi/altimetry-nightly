@@ -156,7 +156,7 @@ MANUAL_LINKS = []
 
 # --- Upstream catchments ------------------------------------------------------
 BUILD_CATCHMENTS = True
-HYBAS_LEVEL = 10
+HYBAS_LEVEL = 12
 CATCHMENT_BBOX = [15.0, -5.0, 38.0, 23.5]   # Nile basin; catchments are cut at this box
 
 # --- STAGE 4: upload results to Earth Engine assets --------------------------
