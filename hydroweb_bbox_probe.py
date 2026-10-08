@@ -57,3 +57,26 @@ L = [f'# HydroWeb stations in bbox {BBOX}', '', f'{(df.type=="river").sum()} riv
      '## Lakes', '', df[df.type == 'lake'].to_string(index=False)]
 open(os.path.join(OUT, 'bbox_stations.md'), 'w').write('\n'.join(L))
 print('\n'.join(L[:40]))
+
+# --- where is Lake Victoria? ------------------------------------------------
+V = ['', '## Victoria search', '']
+V.append('client attrs: ' + ', '.join(a for a in dir(client) if not a.startswith('_')))
+try:
+    for coll in ['HYDROWEB_LAKES_OPE', 'HYDROWEB_LAKES_RESEARCH', 'HYDROWEB_LAKES_V2', 'HYDROWEB_LAKES']:
+        for bb in ([32.5, -1.2, 33.5, -0.8], [30.0, -3.0, 35.0, 0.5]):
+            cwd = os.getcwd(); os.chdir(TMP)
+            try:
+                b = py_hydroweb.DownloadBasket('v_' + coll.lower())
+                b.add_collection(coll, bbox=bb)
+                z = os.path.abspath(f'v_{coll}.zip')
+                p = client.submit_and_download_zip(b, zip_filename=z, output_folder=os.getcwd())
+                names = zipfile.ZipFile(p if (p and os.path.isabs(p)) else z).namelist() if p else []
+                V.append(f'{coll} {bb}: {len(names)} files: {names[:12]}')
+            except Exception as e:
+                V.append(f'{coll} {bb}: {type(e).__name__}: {str(e)[:150]}')
+            finally:
+                os.chdir(cwd)
+except Exception as e:
+    V.append(f'search failed: {e}')
+open(os.path.join(OUT, 'bbox_stations.md'), 'a').write('\n'.join(V))
+print('\n'.join(V))
