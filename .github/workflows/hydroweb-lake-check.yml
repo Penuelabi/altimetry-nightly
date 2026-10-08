@@ -1,0 +1,28 @@
+name: HydroWeb lake last-date check (read-only)
+on:
+  workflow_dispatch:
+  push:
+    branches: [reliefweb-news-pull]
+    paths: [hydroweb_lake_dates.py, .github/workflows/hydroweb-lake-check.yml]
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas google-api-python-client google-auth
+      - run: python hydroweb_lake_dates.py
+      - name: Commit result
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add hydroweb_lake_check
+          git diff --cached --quiet && exit 0
+          git commit -m "HydroWeb lake last-date check"
+          for i in 1 2 3 4; do git fetch origin "${GITHUB_REF_NAME}" && git rebase "origin/${GITHUB_REF_NAME}" && git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}" && exit 0; sleep $((i*8)); done; exit 1
