@@ -1,0 +1,720 @@
+station_uid,station_name,latitude,longitude,county,state,km_to_county,inside_county
+dahiti:10179,"White Nile, River",9.6551,31.7484,Malakal,Upper Nile,0.0,True
+dahiti:11635,"Baro, River",8.1811,34.2557,Maiwut,Upper Nile,42.8,False
+dahiti:11683,"Baro, River",8.4374,33.3778,Luakpiny/Nasir,Upper Nile,0.2,True
+dahiti:11750,"Baro, River",8.1801,34.3378,Maiwut,Upper Nile,48.8,False
+dahiti:11761,"White Nile, River",5.4646,31.7781,Terekeka,Central Equatoria,0.0,True
+dahiti:11815,"Sobat, River",9.2934,31.7009,Panyikang,Upper Nile,0.0,True
+dahiti:11900,"Kagera, River",-0.9939,31.7023,Magwi,Eastern Equatoria,500.5,False
+dahiti:12138,"White Nile, River",9.4561,30.8025,Fangak,Jonglei,0.0,True
+dahiti:12178,"White Nile, River",9.3929,31.2596,Canal/Pigi,Jonglei,0.0,True
+dahiti:12258,"White Nile, River",13.2841,32.6087,Renk,Upper Nile,116.6,False
+dahiti:14196,"White Nile, River",9.6715,31.7902,Malakal,Upper Nile,0.0,True
+dahiti:15192,"Unnamed, River",2.2285,31.4603,Morobo,Central Equatoria,154.8,False
+dahiti:15556,"White Nile, River",5.1443,31.7429,Terekeka,Central Equatoria,0.0,True
+dahiti:15557,"White Nile, River",9.5089,30.7703,Panyikang,Upper Nile,0.0,True
+dahiti:15710,"Kazinga Channel, River",-0.1165,30.0767,Morobo,Central Equatoria,408.4,False
+dahiti:16098,"Unnamed, River",3.5496,31.8223,Magwi,Eastern Equatoria,15.9,False
+dahiti:16099,"Unnamed, River",2.274,31.5395,Kajo-keji,Central Equatoria,150.8,False
+dahiti:16323,"White Nile, River",10.7876,32.3486,Manyo,Upper Nile,0.0,True
+dahiti:16686,"White Nile, River",12.9324,32.7943,Renk,Upper Nile,77.2,False
+dahiti:16846,"Victoria Nile, River",0.6728,33.054,Magwi,Eastern Equatoria,327.1,False
+dahiti:16985,"Kazinga Channel, River",-0.1028,30.1023,Morobo,Central Equatoria,406.3,False
+dahiti:17741,"White Nile, River",13.1403,32.7338,Renk,Upper Nile,100.0,False
+dahiti:17743,"White Nile, River",9.4049,31.254,Panyikang,Upper Nile,0.0,True
+dahiti:17749,"White Nile, River",7.1544,30.7549,Twic East,Jonglei,0.0,True
+dahiti:17750,"White Nile, River",7.0271,30.8572,Yirol East,Lakes,0.0,True
+dahiti:17752,"White Nile, River",6.8445,31.1528,Twic East,Jonglei,0.0,True
+dahiti:17753,"White Nile, River",6.28,31.4927,Awerial,Lakes,0.0,True
+dahiti:17754,"White Nile, River",6.3377,31.4757,Awerial,Lakes,0.0,True
+dahiti:18043,"Sobat, River",9.2932,31.7492,Panyikang,Upper Nile,0.0,True
+dahiti:18741,"Bhar-al-arab, River",9.3144,28.9005,Abiemnhom,Unity,0.0,True
+dahiti:18743,"Sobat, River",9.2405,32.1566,Baliet,Upper Nile,0.0,True
+dahiti:19747,"Baro, River",8.4488,33.3408,Luakpiny/Nasir,Upper Nile,0.1,True
+dahiti:19749,"Lol, River",9.1077,26.6462,Aweil North,Northern Bahr el Ghazal,0.0,True
+dahiti:19751,"White-nile, River",9.3943,31.2573,Canal/Pigi,Jonglei,0.0,True
+dahiti:19752,"White-nile, River",9.4652,30.7757,Fangak,Jonglei,0.1,True
+dahiti:2264,"Victoria Nile, River",0.861,33.0024,Magwi,Eastern Equatoria,305.5,False
+dahiti:23333,"Baro, River",8.3256,33.822,Maiwut,Upper Nile,7.3,False
+dahiti:23334,"Baro, River",8.3018,33.8427,Maiwut,Upper Nile,10.8,False
+dahiti:23336,"Bhar-el-gazal, River",9.461,30.3372,Pariang,Unity,0.0,True
+dahiti:23337,"Bhar-el-gazal, River",9.443,30.312,Pariang,Unity,0.0,True
+dahiti:23338,"Bhar el Ghazai, River",9.2997,29.8327,Guit,Unity,0.0,True
+dahiti:23341,"Lol, River",8.9862,28.545,Twic,Warrap,0.0,True
+dahiti:23342,"Wadi Boro, River",9.1608,26.9957,Aweil West,Northern Bahr el Ghazal,0.0,True
+dahiti:23343,"Wadi Boro, River",9.0303,26.5003,Aweil West,Northern Bahr el Ghazal,0.0,True
+dahiti:23344,"Wadi Boro, River",8.898,26.2288,Aweil West,Northern Bahr el Ghazal,0.0,True
+dahiti:23353,"Pipor, River",7.8554,33.0077,Akobo,Jonglei,0.0,True
+dahiti:23354,"Pibor, River",7.7368,33.0347,Akobo,Jonglei,0.0,True
+dahiti:23357,"Sobat, River",9.0714,32.2651,Baliet,Upper Nile,0.0,True
+dahiti:23358,"Sobat, River",8.8487,32.5357,Ulang,Upper Nile,0.0,True
+dahiti:23359,"Sobat, River",8.5927,32.9457,Ulang,Upper Nile,0.0,True
+dahiti:2686,"Unknown, River",6.2262,28.4526,Nzara,Western Equatoria,0.0,True
+dahiti:2687,"Unknown, River",8.5703,29.3086,Tonj North,Warrap,0.0,True
+dahiti:2688,"Jur, River",8.7531,29.3736,Mayom,Unity,0.0,True
+dahiti:3247,"Unnamed, River",6.672,31.4486,Bor South,Jonglei,0.0,True
+dahiti:3764,"Unknown, River",8.1425,33.2165,Ulang,Upper Nile,3.0,False
+dahiti:38456,"Victoria Nile, River",0.6954,33.0566,Magwi,Eastern Equatoria,324.8,False
+dahiti:5959,"Sobat, River",9.3595,31.8348,Panyikang,Upper Nile,0.0,True
+dahiti:8313,"Sobat, River",8.6337,32.7122,Ulang,Upper Nile,0.0,True
+dahiti:967,"White Nile, River",4.7817,31.6017,Juba,Central Equatoria,0.0,True
+hydroweb:100134,Katonga Trib01 km 6400,0.1235,32.3901,Magwi,Eastern Equatoria,374.4,False
+hydroweb:100135,Lugogo km 5612,1.4122,32.1044,Magwi,Eastern Equatoria,231.7,False
+hydroweb:100136,Kafu km 5582,1.5789,32.0676,Magwi,Eastern Equatoria,213.5,False
+hydroweb:100137,Victoria Nile Trib01 km 5599,1.8352,32.0108,Magwi,Eastern Equatoria,185.9,False
+hydroweb:100255,Bili km 2596,4.0186,23.976,Nagero,Western Equatoria,359.1,False
+hydroweb:100457,Semliki km 5835,0.0587,29.6437,Morobo,Central Equatoria,403.1,False
+hydroweb:100458,White Nile km 3455,13.3349,32.6209,Renk,Upper Nile,122.1,False
+hydroweb:100459,White Nile km 3422,13.4442,32.6461,Renk,Upper Nile,133.9,False
+hydroweb:100730,Lugulu km 2860,-2.2432,27.3035,Yambio,Western Equatoria,734.2,False
+hydroweb:100731,Maiko km 2622,-0.2569,26.8635,Yambio,Western Equatoria,531.8,False
+hydroweb:100732,Maiko Trib01 km 2664,0.1906,26.7644,Yambio,Western Equatoria,489.0,False
+hydroweb:100733,Tshopo Trib01 km 2639,0.5962,26.6746,Nzara,Western Equatoria,451.0,False
+hydroweb:100734,Uere km 2879,4.0994,25.8979,Ezo,Western Equatoria,201.0,False
+hydroweb:100903,Victoria Nile Trib01 km 5710,1.1685,33.0937,Magwi,Eastern Equatoria,276.7,False
+hydroweb:100905,Achwa km 5264,2.7358,32.7464,Magwi,Eastern Equatoria,104.3,False
+hydroweb:101002,Tumbenga km 2245,-1.4597,23.697,Nzara,Western Equatoria,817.7,False
+hydroweb:101003,Lomami km 2257,0.0344,24.0279,Nzara,Western Equatoria,662.3,False
+hydroweb:101004,Congo km 2112,0.8738,24.2137,Nzara,Western Equatoria,578.5,False
+hydroweb:101180,Rwizi km 6102,-0.8064,30.3873,Morobo,Central Equatoria,478.2,False
+hydroweb:101181,Rwizi km 6098,-0.7235,30.4056,Morobo,Central Equatoria,468.8,False
+hydroweb:101182,Rwizi Trib02 km 6128,-0.4629,30.4633,Morobo,Central Equatoria,439.5,False
+hydroweb:101183,Mpanga km 6070,0.1609,30.6012,Morobo,Central Equatoria,369.4,False
+hydroweb:101184,Muzizi km 5600,0.8593,30.7559,Morobo,Central Equatoria,291.2,False
+hydroweb:101185,Nkusi km 5530,1.1089,30.8114,Morobo,Central Equatoria,263.4,False
+hydroweb:101187,Bahr Al Jabal km 4916,4.8992,31.6523,Juba,Central Equatoria,0.0,True
+hydroweb:101452,Luka km 2967,-1.8389,28.1489,Morobo,Central Equatoria,662.0,False
+hydroweb:101453,Luka km 2953,-1.7749,28.1348,Morobo,Central Equatoria,656.1,False
+hydroweb:101454,Nepoko km 2633,2.2314,27.2474,Nzara,Western Equatoria,258.7,False
+hydroweb:101618,Manafwa km 5920,0.9438,34.0786,Ikotos,Eastern Equatoria,316.5,False
+hydroweb:101619,Namatala km 5900,1.0268,34.0601,Ikotos,Eastern Equatoria,307.1,False
+hydroweb:101620,Akokoro km 5900,1.8905,33.8685,Ikotos,Eastern Equatoria,209.3,False
+hydroweb:101698,Bima km 2776,3.2576,25.6772,Ezo,Western Equatoria,277.8,False
+hydroweb:101699,Uere km 2871,4.0858,25.8611,Ezo,Western Equatoria,205.3,False
+hydroweb:101700,Chel km 4862,8.8477,26.9252,Aweil Centre,Northern Bahr el Ghazal,0.0,True
+hydroweb:101865,Kijanebaloba km 20,-0.6609,31.3544,Morobo,Central Equatoria,462.4,False
+hydroweb:101866,Katonga Trib01 km 6165,0.1143,31.5261,Morobo,Central Equatoria,380.7,False
+hydroweb:101867,Katonga Trib01 km 6140,0.3809,31.5852,Magwi,Eastern Equatoria,352.2,False
+hydroweb:101868,Katonga Trib01 km 6126,0.5053,31.6126,Magwi,Eastern Equatoria,338.1,False
+hydroweb:101869,Kafu Trib01 km 5752,0.8111,31.6805,Magwi,Eastern Equatoria,303.5,False
+hydroweb:101872,Pibor km 4625,6.9585,33.0467,Pibor,Jonglei,0.0,True
+hydroweb:101873,Lnyl L Zrq Trib 01 km 3716,13.4888,34.5265,Renk,Upper Nile,194.2,False
+hydroweb:102142,Bomokandi km 3177,3.1106,27.9875,Yambio,Western Equatoria,137.3,False
+hydroweb:102143,Chel km 4942,8.5769,26.7678,Aweil Centre,Northern Bahr el Ghazal,0.0,True
+hydroweb:102319,Baro Trib 01 km 4483,7.868,33.4725,Akobo,Jonglei,12.8,False
+hydroweb:102404,Lilo km 2521,-0.7147,25.7321,Nzara,Western Equatoria,627.6,False
+hydroweb:102405,Aruwimi km 2421,1.9194,26.3155,Nzara,Western Equatoria,340.5,False
+hydroweb:102549,Achwa km 5268,2.5291,32.996,Magwi,Eastern Equatoria,139.3,False
+hydroweb:102552,Pager km 5350,3.1812,33.1406,Ikotos,Eastern Equatoria,65.9,False
+hydroweb:102553,Baro Trib 01 km 4652,7.6279,34.1318,Pochalla,Jonglei,24.1,False
+hydroweb:102827,Ruvubu km 6829,-3.187,30.318,Morobo,Central Equatoria,741.1,False
+hydroweb:102828,Epulu Trib01 km 2933,1.6468,29.2471,Morobo,Central Equatoria,263.1,False
+hydroweb:102829,Bomokandi km 3363,2.7712,28.9979,Ibba,Western Equatoria,175.7,False
+hydroweb:102830,Jur km 4780,7.0731,28.0402,Jur River,Western Bahr el Ghazal,0.0,True
+hydroweb:103014,Baro Trib 01 km 4731,7.4876,34.4928,Pochalla,Jonglei,51.9,False
+hydroweb:103097,Maiko km 2600,-0.3285,26.7527,Yambio,Western Equatoria,543.4,False
+hydroweb:103098,Nepoko km 2649,2.1181,27.2946,Nzara,Western Equatoria,268.2,False
+hydroweb:103099,Jur km 4421,8.7262,28.768,Gogrial East,Warrap,0.0,True
+hydroweb:103100,Bhr Lgzl Trib 04 km 4404,9.1788,28.87,Mayom,Unity,0.0,True
+hydroweb:103101,Bhr Lgzl Trib 04 km 4385,9.2613,28.8886,Mayom,Unity,0.0,True
+hydroweb:103259,Victoria Nile Trib01 km 5840,0.8188,33.5523,Ikotos,Eastern Equatoria,324.0,False
+hydroweb:103260,Namatala Trib01 km 5840,0.9245,33.5756,Ikotos,Eastern Equatoria,312.3,False
+hydroweb:103261,Namatala Trib01 km 5830,0.9568,33.5828,Ikotos,Eastern Equatoria,308.8,False
+hydroweb:103262,Namatala Trib01 km 5820,1.0562,33.6048,Ikotos,Eastern Equatoria,297.9,False
+hydroweb:103263,Namatala Trib01 km 5809,1.116,33.618,Ikotos,Eastern Equatoria,291.3,False
+hydroweb:103264,Namatala Trib01 km 5805,1.156,33.6269,Ikotos,Eastern Equatoria,286.9,False
+hydroweb:103265,Namatala Trib01 km 5810,1.3302,33.6652,Ikotos,Eastern Equatoria,268.0,False
+hydroweb:103266,Akokoro Trib01 km 5815,1.4487,33.6921,Ikotos,Eastern Equatoria,255.1,False
+hydroweb:103267,Akokoro km 5910,1.8832,33.7879,Ikotos,Eastern Equatoria,208.6,False
+hydroweb:103268,Akokoro km 5990,2.1699,33.8514,Ikotos,Eastern Equatoria,178.6,False
+hydroweb:103543,Semliki km 5550,1.0833,30.307,Morobo,Central Equatoria,273.2,False
+hydroweb:103544,Semliki km 5549,1.169,30.2886,Morobo,Central Equatoria,264.5,False
+hydroweb:103545,Dungu km 3554,3.7365,29.7187,Yei,Central Equatoria,58.2,False
+hydroweb:103546,Jur km 4450,8.7431,28.6005,Gogrial East,Warrap,0.0,True
+hydroweb:103547,Lol Trib01 km 4417,9.1201,28.5157,Twic,Warrap,0.0,True
+hydroweb:103739,Baro Wenz Trib01 km 4681,8.104,35.2896,Maiwut,Upper Nile,139.4,False
+hydroweb:103740,Baro Wenz km 4695,8.5374,35.1923,Maiwut,Upper Nile,115.7,False
+hydroweb:103840,Biasi km 2825,-1.3194,27.4684,Yambio,Western Equatoria,630.0,False
+hydroweb:103841,Lenda km 2687,1.233,28.0336,Yambio,Western Equatoria,340.5,False
+hydroweb:103842,Bomokandi km 3236,2.8963,28.4023,Yambio,Western Equatoria,153.7,False
+hydroweb:103843,Bahr Al Arab Trib 02 km 4426,8.2451,29.5949,Tonj North,Warrap,0.0,True
+hydroweb:104094,Kotto km 2901,7.7319,23.2173,Raja,Western Bahr el Ghazal,126.5,False
+hydroweb:104255,Akagera Trib01 km 20,-0.6198,31.6197,Magwi,Eastern Equatoria,460.7,False
+hydroweb:104256,Katonga Trib01 km 6160,0.1549,31.4481,Morobo,Central Equatoria,374.7,False
+hydroweb:104259,Gulnam km 4669,6.8409,29.9623,Rumbek East,Lakes,0.0,True
+hydroweb:104260,Gulnam km 4574,7.5975,29.7929,Rumbek North,Lakes,0.0,True
+hydroweb:104261,Bahr Al Arab Trib 02 km 4435,8.2347,29.6499,Tonj North,Warrap,0.0,True
+hydroweb:104262,Bahr Al Arab km 4333,9.6582,29.3293,Abiemnhom,Unity,0.0,True
+hydroweb:104445,Nahir Ad Dindar km 4059,11.7873,35.3916,Renk,Upper Nile,232.8,False
+hydroweb:104446,Lnyl L Zrq Trib 01 km 3926,13.0825,35.0951,Renk,Upper Nile,217.7,False
+hydroweb:104537,Ibina km 2826,0.8916,28.8931,Morobo,Central Equatoria,354.9,False
+hydroweb:104538,Epulu km 2863,1.4632,29.0197,Morobo,Central Equatoria,294.3,False
+hydroweb:104796,Rubi km 2410,2.715,25.2701,Nzara,Western Equatoria,352.7,False
+hydroweb:104797,Chinko Trib 01 km 2784,5.908,24.5602,Raja,Western Bahr el Ghazal,183.6,False
+hydroweb:104798,Chinko km 2996,6.8678,24.3459,Raja,Western Bahr el Ghazal,117.8,False
+hydroweb:104799,Chinko km 3011,6.9262,24.3328,Raja,Western Bahr el Ghazal,115.3,False
+hydroweb:104987,Katonga km 6255,-0.0192,31.9541,Magwi,Eastern Equatoria,390.6,False
+hydroweb:104988,Katonga Trib01 km 6250,0.0557,31.9375,Magwi,Eastern Equatoria,382.5,False
+hydroweb:104989,Kafu km 5622,1.3477,31.6514,Magwi,Eastern Equatoria,246.2,False
+hydroweb:104990,Kafu km 5632,1.437,31.6317,Magwi,Eastern Equatoria,237.0,False
+hydroweb:104992,Yei km 4546,7.0758,30.3775,Yirol East,Lakes,0.0,True
+hydroweb:105227,Hanger km 4285,9.4636,36.3865,Longochuk,Upper Nile,249.1,False
+hydroweb:105228,Nahir Ad Dindar km 4138,12.0498,35.7994,Renk,Upper Nile,272.9,False
+hydroweb:105229,Shinfa km 4078,12.7014,35.6503,Renk,Upper Nile,261.4,False
+hydroweb:105342,Yei km 4779,5.3282,30.3451,Mundri West,Western Equatoria,0.0,True
+hydroweb:105677,Maiko km 2510,-0.2638,26.3978,Nzara,Western Equatoria,551.3,False
+hydroweb:105678,Tshopo km 2537,0.5492,26.2177,Nzara,Western Equatoria,477.5,False
+hydroweb:105679,Bima km 2766,3.2653,25.6158,Ezo,Western Equatoria,282.3,False
+hydroweb:105850,Simiyu km 6267,-2.5697,33.4541,Magwi,Eastern Equatoria,685.8,False
+hydroweb:105851,Victoria Nile Trib01 km 5702,1.1863,32.6223,Magwi,Eastern Equatoria,260.6,False
+hydroweb:105852,Victoria Nile km 5652,1.3497,32.586,Magwi,Eastern Equatoria,242.1,False
+hydroweb:105853,Victoria Nile Trib01 km 5622,1.7227,32.5034,Magwi,Eastern Equatoria,199.9,False
+hydroweb:105854,Victoria Nile km 5359,1.9987,32.4423,Magwi,Eastern Equatoria,168.7,False
+hydroweb:105855,Victoria Nile km 5339,2.0752,32.4253,Magwi,Eastern Equatoria,160.0,False
+hydroweb:105856,Victoria Nile km 5338,2.2733,32.3815,Magwi,Eastern Equatoria,137.7,False
+hydroweb:105857,Achwa km 5095,3.7151,32.0614,Magwi,Eastern Equatoria,0.0,True
+hydroweb:105858,Nile km 4725,6.2601,31.4949,Awerial,Lakes,0.0,True
+hydroweb:105859,Lnyl L Byd km 4673,6.6516,31.4074,Bor South,Jonglei,0.0,True
+hydroweb:105860,Bahr El Zeraf km 4110,9.0593,30.8673,Fangak,Jonglei,0.0,True
+hydroweb:106079,Angarab Wenz km 3473,13.8276,36.3264,Renk,Upper Nile,374.1,False
+hydroweb:106188,Nyabarongo km 6910,-1.9479,29.6667,Morobo,Central Equatoria,616.2,False
+hydroweb:106190,Rwimi km 6060,0.3866,30.1838,Morobo,Central Equatoria,351.5,False
+hydroweb:106191,Semliki km 5543,1.0988,30.3414,Morobo,Central Equatoria,270.7,False
+hydroweb:106192,Semliki km 5529,1.2207,30.3685,Morobo,Central Equatoria,256.9,False
+hydroweb:106193,Fulus km 4165,8.6543,32.0244,Nyirol,Jonglei,0.0,True
+hydroweb:106194,R Adar km 3864,10.3092,32.3979,Melut,Upper Nile,0.0,True
+hydroweb:106516,Lugulu km 3015,-2.5267,27.8341,Morobo,Central Equatoria,746.0,False
+hydroweb:106517,Uere km 3004,4.4628,26.2849,Ezo,Western Equatoria,143.7,False
+hydroweb:106711,Mara km 6158,-1.5941,34.1729,Ikotos,Eastern Equatoria,595.2,False
+hydroweb:106712,Malaba Trib01 km 5860,0.7034,33.6643,Ikotos,Eastern Equatoria,337.1,False
+hydroweb:106713,Namatala Trib01 km 5825,1.0089,33.5965,Ikotos,Eastern Equatoria,303.1,False
+hydroweb:106714,Namatala Trib01 km 5800,1.1803,33.5586,Ikotos,Eastern Equatoria,284.0,False
+hydroweb:106715,Achwa km 5308,2.3236,33.3052,Ikotos,Eastern Equatoria,158.9,False
+hydroweb:106716,Achwa Trib01 km 5300,2.5944,33.2452,Ikotos,Eastern Equatoria,129.6,False
+hydroweb:106717,Pager Trib01 km 5350,2.8471,33.1892,Ikotos,Eastern Equatoria,102.3,False
+hydroweb:106718,Pager km 5355,3.2302,33.1043,Ikotos,Eastern Equatoria,60.9,False
+hydroweb:106719,Fulus km 4188,8.5609,31.9145,Nyirol,Jonglei,0.0,True
+hydroweb:106720,Fulus km 4114,8.8287,31.8543,Baliet,Upper Nile,0.0,True
+hydroweb:107028,Akagera Trib01 km 6400,-1.1631,30.7755,Morobo,Central Equatoria,514.8,False
+hydroweb:107029,Akagera km 6367,-1.0074,30.8102,Morobo,Central Equatoria,497.5,False
+hydroweb:107030,Rwizi km 6178,-0.6839,30.8818,Morobo,Central Equatoria,461.7,False
+hydroweb:107031,Mpanga Trib01 km 6110,0.2045,31.0785,Morobo,Central Equatoria,364.2,False
+hydroweb:107032,Muzizi Trib01 km 5650,0.6537,31.1779,Morobo,Central Equatoria,315.7,False
+hydroweb:107033,Kafu km 5672,1.2181,31.3029,Morobo,Central Equatoria,256.1,False
+hydroweb:107356,Uele km 3119,3.7528,27.3777,Nzara,Western Equatoria,104.9,False
+hydroweb:107357,Chel km 5095,8.0158,26.4266,Raja,Western Bahr el Ghazal,0.0,True
+hydroweb:107358,Chel km 5070,8.1432,26.398,Aweil Centre,Northern Bahr el Ghazal,0.0,True
+hydroweb:107563,Namatala Trib01 km 5900,1.5253,34.4174,Ikotos,Eastern Equatoria,265.7,False
+hydroweb:107564,Akokoro Trib01 km 5890,1.6943,34.38,Ikotos,Eastern Equatoria,246.8,False
+hydroweb:107565,Akokoro Trib01 km 5895,1.7548,34.3665,Ikotos,Eastern Equatoria,240.1,False
+hydroweb:107566,R Adar km 3880,10.2257,32.474,Melut,Upper Nile,0.0,True
+hydroweb:107674,Uere km 3030,4.3591,26.3892,Ezo,Western Equatoria,139.1,False
+hydroweb:107675,Lol km 4692,8.9459,27.4148,Aweil East,Northern Bahr el Ghazal,0.0,True
+hydroweb:107868,Ngono km 6160,-1.3285,31.6741,Magwi,Eastern Equatoria,537.6,False
+hydroweb:107869,Ngono km 6150,-1.1488,31.714,Magwi,Eastern Equatoria,517.4,False
+hydroweb:107870,Akagera km 6130,-0.95,31.7579,Magwi,Eastern Equatoria,495.0,False
+hydroweb:107871,Katonga Trib01 km 6260,0.0743,31.9847,Magwi,Eastern Equatoria,380.1,False
+hydroweb:107872,Lugogo Trib01 km 5762,0.8757,32.1622,Magwi,Eastern Equatoria,290.8,False
+hydroweb:107873,Lugogo km 5632,1.2831,32.2525,Magwi,Eastern Equatoria,245.7,False
+hydroweb:107874,Victoria Nile km 5609,1.621,32.3273,Magwi,Eastern Equatoria,208.8,False
+hydroweb:107875,Victoria Nile km 5362,1.9279,32.3952,Magwi,Eastern Equatoria,175.7,False
+hydroweb:107876,Victoria Nile km 5360,1.955,32.4013,Magwi,Eastern Equatoria,172.8,False
+hydroweb:107877,Victoria Nile km 5340,2.0751,32.4279,Magwi,Eastern Equatoria,160.1,False
+hydroweb:107878,Victoria Nile Trib01 km 5368,2.4225,32.5048,Magwi,Eastern Equatoria,124.3,False
+hydroweb:107879,Achwa Trib01 km 5388,2.5378,32.5305,Magwi,Eastern Equatoria,113.0,False
+hydroweb:107880,Achwa km 5238,2.9133,32.6139,Magwi,Eastern Equatoria,79.8,False
+hydroweb:107881,Baro Trib 01 km 4543,7.8486,33.7136,Pochalla,Jonglei,17.2,False
+hydroweb:108187,Nyabarongo km 6943,-2.1172,29.6135,Morobo,Central Equatoria,635.8,False
+hydroweb:108188,Rutshuru km 6100,-0.96,29.3571,Morobo,Central Equatoria,520.1,False
+hydroweb:108189,Ibina km 2838,0.8718,28.9515,Morobo,Central Equatoria,353.4,False
+hydroweb:108190,Bomokandi km 3260,2.8313,28.5173,Yambio,Western Equatoria,161.4,False
+hydroweb:108191,Jur km 4973,5.9019,27.8346,Tambura,Western Equatoria,0.0,True
+hydroweb:108192,Jur km 4964,5.9569,27.8223,Tambura,Western Equatoria,0.0,True
+hydroweb:108418,Baro Trib 01 km 4588,7.7299,33.9713,Pochalla,Jonglei,22.6,False
+hydroweb:108533,Maiko km 2490,-0.1719,26.3198,Nzara,Western Equatoria,545.2,False
+hydroweb:108534,Tshopo Trib01 km 2603,0.5596,26.4817,Nzara,Western Equatoria,463.4,False
+hydroweb:108720,Victoria Nile km 5773,0.6413,33.0453,Magwi,Eastern Equatoria,330.2,False
+hydroweb:108721,Victoria Nile km 5760,0.8156,33.084,Magwi,Eastern Equatoria,313.1,False
+hydroweb:108722,Victoria Nile Trib01 km 5720,1.0789,33.1423,Magwi,Eastern Equatoria,287.8,False
+hydroweb:108723,Achwa km 5370,2.3535,33.4246,Ikotos,Eastern Equatoria,154.6,False
+hydroweb:108725,Baro Trib 01 km 4744,7.4426,34.5576,Pochalla,Jonglei,53.4,False
+hydroweb:109057,Kyambura km 5954,-0.2318,30.1311,Morobo,Central Equatoria,419.7,False
+hydroweb:109059,Semliki km 5669,0.8106,29.9001,Morobo,Central Equatoria,315.1,False
+hydroweb:109275,Turkwel km 29,3.1094,35.9361,Kapoeta East,Eastern Equatoria,168.1,False
+hydroweb:109276,Baro km 4610,8.1894,34.8032,Maiwut,Upper Nile,88.1,False
+hydroweb:109363,Ulindi Unidi km 2754,-2.5563,26.7266,Yambio,Western Equatoria,781.6,False
+hydroweb:109364,Lindi km 2684,0.8576,27.4828,Yambio,Western Equatoria,393.1,False
+hydroweb:109365,Nepoko km 2752,2.1291,27.7645,Yambio,Western Equatoria,248.7,False
+hydroweb:109366,Bomokandi km 3163,3.1286,27.9861,Yambio,Western Equatoria,135.5,False
+hydroweb:109367,Bhr Lgzl Trib 02 km 4306,9.1503,29.3309,Mayom,Unity,0.0,True
+hydroweb:109368,Bahr Al Arab km 4307,9.5869,29.4294,Abiemnhom,Unity,0.0,True
+hydroweb:109552,Malaba km 6001,0.5811,33.9671,Ikotos,Eastern Equatoria,353.9,False
+hydroweb:109553,Namatala Trib01 km 5896,1.3745,34.1428,Ikotos,Eastern Equatoria,271.7,False
+hydroweb:109554,Akokoro Trib01 km 6001,2.3069,34.3493,Ikotos,Eastern Equatoria,184.6,False
+hydroweb:109678,Lobaye km 2230,0.4196,24.3763,Nzara,Western Equatoria,604.1,False
+hydroweb:109679,Bili km 2484,4.2233,23.533,Nagero,Western Equatoria,386.1,False
+hydroweb:109680,Mbari km 2582,5.4089,23.2692,Raja,Western Bahr el Ghazal,317.5,False
+hydroweb:109896,Rwizi Trib01 km 6220,-0.7339,31.1773,Morobo,Central Equatoria,468.5,False
+hydroweb:109897,Rwizi Trib01 km 6218,-0.7048,31.1708,Morobo,Central Equatoria,465.3,False
+hydroweb:109898,Nkusi km 5520,1.0941,30.7726,Morobo,Central Equatoria,265.2,False
+hydroweb:109899,Bhr Lgzl Trib 02 km 4375,9.2746,28.9486,Mayom,Unity,0.0,True
+hydroweb:109993,Kotto km 2941,7.8608,23.4306,Raja,Western Bahr el Ghazal,98.6,False
+hydroweb:110091,Gibe Trib01 km 497,6.4357,36.131,Pibor,Jonglei,122.9,False
+hydroweb:110092,Lnyl L Zrq Trib 01 km 3722,13.4563,34.5419,Renk,Upper Nile,192.8,False
+hydroweb:110093,Lnyl L Zrq Trib 01 km 3698,13.5469,34.521,Renk,Upper Nile,198.5,False
+hydroweb:110094,Lnyl L Zrq Trib 01 km 3669,13.6578,34.4955,Renk,Upper Nile,206.0,False
+hydroweb:110218,Lugulu km 2970,-2.3594,27.7053,Morobo,Central Equatoria,735.3,False
+hydroweb:110219,Oso km 2940,-0.9373,28.0204,Morobo,Central Equatoria,579.1,False
+hydroweb:110220,Bomokandi km 3361,2.8253,28.8539,Yambio,Western Equatoria,168.0,False
+hydroweb:110221,Gulnam km 4631,7.1049,29.8067,Rumbek Centre,Lakes,0.0,True
+hydroweb:110389,Mara km 6218,-1.4991,34.4414,Ikotos,Eastern Equatoria,589.3,False
+hydroweb:110390,Turkwel Trib01 km 323,5.3408,35.9583,Kapoeta East,Eastern Equatoria,11.2,False
+hydroweb:110486,Lilo km 2437,-0.555,25.5272,Nzara,Western Equatoria,622.5,False
+hydroweb:110764,Blue Nile km 3920,11.2448,34.9011,Maban,Upper Nile,157.5,False
+hydroweb:110765,Lnyl L Zrq Trib 01 km 3418,14.2252,33.7653,Renk,Upper Nile,228.3,False
+hydroweb:110917,Mara km 6155,-1.5961,34.1575,Ikotos,Eastern Equatoria,595.3,False
+hydroweb:111152,Ituri km 3048,1.5936,29.9077,Morobo,Central Equatoria,235.0,False
+hydroweb:111153,Dungu km 3436,3.7159,29.1488,Ibba,Western Equatoria,69.7,False
+hydroweb:111154,Jur km 4808,6.952,27.9813,Wau,Western Bahr el Ghazal,0.0,True
+hydroweb:111155,Busseri km 4772,7.4267,27.8085,Wau,Western Bahr el Ghazal,0.0,True
+hydroweb:111156,Lol km 4729,9.042,27.2164,Aweil North,Northern Bahr el Ghazal,0.0,True
+hydroweb:111294,Tshopo Trib01 km 2568,0.5103,26.4047,Nzara,Western Equatoria,472.0,False
+hydroweb:111295,Nava km 2580,2.038,26.9497,Nzara,Western Equatoria,292.8,False
+hydroweb:111296,Ibba km 4410,6.2254,28.4538,Nzara,Western Equatoria,0.0,True
+hydroweb:111297,Bahr Al Arab Trib 02 km 4355,8.5843,29.3139,Tonj North,Warrap,0.0,True
+hydroweb:111298,Bhr Lgzl Trib 03 km 4333,8.7148,29.3618,Mayom,Unity,0.0,True
+hydroweb:111299,Bhr Lgzl Trib 01 km 4273,9.0665,29.4913,Mayom,Unity,0.1,True
+hydroweb:111300,Bahr Al Arab km 4263,9.4102,29.6182,Rubkona,Unity,0.0,True
+hydroweb:112209,Victoria Nile km 5741,0.8955,32.9911,Magwi,Eastern Equatoria,301.5,False
+hydroweb:112210,Victoria Nile km 5723,1.0371,32.9406,Magwi,Eastern Equatoria,284.9,False
+hydroweb:112211,Bahr Al Jabal km 5093,3.6244,32.0159,Magwi,Eastern Equatoria,0.0,True
+hydroweb:112212,Bhr Lgzl km 4197,9.3696,29.9297,Guit,Unity,0.0,True
+hydroweb:112358,Nile km 4919,6.1299,31.2539,Awerial,Lakes,0.0,True
+hydroweb:112359,Lnyl L Byd km 4670,6.5498,31.4061,Bor South,Jonglei,0.0,True
+hydroweb:112360,Blue Nile km 3590,13.2611,33.9007,Renk,Upper Nile,133.2,False
+hydroweb:112548,Congo km 2159,0.7214,24.5493,Nzara,Western Equatoria,565.8,False
+hydroweb:112549,Bili km 2433,4.2849,23.275,Nagero,Western Equatoria,407.5,False
+hydroweb:112706,Kotto km 2923,7.7631,23.3438,Raja,Western Bahr el Ghazal,112.8,False
+hydroweb:113241,Sobat Trib 01 km 4390,8.2113,33.1905,Ulang,Upper Nile,0.1,True
+hydroweb:113242,Sobat km 4301,8.5968,33.049,Luakpiny/Nasir,Upper Nile,0.0,True
+hydroweb:113243,R Adar km 3865,10.3111,32.4151,Melut,Upper Nile,0.0,True
+hydroweb:113376,Baro Trib 01 km 4745,7.4385,34.5641,Pochalla,Jonglei,53.6,False
+hydroweb:113377,Kusa km 4110,11.0711,35.9058,Maban,Upper Nile,235.3,False
+hydroweb:113595,Aruwimi Ituri km 2526,1.649,27.0531,Nzara,Western Equatoria,326.7,False
+hydroweb:113596,Uere km 2936,4.3959,26.0699,Ezo,Western Equatoria,167.9,False
+hydroweb:113743,Mbomou km 2811,5.0003,25.1768,Nagero,Western Equatoria,185.5,False
+hydroweb:113744,Lol km 4833,9.1147,26.6746,Aweil West,Northern Bahr el Ghazal,0.0,True
+hydroweb:12757,Maiko km 2460,-0.0731,26.1967,Nzara,Western Equatoria,540.7,False
+hydroweb:12762,Nava km 2610,2.1667,26.8683,Nzara,Western Equatoria,284.4,False
+hydroweb:12763,Ngayu km 2580,1.7614,27.3519,Yambio,Western Equatoria,302.6,False
+hydroweb:200025,Aruwimi km 2258,1.4757,25.2477,Nzara,Western Equatoria,450.8,False
+hydroweb:200026,Lindi km 2306,1.0291,25.3126,Nzara,Western Equatoria,485.7,False
+hydroweb:200029,Lwalaba km 2275,0.3339,25.4137,Nzara,Western Equatoria,543.4,False
+hydroweb:200038,Nahir Ad Dindar km 4199,12.0145,36.0076,Renk,Upper Nile,295.8,False
+hydroweb:200080,Bomokandi km 2934,3.2734,26.5389,Nzara,Western Equatoria,204.7,False
+hydroweb:200082,Maiko km 2417,-0.0008,26.062,Nzara,Western Equatoria,540.0,False
+hydroweb:200083,Tshopo km 2520,0.6186,26.1523,Nzara,Western Equatoria,474.1,False
+hydroweb:200084,Uele km 2929,4.021,26.6483,Ezo,Western Equatoria,140.7,False
+hydroweb:200088,Lol km 4696,8.9436,27.3787,Aweil East,Northern Bahr el Ghazal,0.0,True
+hydroweb:200411,Bomokandi km 3084,3.3156,27.445,Nzara,Western Equatoria,141.5,False
+hydroweb:200412,Lindi km 2772,0.4911,27.8569,Yambio,Western Equatoria,424.7,False
+hydroweb:200414,Nepoko km 2719,2.0981,27.6231,Yambio,Western Equatoria,256.8,False
+hydroweb:200547,Rubi km 2390,2.6886,25.071,Ezo,Western Equatoria,370.8,False
+hydroweb:200566,Atbarah km 3219,15.3332,35.7708,Renk,Upper Nile,436.8,False
+hydroweb:200567,Baro Trib 01 km 4741,7.4437,34.5499,Pochalla,Jonglei,52.8,False
+hydroweb:200568,Baro km 4590,8.1832,34.6605,Maiwut,Upper Nile,76.2,False
+hydroweb:200569,Dabus km 4080,10.1152,34.9527,Maban,Upper Nile,105.3,False
+hydroweb:200601,Uku km 2791,-1.7648,27.0363,Yambio,Western Equatoria,688.0,False
+hydroweb:200662,Aruwimi km 2089,1.3092,24.0391,Nzara,Western Equatoria,559.2,False
+hydroweb:200663,Itimbiri km 2143,2.7684,23.8266,Nagero,Western Equatoria,471.3,False
+hydroweb:200664,Lomami km 2398,-0.5204,24.3052,Nzara,Western Equatoria,692.3,False
+hydroweb:201171,Lindi km 2513,1.2552,26.5128,Nzara,Western Equatoria,392.7,False
+hydroweb:201172,Lowa km 2713,-1.2444,26.8766,Yambio,Western Equatoria,636.3,False
+hydroweb:201173,Lugulu km 2800,-2.1437,27.0066,Yambio,Western Equatoria,729.8,False
+hydroweb:201176,Tshopo Trib01 km 2626,0.5723,26.6117,Nzara,Western Equatoria,456.2,False
+hydroweb:201327,Juba km 4839,5.4162,31.7847,Terekeka,Central Equatoria,0.0,True
+hydroweb:201328,Nile km 4826,5.6044,31.8117,Terekeka,Central Equatoria,0.0,True
+hydroweb:201329,Nile km 4834,5.5371,31.8026,Terekeka,Central Equatoria,0.0,True
+hydroweb:201330,Nile km 4843,5.4725,31.7935,Terekeka,Central Equatoria,0.0,True
+hydroweb:201331,Nile km 4846,5.367,31.7768,Terekeka,Central Equatoria,0.0,True
+hydroweb:201332,Nile km 4862,5.2756,31.7645,Terekeka,Central Equatoria,0.0,True
+hydroweb:201333,Nile km 4884,5.14,31.7429,Juba,Central Equatoria,0.0,True
+hydroweb:201334,Nile km 4892,5.0813,31.7347,Juba,Central Equatoria,0.0,True
+hydroweb:201335,Ruvubu km 6704,-2.611,30.613,Morobo,Central Equatoria,675.4,False
+hydroweb:201336,White Nile km 3623,11.8354,32.7512,Manyo,Upper Nile,0.0,True
+hydroweb:201337,White Nile km 3670,11.4627,32.6936,Manyo,Upper Nile,0.0,True
+hydroweb:201471,Bomokandi km 3339,2.8041,28.9359,Yambio,Western Equatoria,172.9,False
+hydroweb:201487,Lindi km 2475,1.3131,26.2533,Nzara,Western Equatoria,400.9,False
+hydroweb:201706,Sobat km 4264,8.6171,32.8242,Ulang,Upper Nile,0.0,True
+hydroweb:201707,White Nile km 3750,10.8613,32.4832,Renk,Upper Nile,0.0,True
+hydroweb:201743,Aruwimi km 2049,1.2885,23.7853,Nzara,Western Equatoria,582.5,False
+hydroweb:201767,White Nile km 4002,9.3446,31.484,Canal/Pigi,Jonglei,0.0,True
+hydroweb:201840,Akagera km 6456,-1.3473,30.5904,Morobo,Central Equatoria,535.9,False
+hydroweb:202025,White Nile km 3699,11.2248,32.6573,Manyo,Upper Nile,0.0,True
+hydroweb:202026,White Nile km 3728,10.9773,32.619,Manyo,Upper Nile,0.0,True
+hydroweb:202062,Baro Wenz Trib01 km 4698,8.0248,35.3789,Maiwut,Upper Nile,152.1,False
+hydroweb:202063,Baro Wenz km 4707,8.4887,35.3092,Maiwut,Upper Nile,129.1,False
+hydroweb:202100,Tshopo km 2293,0.6721,25.3646,Nzara,Western Equatoria,515.1,False
+hydroweb:202506,Lwalaba km 2354,-0.2862,25.5037,Nzara,Western Equatoria,597.3,False
+hydroweb:202509,Lwalaba km 2714,-3.1969,25.9276,Yambio,Western Equatoria,875.3,False
+hydroweb:202510,Lwalaba km 2768,-3.5971,25.9862,Yambio,Western Equatoria,915.6,False
+hydroweb:202859,Blue Nile km 4224,10.1178,36.1847,Longochuk,Upper Nile,238.3,False
+hydroweb:202861,Hanger km 4233,9.5375,36.0967,Longochuk,Upper Nile,218.2,False
+hydroweb:202890,Congo km 2068,1.0946,23.7571,Nzara,Western Equatoria,598.9,False
+hydroweb:202894,Tshuapa km 2145,-1.0793,23.4412,Nzara,Western Equatoria,800.9,False
+hydroweb:202895,Uele km 2565,3.7114,24.1386,Nagero,Western Equatoria,368.9,False
+hydroweb:202982,Maiko km 2598,-0.3306,26.743,Yambio,Western Equatoria,544.0,False
+hydroweb:203105,Lomani km 2193,0.4563,24.1631,Nzara,Western Equatoria,616.6,False
+hydroweb:203106,Uele km 2477,3.8062,23.6747,Nagero,Western Equatoria,400.4,False
+hydroweb:203222,Semliki km 5671,0.8048,29.8759,Morobo,Central Equatoria,316.6,False
+hydroweb:203243,Aruwimi km 2438,1.8399,26.4273,Nzara,Western Equatoria,340.8,False
+hydroweb:203244,Bomokandi km 2874,3.567,26.1754,Ezo,Western Equatoria,213.8,False
+hydroweb:203245,Elila km 3042,-3.5846,27.217,Morobo,Central Equatoria,881.5,False
+hydroweb:203360,Lnyl L Byd km 4552,7.1247,30.8025,Yirol East,Lakes,0.0,True
+hydroweb:203361,Yei km 4848,4.9664,30.4835,Mundri East,Western Equatoria,0.0,True
+hydroweb:203363,Ruzizi km 90,-3.3151,29.2763,Morobo,Central Equatoria,773.5,False
+hydroweb:203366,Ituri km 3025,1.7472,30.0149,Morobo,Central Equatoria,214.4,False
+hydroweb:203476,Nduye km 2822,1.672,28.7707,Yambio,Western Equatoria,292.0,False
+hydroweb:203688,Epulu km 2849,1.4288,28.9525,Morobo,Central Equatoria,301.8,False
+hydroweb:203689,Ibina km 2851,0.8413,29.038,Morobo,Central Equatoria,351.5,False
+hydroweb:203690,Ituri km 2823,1.1289,28.9961,Morobo,Central Equatoria,326.5,False
+hydroweb:203691,Kibali km 3299,3.6022,28.6356,Yambio,Western Equatoria,78.6,False
+hydroweb:203692,Nduye km 2845,1.7515,28.9057,Morobo,Central Equatoria,277.3,False
+hydroweb:203695,Lol km 4620,8.9499,27.8424,Aweil East,Northern Bahr el Ghazal,0.0,True
+hydroweb:203696,Nahr Al Jur km 4656,7.8796,28.0041,Jur River,Western Bahr el Ghazal,0.0,True
+hydroweb:203697,Bomokandi km 3325,2.8411,28.7469,Yambio,Western Equatoria,163.6,False
+hydroweb:203704,Baro km 4388,8.4586,33.4678,Luakpiny/Nasir,Upper Nile,0.0,True
+hydroweb:203765,Nile km 5018,4.1026,31.5909,Juba,Central Equatoria,0.0,True
+hydroweb:203768,Bomokandi km 3165,3.2898,27.7722,Nzara,Western Equatoria,127.6,False
+hydroweb:203769,Gada km 3183,3.6752,27.8284,Nzara,Western Equatoria,86.2,False
+hydroweb:203770,Ituri km 2595,1.3927,27.4956,Yambio,Western Equatoria,335.6,False
+hydroweb:203771,Lugulu km 2793,-2.1432,26.9815,Yambio,Western Equatoria,730.3,False
+hydroweb:203774,Nepoko km 2715,2.0698,27.5943,Yambio,Western Equatoria,260.8,False
+hydroweb:203775,Ona km 2785,-1.6691,27.0505,Yambio,Western Equatoria,677.2,False
+hydroweb:203777,Nahr Al Jur km 4456,8.7242,28.5795,Gogrial East,Warrap,0.0,True
+hydroweb:203958,Akagera km 6670,-2.4079,30.6428,Morobo,Central Equatoria,652.9,False
+hydroweb:204065,Blue Nile km 3918,11.2387,34.8909,Maban,Upper Nile,156.2,False
+hydroweb:204211,Bima km 2716,3.328,25.3121,Ezo,Western Equatoria,304.0,False
+hydroweb:204212,Congo km 2206,0.5596,24.9088,Nzara,Western Equatoria,554.8,False
+hydroweb:204213,Lomami km 2500,-0.9996,24.6822,Nzara,Western Equatoria,713.0,False
+hydroweb:204214,Mbomou km 2929,5.3397,25.607,Nagero,Western Equatoria,124.3,False
+hydroweb:204215,Uele km 2723,3.5273,25.3411,Ezo,Western Equatoria,288.1,False
+hydroweb:204216,Uere km 2748,3.6682,25.362,Ezo,Western Equatoria,277.3,False
+hydroweb:204229,Baro Trib 01 km 4671,7.625,34.2091,Pochalla,Jonglei,31.4,False
+hydroweb:204230,Baro km 4499,8.207,34.1217,Maiwut,Upper Nile,33.3,False
+hydroweb:204348,Uele km 2853,3.6787,26.1589,Ezo,Western Equatoria,206.4,False
+hydroweb:204376,Epulu km 2820,1.4146,28.7334,Morobo,Central Equatoria,318.2,False
+hydroweb:204524,Akagera km 6129,-0.9564,31.7662,Magwi,Eastern Equatoria,495.7,False
+hydroweb:204525,Lnyl L Byd km 4196,9.0487,30.2933,Guit,Unity,0.0,True
+hydroweb:204668,Kagera km 6402,-1.0693,30.5498,Morobo,Central Equatoria,505.5,False
+hydroweb:204669,Ruvubu km 6658,-2.4554,30.7517,Morobo,Central Equatoria,657.8,False
+hydroweb:204670,Semliki km 5563,1.0891,30.2361,Morobo,Central Equatoria,274.5,False
+hydroweb:3430,Aruwimi km 2499,1.7011,26.8286,Nzara,Western Equatoria,332.3,False
+hydroweb:3431,Aruwimi km 2131,1.3372,24.3299,Nzara,Western Equatoria,532.8,False
+hydroweb:3432,Aruwimi km 2058,1.2919,23.8486,Nzara,Western Equatoria,576.8,False
+hydroweb:3433,Aruwimi km 2434,1.8544,26.3959,Nzara,Western Equatoria,341.4,False
+hydroweb:3434,Aruwimi km 2130,1.3317,24.3141,Nzara,Western Equatoria,534.5,False
+hydroweb:3435,Aruwimi km 2269,1.5437,25.2961,Nzara,Western Equatoria,441.5,False
+hydroweb:3436,Aruwimi km 2042,1.2584,23.7224,Nzara,Western Equatoria,590.1,False
+hydroweb:3437,Aruwimi km 2173,1.2935,24.6489,Nzara,Western Equatoria,510.7,False
+hydroweb:3438,Aruwimi km 2306,1.7272,25.4854,Nzara,Western Equatoria,412.2,False
+hydroweb:3439,Aruwimi km 2367,1.8789,25.9231,Nzara,Western Equatoria,368.8,False
+hydroweb:3440,Aruwimi km 2056,1.296,23.8396,Nzara,Western Equatoria,577.2,False
+hydroweb:3441,Aruwimi km 2509,1.6876,26.9009,Nzara,Western Equatoria,329.9,False
+hydroweb:3442,Aruwimi km 2188,1.3079,24.7769,Nzara,Western Equatoria,499.7,False
+hydroweb:3443,Aruwimi km 2357,1.8811,25.8394,Nzara,Western Equatoria,374.2,False
+hydroweb:3444,Aruwimi km 2113,1.3252,24.1759,Nzara,Western Equatoria,546.5,False
+hydroweb:3445,Aruwimi km 2235,1.4936,25.0739,Nzara,Western Equatoria,461.9,False
+hydroweb:3454,Bomokandi km 3086,3.3019,27.4016,Nzara,Western Equatoria,145.3,False
+hydroweb:3455,Bomokandi km 2943,3.2791,26.6169,Nzara,Western Equatoria,198.4,False
+hydroweb:3456,Bomokandi km 3119,3.3313,27.5636,Nzara,Western Equatoria,133.8,False
+hydroweb:3464,Mbomou km 2746,4.9001,24.7842,Nagero,Western Equatoria,227.2,False
+hydroweb:3465,Bomokandi km 2904,3.4375,26.4071,Nzara,Western Equatoria,202.9,False
+hydroweb:3466,Bomokandi km 3020,3.1531,27.0419,Nzara,Western Equatoria,181.3,False
+hydroweb:3467,Bomokandi km 2933,3.2762,26.5484,Nzara,Western Equatoria,203.8,False
+hydroweb:3468,Bomokandi km 3102,3.3181,27.4741,Nzara,Western Equatoria,139.6,False
+hydroweb:3469,Bomokandi km 2868,3.5396,26.2048,Ezo,Western Equatoria,213.6,False
+hydroweb:3470,Bomokandi km 3023,3.1351,27.0524,Nzara,Western Equatoria,182.5,False
+hydroweb:3476,Chinko km 2691,5.5352,24.3131,Raja,Western Bahr el Ghazal,233.6,False
+hydroweb:3477,Chinko km 2656,5.3834,24.2094,Raja,Western Bahr el Ghazal,254.1,False
+hydroweb:3519,Lwalaba km 2483,-1.2796,25.7592,Nzara,Western Equatoria,683.3,False
+hydroweb:3522,Lwalaba km 2711,-3.1504,25.9181,Yambio,Western Equatoria,870.7,False
+hydroweb:3523,Congo km 2161,0.7241,24.5591,Nzara,Western Equatoria,564.8,False
+hydroweb:3525,Congo km 2053,1.1039,23.7761,Nzara,Western Equatoria,596.6,False
+hydroweb:3527,Congo km 1992,1.4209,23.3999,Ezo,Western Equatoria,605.5,False
+hydroweb:3530,Congo km 2113,0.8623,24.2069,Nzara,Western Equatoria,579.9,False
+hydroweb:3534,Lwalaba km 2227,0.5429,25.0774,Nzara,Western Equatoria,545.1,False
+hydroweb:3538,Lwalaba km 2461,-1.1301,25.642,Nzara,Western Equatoria,673.7,False
+hydroweb:3542,Lwalaba km 2776,-3.6641,26.0182,Yambio,Western Equatoria,921.7,False
+hydroweb:3544,Congo km 2050,1.1116,23.7465,Nzara,Western Equatoria,598.6,False
+hydroweb:3550,Congo km 2195,0.5771,24.8081,Nzara,Western Equatoria,560.1,False
+hydroweb:3557,Congo km 2056,1.1026,23.7954,Nzara,Western Equatoria,595.1,False
+hydroweb:3560,Congo km 2172,0.6551,24.6329,Nzara,Western Equatoria,565.5,False
+hydroweb:3570,Congo km 2128,0.7731,24.3031,Nzara,Western Equatoria,579.7,False
+hydroweb:3602,Elila km 3112,-3.4761,27.5771,Morobo,Central Equatoria,854.0,False
+hydroweb:3603,Elila km 2725,-2.8554,26.1924,Yambio,Western Equatoria,829.9,False
+hydroweb:3604,Elila km 2947,-3.0531,27.0839,Yambio,Western Equatoria,827.1,False
+hydroweb:3605,Elila km 2809,-3.0417,26.5459,Yambio,Western Equatoria,838.9,False
+hydroweb:3606,Elila km 2926,-2.9571,26.9944,Yambio,Western Equatoria,818.5,False
+hydroweb:3607,Elila km 2832,-3.0506,26.6166,Yambio,Western Equatoria,837.9,False
+hydroweb:3608,Elila km 2684,-2.7354,26.0104,Yambio,Western Equatoria,823.7,False
+hydroweb:3609,Epulu km 2732,1.2714,28.3954,Yambio,Western Equatoria,333.9,False
+hydroweb:3629,Itimbiri km 2142,2.7634,23.8204,Nagero,Western Equatoria,472.2,False
+hydroweb:3630,Rubi km 2240,2.8354,24.4001,Ezo,Western Equatoria,418.9,False
+hydroweb:3631,Itimbiri km 2104,2.6821,23.6794,Nagero,Western Equatoria,489.3,False
+hydroweb:3632,Itimbiri km 2055,2.6193,23.4214,Nagero,Western Equatoria,513.5,False
+hydroweb:3633,Rubi km 2223,2.8517,24.305,Ezo,Western Equatoria,426.6,False
+hydroweb:3637,Itimbiri km 2146,2.7824,23.8529,Nagero,Western Equatoria,468.2,False
+hydroweb:3638,Ituri km 2962,1.2229,29.4934,Morobo,Central Equatoria,291.0,False
+hydroweb:3639,Ituri km 2530,1.6143,27.0649,Nzara,Western Equatoria,329.7,False
+hydroweb:3640,Ituri km 2573,1.5404,27.4006,Yambio,Western Equatoria,323.5,False
+hydroweb:3641,Ituri km 2736,1.1611,28.4175,Yambio,Western Equatoria,346.1,False
+hydroweb:3642,Ituri km 2928,1.0879,29.3698,Morobo,Central Equatoria,310.3,False
+hydroweb:3643,Ituri km 2544,1.5806,27.1754,Nzara,Western Equatoria,328.7,False
+hydroweb:3644,Ituri km 2676,1.3341,28.0559,Yambio,Western Equatoria,329.1,False
+hydroweb:3645,Ituri km 2833,1.1952,28.9601,Morobo,Central Equatoria,322.5,False
+hydroweb:3646,Ituri km 2945,1.1811,29.4247,Morobo,Central Equatoria,298.4,False
+hydroweb:3647,Ituri km 2658,1.3371,27.9134,Yambio,Western Equatoria,330.9,False
+hydroweb:3648,Ituri km 2822,1.1886,28.8814,Morobo,Central Equatoria,328.1,False
+hydroweb:3649,Ituri km 3015,1.4461,29.7596,Morobo,Central Equatoria,256.8,False
+hydroweb:3650,Ituri km 2613,1.3434,27.5897,Yambio,Western Equatoria,337.9,False
+hydroweb:3651,Ituri km 2748,1.0869,28.4686,Yambio,Western Equatoria,354.5,False
+hydroweb:3718,Kibali km 3445,3.2931,29.4294,Yei,Central Equatoria,112.5,False
+hydroweb:3719,Kibali km 3436,3.2829,29.3521,Ibba,Western Equatoria,118.0,False
+hydroweb:3720,Kibali km 3362,3.5838,29.0221,Ibba,Western Equatoria,86.8,False
+hydroweb:3792,Lindi km 2538,1.2293,26.6611,Nzara,Western Equatoria,387.5,False
+hydroweb:3793,Lindi km 2655,0.8741,27.3295,Yambio,Western Equatoria,396.2,False
+hydroweb:3794,Lindi km 2517,1.2519,26.5294,Nzara,Western Equatoria,392.1,False
+hydroweb:3795,Lindi km 2695,0.8414,27.5556,Yambio,Western Equatoria,392.9,False
+hydroweb:3796,Lindi km 2226,0.5566,25.0786,Nzara,Western Equatoria,543.8,False
+hydroweb:3797,Lindi km 2465,1.3029,26.1789,Nzara,Western Equatoria,406.2,False
+hydroweb:3798,Lindi km 2604,1.0856,27.0656,Yambio,Western Equatoria,384.2,False
+hydroweb:3799,Lindi km 2774,0.4876,27.8691,Yambio,Western Equatoria,424.9,False
+hydroweb:3800,Lindi km 2356,1.2448,25.5954,Nzara,Western Equatoria,447.7,False
+hydroweb:3801,Lindi km 2447,1.2267,26.0676,Nzara,Western Equatoria,420.0,False
+hydroweb:3802,Lindi km 2599,1.0969,27.0316,Yambio,Western Equatoria,384.5,False
+hydroweb:3803,Lindi km 2853,0.1811,28.169,Yambio,Western Equatoria,455.5,False
+hydroweb:3804,Lindi km 2858,0.1465,28.1772,Yambio,Western Equatoria,459.3,False
+hydroweb:3805,Lindi km 2377,1.2963,25.7096,Nzara,Western Equatoria,435.7,False
+hydroweb:3806,Lindi km 2534,1.2224,26.6281,Nzara,Western Equatoria,389.9,False
+hydroweb:3853,Lomami km 2223,0.2489,24.0759,Nzara,Western Equatoria,640.5,False
+hydroweb:3854,Lomami km 2248,0.0864,24.0399,Nzara,Western Equatoria,657.0,False
+hydroweb:3855,Lomami km 2240,0.1511,24.0509,Nzara,Western Equatoria,650.7,False
+hydroweb:3856,Lomami km 2266,-0.0301,24.0129,Nzara,Western Equatoria,669.0,False
+hydroweb:3857,Lomami km 2507,-1.0245,24.7284,Nzara,Western Equatoria,712.6,False
+hydroweb:3862,Lomami km 2267,-0.0436,24.0106,Nzara,Western Equatoria,670.3,False
+hydroweb:3863,Lomami km 2284,-0.1101,24.0253,Nzara,Western Equatoria,675.0,False
+hydroweb:3873,Lomami km 2415,-0.6489,24.3439,Nzara,Western Equatoria,701.5,False
+hydroweb:3874,Lomami km 2608,-1.4119,25.1102,Nzara,Western Equatoria,728.9,False
+hydroweb:3879,Lomami km 2502,-1.0054,24.6916,Nzara,Western Equatoria,713.0,False
+hydroweb:3885,Lowa km 2744,-1.1585,27.0629,Yambio,Western Equatoria,621.7,False
+hydroweb:3886,Lowa km 2813,-1.2246,27.4894,Yambio,Western Equatoria,619.2,False
+hydroweb:3887,Oso km 2867,-0.929,27.5546,Yambio,Western Equatoria,585.6,False
+hydroweb:3888,Lowa km 2588,-1.2437,26.1469,Yambio,Western Equatoria,662.9,False
+hydroweb:3889,Lowa km 2674,-1.3691,26.6426,Yambio,Western Equatoria,657.1,False
+hydroweb:3890,Lowa km 2826,-1.2648,27.5544,Yambio,Western Equatoria,622.5,False
+hydroweb:3891,Lowa km 2558,-1.3799,26.0554,Yambio,Western Equatoria,680.9,False
+hydroweb:3892,Lowa km 2571,-1.2904,26.0724,Yambio,Western Equatoria,670.9,False
+hydroweb:3893,Lowa km 2741,-1.1565,27.0366,Yambio,Western Equatoria,622.2,False
+hydroweb:3894,Lowa km 2887,-1.4231,27.909,Morobo,Central Equatoria,632.3,False
+hydroweb:3930,Lugulu km 2757,-2.1648,26.8189,Yambio,Western Equatoria,736.9,False
+hydroweb:3931,Lugulu km 2756,-2.1616,26.8141,Yambio,Western Equatoria,736.7,False
+hydroweb:4008,Lwalaba km 2256,0.4234,25.2949,Nzara,Western Equatoria,542.7,False
+hydroweb:4009,Lwalaba km 2359,-0.319,25.4764,Nzara,Western Equatoria,602.0,False
+hydroweb:4010,Lwalaba km 2451,-1.0444,25.6311,Nzara,Western Equatoria,665.6,False
+hydroweb:4011,Lwalaba km 2465,-1.1589,25.6619,Nzara,Western Equatoria,675.6,False
+hydroweb:4012,Lwalaba km 2539,-1.7459,25.792,Nzara,Western Equatoria,729.8,False
+hydroweb:4034,Maiko km 2399,0.0346,25.8985,Nzara,Western Equatoria,544.9,False
+hydroweb:4035,Maiko km 2383,0.0672,25.8566,Nzara,Western Equatoria,543.9,False
+hydroweb:4048,Mbomou km 2966,5.2469,25.7579,Nagero,Western Equatoria,119.9,False
+hydroweb:4049,Mbomou km 2616,4.928,24.1786,Nagero,Western Equatoria,283.9,False
+hydroweb:4050,Mbomou km 2927,5.3512,25.6202,Nagero,Western Equatoria,122.4,False
+hydroweb:4051,Mbomou km 2937,5.3054,25.6293,Nagero,Western Equatoria,125.0,False
+hydroweb:4052,Mbomou km 2804,5.0153,25.1331,Nagero,Western Equatoria,188.2,False
+hydroweb:4053,Mbomou km 3070,5.2461,26.1191,Nagero,Western Equatoria,99.0,False
+hydroweb:4055,Mbomou km 2560,4.8169,23.8686,Nagero,Western Equatoria,320.6,False
+hydroweb:4057,Mbomou km 2534,4.7646,23.6741,Nagero,Western Equatoria,342.9,False
+hydroweb:4058,Mbomou km 2819,5.0131,25.2274,Nagero,Western Equatoria,180.2,False
+hydroweb:4059,Mbomou km 2718,4.976,24.6564,Nagero,Western Equatoria,234.5,False
+hydroweb:4060,Mbomou km 3068,5.2374,26.1126,Nagero,Western Equatoria,100.2,False
+hydroweb:4061,Mbomou km 2948,5.3149,25.6669,Nagero,Western Equatoria,121.3,False
+hydroweb:4062,Mbomou km 2500,4.6556,23.433,Raja,Western Bahr el Ghazal,370.3,False
+hydroweb:4064,Mbomou km 2639,5.003,24.2946,Nagero,Western Equatoria,268.5,False
+hydroweb:4127,Nepoko km 2578,2.0114,27.0405,Nzara,Western Equatoria,290.8,False
+hydroweb:4128,Nepoko km 2539,1.7996,26.9991,Nzara,Western Equatoria,313.9,False
+hydroweb:4129,Nepoko km 2741,2.0754,27.7492,Yambio,Western Equatoria,254.9,False
+hydroweb:4130,Nepoko km 2742,2.0804,27.7502,Yambio,Western Equatoria,254.3,False
+hydroweb:4135,Oso km 2852,-0.9096,27.4759,Yambio,Western Equatoria,585.0,False
+hydroweb:4136,Ouara km 2757,5.2592,24.7041,Nagero,Western Equatoria,214.8,False
+hydroweb:4170,Ouara km 2900,5.7684,25.0591,Nagero,Western Equatoria,155.5,False
+hydroweb:4171,Ouara km 2759,5.2636,24.7204,Nagero,Western Equatoria,212.9,False
+hydroweb:4172,Rubi km 2285,2.8229,24.646,Ezo,Western Equatoria,397.6,False
+hydroweb:4173,Rubi km 2199,2.857,24.1856,Ezo,Western Equatoria,437.4,False
+hydroweb:4174,Rubi km 2315,2.7804,24.7883,Ezo,Western Equatoria,388.1,False
+hydroweb:4260,Tshuapa km 2209,-1.2192,23.7506,Nzara,Western Equatoria,792.2,False
+hydroweb:4263,Tshuapa km 2114,-1.0173,23.2919,Nzara,Western Equatoria,806.0,False
+hydroweb:4267,Tshuapa km 2126,-1.0401,23.3219,Nzara,Western Equatoria,805.9,False
+hydroweb:4269,Tshuapa km 2300,-1.4632,24.1636,Nzara,Western Equatoria,788.4,False
+hydroweb:4272,Tshuapa km 2222,-1.2501,23.8111,Nzara,Western Equatoria,791.1,False
+hydroweb:4274,Tshopo km 2389,0.6014,25.7376,Nzara,Western Equatoria,498.7,False
+hydroweb:4275,Tshopo km 2346,0.7071,25.5793,Nzara,Western Equatoria,498.5,False
+hydroweb:4276,Tshopo km 2263,0.6696,25.2561,Nzara,Western Equatoria,522.1,False
+hydroweb:4310,Kibali km 3420,3.3633,29.2751,Ibba,Western Equatoria,108.4,False
+hydroweb:4311,Uele km 3146,3.7049,27.5459,Nzara,Western Equatoria,99.1,False
+hydroweb:4312,Uele km 2444,3.8322,23.4359,Nagero,Western Equatoria,419.9,False
+hydroweb:4313,Uele km 2874,3.7614,26.2929,Ezo,Western Equatoria,189.3,False
+hydroweb:4314,Uele km 2615,3.4785,24.6244,Nagero,Western Equatoria,353.9,False
+hydroweb:4315,Uele km 2512,3.6979,23.9046,Nagero,Western Equatoria,388.9,False
+hydroweb:4316,Uele km 2827,3.7214,25.9834,Ezo,Western Equatoria,217.9,False
+hydroweb:4317,Uele km 2640,3.4948,24.7944,Nagero,Western Equatoria,341.7,False
+hydroweb:4318,Uele km 3013,3.6016,26.9446,Nzara,Western Equatoria,147.3,False
+hydroweb:4319,Uele km 2778,3.5721,25.7464,Ezo,Western Equatoria,249.0,False
+hydroweb:4320,Uele km 3187,3.6958,27.8579,Nzara,Western Equatoria,82.6,False
+hydroweb:4321,Uele km 2952,3.8893,26.7521,Nzara,Western Equatoria,141.6,False
+hydroweb:4322,Kibali km 3324,3.5831,28.8182,Yambio,Western Equatoria,87.9,False
+hydroweb:4323,Dungu km 3335,3.6946,28.7931,Yambio,Western Equatoria,75.7,False
+hydroweb:4324,Uele km 3157,3.699,27.6451,Nzara,Western Equatoria,93.5,False
+hydroweb:4326,Uele km 2540,3.7048,24.1156,Nagero,Western Equatoria,371.3,False
+hydroweb:4328,Uele km 2683,3.4237,25.1109,Ezo,Western Equatoria,315.9,False
+hydroweb:4329,Uele km 2449,3.8224,23.4646,Nagero,Western Equatoria,417.9,False
+hydroweb:4330,Uele km 2751,3.5501,25.5529,Ezo,Western Equatoria,267.5,False
+hydroweb:4331,Uele km 2576,3.5805,24.3464,Nagero,Western Equatoria,364.0,False
+hydroweb:4332,Uele km 2895,3.8737,26.4171,Ezo,Western Equatoria,170.7,False
+hydroweb:4333,Uele km 2711,3.5509,25.2739,Ezo,Western Equatoria,292.8,False
+hydroweb:4334,Uele km 2868,3.7394,26.2516,Ezo,Western Equatoria,194.3,False
+hydroweb:4335,Uele km 3088,3.8775,27.2174,Nzara,Western Equatoria,104.3,False
+hydroweb:4337,Uele km 3221,3.7284,28.1194,Yambio,Western Equatoria,68.2,False
+hydroweb:4338,Uele km 2469,3.8509,23.6181,Nagero,Western Equatoria,402.3,False
+hydroweb:4340,Uele km 2617,3.4819,24.6331,Nagero,Western Equatoria,353.0,False
+hydroweb:4341,Uere km 2782,3.8126,25.4949,Ezo,Western Equatoria,256.1,False
+hydroweb:4342,Uere km 2718,3.6074,25.2871,Ezo,Western Equatoria,288.1,False
+hydroweb:4343,Uere km 2733,3.6463,25.2944,Ezo,Western Equatoria,285.0,False
+hydroweb:4348,Ulindi km 2640,-2.1218,26.3554,Yambio,Western Equatoria,746.6,False
+hydroweb:4349,Ulindi km 2866,-2.5611,27.1931,Yambio,Western Equatoria,771.1,False
+hydroweb:4350,Ulindi km 2636,-2.0916,26.3356,Yambio,Western Equatoria,744.1,False
+hydroweb:4351,Ulindi km 2799,-2.6105,26.9176,Yambio,Western Equatoria,782.6,False
+hydroweb:4352,Ulindi km 2551,-1.6853,25.9844,Yambio,Western Equatoria,715.3,False
+hydroweb:4353,Ulindi km 2570,-1.7726,25.9651,Yambio,Western Equatoria,725.1,False
+hydroweb:4354,Ulindi km 2973,-2.7758,27.6129,Morobo,Central Equatoria,781.4,False
+hydroweb:4355,Chinko Trib 01 km 2709,5.6531,24.3396,Raja,Western Bahr el Ghazal,220.8,False
+hydroweb:7800,Akagera km 6297,-1.2108,31.2326,Morobo,Central Equatoria,521.6,False
+hydroweb:7801,Akagera km 6479,-1.4021,30.7238,Morobo,Central Equatoria,541.4,False
+hydroweb:7802,Akagera km 6283,-1.2555,31.2927,Morobo,Central Equatoria,527.1,False
+hydroweb:7803,Albert Nile km 5129,3.5496,31.8199,Magwi,Eastern Equatoria,16.2,False
+hydroweb:7804,Atbarah km 3231,15.1897,35.8556,Renk,Upper Nile,430.2,False
+hydroweb:7806,Atbarah km 3418,14.0004,36.0469,Renk,Upper Nile,357.8,False
+hydroweb:7813,Bahr km 4651,8.6897,27.6767,Aweil South,Northern Bahr el Ghazal,0.0,True
+hydroweb:7814,Sobat km 4133,9.0934,32.3359,Baliet,Upper Nile,0.0,True
+hydroweb:7815,Sobat km 4023,9.2934,31.7009,Panyikang,Upper Nile,0.0,True
+hydroweb:7816,Baro km 4616,8.1983,34.8419,Maiwut,Upper Nile,91.1,False
+hydroweb:7817,Baro km 4375,8.4381,33.3784,Luakpiny/Nasir,Upper Nile,0.1,True
+hydroweb:7818,Baro km 4370,8.4489,33.3424,Luakpiny/Nasir,Upper Nile,0.1,True
+hydroweb:7819,Baro km 4523,8.181,34.2556,Maiwut,Upper Nile,42.8,False
+hydroweb:7820,Baro km 4537,8.1804,34.3371,Maiwut,Upper Nile,48.7,False
+hydroweb:7821,Baro km 4450,8.3256,33.8203,Maiwut,Upper Nile,7.2,False
+hydroweb:7822,Baro km 4454,8.3018,33.8429,Maiwut,Upper Nile,10.8,False
+hydroweb:7823,Beles km 4018,11.0728,35.3769,Maban,Upper Nile,184.8,False
+hydroweb:7824,Lol km 4471,8.9862,28.5451,Twic,Warrap,0.0,True
+hydroweb:7825,Bhar Al Arab km 4390,9.3144,28.8988,Abiemnhom,Unity,0.0,True
+hydroweb:7826,Bhar El Gazal km 4147,9.4431,30.3121,Pariang,Unity,0.0,True
+hydroweb:7827,Bhar El Gazal km 4212,9.2997,29.826,Rubkona,Unity,0.0,True
+hydroweb:7828,Bhar El Gazal km 4206,9.3339,29.8656,Guit,Unity,0.0,True
+hydroweb:7829,Bhar El Gazal km 4143,9.4609,30.3404,Pariang,Unity,0.0,True
+hydroweb:7830,Bhar El Gazal km 4278,9.0862,29.4576,Mayom,Unity,0.0,True
+hydroweb:7833,Blue Nile km 4127,10.0179,35.6048,Longochuk,Upper Nile,174.4,False
+hydroweb:7835,Blue Nile km 4230,10.1284,36.2364,Longochuk,Upper Nile,244.1,False
+hydroweb:7836,Blue Nile km 4047,10.4864,35.2434,Maban,Upper Nile,144.6,False
+hydroweb:7838,Blue Nile km 4041,10.5238,35.2116,Maban,Upper Nile,142.4,False
+hydroweb:7840,Blue Nile km 3591,13.2598,33.9004,Renk,Upper Nile,133.1,False
+hydroweb:7841,Blue Nile km 3224,15.2252,33.0584,Renk,Upper Nile,331.8,False
+hydroweb:7842,Blue Nile km 3736,12.4141,34.2791,Renk,Upper Nile,109.0,False
+hydroweb:7843,Blue Nile km 3161,15.5189,32.6609,Renk,Upper Nile,363.1,False
+hydroweb:7844,Blue Nile km 3741,12.3974,34.3171,Renk,Upper Nile,112.7,False
+hydroweb:7845,Blue Nile km 3759,12.2686,34.3467,Renk,Upper Nile,114.3,False
+hydroweb:7846,Blue Nile km 3863,11.4891,34.5199,Maban,Upper Nile,146.2,False
+hydroweb:7847,Blue Nile km 4165,10.0459,35.7874,Longochuk,Upper Nile,194.3,False
+hydroweb:7848,Fulus km 4029,9.2204,31.6839,Canal/Pigi,Jonglei,0.0,True
+hydroweb:7849,Akagera km 6240,-1.2182,31.4584,Morobo,Central Equatoria,525.0,False
+hydroweb:7850,Akagera km 6148,-0.9938,31.7021,Magwi,Eastern Equatoria,500.5,False
+hydroweb:7851,Kazinga Channel km 5934,-0.1135,30.0729,Morobo,Central Equatoria,408.2,False
+hydroweb:7852,Kazinga Channel km 5938,-0.1016,30.1021,Morobo,Central Equatoria,406.2,False
+hydroweb:7853,White Nile km 4934,4.7694,31.599,Juba,Central Equatoria,0.0,True
+hydroweb:7854,White Nile km 4835,5.5431,31.7972,Terekeka,Central Equatoria,0.0,True
+hydroweb:7855,White Nile km 4853,5.3989,31.7637,Terekeka,Central Equatoria,0.0,True
+hydroweb:7856,White Nile km 4994,4.3036,31.5203,Juba,Central Equatoria,0.0,True
+hydroweb:7857,White Nile km 4884,5.1511,31.7457,Juba,Central Equatoria,0.0,True
+hydroweb:7874,White Nile km 4336,8.235,30.3414,Ayod,Jonglei,0.0,True
+hydroweb:7875,White Nile km 4371,8.0904,30.3944,Leer,Unity,0.0,True
+hydroweb:7876,White Nile km 4436,7.7264,30.5278,Panyijiar,Unity,0.0,True
+hydroweb:7877,White Nile km 4500,7.3975,30.6476,Panyijiar,Unity,0.0,True
+hydroweb:7878,White Nile km 4515,7.3208,30.6754,Panyijiar,Unity,0.0,True
+hydroweb:7879,White Nile km 4528,7.2336,30.7071,Panyijiar,Unity,0.0,True
+hydroweb:7880,White Nile km 4536,7.1797,30.7269,Twic East,Jonglei,0.0,True
+hydroweb:7881,White Nile km 4152,9.3336,30.3379,Guit,Unity,0.0,True
+hydroweb:7882,White Nile km 4159,9.2874,30.3471,Guit,Unity,0.0,True
+hydroweb:7883,White Nile km 4568,7.0398,30.8492,Yirol East,Lakes,0.0,True
+hydroweb:7884,White Nile km 4395,7.9564,30.4654,Panyijiar,Unity,0.0,True
+hydroweb:7885,White Nile km 3337,14.0486,32.3142,Renk,Upper Nile,205.4,False
+hydroweb:7886,White Nile km 4030,9.3943,31.2561,Canal/Pigi,Jonglei,0.0,True
+hydroweb:7887,White Nile km 4541,7.1546,30.7529,Yirol East,Lakes,0.0,True
+hydroweb:7888,White Nile km 4088,9.4652,30.7756,Fangak,Jonglei,0.1,True
+hydroweb:7889,White Nile km 4681,6.553,31.4296,Bor South,Jonglei,0.0,True
+hydroweb:7890,White Nile km 4716,6.3391,31.4772,Bor South,Jonglei,0.0,True
+hydroweb:7891,White Nile km 4721,6.3071,31.4848,Awerial,Lakes,0.0,True
+hydroweb:7892,White Nile km 3622,11.8536,32.7487,Renk,Upper Nile,0.0,True
+hydroweb:7893,White Nile km 3739,10.9464,32.5424,Manyo,Upper Nile,0.0,True
+hydroweb:7894,White Nile km 4725,6.2818,31.4929,Awerial,Lakes,0.0,True
+hydroweb:7895,White Nile km 3961,9.6106,31.6784,Malakal,Upper Nile,0.0,True
+hydroweb:7896,White Nile km 3769,10.7826,32.3499,Manyo,Upper Nile,0.0,True
+hydroweb:7897,White Nile km 3465,13.1386,32.7449,Renk,Upper Nile,99.8,False
+hydroweb:7898,White Nile km 3493,12.9309,32.7926,Renk,Upper Nile,77.0,False
+hydroweb:7899,White Nile km 4211,8.9819,30.2277,Guit,Unity,0.0,True
+hydroweb:7900,White Nile km 4218,8.9241,30.215,Fangak,Jonglei,0.0,True
+hydroweb:7901,Blue Nile km 3926,11.2376,34.9469,Maban,Upper Nile,160.9,False
+hydroweb:7902,Blue Nile km 3160,15.5197,32.6594,Renk,Upper Nile,363.2,False
+hydroweb:7903,Blue Nile km 3621,13.0769,33.9646,Renk,Upper Nile,120.0,False
+hydroweb:7904,Blue Nile km 3299,14.7271,33.3121,Renk,Upper Nile,277.9,False
+hydroweb:7905,Lol km 4782,9.1611,26.9961,Aweil West,Northern Bahr el Ghazal,0.0,True
+hydroweb:7906,Lol km 4838,9.1074,26.6474,Aweil North,Northern Bahr el Ghazal,0.0,True
+hydroweb:7907,Lol km 4861,9.0304,26.4986,Aweil West,Northern Bahr el Ghazal,0.0,True
+hydroweb:7908,Lol km 4904,8.8979,26.2285,Aweil West,Northern Bahr el Ghazal,0.0,True
+hydroweb:7909,Lotilla km 4712,6.6836,32.9886,Pibor,Jonglei,0.0,True
+hydroweb:7910,Nahir Ad Dindar km 3983,12.1264,35.1494,Renk,Upper Nile,201.7,False
+hydroweb:7911,Nahir Ad Dindar km 3518,13.7213,34.0123,Renk,Upper Nile,184.0,False
+hydroweb:7912,Nahir Ad Dindar km 3530,13.6527,34.0281,Renk,Upper Nile,177.9,False
+hydroweb:7913,Nahir Ad Dindar km 3543,13.6201,34.0356,Renk,Upper Nile,175.1,False
+hydroweb:7914,Nahir Ad Dindar km 3605,13.3361,34.1009,Renk,Upper Nile,151.8,False
+hydroweb:7915,Nahir Ad Dindar km 3611,13.2939,34.1106,Renk,Upper Nile,148.7,False
+hydroweb:7916,Nahir Ad Dindar km 3870,12.7289,34.8181,Renk,Upper Nile,174.9,False
+hydroweb:7924,Nile km 3096,15.9724,32.5549,Renk,Upper Nile,413.6,False
+hydroweb:7933,Nyabarongo km 6813,-2.0649,30.0722,Morobo,Central Equatoria,620.8,False
+hydroweb:7935,Nyabarongo km 6674,-2.403,30.6134,Morobo,Central Equatoria,652.5,False
+hydroweb:7936,Nyanding km 4459,7.8553,33.0081,Akobo,Jonglei,0.0,True
+hydroweb:7937,Pibor km 4485,7.7374,33.0339,Akobo,Jonglei,0.0,True
+hydroweb:7938,Pibor km 4497,7.6798,33.0476,Akobo,Jonglei,0.0,True
+hydroweb:7946,Ruvubu km 6695,-2.5812,30.6519,Morobo,Central Equatoria,672.0,False
+hydroweb:7947,Semliki km 5618,0.8991,30.1554,Morobo,Central Equatoria,297.1,False
+hydroweb:7948,Semliki km 5690,0.7388,29.7949,Morobo,Central Equatoria,326.6,False
+hydroweb:7949,Semliki km 5782,0.3207,29.5413,Morobo,Central Equatoria,380.1,False
+hydroweb:7950,Semliki km 5846,-0.0251,29.6187,Morobo,Central Equatoria,412.7,False
+hydroweb:7951,Semliki km 5768,0.3869,29.5246,Morobo,Central Equatoria,374.1,False
+hydroweb:7952,Sobat km 4187,8.8488,32.5364,Ulang,Upper Nile,0.0,True
+hydroweb:7953,Sobat km 4122,9.0714,32.2661,Baliet,Upper Nile,0.0,True
+hydroweb:7954,Sobat km 4095,9.2224,32.1533,Baliet,Upper Nile,0.0,True
+hydroweb:7955,Sobat km 4029,9.2932,31.7496,Panyikang,Upper Nile,0.0,True
+hydroweb:7956,Sobat km 4281,8.5934,32.9458,Ulang,Upper Nile,0.0,True
+hydroweb:7957,Victoria Nile km 5354,2.2277,31.4559,Morobo,Central Equatoria,154.7,False
+hydroweb:7958,Victoria Nile km 5365,2.2691,31.5358,Kajo-keji,Central Equatoria,151.3,False
+hydroweb:7959,Victoria Nile km 5771,0.6651,33.0503,Magwi,Eastern Equatoria,327.8,False
+hydroweb:7960,White Nile km 4677,6.5637,31.4018,Bor South,Jonglei,0.0,True
+hydroweb:7961,White Nile km 3783,10.6871,32.2775,Manyo,Upper Nile,0.0,True
+hydroweb:7962,Albert Nile km 5156,3.4376,31.6549,Kajo-keji,Central Equatoria,27.1,False
+hydroweb:7963,White Nile km 3434,13.3429,32.5874,Renk,Upper Nile,123.4,False
+hydroweb:7964,White Nile km 3947,9.6708,31.7864,Malakal,Upper Nile,0.0,True
+hydroweb:7965,White Nile km 4029,9.393,31.2596,Canal/Pigi,Jonglei,0.0,True
+hydroweb:7966,White Nile km 4826,5.6101,31.8112,Terekeka,Central Equatoria,0.0,True
+hydroweb:7967,White Nile km 4845,5.4648,31.7781,Terekeka,Central Equatoria,0.0,True
+hydroweb:7968,White Nile km 4909,4.9603,31.6646,Juba,Central Equatoria,0.0,True
+hydroweb:7969,White Nile km 3905,9.8654,32.0879,Fashoda,Upper Nile,0.0,True
+hydroweb:7970,White Nile km 3679,11.3859,32.677,Renk,Upper Nile,0.0,True
+hydroweb:7971,White Nile km 4084,9.4561,30.8026,Fangak,Jonglei,0.0,True
