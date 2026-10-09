@@ -176,6 +176,24 @@ def options(df):
     return o
 
 
+def gauge_county(stations, counties):
+    """For every gauge: the county polygon it sits in (or the nearest one and the distance)."""
+    import geopandas as gpd
+    pts = gpd.GeoDataFrame(stations.copy(), geometry=gpd.points_from_xy(stations.longitude, stations.latitude),
+                           crs=4326).to_crs(METRIC_CRS)
+    cty = counties.to_crs(METRIC_CRS)
+    rows = []
+    for g in pts.itertuples():
+        d = cty.geometry.distance(g.geometry) / 1000.0
+        i = int(np.argmin(d.values))
+        rows.append({'station_uid': g.station_uid, 'station_name': g.station_name,
+                     'latitude': round(g.latitude, 4), 'longitude': round(g.longitude, 4),
+                     'county': cty.iloc[i]['county'], 'state': cty.iloc[i]['state'],
+                     'km_to_county': round(float(d.values[i]), 1),
+                     'inside_county': bool(d.values[i] <= 0.5)})
+    return pd.DataFrame(rows)
+
+
 def write_md(df, path, today):
     n = len(df)
     vc = df['verdict'].value_counts().to_dict()
@@ -247,6 +265,10 @@ def main():
     os.makedirs(AA_OUT, exist_ok=True)
     df.to_csv(os.path.join(AA_OUT, 'p7_county_station_audit.csv'), index=False)
     write_md(df, os.path.join(AA_OUT, 'p7_county_station_audit.md'), today)
+    stations = load_stations(ALT_DIR)
+    gc = gauge_county(stations, cty)
+    gc.to_csv(os.path.join(AA_OUT, 'p7_gauge_county.csv'), index=False)
+    print(gc[gc.station_uid.eq('hydroweb:105860')].to_string())
     options(df).to_csv(os.path.join(AA_OUT, 'county_gauge_options.csv'), index=False)
     print(df['verdict'].value_counts().to_string())
 
