@@ -146,7 +146,7 @@ MANUAL_LINKS = []
 # --- Upstream catchments ------------------------------------------------------
 BUILD_CATCHMENTS = True
 HYBAS_LEVEL = 6
-CATCHMENT_BBOX = [13.0, -3.0, 36.0, 23.5]   # Nile basin; catchments are cut at this box
+CATCHMENT_BBOX = [13.0, -12.0, 40.0, 24.0]  # Nile basin incl. Lake Victoria/Kagera (south) and Blue Nile (east); catchments are cut at this box
 
 # --- STAGE 4: upload results to Earth Engine assets --------------------------
 UPLOAD_TO_GEE = True
@@ -1721,6 +1721,17 @@ def build_catchments():
     cols = ['station_uid', 'hybas_ids', 'n_basins']
     cache = (pd.read_csv(CATCHMENT_CACHE, dtype={'hybas_ids': str}) if os.path.exists(CATCHMENT_CACHE)
              else pd.DataFrame(columns=cols))
+    # The cache is only valid for the box and level it was built with: a different box means other
+    # upstream basins, so drop those rows and trace them again.
+    box_now = f'{HYBAS_LEVEL}|{CATCHMENT_BBOX}'
+    if len(cache):
+        keep = (cache['trace_box'] == box_now) if 'trace_box' in cache.columns else pd.Series(False, index=cache.index)
+        if not keep.all():
+            print(f"Catchment cache: {int((~keep).sum())} stations were traced for another box; "
+                  f"tracing them again for {box_now}.")
+            cache = cache[keep]
+    if 'trace_box' not in cache.columns:
+        cache['trace_box'] = box_now
     todo_st = stations[~stations.station_uid.isin(cache.station_uid)]
     if todo_st.empty and asset_exists(asset_id):
         print("Station catchments: up to date.")
@@ -1751,12 +1762,13 @@ def build_catchments():
                         seen.add(child)
                         stack.append(child)
             rows.append({'station_uid': h['properties']['uid'],
-                         'hybas_ids': ';'.join(str(x) for x in sorted(seen)), 'n_basins': len(seen)})
+                         'hybas_ids': ';'.join(str(x) for x in sorted(seen)), 'n_basins': len(seen),
+                         'trace_box': box_now})
         missing = set(todo_st.station_uid) - {r['station_uid'] for r in rows}
         if missing:
             print(f"  {len(missing)} stations fall outside HydroBASINS coverage in the box: "
                   f"{', '.join(sorted(missing)[:10])}{' ...' if len(missing) > 10 else ''}")
-        cache = pd.concat([cache, pd.DataFrame(rows, columns=cols)], ignore_index=True)
+        cache = pd.concat([cache, pd.DataFrame(rows, columns=cols + ['trace_box'])], ignore_index=True)
         cache.to_csv(CATCHMENT_CACHE, index=False)
     feats = []
     for r in cache[cache.station_uid.isin(stations.station_uid)].itertuples():
@@ -1783,7 +1795,12 @@ if UPLOAD_TO_GEE:
 
     if BUILD_CATCHMENTS:
         try:
-            build_catchments()
+            ct = build_catchments()
+            if ct is not None:
+                # wait for the export, then share it: start_export deletes the old asset, so the new one
+                # is private until make_public is called
+                if wait_for([ct])[0] == 'COMPLETED':
+                    make_public(f'{ASSET_FOLDER}/station_catchments')
         except Exception as e:
             print(f"Catchment build failed ({type(e).__name__}: {e}); continuing without it.")
 

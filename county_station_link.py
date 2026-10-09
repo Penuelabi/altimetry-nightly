@@ -33,7 +33,7 @@ import pandas as pd
 
 LEVEL_COL = 'Water Surface Elevation - values(m)'
 HYBAS_LEVEL = 6
-CATCHMENT_BBOX = [21.0, -5.0, 42.0, 24.5]            # Nile basin (matches merge_dahiti_hydroweb)
+CATCHMENT_BBOX = [21.0, -12.0, 42.0, 24.5]           # Nile basin incl. Lake Victoria basin to the south
 METRIC_CRS = 32636                                   # UTM 36N - metres over South Sudan
 LOCAL_BAND_DEG = 0.15                                # fallback only: |dlat| below this = "local"
 
