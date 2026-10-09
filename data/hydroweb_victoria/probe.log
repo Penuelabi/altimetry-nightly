@@ -1,0 +1,35 @@
+
+=== A_ope_bbox_victoria: HYDROWEB_LAKES_OPE {'bbox': [31.5, -3.2, 34.9, 0.6]}
+Wait:   0%|          | 0/100 [00:00<?, ?it/s]Wait: 100%|██████████| 100/100 [00:00<00:00, 132.72it/s]Wait: 100%|██████████| 100/100 [00:00<00:00, 132.69it/s]
+Download preparation did not complete successfully, the following error was emitted:
+'Download workflow failed : No file to download. Your selection is empty.'
+Please fix your request or else contact hydroweb.next support team.
+  no zip returned
+
+=== B_ope_point_in_lake: HYDROWEB_LAKES_OPE {'bbox': [32.9, -1.1, 33.1, -0.9]}
+Wait:   0%|          | 0/100 [00:00<?, ?it/s]Wait: 100%|██████████| 100/100 [00:00<00:00, 128.53it/s]Wait: 100%|██████████| 100/100 [00:00<00:00, 128.51it/s]
+Download preparation did not complete successfully, the following error was emitted:
+'Download workflow failed : No file to download. Your selection is empty.'
+Please fix your request or else contact hydroweb.next support team.
+  no zip returned
+
+=== C_ope_toponym: HYDROWEB_LAKES_OPE {'intersects_refs': ['HYDROWEB_LAKES_OPE.L_victoria']}
+Wait:   0%|          | 0/100 [00:00<?, ?it/s]Wait: 100%|██████████| 100/100 [00:00<00:00, 165.69it/s]Wait: 100%|██████████| 100/100 [00:00<00:00, 165.65it/s]
+Download preparation did not complete successfully, the following error was emitted:
+'Download workflow failed : No file to download. Your selection is empty.'
+Please fix your request or else contact hydroweb.next support team.
+  no zip returned
+
+=== D_research_bbox_victoria: HYDROWEB_LAKES_RESEARCH {'bbox': [31.5, -3.2, 34.9, 0.6]}
+Wait:   0%|          | 0/100 [00:00<?, ?it/s]Wait: 100%|██████████| 100/100 [00:00<00:00, 127.90it/s]Wait: 100%|██████████| 100/100 [00:00<00:00, 127.88it/s]
+Download preparation did not complete successfully, the following error was emitted:
+'Download workflow failed : No file to download. Your selection is empty.'
+Please fix your request or else contact hydroweb.next support team.
+  no zip returned
+
+=== E_ope_bbox_nile_lakes: HYDROWEB_LAKES_OPE {'bbox': [29.0, -4.0, 36.5, 4.0]}
+Wait:   0%|          | 0/100 [00:00<?, ?it/s]Wait: 100%|██████████| 100/100 [00:11<00:00,  8.80it/s]Wait: 100%|██████████| 100/100 [00:11<00:00,  8.80it/s]
+/home/runner/work/altimetry-nightly/altimetry-nightly/hydroweb_victoria_out/E_ope_bbox_nile_lakes/E_ope_bbox_nile_lakes.zip:   0%|          | 0.00/75.3k [00:00<?, ?B/s]/home/runner/work/altimetry-nightly/altimetry-nightly/hydroweb_victoria_out/E_ope_bbox_nile_lakes/E_ope_bbox_nile_lakes.zip: 100%|██████████| 75.3k/75.3k [00:00<00:00, 185kB/s]/home/runner/work/altimetry-nightly/altimetry-nightly/hydroweb_victoria_out/E_ope_bbox_nile_lakes/E_ope_bbox_nile_lakes.zip: 100%|██████████| 75.3k/75.3k [00:00<00:00, 185kB/s]
+  12 files: ['hydroprd_L_bogoria.txt', 'hydroprd_L_edouard.txt', 'hydroprd_L_elmenteita.txt', 'hydroprd_L_george.txt', 'hydroprd_L_gigati.txt', 'hydroprd_L_kawi.txt', 'hydroprd_L_kijanebaloba.txt', 'hydroprd_L_kivu.txt', 'hydroprd_L_manyara.txt', 'hydroprd_L_naivasha.txt', 'hydroprd_L_nakuru.txt', 'hydroprd_L_turkana.txt']
+
+RESULT: Lake Victoria NOT returned by any attempt
