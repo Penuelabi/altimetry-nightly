@@ -1,0 +1,34 @@
+name: Hydroweb Lake Victoria probe (manual, no repo writes)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      HYDROWEB_API_KEY: ${{ secrets.HYDROWEB_API_KEY }}
+      OUT: ${{ github.workspace }}/hydroweb_victoria_out
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - run: pip install -q py-hydroweb
+      - name: Ask Hydroweb for Lake Victoria
+        run: python hydroweb_victoria_probe.py 2>&1 | tee "$RUNNER_TEMP/probe.log"
+      - name: Summary
+        if: always()
+        run: |
+          { echo '```'; tail -n 60 "$RUNNER_TEMP/probe.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hydroweb-victoria-probe
+          path: hydroweb_victoria_out
+          if-no-files-found: ignore
