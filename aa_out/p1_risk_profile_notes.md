@@ -1,6 +1,6 @@
 # County flood risk profile - method notes
 
-Generated 2026-10-09 14:05 UTC by aa_p1_risk_profile.py (Roadmap on Anticipatory Action, Pillar 1: Risk Knowledge).
+Generated 2026-10-09 14:09 UTC by aa_p1_risk_profile.py (Roadmap on Anticipatory Action, Pillar 1: Risk Knowledge).
 
 ## What the score means
 Each indicator is scaled 0-10 across the counties (log scale for counts; values above the 95th percentile score 10). Indicators are averaged within a dimension; hazard and exposure form one dimension, as in INFORM. Dimensions are combined by a geometric mean offset by 1 (((d1+1)(d2+1)...)^(1/n) - 1), so a county needs both hazard/exposure and vulnerability to rank high, but one empty dimension does not erase the score.

@@ -1,6 +1,6 @@
 # Jonglei - anticipatory action situation brief
 
-Prepared 2026-10-09 14:06 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
+Prepared 2026-10-09 14:09 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -24,7 +24,7 @@ Prepared 2026-10-09 14:06 UTC for the Jonglei state TWG-AA. Rain and soil data t
 ## Anticipatory action plans
 | Plan | County | Stage | Since | Plan status | River / readiness / activation (m) |
 |---|---|---|---|---|---|
-| AAP-FL-FANGAK | Fangak | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 392.45// |
+| AAP-FL-FANGAK | Fangak | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 393.28// |
 | AAP-FL-AYOD | Ayod | **activated** | 2026-10-09 14:03 | draft (example) - not validated | 399.21// |
 | AAP-FL-TWICEAST | Twic East | **activated** | 2026-10-09 14:03 | draft (example) - not validated | 410.11// |
 

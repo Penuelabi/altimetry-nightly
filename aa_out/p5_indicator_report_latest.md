@@ -1,6 +1,6 @@
 # Anticipatory action roadmap - progress report 2026Q4
 
-Prepared 2026-10-09 14:06 UTC by aa_p5_indicator_tracker.py for the quarterly TWG-AA meeting (South Sudan Roadmap on Anticipatory Action 2025-2030, Pillars 1, 2, 3 and 5).
+Prepared 2026-10-09 14:09 UTC by aa_p5_indicator_tracker.py for the quarterly TWG-AA meeting (South Sudan Roadmap on Anticipatory Action 2025-2030, Pillars 1, 2, 3 and 5).
 
 Snapshot indicators show the latest value in the quarter; event indicators are counts in the quarter.
 
@@ -11,8 +11,8 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 | Counties with a flood risk profile |  |  |  | 79 | 79 |  |  | p1_county_risk_profile.csv |
 | Livelihood zones with exposure analysis |  |  |  | 12 | 12 |  |  | p1_zone_profile.csv |
 | Vulnerability and coping indicators in use |  |  |  | 1 | 1 |  |  | aa_config/county_vulnerability.csv |
-| Risk maps produced |  |  |  | 11 | 11 |  |  | p1_risk_map.png |
-| Risk datasets exported in HXL for the IMS |  |  |  | 11 | 11 |  |  | p1_county_risk_profile_hxl.csv |
+| Risk maps produced |  |  |  | 12 | 12 |  |  | p1_risk_map.png |
+| Risk datasets exported in HXL for the IMS |  |  |  | 12 | 12 |  |  | p1_county_risk_profile_hxl.csv |
 | Risk and trigger datasets in HXL for the IMS |  |  |  | 2 | 2 |  |  | aa_indicator_ledger.csv |
 
 ## Pillar 2 - Trigger and early warning systems
@@ -22,8 +22,8 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 | Hazards with defined thresholds and data requirements |  |  |  | 3 | 3 |  |  | p2_trigger_design_note.md |
 | Counties with proposed river trigger levels |  |  |  | 32 | 32 |  |  | aa_triggers.csv |
 | Counties with validated river trigger levels |  |  |  | 0 | 0 |  |  | aa_triggers.csv |
-| Trigger skill evaluations against recorded impacts |  |  |  | 11 | 11 |  |  | p2_trigger_skill_season.csv |
-| Datasets packaged and validated for the repository |  |  |  | 126 | 126 |  |  | aa_data_package_*.zip |
+| Trigger skill evaluations against recorded impacts |  |  |  | 12 | 12 |  |  | p2_trigger_skill_season.csv |
+| Datasets packaged and validated for the repository |  |  |  | 133 | 133 |  |  | aa_data_package_*.zip |
 | Languages with validated warning templates |  |  |  | 1 | 1 |  |  | aa_config/message_templates.csv |
 | Datasets failing validation |  |  |  | 0 | 0 |  |  | aa_indicator_ledger.csv |
 
@@ -46,9 +46,9 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 |---|---|---|---|---|---|---|---|---|
 | Subnational TWG-AA groups active (state / county) |  |  |  | 0 | 0 |  |  | aa_config/recipient_groups.csv |
 | TWG-AA meetings held |  |  |  |  |  |  |  | aa_config/meetings_log.csv |
-| TWG-AA situation briefs prepared |  |  |  | 196 | 196 |  |  | aa_out/dissemination |
+| TWG-AA situation briefs prepared |  |  |  | 207 | 207 |  |  | aa_out/dissemination |
 | Community groups / radio listening hubs registered |  |  |  | 0 | 0 |  |  | aa_config/recipient_groups.csv |
-| Early warning messages prepared |  |  |  | 1,346 | 1,346 |  |  | dissemination/*/messages.csv |
+| Early warning messages prepared |  |  |  | 1,448 | 1,448 |  |  | dissemination/*/messages.csv |
 | Early warning items sent |  |  |  |  |  |  |  | dissemination_log.csv (status sent) |
 | Community feedback records |  |  |  |  |  |  |  | aa_config/feedback_log.csv |
 
