@@ -151,14 +151,17 @@ run_utc,script,pillar,activity,indicator,value,kind,unit,verification,note
 2026-10-09 14:09,aa_p2_trigger_scorecard.py,2,Develop technical guidance and tools for triggers and thresholds,Counties with proposed river trigger levels,32,snapshot,counties,aa_triggers.csv,
 2026-10-09 14:09,aa_p2_trigger_scorecard.py,2,Develop technical guidance and tools for triggers and thresholds,Counties with validated river trigger levels,0,snapshot,counties,"aa_triggers.csv (validated_by, validated_date)",
 2026-10-09 14:09,aa_p2_trigger_scorecard.py,2,"Map hazards, vulnerabilities and impacts to inform IbF and AA protocols",Trigger skill evaluations against recorded impacts,1,event,evaluations,p2_trigger_skill_season.csv; p2_trigger_track_record.csv,readiness S85 POD 67% FAR 38%; activation S85+U55 POD 65% FAR 33%
-2026-10-09 14:09,aa_p3_aap_engine.py,3,Develop standardised AAPs for multi-hazard,Anticipatory action plans developed,6,snapshot,plans,aa_config/aap_plans.csv,
-2026-10-09 14:09,aa_p3_aap_engine.py,3,Develop standardised AAPs for multi-hazard,Anticipatory action plans validated,0,snapshot,plans,"aa_config/aap_plans.csv (status, validated_by, validated_date)",
-2026-10-09 14:09,aa_p3_aap_engine.py,3,Joint activation of the AAPs when the threshold is reached,Plans in readiness or activated now,6,snapshot,plans,aap_status_latest.csv,
 2026-10-09 14:09,aa_p5_dissemination.py,5,Quarterly updates on operations at all levels,TWG-AA situation briefs prepared,11,event,briefs,dissemination/20261009_1409,
 2026-10-09 14:09,aa_p5_dissemination.py,5,Community groups / radio listening hubs disseminate early warnings,Early warning messages prepared,102,event,messages,messages.csv,en 102
-2026-10-09 14:09,aa_p5_dissemination.py,5,Coordination platforms at subnational level linked to the NTWG-AA,Subnational TWG-AA groups active (state / county),0,snapshot,groups,aa_config/recipient_groups.csv,
-2026-10-09 14:09,aa_p5_dissemination.py,5,Community groups / radio listening hubs disseminate early warnings,Community groups / radio listening hubs registered,0,snapshot,groups,aa_config/recipient_groups.csv,
-2026-10-09 14:09,aa_p5_dissemination.py,2,Translate meteorological information into local languages,Languages with validated warning templates,1,snapshot,languages,aa_config/message_templates.csv,en
 2026-10-09 14:09,aa_p2_data_package.py,2,"Centralized repository for multi-hazard IbF, EW and trigger-threshold data",Datasets packaged and validated for the repository,7,event,datasets,aa_data_package_20261009_1409.zip,uploaded once shared with SSMS
-2026-10-09 14:09,aa_p2_data_package.py,2,"Centralized repository for multi-hazard IbF, EW and trigger-threshold data",Datasets failing validation,0,snapshot,datasets,aa_data_package_latest.json,
-2026-10-09 14:09,aa_p2_data_package.py,1,Integrate risk information into the information management system,Risk and trigger datasets in HXL for the IMS,2,snapshot,datasets,aa_data_package_20261009_1409.zip,
+2026-10-09 16:42,aa_p3_aap_engine.py,3,Develop standardised AAPs for multi-hazard,Anticipatory action plans developed,6,snapshot,plans,aa_config/aap_plans.csv,
+2026-10-09 16:42,aa_p3_aap_engine.py,3,Develop standardised AAPs for multi-hazard,Anticipatory action plans validated,0,snapshot,plans,"aa_config/aap_plans.csv (status, validated_by, validated_date)",
+2026-10-09 16:42,aa_p3_aap_engine.py,3,Joint activation of the AAPs when the threshold is reached,Plans in readiness or activated now,6,snapshot,plans,aap_status_latest.csv,
+2026-10-09 16:42,aa_p5_dissemination.py,5,Quarterly updates on operations at all levels,TWG-AA situation briefs prepared,11,event,briefs,dissemination/20261009_1642,
+2026-10-09 16:42,aa_p5_dissemination.py,5,Community groups / radio listening hubs disseminate early warnings,Early warning messages prepared,106,event,messages,messages.csv,en 106
+2026-10-09 16:42,aa_p5_dissemination.py,5,Coordination platforms at subnational level linked to the NTWG-AA,Subnational TWG-AA groups active (state / county),0,snapshot,groups,aa_config/recipient_groups.csv,
+2026-10-09 16:42,aa_p5_dissemination.py,5,Community groups / radio listening hubs disseminate early warnings,Community groups / radio listening hubs registered,0,snapshot,groups,aa_config/recipient_groups.csv,
+2026-10-09 16:42,aa_p5_dissemination.py,2,Translate meteorological information into local languages,Languages with validated warning templates,1,snapshot,languages,aa_config/message_templates.csv,en
+2026-10-09 16:42,aa_p2_data_package.py,2,"Centralized repository for multi-hazard IbF, EW and trigger-threshold data",Datasets packaged and validated for the repository,7,event,datasets,aa_data_package_20261009_1642.zip,uploaded once shared with SSMS
+2026-10-09 16:42,aa_p2_data_package.py,2,"Centralized repository for multi-hazard IbF, EW and trigger-threshold data",Datasets failing validation,0,snapshot,datasets,aa_data_package_latest.json,
+2026-10-09 16:42,aa_p2_data_package.py,1,Integrate risk information into the information management system,Risk and trigger datasets in HXL for the IMS,2,snapshot,datasets,aa_data_package_20261009_1642.zip,
