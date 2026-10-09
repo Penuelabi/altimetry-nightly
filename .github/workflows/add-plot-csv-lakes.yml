@@ -1,0 +1,41 @@
+name: Add plot CSV lakes to merge (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Only report what would be added (nothing written to Drive)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: altimetry-nightly   # same group as the nightly run: never two writers on the merged files
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  add:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+      ALTIMETRY_OUT_DIR: ${{ github.workspace }}/altdata
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-bulletin.txt
+      - run: pip install -r requirements-bulletin.txt
+      - name: Add the plot CSVs (data/manual_lakes) to the merged files on Drive
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python add_plot_csv_to_merge.py --drive --dry-run
+          else
+            python add_plot_csv_to_merge.py --drive
+          fi
