@@ -1,12 +1,12 @@
 # River triggers - design note (proposal for validation)
 
-Generated 2026-10-09 13:29 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-10-09 13:58 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
-- **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 24 days before displacement).
+- **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 36 days before displacement).
 - **Readiness: S85** (a lower rule of the same kind that catches at least 60% of flood seasons on time and as many as activation; best TSS; median 44 days before displacement).
 - Names: P = percentile of the gauge record; 2yr/5yr/10yr = return levels; S = seasonal percentile (how unusual for the time of year); R = rise since the dry-season low against the gauge's usual rise; U = Sudd regional upstream index x100; A+U = both.
-- Counties without a reliable gauge use the regional rule if they are Sudd counties (readiness U50, activation U70), otherwise the bulletin flood alert. Each county's values and suggested plan rules are in aa_triggers.csv.
+- Counties without a reliable gauge use the regional rule if they are Sudd counties (readiness U55, activation U70), otherwise the bulletin flood alert. Each county's values and suggested plan rules are in aa_triggers.csv.
 
 ## Evidence
 169 county-seasons with a recorded flood impact, seasons 2020-2025 (July-January); 144 county-seasons scored at 24 counties with a reliable gauge. Regional index: 21 Sudd counties with recorded flood displacement, 47 upstream gauges.
@@ -29,7 +29,7 @@ Generated 2026-10-09 13:29 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 | regional | U80 | 144 | 76 | 49 | 19 | 8 | 28 | 64% | 29% | 0.47 | 0.23 | 0 |
 | regional | U70 | 144 | 76 | 63 | 12 | 1 | 45 | 83% | 38% | 0.52 | 0.17 | 30 |
 | regional | U50 | 144 | 76 | 73 | 3 | 0 | 68 | 96% | 47% | 0.51 | -0.04 | 61 |
-| regional | U55 | 144 | 76 | 71 | 5 | 0 | 68 | 93% | 47% | 0.49 | -0.07 | 31 |
+| regional | U55 | 144 | 76 | 73 | 3 | 0 | 68 | 96% | 47% | 0.51 | -0.04 | 61 |
 | regional | U60 | 144 | 76 | 70 | 6 | 0 | 68 | 92% | 47% | 0.49 | -0.08 | 31 |
 | regional | U65 | 144 | 76 | 64 | 12 | 0 | 68 | 84% | 47% | 0.44 | -0.16 | 30 |
 | rise | R50 | 144 | 76 | 44 | 9 | 23 | 30 | 58% | 36% | 0.42 | 0.14 | 54 |
@@ -40,21 +40,21 @@ Generated 2026-10-09 13:29 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 | seasonal | S80 | 144 | 76 | 52 | 3 | 21 | 32 | 68% | 37% | 0.48 | 0.21 | 48 |
 | seasonal | S70 | 144 | 76 | 61 | 3 | 12 | 44 | 80% | 41% | 0.51 | 0.16 | 53 |
 | seasonal | S95 | 144 | 76 | 24 | 4 | 48 | 15 | 32% | 35% | 0.26 | 0.10 | 21 |
-| seasonal+regional | S85+U70 | 144 | 76 | 35 | 11 | 30 | 9 | 46% | 16% | 0.41 | 0.33 | -1 |
-| seasonal+regional | S80+U70 | 144 | 76 | 39 | 11 | 26 | 15 | 51% | 23% | 0.43 | 0.29 | -2 |
-| seasonal+regional | S85+U55 | 144 | 76 | 42 | 8 | 26 | 19 | 55% | 28% | 0.44 | 0.27 | 24 |
+| seasonal+regional | S85+U70 | 144 | 76 | 35 | 11 | 30 | 11 | 46% | 19% | 0.40 | 0.30 | -1 |
+| seasonal+regional | S85+U55 | 144 | 76 | 45 | 6 | 25 | 20 | 59% | 28% | 0.47 | 0.30 | 36 |
 | seasonal+regional | S85+U60 | 144 | 76 | 42 | 8 | 26 | 19 | 55% | 28% | 0.44 | 0.27 | 24 |
-| seasonal+regional | S90+U70 | 144 | 76 | 26 | 10 | 40 | 6 | 34% | 14% | 0.32 | 0.25 | -1 |
-| seasonal+regional | S80+U55 | 144 | 76 | 48 | 7 | 21 | 29 | 63% | 35% | 0.46 | 0.21 | 24 |
+| seasonal+regional | S90+U55 | 144 | 76 | 37 | 7 | 32 | 17 | 49% | 28% | 0.40 | 0.24 | 30 |
+| seasonal+regional | S80+U70 | 144 | 76 | 39 | 11 | 26 | 19 | 51% | 28% | 0.41 | 0.23 | -2 |
+| seasonal+regional | S80+U55 | 144 | 76 | 50 | 5 | 21 | 29 | 66% | 35% | 0.48 | 0.23 | 40 |
+| seasonal+regional | S90+U70 | 144 | 76 | 26 | 10 | 40 | 8 | 34% | 18% | 0.31 | 0.22 | -1 |
 | seasonal+regional | S80+U60 | 144 | 76 | 48 | 7 | 21 | 29 | 63% | 35% | 0.46 | 0.21 | 24 |
-| seasonal+regional | S90+U55 | 144 | 76 | 32 | 8 | 36 | 16 | 42% | 29% | 0.35 | 0.19 | 20 |
 | seasonal+regional | S90+U60 | 144 | 76 | 32 | 8 | 36 | 16 | 42% | 29% | 0.35 | 0.19 | 20 |
 
 ### The chosen rules, impact = flood displacement only
 | candidate | events | hits | late | misses | false_alarms | POD | FAR | CSI | TSS | median_lead_days |
 |---|---|---|---|---|---|---|---|---|---|---|
 | S85 | 32 | 16 | 5 | 11 | 54 | 50% | 72% | 0.19 | 0.02 | 44 |
-| S85+U55 | 32 | 12 | 8 | 12 | 49 | 38% | 71% | 0.15 | -0.06 | 24 |
+| S85+U55 | 32 | 15 | 6 | 11 | 50 | 47% | 70% | 0.18 | 0.02 | 36 |
 
 ## Counties
 Rule used: bulletin flood alert 46, seasonal + regional 24, regional 9.
