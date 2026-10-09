@@ -1,80 +1,126 @@
 state,county,livelihood_zone,share
 Abyei Administrative Area,Abyei Region,,1.0
-Central Equatoria,Juba,,1.0
-Central Equatoria,Kajo-keji,,1.0
-Central Equatoria,Lainya,,1.0
-Central Equatoria,Morobo,,1.0
-Central Equatoria,Terekeka,,1.0
-Central Equatoria,Yei,,1.0
-Eastern Equatoria,Budi,,1.0
-Eastern Equatoria,Ikotos,,1.0
-Eastern Equatoria,Kapoeta East,,1.0
-Eastern Equatoria,Kapoeta North,,1.0
-Eastern Equatoria,Kapoeta South,,1.0
-Eastern Equatoria,Lafon,,1.0
-Eastern Equatoria,Magwi,,1.0
-Eastern Equatoria,Torit,,1.0
-Jonglei,Akobo,,1.0
-Jonglei,Ayod,,1.0
-Jonglei,Bor South,,1.0
-Jonglei,Canal/Pigi,,1.0
-Jonglei,Duk,,1.0
-Jonglei,Fangak,,1.0
-Jonglei,Nyirol,,1.0
-Jonglei,Pibor,,1.0
-Jonglei,Pochalla,,1.0
-Jonglei,Twic East,,1.0
-Jonglei,Uror,,1.0
-Lakes,Awerial,,1.0
-Lakes,Cueibet,,1.0
-Lakes,Rumbek Centre,,1.0
-Lakes,Rumbek East,,1.0
-Lakes,Rumbek North,,1.0
-Lakes,Wulu,,1.0
-Lakes,Yirol East,,1.0
-Lakes,Yirol West,,1.0
-Northern Bahr el Ghazal,Aweil Centre,,1.0
-Northern Bahr el Ghazal,Aweil East,,1.0
-Northern Bahr el Ghazal,Aweil North,,1.0
-Northern Bahr el Ghazal,Aweil South,,1.0
-Northern Bahr el Ghazal,Aweil West,,1.0
-Unity,Abiemnhom,,1.0
-Unity,Guit,,1.0
-Unity,Koch,,1.0
-Unity,Leer,,1.0
-Unity,Mayendit,,1.0
-Unity,Mayom,,1.0
-Unity,Panyijiar,,1.0
-Unity,Pariang,,1.0
-Unity,Rubkona,,1.0
-Upper Nile,Baliet,,1.0
-Upper Nile,Fashoda,,1.0
-Upper Nile,Longochuk,,1.0
-Upper Nile,Luakpiny/Nasir,,1.0
-Upper Nile,Maban,,1.0
-Upper Nile,Maiwut,,1.0
-Upper Nile,Malakal,,1.0
-Upper Nile,Manyo,,1.0
-Upper Nile,Melut,,1.0
-Upper Nile,Panyikang,,1.0
-Upper Nile,Renk,,1.0
-Upper Nile,Ulang,,1.0
-Warrap,Gogrial East,,1.0
-Warrap,Gogrial West,,1.0
-Warrap,Tonj East,,1.0
-Warrap,Tonj North,,1.0
-Warrap,Tonj South,,1.0
-Warrap,Twic,,1.0
-Western Bahr el Ghazal,Jur River,,1.0
-Western Bahr el Ghazal,Raja,,1.0
-Western Bahr el Ghazal,Wau,,1.0
-Western Equatoria,Ezo,,1.0
-Western Equatoria,Ibba,,1.0
-Western Equatoria,Maridi,,1.0
-Western Equatoria,Mundri East,,1.0
-Western Equatoria,Mundri West,,1.0
-Western Equatoria,Mvolo,,1.0
-Western Equatoria,Nagero,,1.0
-Western Equatoria,Nzara,,1.0
-Western Equatoria,Tambura,,1.0
-Western Equatoria,Yambio,,1.0
+Central Equatoria,Juba,SS02 Ironstone Plateau agro-pastoral,0.042
+Central Equatoria,Juba,SS03 Highland forest and sorghum,0.906
+Central Equatoria,Juba,SS08 Nile basin fishing and agro-pastoral,0.052
+Central Equatoria,Kajo-keji,SS01 Equatorial maize and cassava,1.0
+Central Equatoria,Lainya,SS01 Equatorial maize and cassava,1.0
+Central Equatoria,Morobo,SS01 Equatorial maize and cassava,1.0
+Central Equatoria,Terekeka,SS02 Ironstone Plateau agro-pastoral,0.806
+Central Equatoria,Terekeka,SS06 Eastern plains sorghum and cattle,0.128
+Central Equatoria,Terekeka,SS08 Nile basin fishing and agro-pastoral,0.066
+Central Equatoria,Yei,SS01 Equatorial maize and cassava,1.0
+Eastern Equatoria,Budi,SS03 Highland forest and sorghum,0.85
+Eastern Equatoria,Budi,SS05 South-Eastern semi-arid pastoral,0.15
+Eastern Equatoria,Ikotos,SS01 Equatorial maize and cassava,0.444
+Eastern Equatoria,Ikotos,SS03 Highland forest and sorghum,0.556
+Eastern Equatoria,Kapoeta East,SS05 South-Eastern semi-arid pastoral,1.0
+Eastern Equatoria,Kapoeta North,SS05 South-Eastern semi-arid pastoral,1.0
+Eastern Equatoria,Kapoeta South,SS03 Highland forest and sorghum,0.031
+Eastern Equatoria,Kapoeta South,SS05 South-Eastern semi-arid pastoral,0.969
+Eastern Equatoria,Lafon,SS03 Highland forest and sorghum,0.095
+Eastern Equatoria,Lafon,SS05 South-Eastern semi-arid pastoral,0.278
+Eastern Equatoria,Lafon,SS06 Eastern plains sorghum and cattle,0.628
+Eastern Equatoria,Magwi,SS01 Equatorial maize and cassava,0.253
+Eastern Equatoria,Magwi,SS03 Highland forest and sorghum,0.747
+Eastern Equatoria,Torit,SS03 Highland forest and sorghum,1.0
+Jonglei,Akobo,SS06 Eastern plains sorghum and cattle,0.819
+Jonglei,Akobo,SS10 North-Eastern maize cattle and fishing,0.181
+Jonglei,Ayod,SS06 Eastern plains sorghum and cattle,0.612
+Jonglei,Ayod,SS08 Nile basin fishing and agro-pastoral,0.388
+Jonglei,Bor South,SS06 Eastern plains sorghum and cattle,0.911
+Jonglei,Bor South,SS08 Nile basin fishing and agro-pastoral,0.089
+Jonglei,Canal/Pigi,SS06 Eastern plains sorghum and cattle,1.0
+Jonglei,Duk,SS06 Eastern plains sorghum and cattle,0.693
+Jonglei,Duk,SS08 Nile basin fishing and agro-pastoral,0.307
+Jonglei,Fangak,SS06 Eastern plains sorghum and cattle,0.388
+Jonglei,Fangak,SS08 Nile basin fishing and agro-pastoral,0.612
+Jonglei,Nyirol,SS06 Eastern plains sorghum and cattle,1.0
+Jonglei,Pibor,SS05 South-Eastern semi-arid pastoral,0.728
+Jonglei,Pibor,SS06 Eastern plains sorghum and cattle,0.185
+Jonglei,Pibor,SS12 Maize Sorghum Fishing and Natural Resources,0.087
+Jonglei,Pochalla,SS12 Maize Sorghum Fishing and Natural Resources,1.0
+Jonglei,Twic East,SS06 Eastern plains sorghum and cattle,0.646
+Jonglei,Twic East,SS08 Nile basin fishing and agro-pastoral,0.354
+Jonglei,Uror,SS06 Eastern plains sorghum and cattle,1.0
+Lakes,Awerial,SS02 Ironstone Plateau agro-pastoral,0.554
+Lakes,Awerial,SS08 Nile basin fishing and agro-pastoral,0.446
+Lakes,Cueibet,SS02 Ironstone Plateau agro-pastoral,0.751
+Lakes,Cueibet,SS07 Greater Bahr el Ghazal sorghum and cattle,0.249
+Lakes,Rumbek Centre,SS02 Ironstone Plateau agro-pastoral,0.155
+Lakes,Rumbek Centre,SS07 Greater Bahr el Ghazal sorghum and cattle,0.845
+Lakes,Rumbek East,SS02 Ironstone Plateau agro-pastoral,0.453
+Lakes,Rumbek East,SS07 Greater Bahr el Ghazal sorghum and cattle,0.547
+Lakes,Rumbek North,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Lakes,Wulu,SS02 Ironstone Plateau agro-pastoral,0.829
+Lakes,Wulu,SS04 Western plains groundnuts sesame and sorghum,0.171
+Lakes,Yirol East,SS02 Ironstone Plateau agro-pastoral,0.117
+Lakes,Yirol East,SS07 Greater Bahr el Ghazal sorghum and cattle,0.321
+Lakes,Yirol East,SS08 Nile basin fishing and agro-pastoral,0.563
+Lakes,Yirol West,SS02 Ironstone Plateau agro-pastoral,0.849
+Lakes,Yirol West,SS07 Greater Bahr el Ghazal sorghum and cattle,0.151
+Northern Bahr el Ghazal,Aweil Centre,SS04 Western plains groundnuts sesame and sorghum,0.645
+Northern Bahr el Ghazal,Aweil Centre,SS07 Greater Bahr el Ghazal sorghum and cattle,0.355
+Northern Bahr el Ghazal,Aweil East,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Northern Bahr el Ghazal,Aweil North,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Northern Bahr el Ghazal,Aweil South,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Northern Bahr el Ghazal,Aweil West,SS04 Western plains groundnuts sesame and sorghum,0.129
+Northern Bahr el Ghazal,Aweil West,SS07 Greater Bahr el Ghazal sorghum and cattle,0.871
+Unity,Abiemnhom,SS11 Northern sorhgum and livestock,1.0
+Unity,Guit,SS08 Nile basin fishing and agro-pastoral,0.379
+Unity,Guit,SS09 North-Western Nile basin cattle and maize,0.621
+Unity,Koch,SS08 Nile basin fishing and agro-pastoral,0.215
+Unity,Koch,SS09 North-Western Nile basin cattle and maize,0.785
+Unity,Leer,SS07 Greater Bahr el Ghazal sorghum and cattle,0.29
+Unity,Leer,SS08 Nile basin fishing and agro-pastoral,0.71
+Unity,Mayendit,SS07 Greater Bahr el Ghazal sorghum and cattle,0.94
+Unity,Mayendit,SS08 Nile basin fishing and agro-pastoral,0.06
+Unity,Mayom,SS09 North-Western Nile basin cattle and maize,1.0
+Unity,Panyijiar,SS07 Greater Bahr el Ghazal sorghum and cattle,0.489
+Unity,Panyijiar,SS08 Nile basin fishing and agro-pastoral,0.511
+Unity,Pariang,SS11 Northern sorhgum and livestock,1.0
+Unity,Rubkona,SS09 North-Western Nile basin cattle and maize,1.0
+Upper Nile,Baliet,SS10 North-Eastern maize cattle and fishing,0.243
+Upper Nile,Baliet,SS11 Northern sorhgum and livestock,0.757
+Upper Nile,Fashoda,SS11 Northern sorhgum and livestock,1.0
+Upper Nile,Longochuk,SS10 North-Eastern maize cattle and fishing,1.0
+Upper Nile,Luakpiny/Nasir,SS10 North-Eastern maize cattle and fishing,1.0
+Upper Nile,Maban,SS11 Northern sorhgum and livestock,1.0
+Upper Nile,Maiwut,SS10 North-Eastern maize cattle and fishing,1.0
+Upper Nile,Malakal,SS11 Northern sorhgum and livestock,1.0
+Upper Nile,Manyo,SS11 Northern sorhgum and livestock,1.0
+Upper Nile,Melut,SS11 Northern sorhgum and livestock,1.0
+Upper Nile,Panyikang,SS10 North-Eastern maize cattle and fishing,0.197
+Upper Nile,Panyikang,SS11 Northern sorhgum and livestock,0.803
+Upper Nile,Renk,SS11 Northern sorhgum and livestock,1.0
+Upper Nile,Ulang,SS10 North-Eastern maize cattle and fishing,1.0
+Warrap,Gogrial East,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Warrap,Gogrial West,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Warrap,Tonj East,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Warrap,Tonj North,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Warrap,Tonj South,SS02 Ironstone Plateau agro-pastoral,0.838
+Warrap,Tonj South,SS07 Greater Bahr el Ghazal sorghum and cattle,0.162
+Warrap,Twic,SS07 Greater Bahr el Ghazal sorghum and cattle,1.0
+Western Bahr el Ghazal,Jur River,SS02 Ironstone Plateau agro-pastoral,0.31
+Western Bahr el Ghazal,Jur River,SS04 Western plains groundnuts sesame and sorghum,0.261
+Western Bahr el Ghazal,Jur River,SS07 Greater Bahr el Ghazal sorghum and cattle,0.429
+Western Bahr el Ghazal,Raja,SS04 Western plains groundnuts sesame and sorghum,1.0
+Western Bahr el Ghazal,Wau,SS04 Western plains groundnuts sesame and sorghum,1.0
+Western Equatoria,Ezo,SS01 Equatorial maize and cassava,0.687
+Western Equatoria,Ezo,SS04 Western plains groundnuts sesame and sorghum,0.313
+Western Equatoria,Ibba,SS01 Equatorial maize and cassava,0.881
+Western Equatoria,Ibba,SS02 Ironstone Plateau agro-pastoral,0.119
+Western Equatoria,Maridi,SS01 Equatorial maize and cassava,0.893
+Western Equatoria,Maridi,SS02 Ironstone Plateau agro-pastoral,0.107
+Western Equatoria,Mundri East,SS01 Equatorial maize and cassava,0.663
+Western Equatoria,Mundri East,SS02 Ironstone Plateau agro-pastoral,0.337
+Western Equatoria,Mundri West,SS01 Equatorial maize and cassava,0.793
+Western Equatoria,Mundri West,SS02 Ironstone Plateau agro-pastoral,0.207
+Western Equatoria,Mvolo,SS02 Ironstone Plateau agro-pastoral,1.0
+Western Equatoria,Nagero,SS04 Western plains groundnuts sesame and sorghum,1.0
+Western Equatoria,Nzara,SS01 Equatorial maize and cassava,0.595
+Western Equatoria,Nzara,SS04 Western plains groundnuts sesame and sorghum,0.405
+Western Equatoria,Tambura,SS01 Equatorial maize and cassava,0.159
+Western Equatoria,Tambura,SS04 Western plains groundnuts sesame and sorghum,0.841
+Western Equatoria,Yambio,SS01 Equatorial maize and cassava,0.771
+Western Equatoria,Yambio,SS04 Western plains groundnuts sesame and sorghum,0.229
