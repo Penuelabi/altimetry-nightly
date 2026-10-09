@@ -1,4 +1,4 @@
-# Radio scripts - 2026-10-09 13:58 UTC
+# Radio scripts - 2026-10-09 14:03 UTC
 
 > Drafts for SSMS / MHADM validation before broadcast. Read slowly; repeat the key action twice.
 
@@ -166,9 +166,21 @@ Good day, listeners in Nagero. This is a yellow flood message for Nagero, Wester
 
 Good day, listeners in Nzara. This is a yellow flood message for Nzara, Western Equatoria. There is a 34% chance of more than 50 millimetres of rain in the next week and about 47 millimetres of rain are expected this week. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
 
+## Ayod (Jonglei) - English
+
+Good day, listeners in Ayod. The river gauge serving Ayod shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+
+## Duk (Jonglei) - English
+
+Good day, listeners in Duk. The river gauge serving Duk shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+
 ## Fangak (Jonglei) - English
 
 Good day, listeners in Fangak. The river gauge serving Fangak shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+
+## Twic East (Jonglei) - English
+
+Good day, listeners in Twic East. The river gauge serving Twic East shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
 
 ## Guit (Unity) - English
 
@@ -177,6 +189,10 @@ Good day, listeners in Guit. The river gauge serving Guit shows a high water lev
 ## Koch (Unity) - English
 
 Good day, listeners in Koch. The river gauge serving Koch shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+
+## Leer (Unity) - English
+
+Good day, listeners in Leer. The river gauge serving Leer shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
 
 ## Panyijiar (Unity) - English
 

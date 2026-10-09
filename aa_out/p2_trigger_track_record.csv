@@ -16,22 +16,12 @@ Aweil West,dahiti:23343,2021-22,2021-07-01,2021-07-01,false alarm,,,,
 Aweil West,dahiti:23343,2022-23,2022-09-06,2022-09-06,hit,,False,,True
 Aweil West,dahiti:23343,2024-25,2024-09-04,2024-09-04,hit,,False,,True
 Aweil West,dahiti:23343,2025-26,2025-10-14,2025-10-14,false alarm,,,,
-Ayod,hydroweb:105860,2024-25,2024-09-26,2024-09-26,hit,36.0,True,2024-11,True
-Ayod,hydroweb:105860,2025-26,2025-07-20,2025-07-20,hit,43.0,True,2025-09,True
-Bor South,hydroweb:105860,2024-25,2024-09-26,2024-09-26,late,,True,2024-08,True
-Bor South,hydroweb:105860,2025-26,2025-07-20,2025-07-20,hit,,False,,True
 Canal/Pigi,dahiti:12178,2021-22,2021-07-13,2021-07-13,hit,50.0,True,2021-09,True
 Canal/Pigi,dahiti:12178,2024-25,2024-10-13,2024-10-13,hit,,False,,True
 Canal/Pigi,dahiti:12178,2025-26,2025-08-06,2025-08-06,hit,26.0,True,2025-09,True
-Duk,hydroweb:105860,2024-25,2024-09-26,2024-09-26,hit,,False,,True
-Duk,hydroweb:105860,2025-26,2025-07-20,2025-07-20,hit,,False,,True
 Jur River,hydroweb:102830,2022-23,2022-09-29,2022-09-29,hit,,False,,True
 Jur River,hydroweb:102830,2023-24,2023-08-19,2023-11-08,false alarm,,,,
 Jur River,hydroweb:102830,2024-25,2024-08-31,2024-10-24,hit,,False,,True
-Leer,hydroweb:104261,2021-22,2021-08-01,2021-08-01,late,,True,2021-07,True
-Leer,hydroweb:104261,2022-23,2022-09-10,2022-09-10,hit,,False,,True
-Leer,hydroweb:104261,2024-25,2024-08-12,2024-09-08,hit,54.0,True,2024-11,True
-Leer,hydroweb:104261,2025-26,2025-07-02,2025-07-02,hit,30.0,True,2025-08,True
 Malakal,dahiti:11815,2021-22,2021-07-11,2021-07-11,hit,21.0,True,2021-08,True
 Malakal,dahiti:11815,2022-23,2022-07-24,,correct negative,,,,
 Malakal,dahiti:11815,2024-25,2024-11-07,2024-11-07,late,,True,2024-10,False
@@ -51,8 +41,6 @@ Nyirol,hydroweb:106193,2022-23,2022-08-07,2022-09-03,hit,,False,,True
 Nyirol,hydroweb:106193,2025-26,2025-09-14,2025-09-14,hit,,False,,True
 Pibor,hydroweb:7909,2020-21,2020-08-02,2020-09-25,false alarm,,,,
 Pibor,hydroweb:7909,2022-23,2022-12-14,2022-12-14,false alarm,,,,
-Pochalla,hydroweb:7909,2020-21,2020-08-02,2020-09-25,false alarm,,,,
-Pochalla,hydroweb:7909,2022-23,2022-12-14,2022-12-14,hit,,False,,True
 Rubkona,hydroweb:104262,2021-22,2021-08-28,2021-08-28,late,,True,2021-08,True
 Rubkona,hydroweb:104262,2022-23,2022-09-10,2022-09-10,hit,21.0,True,2022-10,True
 Rubkona,hydroweb:104262,2023-24,2023-07-04,,correct negative,,,,
@@ -65,8 +53,6 @@ Tonj South,dahiti:2686,2020-21,2020-08-22,2020-09-01,false alarm,,,,
 Tonj South,dahiti:2686,2023-24,2023-11-05,2023-11-05,false alarm,,,,
 Tonj South,dahiti:2686,2024-25,2024-07-10,2024-09-17,hit,,False,,True
 Tonj South,dahiti:2686,2025-26,2025-11-18,2025-11-18,false alarm,,,,
-Twic East,hydroweb:105860,2024-25,2024-09-26,2024-09-26,hit,,False,,True
-Twic East,hydroweb:105860,2025-26,2025-07-20,2025-07-20,hit,12.0,True,2025-08,True
 Wulu,dahiti:2686,2020-21,2020-08-22,2020-09-01,false alarm,,,,
 Wulu,dahiti:2686,2023-24,2023-11-05,2023-11-05,false alarm,,,,
 Wulu,dahiti:2686,2024-25,2024-07-10,2024-09-17,false alarm,,,,

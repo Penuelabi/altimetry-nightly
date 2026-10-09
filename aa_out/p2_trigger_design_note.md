@@ -1,64 +1,64 @@
 # River triggers - design note (proposal for validation)
 
-Generated 2026-10-09 13:58 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-10-09 14:03 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
 - **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 36 days before displacement).
-- **Readiness: S85** (a lower rule of the same kind that catches at least 60% of flood seasons on time and as many as activation; best TSS; median 44 days before displacement).
+- **Readiness: S85** (a lower rule of the same kind that catches at least 60% of flood seasons on time and as many as activation; best TSS; median 46 days before displacement).
 - Names: P = percentile of the gauge record; 2yr/5yr/10yr = return levels; S = seasonal percentile (how unusual for the time of year); R = rise since the dry-season low against the gauge's usual rise; U = Sudd regional upstream index x100; A+U = both.
-- Counties without a reliable gauge use the regional rule if they are Sudd counties (readiness U55, activation U70), otherwise the bulletin flood alert. Each county's values and suggested plan rules are in aa_triggers.csv.
+- Counties without a reliable gauge use the regional rule if they are Sudd counties (readiness U60, activation U70), otherwise the bulletin flood alert. Each county's values and suggested plan rules are in aa_triggers.csv.
 
 ## Evidence
-169 county-seasons with a recorded flood impact, seasons 2020-2025 (July-January); 144 county-seasons scored at 24 counties with a reliable gauge. Regional index: 21 Sudd counties with recorded flood displacement, 47 upstream gauges.
+169 county-seasons with a recorded flood impact, seasons 2020-2025 (July-January); 108 county-seasons scored at 18 counties with a reliable gauge. Regional index: 21 Sudd counties with recorded flood displacement, 47 upstream gauges.
 
 ### Every rule (impact = displacement or listed in a flood assessment; used for the choice)
 | family | candidate | county_seasons | events | hits | late | misses | false_alarms | POD | FAR | CSI | TSS | median_lead_days |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| level | 2yr+0.25m | 144 | 76 | 40 | 7 | 29 | 23 | 53% | 33% | 0.40 | 0.19 | 12 |
-| level | P95 | 144 | 76 | 34 | 11 | 31 | 21 | 45% | 32% | 0.35 | 0.14 | 18 |
-| level | 5yr | 144 | 76 | 25 | 9 | 42 | 14 | 33% | 29% | 0.28 | 0.12 | 9 |
-| level | P90 | 144 | 76 | 45 | 9 | 22 | 34 | 59% | 39% | 0.41 | 0.09 | 16 |
-| level | 2yr | 144 | 76 | 58 | 8 | 10 | 48 | 76% | 42% | 0.47 | 0.06 | 30 |
-| level | P80 | 144 | 76 | 54 | 10 | 12 | 47 | 71% | 42% | 0.44 | 0.02 | 32 |
-| level | 10yr | 144 | 76 | 3 | 3 | 70 | 3 | 4% | 33% | 0.04 | -0.00 |  |
-| level | 2yr-0.25m | 144 | 76 | 66 | 5 | 5 | 61 | 87% | 46% | 0.48 | -0.03 | 23 |
-| level | P70 | 144 | 76 | 64 | 5 | 7 | 61 | 84% | 47% | 0.47 | -0.05 | 26 |
-| level | P60 | 144 | 76 | 67 | 6 | 3 | 65 | 88% | 47% | 0.48 | -0.07 | 30 |
-| level | 2yr-0.50m | 144 | 76 | 66 | 5 | 5 | 66 | 87% | 48% | 0.46 | -0.10 | 40 |
-| regional | U75 | 144 | 76 | 55 | 13 | 8 | 28 | 72% | 29% | 0.53 | 0.31 | 0 |
-| regional | U80 | 144 | 76 | 49 | 19 | 8 | 28 | 64% | 29% | 0.47 | 0.23 | 0 |
-| regional | U70 | 144 | 76 | 63 | 12 | 1 | 45 | 83% | 38% | 0.52 | 0.17 | 30 |
-| regional | U50 | 144 | 76 | 73 | 3 | 0 | 68 | 96% | 47% | 0.51 | -0.04 | 61 |
-| regional | U55 | 144 | 76 | 73 | 3 | 0 | 68 | 96% | 47% | 0.51 | -0.04 | 61 |
-| regional | U60 | 144 | 76 | 70 | 6 | 0 | 68 | 92% | 47% | 0.49 | -0.08 | 31 |
-| regional | U65 | 144 | 76 | 64 | 12 | 0 | 68 | 84% | 47% | 0.44 | -0.16 | 30 |
-| rise | R50 | 144 | 76 | 44 | 9 | 23 | 30 | 58% | 36% | 0.42 | 0.14 | 54 |
-| rise | R90 | 144 | 76 | 10 | 3 | 63 | 7 | 13% | 35% | 0.12 | 0.03 | -2 |
-| rise | R75 | 144 | 76 | 18 | 3 | 55 | 16 | 24% | 43% | 0.20 | 0.00 | 54 |
-| seasonal | S85 | 144 | 76 | 46 | 5 | 25 | 24 | 61% | 32% | 0.46 | 0.25 | 44 |
-| seasonal | S90 | 144 | 76 | 38 | 6 | 32 | 18 | 50% | 29% | 0.40 | 0.24 | 36 |
-| seasonal | S80 | 144 | 76 | 52 | 3 | 21 | 32 | 68% | 37% | 0.48 | 0.21 | 48 |
-| seasonal | S70 | 144 | 76 | 61 | 3 | 12 | 44 | 80% | 41% | 0.51 | 0.16 | 53 |
-| seasonal | S95 | 144 | 76 | 24 | 4 | 48 | 15 | 32% | 35% | 0.26 | 0.10 | 21 |
-| seasonal+regional | S85+U70 | 144 | 76 | 35 | 11 | 30 | 11 | 46% | 19% | 0.40 | 0.30 | -1 |
-| seasonal+regional | S85+U55 | 144 | 76 | 45 | 6 | 25 | 20 | 59% | 28% | 0.47 | 0.30 | 36 |
-| seasonal+regional | S85+U60 | 144 | 76 | 42 | 8 | 26 | 19 | 55% | 28% | 0.44 | 0.27 | 24 |
-| seasonal+regional | S90+U55 | 144 | 76 | 37 | 7 | 32 | 17 | 49% | 28% | 0.40 | 0.24 | 30 |
-| seasonal+regional | S80+U70 | 144 | 76 | 39 | 11 | 26 | 19 | 51% | 28% | 0.41 | 0.23 | -2 |
-| seasonal+regional | S80+U55 | 144 | 76 | 50 | 5 | 21 | 29 | 66% | 35% | 0.48 | 0.23 | 40 |
-| seasonal+regional | S90+U70 | 144 | 76 | 26 | 10 | 40 | 8 | 34% | 18% | 0.31 | 0.22 | -1 |
-| seasonal+regional | S80+U60 | 144 | 76 | 48 | 7 | 21 | 29 | 63% | 35% | 0.46 | 0.21 | 24 |
-| seasonal+regional | S90+U60 | 144 | 76 | 32 | 8 | 36 | 16 | 42% | 29% | 0.35 | 0.19 | 20 |
+| level | 2yr+0.25m | 108 | 52 | 30 | 4 | 18 | 21 | 58% | 38% | 0.41 | 0.20 | -1 |
+| level | P95 | 108 | 52 | 25 | 9 | 18 | 19 | 48% | 36% | 0.35 | 0.14 | 38 |
+| level | P90 | 108 | 52 | 35 | 6 | 11 | 32 | 67% | 44% | 0.42 | 0.10 | 2 |
+| level | 5yr | 108 | 52 | 17 | 7 | 28 | 13 | 33% | 35% | 0.26 | 0.09 | 10 |
+| level | 2yr | 108 | 52 | 42 | 6 | 4 | 40 | 81% | 45% | 0.46 | 0.09 | 26 |
+| level | P80 | 108 | 52 | 43 | 6 | 3 | 44 | 83% | 47% | 0.45 | 0.04 | 23 |
+| level | 2yr-0.25m | 108 | 52 | 45 | 3 | 4 | 49 | 87% | 51% | 0.45 | -0.01 | 22 |
+| level | P70 | 108 | 52 | 47 | 3 | 2 | 52 | 90% | 51% | 0.45 | -0.02 | 22 |
+| level | 10yr | 108 | 52 | 1 | 1 | 50 | 3 | 2% | 60% | 0.02 | -0.03 |  |
+| level | P60 | 108 | 52 | 47 | 3 | 2 | 56 | 90% | 53% | 0.44 | -0.10 | 36 |
+| level | 2yr-0.50m | 108 | 52 | 45 | 3 | 4 | 54 | 87% | 53% | 0.42 | -0.10 | 36 |
+| regional | U75 | 108 | 52 | 40 | 7 | 5 | 25 | 77% | 35% | 0.52 | 0.32 | 0 |
+| regional | U80 | 108 | 52 | 37 | 10 | 5 | 25 | 71% | 35% | 0.48 | 0.27 | 0 |
+| regional | U70 | 108 | 52 | 46 | 6 | 0 | 38 | 88% | 42% | 0.51 | 0.21 | 31 |
+| regional | U50 | 108 | 52 | 50 | 2 | 0 | 56 | 96% | 52% | 0.46 | -0.04 | 62 |
+| regional | U55 | 108 | 52 | 50 | 2 | 0 | 56 | 96% | 52% | 0.46 | -0.04 | 61 |
+| regional | U60 | 108 | 52 | 50 | 2 | 0 | 56 | 96% | 52% | 0.46 | -0.04 | 31 |
+| regional | U65 | 108 | 52 | 47 | 5 | 0 | 56 | 90% | 52% | 0.44 | -0.10 | 46 |
+| rise | R50 | 108 | 52 | 34 | 4 | 14 | 25 | 65% | 40% | 0.44 | 0.21 | 38 |
+| rise | R75 | 108 | 52 | 16 | 2 | 34 | 11 | 31% | 38% | 0.25 | 0.11 | 54 |
+| rise | R90 | 108 | 52 | 9 | 2 | 41 | 4 | 17% | 27% | 0.16 | 0.10 | -2 |
+| seasonal | S85 | 108 | 52 | 35 | 3 | 14 | 23 | 67% | 38% | 0.47 | 0.26 | 46 |
+| seasonal | S90 | 108 | 52 | 29 | 3 | 20 | 17 | 56% | 35% | 0.42 | 0.25 | 45 |
+| seasonal | S80 | 108 | 52 | 39 | 2 | 11 | 30 | 75% | 42% | 0.48 | 0.21 | 52 |
+| seasonal | S70 | 108 | 52 | 45 | 2 | 5 | 39 | 87% | 45% | 0.49 | 0.17 | 53 |
+| seasonal | S95 | 108 | 52 | 19 | 3 | 30 | 14 | 37% | 39% | 0.29 | 0.12 | 21 |
+| seasonal+regional | S85+U70 | 108 | 52 | 27 | 7 | 18 | 11 | 52% | 24% | 0.43 | 0.32 | -1 |
+| seasonal+regional | S85+U55 | 108 | 52 | 34 | 4 | 14 | 19 | 65% | 33% | 0.48 | 0.31 | 36 |
+| seasonal+regional | S85+U60 | 108 | 52 | 32 | 5 | 15 | 18 | 62% | 33% | 0.46 | 0.29 | 24 |
+| seasonal+regional | S80+U70 | 108 | 52 | 30 | 7 | 15 | 17 | 58% | 31% | 0.43 | 0.27 | -2 |
+| seasonal+regional | S90+U55 | 108 | 52 | 28 | 4 | 20 | 16 | 54% | 33% | 0.41 | 0.25 | 36 |
+| seasonal+regional | S80+U55 | 108 | 52 | 38 | 3 | 11 | 27 | 73% | 40% | 0.48 | 0.25 | 50 |
+| seasonal+regional | S80+U60 | 108 | 52 | 37 | 4 | 11 | 27 | 71% | 40% | 0.47 | 0.23 | 24 |
+| seasonal+regional | S90+U70 | 108 | 52 | 19 | 6 | 27 | 8 | 37% | 24% | 0.32 | 0.22 | -1 |
+| seasonal+regional | S90+U60 | 108 | 52 | 24 | 5 | 23 | 15 | 46% | 34% | 0.36 | 0.19 | 22 |
 
 ### The chosen rules, impact = flood displacement only
 | candidate | events | hits | late | misses | false_alarms | POD | FAR | CSI | TSS | median_lead_days |
 |---|---|---|---|---|---|---|---|---|---|---|
-| S85 | 32 | 16 | 5 | 11 | 54 | 50% | 72% | 0.19 | 0.02 | 44 |
-| S85+U55 | 32 | 15 | 6 | 11 | 50 | 47% | 70% | 0.18 | 0.02 | 36 |
+| S85 | 19 | 11 | 3 | 5 | 47 | 58% | 77% | 0.17 | 0.05 | 46 |
+| S85+U55 | 19 | 10 | 4 | 5 | 43 | 53% | 75% | 0.16 | 0.04 | 36 |
 
 ## Counties
-Rule used: bulletin flood alert 46, seasonal + regional 24, regional 9.
-At or above a proposed value now: 9: Panyijiar (activation), Fangak (activation), Guit (activation), Panyikang (activation), Fashoda (activation), Renk (activation), Koch (activation), Juba (activation), Pariang (activation)
+Rule used: bulletin flood alert 47, seasonal + regional 18, regional 14.
+At or above a proposed value now: 14: Panyijiar (activation), Fangak (activation), Leer (activation), Ayod (activation), Twic East (activation), Guit (activation), Panyikang (activation), Duk (activation), Fashoda (activation), Renk (activation), Koch (activation), Bor South (activation), Juba (activation), Pariang (activation)
 
 ## How to read and validate
 - POD: share of flood seasons caught on time. FAR: share of the seasons a rule fired with no impact recorded. CSI and TSS combine both; higher is better. Late = fired after displacement had begun (counted as a miss).

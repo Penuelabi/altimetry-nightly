@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261009_1358",
+ "name": "south-sudan-hydroclimate-aa-20261009_1403",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261009_1358",
- "created": "2026-10-09T13:58:22Z",
+ "version": "20261009_1403",
+ "created": "2026-10-09T14:03:14Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -851,8 +851,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 11002,
-   "hash": "sha256:e9b73eb2344979dce7c12a4be3a815a9b72323bfeca6742b9be798779e9e9b3c",
+   "bytes": 11052,
+   "hash": "sha256:b0fca65111825bae5a809eb3cfbdd998f6ddb3fde8dbdb96d92a1e4e82037a83",
    "rows": 79,
    "schema": {
     "fields": [
@@ -959,7 +959,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 17651,
-   "hash": "sha256:807311da19227822b818c1fe4f3a8d695665dc26b47f66154fb687b21ffb78f7",
+   "hash": "sha256:ee1768ddb5d9cb69a4ed13afb5bb4ffdf3b8b79938f933a9528a6f0c3326fd14",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1194,8 +1194,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 41164,
-   "hash": "sha256:3c878b695e2805ef88498271db7b1acccd3e951b7c4357a2a70d1028f1358ecf",
+   "bytes": 41487,
+   "hash": "sha256:7e434a9e4ff4dff2e79745f5771861fabacc0d59a53fa3ca394f64617d58b9b4",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1395,7 +1395,7 @@
      {
       "check": "stage categories",
       "status": "pass",
-      "detail": "activated, normal"
+      "detail": "activated"
      }
     ]
    },
@@ -1405,8 +1405,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1571,
-   "hash": "sha256:d6d8f999d26610246f41d0aa197d9c46182fab2cac0cc54377d23bbcb208fccc",
+   "bytes": 1621,
+   "hash": "sha256:ba152c50b39465a047e7f3763efd770ab6dd9377d26c05ef2af72bbbec5088fd",
    "rows": 6,
    "schema": {
     "fields": [
@@ -1452,15 +1452,15 @@
      },
      {
       "name": "readiness_now",
-      "type": "string"
+      "type": "boolean"
      },
      {
       "name": "activation_now",
-      "type": "string"
+      "type": "boolean"
      },
      {
       "name": "missing_or_stale",
-      "type": "string"
+      "type": "number"
      },
      {
       "name": "river_level_m",
