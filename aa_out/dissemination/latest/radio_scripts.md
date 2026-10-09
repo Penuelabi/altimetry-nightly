@@ -1,4 +1,4 @@
-# Radio scripts - 2026-10-09 01:31 UTC
+# Radio scripts - 2026-10-09 11:42 UTC
 
 > Drafts for SSMS / MHADM validation before broadcast. Read slowly; repeat the key action twice.
 
@@ -174,6 +174,18 @@ Good day, listeners in Fangak. The river gauge serving Fangak shows a high water
 
 Good day, listeners in Guit. The river gauge serving Guit shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
 
+## Koch (Unity) - English
+
+Good day, listeners in Koch. The river gauge serving Koch shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+
 ## Panyijiar (Unity) - English
 
 Good day, listeners in Panyijiar. The river gauge serving Panyijiar shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+
+## Fashoda (Upper Nile) - English
+
+Good day, listeners in Fashoda. The river gauge serving Fashoda shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+
+## Renk (Upper Nile) - English
+
+Good day, listeners in Renk. The river gauge serving Renk shows a high water level. Water can rise further in the coming weeks. Please keep boats ready, move animals and stored food near high ground, and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).

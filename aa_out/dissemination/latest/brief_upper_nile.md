@@ -1,13 +1,13 @@
 # Upper Nile - anticipatory action situation brief
 
-Prepared 2026-10-09 01:31 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
+Prepared 2026-10-09 11:42 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
 - Counties by alert level: red 0, orange 1, yellow 2, green 9.
 - No anticipatory action plan is in readiness or activated.
-- River gauges at a proposed trigger level: 0 counties (0 at activation level).
+- River gauges at a proposed trigger level: 3 counties (3 at activation level).
 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |

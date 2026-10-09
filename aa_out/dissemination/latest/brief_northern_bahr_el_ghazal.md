@@ -1,6 +1,6 @@
 # Northern Bahr el Ghazal - anticipatory action situation brief
 
-Prepared 2026-10-09 01:31 UTC for the Northern Bahr el Ghazal state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
+Prepared 2026-10-09 11:42 UTC for the Northern Bahr el Ghazal state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -20,4 +20,4 @@ Prepared 2026-10-09 01:31 UTC for the Northern Bahr el Ghazal state TWG-AA. Rain
 - Ask intermediaries to translate and validate templates for: Bari, Dinka (Thuongjang), Juba Arabic, Nuer (Thok Naath), Shilluk (Dhok Cøllø).
 
 ## Notes
-- 1 county gauges have no satellite pass in the last weeks: Aweil West
+- 1 county gauges have no satellite pass in the last weeks: Aweil Centre
