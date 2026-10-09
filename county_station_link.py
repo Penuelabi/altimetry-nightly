@@ -248,6 +248,36 @@ def _network_relation(county, uid, sets):
     return None
 
 
+def apply_overrides(out, stations):
+    """Audited overrides (aa_config/county_station_override.csv): county -> gauge, from the p7 audit.
+    The network ranking prefers an 'upstream' gauge even when it is 100+ km from the county; an override
+    pins a gauge that sits on or next to the county. Missing gauges in this run are skipped."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(here, 'aa_config', 'county_station_override.csv')
+    if not os.path.exists(path):
+        return out
+    ov = pd.read_csv(path)
+    st = stations.set_index('station_uid')
+    out = out.copy()
+    n = 0
+    for r in ov.itertuples():
+        if r.station_uid not in st.index:
+            continue
+        m = out['county'].astype(str).str.lower() == str(r.county).lower()
+        if not m.any():
+            continue
+        s = st.loc[r.station_uid]
+        for col, val in (('station_uid', r.station_uid), ('station_name', s['station_name']), ('river', s['river']),
+                         ('relation', 'audit-override'), ('confidence', 'medium'),
+                         ('distance_km', r.distance_km), ('last_date', s['last_date']),
+                         ('last_level_m', s['last_level_m']), ('flood_status', s['flood_status']),
+                         ('seasonal_pctile', s['seasonal_pctile']), ('rate_m_per_day', s['rate_m_per_day'])):
+            out.loc[m, col] = val
+        n += 1
+    print(f"county_station_link: applied {n} audited gauge overrides")
+    return out
+
+
 def match(stations, counties, sets):
     dist = _distances_km(counties, stations)
     rows = []
@@ -318,7 +348,7 @@ def build():
     except Exception as e:
         print(f"county_station_link: catchment step failed ({type(e).__name__}: {e}); distance-only fallback.")
         sets = None
-    out = match(stations, counties, sets)
+    out = apply_overrides(match(stations, counties, sets), stations)
     path = os.path.join(BUL_DIR, 'county_station_link.csv')
     out.to_csv(path, index=False)
     tier = out['relation'].value_counts().to_dict()
@@ -331,7 +361,26 @@ def build():
     return out, path
 
 
+def apply_only():
+    """Re-apply the audited overrides to the existing link file (no Earth Engine needed)."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    src = next((p for p in (os.path.join(BUL_DIR, 'county_station_link.csv'),
+                            os.path.join(here, 'county_station_link.csv')) if os.path.exists(p)), None)
+    if not src:
+        print('county_station_link: no link file to patch')
+        return
+    out = apply_overrides(pd.read_csv(src), load_stations())
+    out.to_csv(os.path.join(BUL_DIR, 'county_station_link.csv'), index=False)
+    print(f"county_station_link: patched link file written ({src} -> {BUL_DIR})")
+
+
 if __name__ == '__main__':
+    if '--apply-only' in sys.argv:
+        try:
+            apply_only()
+        except Exception as e:
+            print(f"WARNING: override step failed ({type(e).__name__}: {e})")
+        sys.exit(0)
     try:
         build()
     except Exception as e:

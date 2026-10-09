@@ -51,6 +51,10 @@ jobs:
           python drive_sync.py pull bulletin || echo "WARNING: bulletin pull failed"
           python drive_sync.py pull || echo "WARNING: altimetry pull failed; river values will be missing"
 
+      - name: Apply audited county gauge overrides to the link file
+        run: |
+          python county_station_link.py --apply-only || echo "WARNING: gauge overrides skipped"
+
       - name: Weekly (Mondays, first run, or on request) - risk profile, trigger scorecard, indicator report
         run: |
           if [ "$(date -u +%u)" = "1" ] || [ "${{ github.event.inputs.weekly }}" = "true" ] || [ ! -f aa_out/aa_triggers.csv ]; then

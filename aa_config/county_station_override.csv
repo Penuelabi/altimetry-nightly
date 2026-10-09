@@ -1,0 +1,28 @@
+county,station_uid,station_name,distance_km,reason
+Aweil East,hydroweb:203695,Lol km 4620,0.0,p7 audit 2026-10-09: linked Lol Trib01 km 4417 was 58 km away; Lol km 4620 is 0.0 km with a fresh reading
+Aweil North,hydroweb:7906,Lol km 4838,0.0,p7 audit 2026-10-09: linked Lol Trib01 km 4417 was 126 km away; Lol km 4838 is 0.0 km with a fresh reading
+Ayod,hydroweb:7874,White Nile km 4336,0.0,p7 audit 2026-10-09: linked Bahr El Zeraf km 4110 was 30 km away; White Nile km 4336 is 0.0 km with a fresh reading
+Bor South,hydroweb:7889,White Nile km 4681,0.0,p7 audit 2026-10-09: linked Bahr El Zeraf km 4110 was 247 km away; White Nile km 4681 is 0.0 km with a fresh reading
+Budi,hydroweb:102552,Pager km 5350,88.0,p7 audit 2026-10-09: linked Lotilla km 4712 was 198 km away; Pager km 5350 is 88.0 km with a fresh reading
+Duk,hydroweb:7877,White Nile km 4500,0.1,p7 audit 2026-10-09: linked Bahr El Zeraf km 4110 was 135 km away; White Nile km 4500 is 0.1 km with a fresh reading
+Fashoda,hydroweb:7969,White Nile km 3905,0.0,p7 audit 2026-10-09: linked White Nile km 3783 was 59 km away; White Nile km 3905 is 0.0 km with a fresh reading
+Gogrial East,hydroweb:203777,Nahr Al Jur km 4456,0.0,p7 audit 2026-10-09: linked Bahr Al Arab Trib 02 km 4355 was 39 km away; Nahr Al Jur km 4456 is 0.0 km with a fresh reading
+Guit,hydroweb:7900,White Nile km 4218,0.0,p7 audit 2026-10-09: linked White Nile km 4500 was 172 km away; White Nile km 4218 is 0.0 km with a fresh reading
+Ikotos,hydroweb:102552,Pager km 5350,65.9,p7 audit 2026-10-09: linked Lotilla km 4712 was 251 km away; Pager km 5350 is 65.9 km with a fresh reading
+Kajo-keji,hydroweb:203765,Nile km 5018,0.3,p7 audit 2026-10-09: linked White Nile km 4934 was 71 km away; Nile km 5018 is 0.3 km with a fresh reading
+Lafon,hydroweb:201328,Nile km 4826,32.9,p7 audit 2026-10-09: linked Lotilla km 4712 was 93 km away; Nile km 4826 is 32.9 km with a fresh reading
+Leer,hydroweb:7875,White Nile km 4371,0.0,p7 audit 2026-10-09: linked Bahr Al Arab Trib 02 km 4435 was 46 km away; White Nile km 4371 is 0.0 km with a fresh reading
+Longochuk,hydroweb:203704,Baro km 4388,43.9,p7 audit 2026-10-09: linked R Adar km 3880 was 73 km away; Baro km 4388 is 43.9 km with a fresh reading
+Luakpiny/Nasir,hydroweb:203704,Baro km 4388,0.0,p7 audit 2026-10-09: linked R Adar km 3880 was 107 km away; Baro km 4388 is 0.0 km with a fresh reading
+Maiwut,hydroweb:7821,Baro km 4450,7.2,p7 audit 2026-10-09: linked R Adar km 3880 was 178 km away; Baro km 4450 is 7.2 km with a fresh reading
+Maridi,hydroweb:203361,Yei km 4848,40.5,p7 audit 2026-10-09: linked Ibba km 4410 was 114 km away; Yei km 4848 is 40.5 km with a fresh reading
+Mayom,hydroweb:7830,Bhar El Gazal km 4278,0.0,p7 audit 2026-10-09: linked Lol km 4620 was 94 km away; Bhar El Gazal km 4278 is 0.0 km with a fresh reading
+Morobo,hydroweb:203765,Nile km 5018,65.6,p7 audit 2026-10-09: linked White Nile km 4934 was 114 km away; Nile km 5018 is 65.6 km with a fresh reading
+Mundri East,hydroweb:203361,Yei km 4848,0.0,p7 audit 2026-10-09: linked Nile km 4919 was 67 km away; Yei km 4848 is 0.0 km with a fresh reading
+Nagero,hydroweb:108192,Jur km 4964,7.5,p7 audit 2026-10-09: linked Busseri km 4772 was 71 km away; Jur km 4964 is 7.5 km with a fresh reading
+Panyikang,dahiti:15557,"White Nile, River",0.0,"p7 audit 2026-10-09: linked Sobat Trib 01 km 4390 was 148 km away; White Nile, River is 0.0 km with a fresh reading"
+Pochalla,hydroweb:102319,Baro Trib 01 km 4483,14.8,p7 audit 2026-10-09: linked Lotilla km 4712 was 49 km away; Baro Trib 01 km 4483 is 14.8 km with a fresh reading
+Terekeka,dahiti:15556,"White Nile, River",0.0,"p7 audit 2026-10-09: linked Nile km 4919 was 26 km away; White Nile, River is 0.0 km with a fresh reading"
+Torit,hydroweb:7853,White Nile km 4934,53.2,p7 audit 2026-10-09: linked Lotilla km 4712 was 197 km away; White Nile km 4934 is 53.2 km with a fresh reading
+Twic East,dahiti:17749,"White Nile, River",0.0,"p7 audit 2026-10-09: linked Bahr El Zeraf km 4110 was 190 km away; White Nile, River is 0.0 km with a fresh reading"
+Yambio,hydroweb:111296,Ibba km 4410,21.3,p7 audit 2026-10-09: linked Jur km 4973 was 60 km away; Ibba km 4410 is 21.3 km with a fresh reading
