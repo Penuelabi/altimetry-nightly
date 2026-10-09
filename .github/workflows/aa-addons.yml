@@ -43,7 +43,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install packages
-        run: pip install pandas numpy matplotlib geopandas google-api-python-client google-auth
+        run: pip install pandas numpy matplotlib geopandas google-api-python-client google-auth earthengine-api
 
       - name: Pull bulletin and altimetry files from Drive
         run: |
@@ -66,6 +66,10 @@ jobs:
           python aa_p3_aap_engine.py   2>&1 | tee "$RUNNER_TEMP/aa.log" || true
           python aa_p5_dissemination.py || echo "WARNING: briefs skipped"
           python aa_p2_data_package.py  || echo "WARNING: data package skipped"
+
+      - name: Publish add-on results to Earth Engine (asset read by gee_code_editor_aa_addons_test.js)
+        run: |
+          python aa_p6_gee_publish.py || echo "WARNING: Earth Engine publish skipped"
 
       - name: Show plan status in the run summary
         if: always()
