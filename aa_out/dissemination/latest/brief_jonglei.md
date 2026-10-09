@@ -1,11 +1,11 @@
 # Jonglei - anticipatory action situation brief
 
-Prepared 2026-10-08 17:12 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 00 UTC.
+Prepared 2026-10-09 01:31 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
-- Counties by alert level: red 1, orange 3, yellow 3, green 4.
+- Counties by alert level: red 1, orange 4, yellow 2, green 4.
 - Validated plans in readiness: 0; activated: 0.
 - Draft plans whose rules are met: 1 (for review, not activations).
 - River gauges at a proposed trigger level: 0 counties (0 at activation level).
@@ -13,13 +13,13 @@ Prepared 2026-10-08 17:12 UTC for the Jonglei state TWG-AA. Rain and soil data t
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Akobo | Jonglei | **RED** | drought / dry spell | 37 | 10% | 1,673 |
-| Bor South | Jonglei | **ORANGE** | drought / dry spell | 38 | 22% | 7,498 |
-| Nyirol | Jonglei | **ORANGE** | drought / dry spell | 29 | 6% | 814 |
-| Uror | Jonglei | **ORANGE** | drought / dry spell | 35 | 16% | 1,768 |
-| Pibor | Jonglei | **YELLOW** | flood / waterlogging | 42 | 30% | 1,354 |
-| Pochalla | Jonglei | **YELLOW** | flood / waterlogging | 42 | 32% | 498 |
-| Twic East | Jonglei | **YELLOW** | flood / waterlogging | 35 | 22% | 6,132 |
+| Akobo | Jonglei | **RED** | drought / dry spell | 36 | 12% | 1,673 |
+| Bor South | Jonglei | **ORANGE** | drought / dry spell | 39 | 20% | 7,498 |
+| Canal/Pigi | Jonglei | **ORANGE** | drought / dry spell | 30 | 10% | 2,399 |
+| Nyirol | Jonglei | **ORANGE** | drought / dry spell | 31 | 8% | 814 |
+| Uror | Jonglei | **ORANGE** | drought / dry spell | 35 | 12% | 1,768 |
+| Pibor | Jonglei | **YELLOW** | flood / waterlogging | 39 | 26% | 1,354 |
+| Pochalla | Jonglei | **YELLOW** | flood / waterlogging | 40 | 30% | 498 |
 
 ## Anticipatory action plans
 | Plan | County | Stage | Since | Plan status | River / readiness / activation (m) |

@@ -1,6 +1,6 @@
 # Central Equatoria - anticipatory action situation brief
 
-Prepared 2026-10-08 17:12 UTC for the Central Equatoria state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 00 UTC.
+Prepared 2026-10-09 01:31 UTC for the Central Equatoria state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,12 +12,12 @@ Prepared 2026-10-08 17:12 UTC for the Central Equatoria state TWG-AA. Rain and s
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Juba | Central Equatoria | **RED** | flood / waterlogging | 50 | 52% | 2,953 |
-| Kajo-keji | Central Equatoria | **ORANGE** | flood / waterlogging | 59 | 74% | 190 |
-| Lainya | Central Equatoria | **YELLOW** | flood / waterlogging | 54 | 66% | 72 |
-| Morobo | Central Equatoria | **YELLOW** | flood / waterlogging | 53 | 62% | 44 |
-| Terekeka | Central Equatoria | **YELLOW** | flood / waterlogging | 42 | 24% | 4,725 |
-| Yei | Central Equatoria | **YELLOW** | flood / waterlogging | 56 | 68% | 154 |
+| Juba | Central Equatoria | **RED** | flood / waterlogging | 51 | 54% | 2,953 |
+| Kajo-keji | Central Equatoria | **ORANGE** | flood / waterlogging | 54 | 62% | 190 |
+| Lainya | Central Equatoria | **YELLOW** | flood / waterlogging | 54 | 60% | 72 |
+| Morobo | Central Equatoria | **YELLOW** | flood / waterlogging | 53 | 56% | 44 |
+| Terekeka | Central Equatoria | **YELLOW** | flood / waterlogging | 40 | 30% | 4,725 |
+| Yei | Central Equatoria | **YELLOW** | flood / waterlogging | 56 | 66% | 154 |
 
 ## Decisions for the group
 - Agree the warning for the 6 counties with an alert and the channels (radio hubs, chiefs, SMS).

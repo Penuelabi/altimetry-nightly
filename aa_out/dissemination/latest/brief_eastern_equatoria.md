@@ -1,6 +1,6 @@
 # Eastern Equatoria - anticipatory action situation brief
 
-Prepared 2026-10-08 17:12 UTC for the Eastern Equatoria state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 00 UTC.
+Prepared 2026-10-09 01:31 UTC for the Eastern Equatoria state TWG-AA. Rain and soil data to 2026-10-04; ECMWF run 2026-10-08 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,9 +12,9 @@ Prepared 2026-10-08 17:12 UTC for the Eastern Equatoria state TWG-AA. Rain and s
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Lafon | Eastern Equatoria | **RED** | drought / dry spell | 41 | 28% | 1,795 |
-| Magwi | Eastern Equatoria | **ORANGE** | flood / waterlogging | 57 | 62% | 843 |
-| Torit | Eastern Equatoria | **YELLOW** | flood / waterlogging | 53 | 54% | 14 |
+| Lafon | Eastern Equatoria | **RED** | drought / dry spell | 39 | 16% | 1,795 |
+| Magwi | Eastern Equatoria | **ORANGE** | flood / waterlogging | 57 | 64% | 843 |
+| Torit | Eastern Equatoria | **YELLOW** | flood / waterlogging | 53 | 58% | 14 |
 
 ## Decisions for the group
 - Agree the warning for the 3 counties with an alert and the channels (radio hubs, chiefs, SMS).
