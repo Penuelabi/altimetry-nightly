@@ -28,14 +28,13 @@ import pandas as pd
 START_YEAR = 2016
 WSE_COL = 'Water Surface Elevation - values(m)'
 
-# lake key (from the file name plot_<key>.csv) -> station settings.
-# station_id / lat / lon are taken from the merged file when a Hydroweb station of that name is already in it;
-# the values below are only the fallback. Albert has no Hydroweb id in this repo: the id below is a manual
-# placeholder (outside the real Hydroweb range). Replace it with the real Hydroweb id if you know it, before
-# the first run, because changing it later would leave the first rows under the old id.
+# lake key (from the file name plot_<key>.csv) -> fallback station settings. When the merged file already holds a
+# Hydroweb station for the lake, its id, name and position are used instead (Albert is already there as
+# 1300000000159). The fallback only matters for a lake that is not in the merged file yet; set the real
+# Hydroweb id before the first run, because changing it later would split the series.
 LAKES = {
     'L_victoria': {'name': 'Victoria', 'station_id': 1300000000016, 'lat': -1.0, 'lon': 33.0},
-    'L_albert':   {'name': 'Albert',   'station_id': 9100000000001, 'lat': 1.683, 'lon': 30.917},
+    'L_albert':   {'name': 'Albert',   'station_id': 1300000000159, 'lat': 1.67, 'lon': 30.92},
 }
 
 
@@ -84,9 +83,11 @@ def main():
     miss = [c for c in need if c not in header]
     if miss:
         sys.exit(f'merged file lacks columns {miss}; run the nightly update first.')
-    hist = pd.read_csv(csv_path, usecols=['source', 'station_id', 'type', 'location/river_name', 'latitude',
-                                          'longitude', 'date', 'station_uid'])
+    hist = pd.read_csv(csv_path)
     hist['date'] = hist['date'].astype(str)
+    # values that belong to the station, not to the day: copied from the station's latest saved row
+    station_cols = [c for c in ('Elevation_Max', 'Elevation_Mean', 'Elevation_Min', 'Station After_this_station',
+                                'Station Before_this_Station', 'Lag Days') if c in header]
 
     files = sorted(glob.glob(os.path.join(a.src, 'plot_L_*.csv')))
     if not files:
@@ -121,10 +122,17 @@ def main():
               f'{len(new)} to add ({new["date"].min() if len(new) else "-"} to {new["date"].max() if len(new) else "-"})')
         if new.empty:
             continue
-        add.append(pd.DataFrame({
+        block = pd.DataFrame({
             'source': 'Hydroweb', 'station_id': sid, 'type': 'lake', 'location/river_name': label,
-            'latitude': lat, 'longitude': lon, 'date': new['date'].values, WSE_COL: new['wse'].values,
-            'uncertainty (m)': new['unc'].values, 'station_uid': uid}))
+            'latitude': lat, 'longitude': lon, 'year': new['date_dt'].dt.year.values,
+            'month': new['date_dt'].dt.month.values, 'day': new['date_dt'].dt.day.values,
+            'date': new['date'].values, WSE_COL: new['wse'].values,
+            'uncertainty (m)': new['unc'].values, 'station_uid': uid})
+        prev = hist[hist['station_uid'] == uid].sort_values('date')
+        if len(prev):
+            for c in station_cols:
+                block[c] = prev[c].iloc[-1]
+        add.append(block)
 
     if not add:
         print('Nothing to add.')
