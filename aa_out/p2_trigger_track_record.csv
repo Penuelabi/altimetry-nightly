@@ -6,44 +6,44 @@ Abiemnhom,dahiti:18741,2024-25,2024-10-26,2024-10-26,false alarm,,,,
 Akobo,dahiti:23353,2020-21,2020-08-14,2020-09-10,false alarm,,,,
 Akobo,dahiti:23353,2025-26,2025-10-19,2025-10-19,hit,,False,,True
 Aweil Centre,hydroweb:101700,2020-21,2020-10-21,2020-10-21,false alarm,,,,
-Aweil Centre,hydroweb:101700,2021-22,2021-07-18,2021-07-18,hit,,False,,True
+Aweil Centre,hydroweb:101700,2021-22,2021-07-18,2021-08-14,hit,,False,,True
 Aweil Centre,hydroweb:101700,2022-23,2022-08-27,2022-09-23,hit,,False,,True
 Aweil Centre,hydroweb:101700,2023-24,2023-07-17,,correct negative,,,,
 Aweil Centre,hydroweb:101700,2024-25,2024-11-14,2024-11-14,hit,,False,,True
 Aweil South,hydroweb:7813,2023-24,2024-01-01,2024-01-01,false alarm,,,,
 Aweil South,hydroweb:7813,2024-25,2024-08-04,2024-09-27,hit,,False,,True
-Aweil West,dahiti:23343,2021-22,2021-07-01,2021-07-01,false alarm,,,,
+Aweil West,dahiti:23343,2021-22,2021-07-01,,correct negative,,,,
 Aweil West,dahiti:23343,2022-23,2022-09-06,2022-09-06,hit,,False,,True
 Aweil West,dahiti:23343,2024-25,2024-09-04,2024-09-04,hit,,False,,True
 Aweil West,dahiti:23343,2025-26,2025-10-14,2025-10-14,false alarm,,,,
 Ayod,hydroweb:105860,2024-25,2024-09-26,2024-09-26,hit,36.0,True,2024-11,True
-Ayod,hydroweb:105860,2025-26,2025-07-20,2025-07-20,hit,43.0,True,2025-09,True
+Ayod,hydroweb:105860,2025-26,2025-07-20,2025-08-16,hit,16.0,True,2025-09,True
 Bor South,hydroweb:105860,2024-25,2024-09-26,2024-09-26,late,,True,2024-08,True
-Bor South,hydroweb:105860,2025-26,2025-07-20,2025-07-20,hit,,False,,True
-Canal/Pigi,dahiti:12178,2021-22,2021-07-13,2021-07-13,hit,50.0,True,2021-09,True
+Bor South,hydroweb:105860,2025-26,2025-07-20,2025-08-16,hit,,False,,True
+Canal/Pigi,dahiti:12178,2021-22,2021-07-13,2021-08-09,hit,23.0,True,2021-09,True
 Canal/Pigi,dahiti:12178,2024-25,2024-10-13,2024-10-13,hit,,False,,True
 Canal/Pigi,dahiti:12178,2025-26,2025-08-06,2025-08-06,hit,26.0,True,2025-09,True
 Duk,hydroweb:105860,2024-25,2024-09-26,2024-09-26,hit,,False,,True
-Duk,hydroweb:105860,2025-26,2025-07-20,2025-07-20,hit,,False,,True
+Duk,hydroweb:105860,2025-26,2025-07-20,2025-08-16,hit,,False,,True
 Jur River,hydroweb:102830,2022-23,2022-09-29,2022-09-29,hit,,False,,True
 Jur River,hydroweb:102830,2023-24,2023-08-19,2023-11-08,false alarm,,,,
 Jur River,hydroweb:102830,2024-25,2024-08-31,2024-10-24,hit,,False,,True
 Leer,hydroweb:104261,2021-22,2021-08-01,2021-08-01,late,,True,2021-07,True
 Leer,hydroweb:104261,2022-23,2022-09-10,2022-09-10,hit,,False,,True
 Leer,hydroweb:104261,2024-25,2024-08-12,2024-09-08,hit,54.0,True,2024-11,True
-Leer,hydroweb:104261,2025-26,2025-07-02,2025-07-02,hit,30.0,True,2025-08,True
-Malakal,dahiti:11815,2021-22,2021-07-11,2021-07-11,hit,21.0,True,2021-08,True
+Leer,hydroweb:104261,2025-26,2025-07-02,2025-12-11,late,,True,2025-08,True
+Malakal,dahiti:11815,2021-22,2021-07-11,2021-08-07,hit,-6.0,True,2021-08,True
 Malakal,dahiti:11815,2022-23,2022-07-24,,correct negative,,,,
 Malakal,dahiti:11815,2024-25,2024-11-07,2024-11-07,late,,True,2024-10,False
-Malakal,dahiti:11815,2025-26,2025-07-18,2025-07-18,hit,45.0,True,2025-09,True
+Malakal,dahiti:11815,2025-26,2025-07-18,2025-08-04,hit,28.0,True,2025-09,True
 Manyo,dahiti:16323,2021-22,2022-01-09,2022-01-09,false alarm,,,,
 Manyo,dahiti:16323,2022-23,2022-07-17,2022-09-09,hit,-8.0,True,2022-09,True
 Manyo,dahiti:16323,2025-26,2025-08-24,2025-08-24,hit,,False,,True
 Mayendit,hydroweb:104261,2021-22,2021-08-01,2021-08-01,hit,,False,,True
 Mayendit,hydroweb:104261,2022-23,2022-09-10,2022-09-10,hit,,False,,True
 Mayendit,hydroweb:104261,2024-25,2024-08-12,2024-09-08,hit,54.0,True,2024-11,True
-Mayendit,hydroweb:104261,2025-26,2025-07-02,2025-07-02,hit,,False,,True
-Melut,hydroweb:106194,2021-22,2021-07-25,2021-07-25,hit,68.0,True,2021-10,True
+Mayendit,hydroweb:104261,2025-26,2025-07-02,2025-12-11,hit,,False,,True
+Melut,hydroweb:106194,2021-22,2021-07-25,,miss,,True,2021-10,True
 Melut,hydroweb:106194,2022-23,2022-09-03,2022-09-03,hit,59.0,True,2022-11,False
 Melut,hydroweb:106194,2025-26,2025-08-18,2025-08-18,hit,,False,,True
 Nyirol,hydroweb:106193,2020-21,2020-10-28,2020-10-28,false alarm,,,,
@@ -60,17 +60,17 @@ Rubkona,hydroweb:104262,2024-25,2024-11-28,2024-11-28,late,,True,2024-07,True
 Tonj East,hydroweb:104261,2021-22,2021-08-01,2021-08-01,hit,,False,,True
 Tonj East,hydroweb:104261,2022-23,2022-09-10,2022-09-10,hit,,False,,True
 Tonj East,hydroweb:104261,2024-25,2024-08-12,2024-09-08,hit,,False,,True
-Tonj East,hydroweb:104261,2025-26,2025-07-02,2025-07-02,hit,,False,,True
+Tonj East,hydroweb:104261,2025-26,2025-07-02,2025-12-11,hit,,False,,True
 Tonj South,dahiti:2686,2020-21,2020-08-22,2020-09-01,false alarm,,,,
 Tonj South,dahiti:2686,2023-24,2023-11-05,2023-11-05,false alarm,,,,
 Tonj South,dahiti:2686,2024-25,2024-07-10,2024-09-17,hit,,False,,True
 Tonj South,dahiti:2686,2025-26,2025-11-18,2025-11-18,false alarm,,,,
 Twic East,hydroweb:105860,2024-25,2024-09-26,2024-09-26,hit,,False,,True
-Twic East,hydroweb:105860,2025-26,2025-07-20,2025-07-20,hit,12.0,True,2025-08,True
+Twic East,hydroweb:105860,2025-26,2025-07-20,2025-08-16,hit,-15.0,True,2025-08,True
 Wulu,dahiti:2686,2020-21,2020-08-22,2020-09-01,false alarm,,,,
 Wulu,dahiti:2686,2023-24,2023-11-05,2023-11-05,false alarm,,,,
 Wulu,dahiti:2686,2024-25,2024-07-10,2024-09-17,false alarm,,,,
 Wulu,dahiti:2686,2025-26,2025-11-18,2025-11-18,hit,,False,,True
-Yirol East,hydroweb:7890,2021-22,2021-07-23,2021-07-23,hit,9.0,True,2021-08,True
+Yirol East,hydroweb:7890,2021-22,2021-07-23,2021-08-19,late,,True,2021-08,True
 Yirol East,hydroweb:7890,2024-25,2024-08-30,2024-12-16,late,,True,2024-11,False
 Yirol East,hydroweb:7890,2025-26,2025-10-09,2025-10-09,hit,,False,,True

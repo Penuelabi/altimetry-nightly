@@ -1,6 +1,6 @@
 # Anticipatory action roadmap - progress report 2026Q4
 
-Prepared 2026-10-09 11:42 UTC by aa_p5_indicator_tracker.py for the quarterly TWG-AA meeting (South Sudan Roadmap on Anticipatory Action 2025-2030, Pillars 1, 2, 3 and 5).
+Prepared 2026-10-09 13:29 UTC by aa_p5_indicator_tracker.py for the quarterly TWG-AA meeting (South Sudan Roadmap on Anticipatory Action 2025-2030, Pillars 1, 2, 3 and 5).
 
 Snapshot indicators show the latest value in the quarter; event indicators are counts in the quarter.
 
@@ -9,10 +9,10 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 | Indicator | 2026Q1 | 2026Q2 | 2026Q3 | 2026Q4 | Year to date | Target | Achieved | Verification |
 |---|---|---|---|---|---|---|---|---|
 | Counties with a flood risk profile |  |  |  | 79 | 79 |  |  | p1_county_risk_profile.csv |
-| Livelihood zones with exposure analysis |  |  |  | 0 | 0 |  |  | p1_zone_profile.csv |
-| Vulnerability and coping indicators in use |  |  |  | 0 | 0 |  |  | aa_config/county_vulnerability.csv |
-| Risk maps produced |  |  |  | 7 | 7 |  |  | p1_risk_map.png |
-| Risk datasets exported in HXL for the IMS |  |  |  | 7 | 7 |  |  | p1_county_risk_profile_hxl.csv |
+| Livelihood zones with exposure analysis |  |  |  | 12 | 12 |  |  | p1_zone_profile.csv |
+| Vulnerability and coping indicators in use |  |  |  | 1 | 1 |  |  | aa_config/county_vulnerability.csv |
+| Risk maps produced |  |  |  | 8 | 8 |  |  | p1_risk_map.png |
+| Risk datasets exported in HXL for the IMS |  |  |  | 8 | 8 |  |  | p1_county_risk_profile_hxl.csv |
 | Risk and trigger datasets in HXL for the IMS |  |  |  | 2 | 2 |  |  | aa_indicator_ledger.csv |
 
 ## Pillar 2 - Trigger and early warning systems
@@ -22,8 +22,8 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 | Hazards with defined thresholds and data requirements |  |  |  | 3 | 3 |  |  | p2_trigger_design_note.md |
 | Counties with proposed river trigger levels |  |  |  | 33 | 33 |  |  | aa_triggers.csv |
 | Counties with validated river trigger levels |  |  |  | 0 | 0 |  |  | aa_triggers.csv |
-| Trigger skill evaluations against recorded impacts |  |  |  | 7 | 7 |  |  | p2_trigger_skill_season.csv |
-| Datasets packaged and validated for the repository |  |  |  | 98 | 98 |  |  | aa_data_package_*.zip |
+| Trigger skill evaluations against recorded impacts |  |  |  | 8 | 8 |  |  | p2_trigger_skill_season.csv |
+| Datasets packaged and validated for the repository |  |  |  | 105 | 105 |  |  | aa_data_package_*.zip |
 | Languages with validated warning templates |  |  |  | 1 | 1 |  |  | aa_config/message_templates.csv |
 | Datasets failing validation |  |  |  | 0 | 0 |  |  | aa_indicator_ledger.csv |
 
@@ -46,9 +46,9 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 |---|---|---|---|---|---|---|---|---|
 | Subnational TWG-AA groups active (state / county) |  |  |  | 0 | 0 |  |  | aa_config/recipient_groups.csv |
 | TWG-AA meetings held |  |  |  |  |  |  |  | aa_config/meetings_log.csv |
-| TWG-AA situation briefs prepared |  |  |  | 152 | 152 |  |  | aa_out/dissemination |
+| TWG-AA situation briefs prepared |  |  |  | 163 | 163 |  |  | aa_out/dissemination |
 | Community groups / radio listening hubs registered |  |  |  | 0 | 0 |  |  | aa_config/recipient_groups.csv |
-| Early warning messages prepared |  |  |  | 962 | 962 |  |  | dissemination/*/messages.csv |
+| Early warning messages prepared |  |  |  | 1,056 | 1,056 |  |  | dissemination/*/messages.csv |
 | Early warning items sent |  |  |  |  |  |  |  | dissemination_log.csv (status sent) |
 | Community feedback records |  |  |  |  |  |  |  | aa_config/feedback_log.csv |
 
@@ -66,8 +66,6 @@ Snapshot indicators show the latest value in the quarter; event indicators are c
 Simulation exercise packs prepared, Simulation exercises conducted, AAPs activated, TWG-AA meetings held, Early warning items sent, Community feedback records
 
 ## Suggested next steps
-- Agree vulnerability indicators (e.g. IPC phase, IDP share) and fill aa_config/county_vulnerability.csv.
-- Add FEWS NET livelihood zones in aa_config/county_livelihood_zones.csv for the zone profile.
 - Validate the proposed river trigger levels with SSMS / MWRI (aa_triggers.csv: validated_by, validated_date).
 - Take the draft anticipatory action plans to the TWG-AA for validation (aa_config/aap_plans.csv).
 - Run a simulation exercise with a pack from aa_p3_simulation.py and record conducted_date.
