@@ -87,9 +87,9 @@ DAHITI_RAW_XLSX = os.path.join(OUT_DIR, 'dahiti_water_levels_raw.xlsx')
 DAHITI_SEED_FILE = os.path.join(OUT_DIR, 'dahiti_water_levels_raw.xlsx')
 #DAHITI_SEED_FILE = os.path.join(OUT_DIR, 'combined_water_levels_analyzed_20260929_085307.xlsx')
 SEED_CHECK_CSV = os.path.join(OUT_DIR, 'dahiti_seed_check.csv')
-DAHITI_PAUSE_S = 3
-DAHITI_MAX_RETRIES = 4
-DAHITI_MAX_WAIT_S = 120
+DAHITI_PAUSE_S = 2
+DAHITI_MAX_RETRIES = 3
+DAHITI_MAX_WAIT_S = 10
 DAHITI_STOP_AFTER_429 = 3
 RIVERS_ZIP = os.path.join(OUT_DIR, 'Theia_Hydroweb_Operational_Rivers.zip')
 LAKES_ZIP = os.path.join(OUT_DIR, 'HYDROWEB_LAKES_OPE.zip')
@@ -327,7 +327,7 @@ def load_seed():
 
 def dahiti_post(url, payload, timeout=60):
     """POST to the DAHITI API, backing off on HTTP 429 / 5xx / network errors."""
-    wait = 15
+    wait = 5
     status = 'no response'
     for attempt in range(DAHITI_MAX_RETRIES + 1):
         try:
