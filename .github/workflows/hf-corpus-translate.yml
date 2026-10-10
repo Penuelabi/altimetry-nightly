@@ -9,6 +9,8 @@ on:
       - '!hf_tools/draft_template_translations.py'
       - '!hf_tools/eval_models.py'
       - '!hf_tools/eval_google.py'
+      - '!hf_tools/translate_google.py'
+      - '!hf_tools/draft_templates_google.py'
       - '.github/workflows/hf-corpus-translate.yml'
 
 permissions:
