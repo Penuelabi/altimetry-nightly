@@ -1,0 +1,4 @@
+google nuer (nus): chrF 92.9 BLEU 87.6 (copy-English chrF 16.6)
+google dinka (din): chrF 93.8 BLEU 90.9 (copy-English chrF 16.1)
+google swahili (sw): chrF 73.2 BLEU 52.3 (copy-English chrF 24.6)
+Saved /home/runner/work/altimetry-nightly/altimetry-nightly/eval_results/google-translate-v2.json
