@@ -1,0 +1,322 @@
+state,county,population,alert_level,hazard,role,language,state_advisory_file,released,validated_share
+Abyei Region,Abyei Region,145358,orange,dry,english,en,advisory_abyei_region_en.md,yes,1.0
+Abyei Region,Abyei Region,145358,orange,dry,primary,din,,no,0.0
+Abyei Region,Abyei Region,145358,orange,dry,secondary,ara,,no,0.0
+Central Equatoria,Juba,570834,orange,flood,english,en,advisory_central_equatoria_en.md,yes,1.0
+Central Equatoria,Juba,570834,orange,flood,primary,bfa,,no,0.0
+Central Equatoria,Juba,570834,orange,flood,secondary,pga,,no,0.0
+Central Equatoria,Juba,570834,orange,flood,secondary,ara,,no,0.0
+Central Equatoria,Juba,570834,orange,flood,secondary,din,,no,0.0
+Central Equatoria,Juba,570834,orange,flood,secondary,nus,,no,0.0
+Central Equatoria,Kajo-keji,257989,orange,flood,english,en,advisory_central_equatoria_en.md,yes,1.0
+Central Equatoria,Kajo-keji,257989,orange,flood,primary,keo,,no,0.0
+Central Equatoria,Kajo-keji,257989,orange,flood,secondary,pga,,no,0.0
+Central Equatoria,Kajo-keji,257989,orange,flood,secondary,swa,,no,0.0
+Central Equatoria,Lainya,119155,green,flood,english,en,advisory_central_equatoria_en.md,yes,1.0
+Central Equatoria,Lainya,119155,green,flood,primary,bfa,,no,0.0
+Central Equatoria,Lainya,119155,green,flood,secondary,pga,,no,0.0
+Central Equatoria,Morobo,136697,green,flood,english,en,advisory_central_equatoria_en.md,yes,1.0
+Central Equatoria,Morobo,136697,green,flood,primary,keo,,no,0.0
+Central Equatoria,Morobo,136697,green,flood,secondary,pga,,no,0.0
+Central Equatoria,Morobo,136697,green,flood,secondary,swa,,no,0.0
+Central Equatoria,Terekeka,266693,green,flood,english,en,advisory_central_equatoria_en.md,yes,1.0
+Central Equatoria,Terekeka,266693,green,flood,primary,bfa,,no,0.0
+Central Equatoria,Terekeka,266693,green,flood,secondary,pga,,no,0.0
+Central Equatoria,Terekeka,266693,green,flood,secondary,din,,no,0.0
+Central Equatoria,Yei,327602,green,flood,english,en,advisory_central_equatoria_en.md,yes,1.0
+Central Equatoria,Yei,327602,green,flood,primary,keo,,no,0.0
+Central Equatoria,Yei,327602,green,flood,secondary,pga,,no,0.0
+Central Equatoria,Yei,327602,green,flood,secondary,swa,,no,0.0
+Eastern Equatoria,Budi,108474,green,flood,english,en,advisory_eastern_equatoria_en.md,yes,1.0
+Eastern Equatoria,Budi,108474,green,flood,primary,tpo,,no,0.0
+Eastern Equatoria,Budi,108474,green,flood,secondary,pga,,no,0.0
+Eastern Equatoria,Ikotos,111148,green,flood,english,en,advisory_eastern_equatoria_en.md,yes,1.0
+Eastern Equatoria,Ikotos,111148,green,flood,primary,lot,,no,0.0
+Eastern Equatoria,Ikotos,111148,green,flood,secondary,pga,,no,0.0
+Eastern Equatoria,Ikotos,111148,green,flood,secondary,swa,,no,0.0
+Eastern Equatoria,Kapoeta East,175078,green,flood,english,en,advisory_eastern_equatoria_en.md,yes,1.0
+Eastern Equatoria,Kapoeta East,175078,green,flood,primary,tpo,,no,0.0
+Eastern Equatoria,Kapoeta East,175078,green,flood,secondary,pga,,no,0.0
+Eastern Equatoria,Kapoeta North,162158,green,flood,english,en,advisory_eastern_equatoria_en.md,yes,1.0
+Eastern Equatoria,Kapoeta North,162158,green,flood,primary,tpo,,no,0.0
+Eastern Equatoria,Kapoeta North,162158,green,flood,secondary,pga,,no,0.0
+Eastern Equatoria,Kapoeta South,105511,green,flood,english,en,advisory_eastern_equatoria_en.md,yes,1.0
+Eastern Equatoria,Kapoeta South,105511,green,flood,primary,tpo,,no,0.0
+Eastern Equatoria,Kapoeta South,105511,green,flood,secondary,pga,,no,0.0
+Eastern Equatoria,Lafon,163767,red,dry,english,en,advisory_eastern_equatoria_en.md,yes,1.0
+Eastern Equatoria,Lafon,163767,red,dry,primary,lot,,no,0.0
+Eastern Equatoria,Lafon,163767,red,dry,secondary,pga,,no,0.0
+Eastern Equatoria,Magwi,314109,orange,flood,english,en,advisory_eastern_equatoria_en.md,yes,1.0
+Eastern Equatoria,Magwi,314109,orange,flood,primary,ach,,no,0.0
+Eastern Equatoria,Magwi,314109,orange,flood,secondary,mhi,,no,0.0
+Eastern Equatoria,Magwi,314109,orange,flood,secondary,swa,,no,0.0
+Eastern Equatoria,Magwi,314109,orange,flood,secondary,pga,,no,0.0
+Eastern Equatoria,Torit,65844,green,flood,english,en,advisory_eastern_equatoria_en.md,yes,1.0
+Eastern Equatoria,Torit,65844,green,flood,primary,lot,,no,0.0
+Eastern Equatoria,Torit,65844,green,flood,secondary,pga,,no,0.0
+Eastern Equatoria,Torit,65844,green,flood,secondary,swa,,no,0.0
+Jonglei,Akobo,238042,orange,dry,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Akobo,238042,orange,dry,primary,nus,,no,0.0
+Jonglei,Akobo,238042,orange,dry,secondary,din,,no,0.0
+Jonglei,Akobo,238042,orange,dry,secondary,pga,,no,0.0
+Jonglei,Ayod,205709,green,flood,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Ayod,205709,green,flood,primary,nus,,no,0.0
+Jonglei,Ayod,205709,green,flood,secondary,din,,no,0.0
+Jonglei,Ayod,205709,green,flood,secondary,pga,,no,0.0
+Jonglei,Bor South,354711,orange,dry,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Bor South,354711,orange,dry,primary,din,,no,0.0
+Jonglei,Bor South,354711,orange,dry,secondary,pga,,no,0.0
+Jonglei,Bor South,354711,orange,dry,secondary,nus,,no,0.0
+Jonglei,Canal/Pigi,111613,orange,dry,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Canal/Pigi,111613,orange,dry,primary,din,,no,0.0
+Jonglei,Canal/Pigi,111613,orange,dry,secondary,nus,,no,0.0
+Jonglei,Canal/Pigi,111613,orange,dry,secondary,pga,,no,0.0
+Jonglei,Duk,206545,green,flood,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Duk,206545,green,flood,primary,din,,no,0.0
+Jonglei,Duk,206545,green,flood,secondary,pga,,no,0.0
+Jonglei,Duk,206545,green,flood,secondary,nus,,no,0.0
+Jonglei,Fangak,213029,green,flood,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Fangak,213029,green,flood,primary,nus,,no,0.0
+Jonglei,Fangak,213029,green,flood,secondary,din,,no,0.0
+Jonglei,Fangak,213029,green,flood,secondary,pga,,no,0.0
+Jonglei,Nyirol,153295,orange,dry,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Nyirol,153295,orange,dry,primary,nus,,no,0.0
+Jonglei,Nyirol,153295,orange,dry,secondary,din,,no,0.0
+Jonglei,Nyirol,153295,orange,dry,secondary,pga,,no,0.0
+Jonglei,Pibor,237649,orange,dry,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Pibor,237649,orange,dry,primary,mur,,no,0.0
+Jonglei,Pibor,237649,orange,dry,secondary,nus,,no,0.0
+Jonglei,Pibor,237649,orange,dry,secondary,pga,,no,0.0
+Jonglei,Pochalla,82568,orange,dry,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Pochalla,82568,orange,dry,primary,anu,,no,0.0
+Jonglei,Pochalla,82568,orange,dry,secondary,mur,,no,0.0
+Jonglei,Pochalla,82568,orange,dry,secondary,pga,,no,0.0
+Jonglei,Twic East,129822,green,flood,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Twic East,129822,green,flood,primary,din,,no,0.0
+Jonglei,Twic East,129822,green,flood,secondary,pga,,no,0.0
+Jonglei,Twic East,129822,green,flood,secondary,nus,,no,0.0
+Jonglei,Uror,205594,orange,dry,english,en,advisory_jonglei_en.md,yes,1.0
+Jonglei,Uror,205594,orange,dry,primary,nus,,no,0.0
+Jonglei,Uror,205594,orange,dry,secondary,din,,no,0.0
+Jonglei,Uror,205594,orange,dry,secondary,pga,,no,0.0
+Lakes,Awerial,144223,orange,dry,english,en,advisory_lakes_en.md,yes,1.0
+Lakes,Awerial,144223,orange,dry,primary,din,,no,0.0
+Lakes,Awerial,144223,orange,dry,secondary,pga,,no,0.0
+Lakes,Awerial,144223,orange,dry,secondary,ara,,no,0.0
+Lakes,Cueibet,189199,green,flood,english,en,advisory_lakes_en.md,yes,1.0
+Lakes,Cueibet,189199,green,flood,primary,din,,no,0.0
+Lakes,Cueibet,189199,green,flood,secondary,pga,,no,0.0
+Lakes,Cueibet,189199,green,flood,secondary,ara,,no,0.0
+Lakes,Rumbek Centre,222497,orange,dry,english,en,advisory_lakes_en.md,yes,1.0
+Lakes,Rumbek Centre,222497,orange,dry,primary,din,,no,0.0
+Lakes,Rumbek Centre,222497,orange,dry,secondary,pga,,no,0.0
+Lakes,Rumbek Centre,222497,orange,dry,secondary,ara,,no,0.0
+Lakes,Rumbek East,180970,green,flood,english,en,advisory_lakes_en.md,yes,1.0
+Lakes,Rumbek East,180970,green,flood,primary,din,,no,0.0
+Lakes,Rumbek East,180970,green,flood,secondary,pga,,no,0.0
+Lakes,Rumbek East,180970,green,flood,secondary,ara,,no,0.0
+Lakes,Rumbek North,75047,orange,dry,english,en,advisory_lakes_en.md,yes,1.0
+Lakes,Rumbek North,75047,orange,dry,primary,din,,no,0.0
+Lakes,Rumbek North,75047,orange,dry,secondary,pga,,no,0.0
+Lakes,Rumbek North,75047,orange,dry,secondary,ara,,no,0.0
+Lakes,Wulu,92247,yellow,flood,english,en,advisory_lakes_en.md,yes,1.0
+Lakes,Wulu,92247,yellow,flood,primary,din,,no,0.0
+Lakes,Wulu,92247,yellow,flood,secondary,pga,,no,0.0
+Lakes,Wulu,92247,yellow,flood,secondary,ara,,no,0.0
+Lakes,Yirol East,165810,green,flood,english,en,advisory_lakes_en.md,yes,1.0
+Lakes,Yirol East,165810,green,flood,primary,din,,no,0.0
+Lakes,Yirol East,165810,green,flood,secondary,pga,,no,0.0
+Lakes,Yirol East,165810,green,flood,secondary,ara,,no,0.0
+Lakes,Yirol West,181325,orange,dry,english,en,advisory_lakes_en.md,yes,1.0
+Lakes,Yirol West,181325,orange,dry,primary,din,,no,0.0
+Lakes,Yirol West,181325,orange,dry,secondary,pga,,no,0.0
+Lakes,Yirol West,181325,orange,dry,secondary,ara,,no,0.0
+Northern Bahr el Ghazal,Aweil Centre,78958,orange,dry,english,en,advisory_northern_bahr_el_ghazal_en.md,yes,1.0
+Northern Bahr el Ghazal,Aweil Centre,78958,orange,dry,primary,din,,no,0.0
+Northern Bahr el Ghazal,Aweil Centre,78958,orange,dry,secondary,ara,,no,0.0
+Northern Bahr el Ghazal,Aweil Centre,78958,orange,dry,secondary,pga,,no,0.0
+Northern Bahr el Ghazal,Aweil East,395769,orange,dry,english,en,advisory_northern_bahr_el_ghazal_en.md,yes,1.0
+Northern Bahr el Ghazal,Aweil East,395769,orange,dry,primary,din,,no,0.0
+Northern Bahr el Ghazal,Aweil East,395769,orange,dry,secondary,ara,,no,0.0
+Northern Bahr el Ghazal,Aweil East,395769,orange,dry,secondary,pga,,no,0.0
+Northern Bahr el Ghazal,Aweil North,185929,orange,dry,english,en,advisory_northern_bahr_el_ghazal_en.md,yes,1.0
+Northern Bahr el Ghazal,Aweil North,185929,orange,dry,primary,din,,no,0.0
+Northern Bahr el Ghazal,Aweil North,185929,orange,dry,secondary,ara,,no,0.0
+Northern Bahr el Ghazal,Aweil North,185929,orange,dry,secondary,pga,,no,0.0
+Northern Bahr el Ghazal,Aweil South,151604,orange,dry,english,en,advisory_northern_bahr_el_ghazal_en.md,yes,1.0
+Northern Bahr el Ghazal,Aweil South,151604,orange,dry,primary,din,,no,0.0
+Northern Bahr el Ghazal,Aweil South,151604,orange,dry,secondary,ara,,no,0.0
+Northern Bahr el Ghazal,Aweil South,151604,orange,dry,secondary,pga,,no,0.0
+Northern Bahr el Ghazal,Aweil West,223173,orange,dry,english,en,advisory_northern_bahr_el_ghazal_en.md,yes,1.0
+Northern Bahr el Ghazal,Aweil West,223173,orange,dry,primary,din,,no,0.0
+Northern Bahr el Ghazal,Aweil West,223173,orange,dry,secondary,ara,,no,0.0
+Northern Bahr el Ghazal,Aweil West,223173,orange,dry,secondary,pga,,no,0.0
+Unity,Abiemnhom,60349,yellow,dry,english,en,advisory_unity_en.md,yes,1.0
+Unity,Abiemnhom,60349,yellow,dry,primary,din,,no,0.0
+Unity,Abiemnhom,60349,yellow,dry,secondary,nus,,no,0.0
+Unity,Abiemnhom,60349,yellow,dry,secondary,ara,,no,0.0
+Unity,Abiemnhom,60349,yellow,dry,secondary,pga,,no,0.0
+Unity,Guit,73878,green,flood,english,en,advisory_unity_en.md,yes,1.0
+Unity,Guit,73878,green,flood,primary,nus,,no,0.0
+Unity,Guit,73878,green,flood,secondary,din,,no,0.0
+Unity,Guit,73878,green,flood,secondary,pga,,no,0.0
+Unity,Koch,115158,green,flood,english,en,advisory_unity_en.md,yes,1.0
+Unity,Koch,115158,green,flood,primary,nus,,no,0.0
+Unity,Koch,115158,green,flood,secondary,din,,no,0.0
+Unity,Koch,115158,green,flood,secondary,pga,,no,0.0
+Unity,Leer,86784,green,flood,english,en,advisory_unity_en.md,yes,1.0
+Unity,Leer,86784,green,flood,primary,nus,,no,0.0
+Unity,Leer,86784,green,flood,secondary,din,,no,0.0
+Unity,Leer,86784,green,flood,secondary,pga,,no,0.0
+Unity,Mayendit,74335,green,flood,english,en,advisory_unity_en.md,yes,1.0
+Unity,Mayendit,74335,green,flood,primary,nus,,no,0.0
+Unity,Mayendit,74335,green,flood,secondary,din,,no,0.0
+Unity,Mayendit,74335,green,flood,secondary,pga,,no,0.0
+Unity,Mayom,170251,orange,dry,english,en,advisory_unity_en.md,yes,1.0
+Unity,Mayom,170251,orange,dry,primary,nus,,no,0.0
+Unity,Mayom,170251,orange,dry,secondary,din,,no,0.0
+Unity,Mayom,170251,orange,dry,secondary,pga,,no,0.0
+Unity,Panyijiar,126239,green,flood,english,en,advisory_unity_en.md,yes,1.0
+Unity,Panyijiar,126239,green,flood,primary,nus,,no,0.0
+Unity,Panyijiar,126239,green,flood,secondary,din,,no,0.0
+Unity,Panyijiar,126239,green,flood,secondary,pga,,no,0.0
+Unity,Pariang,143832,orange,dry,english,en,advisory_unity_en.md,yes,1.0
+Unity,Pariang,143832,orange,dry,primary,din,,no,0.0
+Unity,Pariang,143832,orange,dry,secondary,nus,,no,0.0
+Unity,Pariang,143832,orange,dry,secondary,ara,,no,0.0
+Unity,Pariang,143832,orange,dry,secondary,pga,,no,0.0
+Unity,Rubkona,361802,yellow,flood,english,en,advisory_unity_en.md,yes,1.0
+Unity,Rubkona,361802,yellow,flood,primary,nus,,no,0.0
+Unity,Rubkona,361802,yellow,flood,secondary,din,,no,0.0
+Unity,Rubkona,361802,yellow,flood,secondary,ara,,no,0.0
+Unity,Rubkona,361802,yellow,flood,secondary,pga,,no,0.0
+Upper Nile,Baliet,76145,green,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Baliet,76145,green,flood,primary,din,,no,0.0
+Upper Nile,Baliet,76145,green,flood,secondary,ara,,no,0.0
+Upper Nile,Baliet,76145,green,flood,secondary,shk,,no,0.0
+Upper Nile,Baliet,76145,green,flood,secondary,pga,,no,0.0
+Upper Nile,Fashoda,83775,green,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Fashoda,83775,green,flood,primary,shk,,no,0.0
+Upper Nile,Fashoda,83775,green,flood,secondary,din,,no,0.0
+Upper Nile,Fashoda,83775,green,flood,secondary,ara,,no,0.0
+Upper Nile,Fashoda,83775,green,flood,secondary,pga,,no,0.0
+Upper Nile,Longochuk,80526,green,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Longochuk,80526,green,flood,primary,nus,,no,0.0
+Upper Nile,Longochuk,80526,green,flood,secondary,din,,no,0.0
+Upper Nile,Longochuk,80526,green,flood,secondary,pga,,no,0.0
+Upper Nile,Luakpiny/Nasir,350742,yellow,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Luakpiny/Nasir,350742,yellow,flood,primary,nus,,no,0.0
+Upper Nile,Luakpiny/Nasir,350742,yellow,flood,secondary,din,,no,0.0
+Upper Nile,Luakpiny/Nasir,350742,yellow,flood,secondary,pga,,no,0.0
+Upper Nile,Maban,84550,green,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Maban,84550,green,flood,primary,ara,,no,0.0
+Upper Nile,Maban,84550,green,flood,secondary,pga,,no,0.0
+Upper Nile,Maiwut,147823,green,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Maiwut,147823,green,flood,primary,nus,,no,0.0
+Upper Nile,Maiwut,147823,green,flood,secondary,din,,no,0.0
+Upper Nile,Maiwut,147823,green,flood,secondary,pga,,no,0.0
+Upper Nile,Malakal,204041,orange,dry,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Malakal,204041,orange,dry,primary,shk,,no,0.0
+Upper Nile,Malakal,204041,orange,dry,secondary,din,,no,0.0
+Upper Nile,Malakal,204041,orange,dry,secondary,nus,,no,0.0
+Upper Nile,Malakal,204041,orange,dry,secondary,ara,,no,0.0
+Upper Nile,Malakal,204041,orange,dry,secondary,pga,,no,0.0
+Upper Nile,Manyo,83853,green,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Manyo,83853,green,flood,primary,din,,no,0.0
+Upper Nile,Manyo,83853,green,flood,secondary,ara,,no,0.0
+Upper Nile,Manyo,83853,green,flood,secondary,shk,,no,0.0
+Upper Nile,Manyo,83853,green,flood,secondary,pga,,no,0.0
+Upper Nile,Melut,134054,green,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Melut,134054,green,flood,primary,din,,no,0.0
+Upper Nile,Melut,134054,green,flood,secondary,ara,,no,0.0
+Upper Nile,Melut,134054,green,flood,secondary,shk,,no,0.0
+Upper Nile,Melut,134054,green,flood,secondary,pga,,no,0.0
+Upper Nile,Panyikang,69656,yellow,dry,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Panyikang,69656,yellow,dry,primary,shk,,no,0.0
+Upper Nile,Panyikang,69656,yellow,dry,secondary,din,,no,0.0
+Upper Nile,Panyikang,69656,yellow,dry,secondary,ara,,no,0.0
+Upper Nile,Panyikang,69656,yellow,dry,secondary,pga,,no,0.0
+Upper Nile,Renk,210351,green,flood,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Renk,210351,green,flood,primary,din,,no,0.0
+Upper Nile,Renk,210351,green,flood,secondary,ara,,no,0.0
+Upper Nile,Renk,210351,green,flood,secondary,shk,,no,0.0
+Upper Nile,Renk,210351,green,flood,secondary,pga,,no,0.0
+Upper Nile,Ulang,167265,orange,dry,english,en,advisory_upper_nile_en.md,yes,1.0
+Upper Nile,Ulang,167265,orange,dry,primary,nus,,no,0.0
+Upper Nile,Ulang,167265,orange,dry,secondary,din,,no,0.0
+Upper Nile,Ulang,167265,orange,dry,secondary,pga,,no,0.0
+Warrap,Gogrial East,138793,orange,dry,english,en,advisory_warrap_en.md,yes,1.0
+Warrap,Gogrial East,138793,orange,dry,primary,din,,no,0.0
+Warrap,Gogrial East,138793,orange,dry,secondary,pga,,no,0.0
+Warrap,Gogrial East,138793,orange,dry,secondary,ara,,no,0.0
+Warrap,Gogrial West,347953,yellow,flood,english,en,advisory_warrap_en.md,yes,1.0
+Warrap,Gogrial West,347953,yellow,flood,primary,din,,no,0.0
+Warrap,Gogrial West,347953,yellow,flood,secondary,pga,,no,0.0
+Warrap,Gogrial West,347953,yellow,flood,secondary,ara,,no,0.0
+Warrap,Tonj East,190959,orange,dry,english,en,advisory_warrap_en.md,yes,1.0
+Warrap,Tonj East,190959,orange,dry,primary,din,,no,0.0
+Warrap,Tonj East,190959,orange,dry,secondary,pga,,no,0.0
+Warrap,Tonj East,190959,orange,dry,secondary,ara,,no,0.0
+Warrap,Tonj North,271487,orange,dry,english,en,advisory_warrap_en.md,yes,1.0
+Warrap,Tonj North,271487,orange,dry,primary,din,,no,0.0
+Warrap,Tonj North,271487,orange,dry,secondary,pga,,no,0.0
+Warrap,Tonj North,271487,orange,dry,secondary,ara,,no,0.0
+Warrap,Tonj South,126289,green,flood,english,en,advisory_warrap_en.md,yes,1.0
+Warrap,Tonj South,126289,green,flood,primary,din,,no,0.0
+Warrap,Tonj South,126289,green,flood,secondary,pga,,no,0.0
+Warrap,Tonj South,126289,green,flood,secondary,ara,,no,0.0
+Warrap,Twic,291675,orange,dry,english,en,advisory_warrap_en.md,yes,1.0
+Warrap,Twic,291675,orange,dry,primary,din,,no,0.0
+Warrap,Twic,291675,orange,dry,secondary,pga,,no,0.0
+Warrap,Twic,291675,orange,dry,secondary,ara,,no,0.0
+Western Bahr el Ghazal,Jur River,293840,green,flood,english,en,advisory_western_bahr_el_ghazal_en.md,yes,1.0
+Western Bahr el Ghazal,Jur River,293840,green,flood,primary,din,,no,0.0
+Western Bahr el Ghazal,Jur River,293840,green,flood,secondary,pga,,no,0.0
+Western Bahr el Ghazal,Jur River,293840,green,flood,secondary,ara,,no,0.0
+Western Bahr el Ghazal,Raja,76633,orange,dry,english,en,advisory_western_bahr_el_ghazal_en.md,yes,1.0
+Western Bahr el Ghazal,Raja,76633,orange,dry,primary,pga,,no,0.0
+Western Bahr el Ghazal,Raja,76633,orange,dry,secondary,ara,,no,0.0
+Western Bahr el Ghazal,Wau,345948,green,flood,english,en,advisory_western_bahr_el_ghazal_en.md,yes,1.0
+Western Bahr el Ghazal,Wau,345948,green,flood,primary,pga,,no,0.0
+Western Bahr el Ghazal,Wau,345948,green,flood,secondary,din,,no,0.0
+Western Bahr el Ghazal,Wau,345948,green,flood,secondary,ara,,no,0.0
+Western Equatoria,Ezo,138291,yellow,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Ezo,138291,yellow,flood,primary,zne,,no,0.0
+Western Equatoria,Ezo,138291,yellow,flood,secondary,pga,,no,0.0
+Western Equatoria,Ezo,138291,yellow,flood,secondary,swa,,no,0.0
+Western Equatoria,Ibba,68544,green,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Ibba,68544,green,flood,primary,zne,,no,0.0
+Western Equatoria,Ibba,68544,green,flood,secondary,pga,,no,0.0
+Western Equatoria,Ibba,68544,green,flood,secondary,swa,,no,0.0
+Western Equatoria,Maridi,113864,green,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Maridi,113864,green,flood,primary,mgd,,no,0.0
+Western Equatoria,Maridi,113864,green,flood,secondary,zne,,no,0.0
+Western Equatoria,Maridi,113864,green,flood,secondary,pga,,no,0.0
+Western Equatoria,Mundri East,103283,yellow,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Mundri East,103283,yellow,flood,primary,mgd,,no,0.0
+Western Equatoria,Mundri East,103283,yellow,flood,secondary,zne,,no,0.0
+Western Equatoria,Mundri East,103283,yellow,flood,secondary,pga,,no,0.0
+Western Equatoria,Mundri West,51413,yellow,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Mundri West,51413,yellow,flood,primary,mgd,,no,0.0
+Western Equatoria,Mundri West,51413,yellow,flood,secondary,zne,,no,0.0
+Western Equatoria,Mundri West,51413,yellow,flood,secondary,pga,,no,0.0
+Western Equatoria,Mvolo,77611,green,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Mvolo,77611,green,flood,primary,mgd,,no,0.0
+Western Equatoria,Mvolo,77611,green,flood,secondary,din,,no,0.0
+Western Equatoria,Mvolo,77611,green,flood,secondary,pga,,no,0.0
+Western Equatoria,Nagero,61561,yellow,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Nagero,61561,yellow,flood,primary,zne,,no,0.0
+Western Equatoria,Nagero,61561,yellow,flood,secondary,pga,,no,0.0
+Western Equatoria,Nagero,61561,yellow,flood,secondary,swa,,no,0.0
+Western Equatoria,Nzara,86370,yellow,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Nzara,86370,yellow,flood,primary,zne,,no,0.0
+Western Equatoria,Nzara,86370,yellow,flood,secondary,pga,,no,0.0
+Western Equatoria,Nzara,86370,yellow,flood,secondary,swa,,no,0.0
+Western Equatoria,Tambura,122913,orange,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Tambura,122913,orange,flood,primary,zne,,no,0.0
+Western Equatoria,Tambura,122913,orange,flood,secondary,pga,,no,0.0
+Western Equatoria,Tambura,122913,orange,flood,secondary,swa,,no,0.0
+Western Equatoria,Yambio,173972,green,flood,english,en,advisory_western_equatoria_en.md,yes,1.0
+Western Equatoria,Yambio,173972,green,flood,primary,zne,,no,0.0
+Western Equatoria,Yambio,173972,green,flood,secondary,pga,,no,0.0
+Western Equatoria,Yambio,173972,green,flood,secondary,swa,,no,0.0

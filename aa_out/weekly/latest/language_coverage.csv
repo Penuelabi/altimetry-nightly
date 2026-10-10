@@ -1,5 +1,18 @@
-language,language_name,blocks_total,blocks_validated,blocks_draft_only,files_written,released
-en,English,117,117,0,12,yes
-din,Dinka (Thuongjang),117,0,117,0,no (needs validation)
-nus,Nuer (Thok Naath),117,0,117,0,no (needs validation)
-swa,Swahili,117,0,117,0,no (needs validation)
+language,language_name,blocks_total,blocks_validated,blocks_draft_only,counties_primary,population_primary,counties_any,files_written,released
+en,English,117,117,0,0,0,0,12,yes
+din,Dinka (Thuongjang),117,0,117,31,5604380,54,0,no (needs validation)
+nus,Nuer (Thok Naath),117,0,117,16,2770472,25,0,no (needs validation)
+swa,Swahili,117,0,117,0,0,12,0,no (needs validation)
+ara,Arabic (Modern Standard),117,0,117,1,84550,35,0,no (needs validation)
+pga,Juba Arabic (Latin letters),117,0,0,2,422581,78,0,no (needs validation)
+shk,Shilluk (Dhøg Cøllø),117,0,0,3,357472,7,0,no (needs validation)
+ach,Acholi,117,0,117,1,314109,1,0,no (needs validation)
+mur,Murle,117,0,0,1,237649,2,0,no (needs validation)
+bfa,Bari,117,0,0,3,956682,3,0,no (needs validation)
+tpo,Toposa,117,0,0,4,551221,4,0,no (needs validation)
+zne,Zande,117,0,0,6,651651,9,0,no (needs validation)
+mgd,Moru,117,0,0,4,346171,4,0,no (needs validation)
+lot,Lotuho (Otuho),117,0,0,3,340759,3,0,no (needs validation)
+keo,Kakwa,117,0,0,3,722288,3,0,no (needs validation)
+mhi,Madi,117,0,0,0,0,1,0,no (needs validation)
+anu,Anuak (Anywaa),117,0,0,1,82568,1,0,no (needs validation)
