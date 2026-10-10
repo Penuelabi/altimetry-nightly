@@ -12,24 +12,24 @@ The Commissioner also announced plans to construct headquarters for all 13 Payam
 
 ## Nuer (nus_Latn)
 
-RƐL: Kä Kalisto Lado, min la Kumɛthɛr duŋ Juba County, kɛ Pay Bädäk, 9 Pay Bädäk 2026, cuɛ la̱tdɛ tok kɛ thuɔ̱k mi̱ caa la̱t kɛ kui̱ la̱t gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱a̱th in tä gua̱th in tä gua̱th in tä gua̱a̱th in tä gua̱th in tä gua̱a̱th in tä gua̱a̱th in tä kɛ gua̱a̱th in tä kɛ gua̱a̱th in tä kɛ gua̱a̱th in tä kɛ gua̱a̱th in tä kɛ gua̱a̱th ɛmɔ.
+PICTORIAL: Kä Kalisto Lado min la Kumɛthɛr duŋ Ji̱ba County, kɛ Pay Bädäk, 9 Ko̱o̱r 2026, cuɛ la̱tdɛ tok kɛ ta̱a̱ in ca riali̱kä thi̱n kä ɣöö ba wi̱i̱ duël gɔ̱ɔ̱r.
 
-Ɛn la̱t, mi̱ cua la̱t ɛ Hatay Holding Company Ltd., cua jɛ car ɛn ɣöö ba jɛ thuɔ̱k rɛy ruuni̱ da̱ŋ ŋuan, kɛnɛ ɣöö ba la̱tdɛ la̱t kɛ gua̱a̱th ti̱ ŋuan kɛ cäŋ.
+Ɛn la̱t, mi̱ cua la̱th ɛ Hatay Holding Company Ltd., cua jɛ car ɛn ɣöö ba jɛ thuɔ̱k rɛy ruuni̱ da̱ŋ ŋuaan, kɛ ta̱th in ca riali̱kä i̱ bɛ ŋot kɛ gua̱a̱th 24 kɛ cäŋ kɛl.
 
-Ɛn Kumɛthɛr cuɛ la̱t ruac kɛ kui̱i̱ ka̱mni̱ ti̱ ŋuan kɛ kui̱i̱ kä 13 Payam kɛnɛ Boma kä Juba County.
+Ɛn Kumɛthɛr cuɛ la̱t ruac kɛ kui̱i̱ ka̱mni̱ ti̱ ŋuan ti̱ dëë täth kä Payam kɛnɛ Boma rɛy Ji̱ba County.
 
 ## Dinka (dik_Latn)
 
-PICTORIAL: Raan cɔl Kalisto Lado, akutnhom de kɔc juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈ɛ̈r juɛ̈r juɛ̈ɛ̈r juɛ̈r juɛ̈ɛ̈r juɛ̈ɛ̈r juɛ̈r juɛ̈ɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈r juɛ̈
+PICTORIAL: Raan cɔl Kalisto Lado, akutnhom de kɔc cï puɔ̈ɔ̈c tënë Juba County, acï bɛ̈n la tueŋ në pɛɛi ë nïn ka 9 October 2026, ku jɔl kë cï luɔɔi looi bï thääp thïn.
 
-Akɔ̈u, cï looi në Hatay Holding Company Ltd., acï bɛ̈n ya thääp në pɛ̈i kaŋuan yiic, ku jɔl ya luɔɔi de lɔ̈ɔ̈m acï bɛ̈n ya looi në pɛ̈i 24.
+Akɔ̈u, cï looi në Hatay Holding Company Ltd., acï bɛ̈n ya thääp në pɛ̈i kaŋuan yiic, ku jɔl ya luɔɔi cï guiir bï ya la tueŋ në 24 ë nïn.
 
-Raan cï lɔc ku dɔc acï bɛ̈n bɛ̈n lɛ̈k ke cï guiir bïk thääp looi tënë thääp 13 de Payam ku Bomas de Juba County.
+Raan cï lɔc ku dɔc acï bɛ̈n lɛ̈k ke cï guiir bïk thääp looi tënë 13 de Payam ku Bomas de Juba County.
 
 ## Swahili (swh_Latn)
 
-PICTORIAL: Kamishna wa Msimamizi wa Kaunti ya Juba, Kalisto Lado, siku ya Ijumaa, Oktoba 9, 2026, alizindua mradi wa kukamilisha Jengo la Makao Makuu ya Kaunti.
+PICTORIAL: Kamishna wa Wilaya ya Juba, Kalisto Lado, siku ya Ijumaa, Oktoba 9, 2026, alizindua mradi wa kukamilisha Jengo la Makao Makuu ya Wilaya.
 
-Mradi huo, uliofanywa na Hatay Holding Company Ltd., unatarajiwa kukamilika ndani ya miezi minne, na ujenzi uliopangwa kufanyika saa 24 kwa siku.
+Mradi huo, uliofanywa na Hatay Holding Company Ltd., unatarajiwa kukamilika ndani ya miezi minne, na ujenzi umepangwa kufanyika masaa 24 kwa siku.
 
 Kamishna pia alitangaza mipango ya kujenga makao makuu kwa Payams wote 13 na Bomas ya Kaunti ya Juba.
