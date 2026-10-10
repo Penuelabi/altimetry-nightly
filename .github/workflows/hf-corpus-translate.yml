@@ -6,13 +6,14 @@ on:
     branches: [hf-translate]
     paths:
       - 'hf_tools/**'
+      - '!hf_tools/draft_template_translations.py'
       - '.github/workflows/hf-corpus-translate.yml'
 
 permissions:
   contents: write
 
 concurrency:
-  group: hf-corpus-translate
+  group: hf-branch-writes
   cancel-in-progress: false
 
 jobs:
@@ -55,4 +56,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A hf_tools
           git commit -m "HF corpus sample and translations [skip ci]" || echo "nothing to commit"
+          git pull --rebase origin ${GITHUB_REF_NAME} || true
           git push origin HEAD:${GITHUB_REF_NAME}

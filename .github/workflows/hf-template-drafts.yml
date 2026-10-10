@@ -1,0 +1,66 @@
+name: Draft Dinka/Nuer alert-message translations (manual / on push to hf-translate)
+
+# Reads aa_config/message_templates.csv, writes aa_out/template_translation_drafts.csv.
+# Drafts are NOT validated and are never read by the dissemination script until a native speaker
+# copies corrected text into message_templates.csv with validated_by filled. Nothing is sent.
+
+on:
+  workflow_dispatch:
+    inputs:
+      langs:
+        description: 'Language codes (din,nus,swa)'
+        default: 'din,nus'
+  push:
+    branches: [hf-translate]
+    paths:
+      - 'hf_tools/draft_template_translations.py'
+      - 'hf_tools/translate_hf.py'
+      - '.github/workflows/hf-template-drafts.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hf-branch-writes
+  cancel-in-progress: false
+
+jobs:
+  drafts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-nllb-200-distilled-600m
+      - name: Install
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers sentencepiece
+      - name: Draft translations
+        env:
+          HF_TOKEN: ${{ secrets.HUGGINGFACE }}
+        run: |
+          set -o pipefail
+          mkdir -p aa_out
+          python hf_tools/draft_template_translations.py --langs "${{ github.event.inputs.langs || 'din,nus' }}" 2>&1 | tee aa_out/template_translation_drafts.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: template-translation-drafts
+          path: |
+            aa_out/template_translation_drafts.csv
+            aa_out/template_translation_drafts.log
+      - name: Commit drafts to this branch
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add aa_out/template_translation_drafts.csv aa_out/template_translation_drafts.log || true
+          git commit -m "Draft alert-message translations (unvalidated) [skip ci]" || echo "nothing to commit"
+          git pull --rebase origin ${GITHUB_REF_NAME} || true
+          git push origin HEAD:${GITHUB_REF_NAME}
