@@ -1,0 +1,69 @@
+name: Weekly early warning advisory (manual / on push to hf-translate)
+
+# Builds the weekly advisory for every state and the country from the platform's latest data (bulletin, river state,
+# risk profile, news), drafts Google translations of the advice blocks for native-speaker review, and commits:
+#   aa_config/weekly_blocks.csv, aa_config/seasonal_outlook.csv, aa_out/weekly/latest/
+# Reads Drive (pull only). Sends nothing. Translations are drafts and are not released until validated_by is filled.
+#
+# To run every Monday after the Sunday bulletin, merge to main and add:
+#   schedule:
+#     - cron: '0 5 * * 1'    # 05:00 UTC = 07:00 Juba
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [hf-translate]
+    paths:
+      - 'aa_p5_weekly_advisory.py'
+      - 'hf_tools/translate_blocks_google.py'
+      - '.github/workflows/weekly-advisory.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hf-branch-writes
+  cancel-in-progress: false
+
+jobs:
+  weekly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+      BULLETIN_FOLDER_ID: ${{ secrets.BULLETIN_FOLDER_ID }}
+      BULLETIN_OUT_DIR: ${{ github.workspace }}/bulletin
+      ALTIMETRY_OUT_DIR: ${{ github.workspace }}/altdata
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests google-api-python-client google-auth
+      - name: Pull the bulletin from Drive (read only)
+        run: |
+          mkdir -p "$BULLETIN_OUT_DIR"
+          python drive_sync.py pull bulletin 2>&1 | tail -15
+          ls -la "$BULLETIN_OUT_DIR" | head
+      - name: Self-test and sync the advice blocks
+        run: |
+          python aa_p5_weekly_advisory.py --selftest
+          python aa_p5_weekly_advisory.py --init
+      - name: Draft translations with Google Cloud Translation
+        run: python hf_tools/translate_blocks_google.py 2>&1 | tee hf_tools/translate_blocks_google.log
+      - name: Build the weekly advisories
+        run: python aa_p5_weekly_advisory.py 2>&1 | tee hf_tools/weekly_advisory.log
+      - name: Commit results to this branch
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add aa_config/weekly_blocks.csv aa_config/seasonal_outlook.csv hf_tools/*.log || true
+          git add aa_out/weekly/latest || true
+          git commit -m "Weekly advisory: blocks, draft translations and advisories [skip ci]" || { echo "nothing to commit"; exit 0; }
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin ${GITHUB_REF_NAME} && git push origin HEAD:${GITHUB_REF_NAME} && break
+            sleep $((RANDOM % 10 + 3))
+          done
