@@ -165,3 +165,14 @@ run_utc,script,pillar,activity,indicator,value,kind,unit,verification,note
 2026-10-09 16:42,aa_p2_data_package.py,2,"Centralized repository for multi-hazard IbF, EW and trigger-threshold data",Datasets packaged and validated for the repository,7,event,datasets,aa_data_package_20261009_1642.zip,uploaded once shared with SSMS
 2026-10-09 16:42,aa_p2_data_package.py,2,"Centralized repository for multi-hazard IbF, EW and trigger-threshold data",Datasets failing validation,0,snapshot,datasets,aa_data_package_latest.json,
 2026-10-09 16:42,aa_p2_data_package.py,1,Integrate risk information into the information management system,Risk and trigger datasets in HXL for the IMS,2,snapshot,datasets,aa_data_package_20261009_1642.zip,
+2026-10-10 01:14,aa_p3_aap_engine.py,3,Develop standardised AAPs for multi-hazard,Anticipatory action plans developed,6,snapshot,plans,aa_config/aap_plans.csv,
+2026-10-10 01:14,aa_p3_aap_engine.py,3,Develop standardised AAPs for multi-hazard,Anticipatory action plans validated,0,snapshot,plans,"aa_config/aap_plans.csv (status, validated_by, validated_date)",
+2026-10-10 01:14,aa_p3_aap_engine.py,3,Joint activation of the AAPs when the threshold is reached,Plans in readiness or activated now,6,snapshot,plans,aap_status_latest.csv,
+2026-10-10 01:14,aa_p5_dissemination.py,5,Quarterly updates on operations at all levels,TWG-AA situation briefs prepared,12,event,briefs,dissemination/20261010_0114,
+2026-10-10 01:14,aa_p5_dissemination.py,5,Community groups / radio listening hubs disseminate early warnings,Early warning messages prepared,104,event,messages,messages.csv,en 104
+2026-10-10 01:14,aa_p5_dissemination.py,5,Coordination platforms at subnational level linked to the NTWG-AA,Subnational TWG-AA groups active (state / county),0,snapshot,groups,aa_config/recipient_groups.csv,
+2026-10-10 01:14,aa_p5_dissemination.py,5,Community groups / radio listening hubs disseminate early warnings,Community groups / radio listening hubs registered,0,snapshot,groups,aa_config/recipient_groups.csv,
+2026-10-10 01:14,aa_p5_dissemination.py,2,Translate meteorological information into local languages,Languages with validated warning templates,1,snapshot,languages,aa_config/message_templates.csv,en
+2026-10-10 01:14,aa_p2_data_package.py,2,"Centralized repository for multi-hazard IbF, EW and trigger-threshold data",Datasets packaged and validated for the repository,7,event,datasets,aa_data_package_20261010_0114.zip,uploaded once shared with SSMS
+2026-10-10 01:14,aa_p2_data_package.py,2,"Centralized repository for multi-hazard IbF, EW and trigger-threshold data",Datasets failing validation,0,snapshot,datasets,aa_data_package_latest.json,
+2026-10-10 01:14,aa_p2_data_package.py,1,Integrate risk information into the information management system,Risk and trigger datasets in HXL for the IMS,2,snapshot,datasets,aa_data_package_20261010_0114.zip,
