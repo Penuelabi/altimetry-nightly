@@ -1,0 +1,91 @@
+{
+  "model": "madlad-3b",
+  "n_sentences": 30,
+  "scores": {
+    "nuer": {
+      "chrF": 40.4,
+      "BLEU": 14.5,
+      "copy_English_chrF": 16.6
+    },
+    "dinka": {
+      "chrF": 33.6,
+      "BLEU": 9.6,
+      "copy_English_chrF": 16.1
+    },
+    "swahili": {
+      "chrF": 57.8,
+      "BLEU": 29.4,
+      "copy_English_chrF": 24.6
+    }
+  },
+  "samples": {
+    "nuer": [
+      {
+        "en": "A family member or a support person may stay with a patient during recovery.",
+        "ref": "Ram mi te rɛy dhɔaru kiɛ ram min luäk jɛ derɛ cieŋ kɛɛl kɛ juey kɛ gua̱a̱th in cɛ gɔaa.",
+        "hyp": "Nɛy tin tä rɛy ciëŋ kiɛ nɛy tin laa luäk raan dɔ̱ŋ dee kɛ cieŋ kɛɛl kɛ ram in ci̱ jua̱th jiäk kɛ gua̱a̱th in ci̱ pua̱nydɛ wɔ̱ a gɔaa."
+      },
+      {
+        "en": "This levy is one of a number of measures put forward by the Institute for Public Policy Research to address London's housing crisis.",
+        "ref": "Levy ɛmɛ ɛ kɛl kä tin caa la̱th nhiam ɛ Institute for Public Policy Research kɛ ɣöö baa riɛk tiecni̱ kä London ku lɛ luäŋ kɛ wuɔ̱c.",
+        "hyp": "Ɛn yio̱w ɛmɛ ɛ kɛl kä dup ti̱ ŋuan tëë caa ka̱m raar ɛ muktäb mi̱ cɔali̱ Institute for Public Policy Research kɛ ɣöö baa riɛk in tä kä tiec kä London jakä bum."
+      },
+      {
+        "en": "By Kate Vidinsky, UCSF News Office | May 20, 2011 Individuals who are treated for cancer during childhood have a significantly higher risk of developing gastrointestinal (GI) complications -- from mild to severe -- later in life, according to a study led by the University of California, San Francisco.",
+        "ref": "Ɛn Kate Vidinthki̱, muktäb ruaacni̱ UCSF | Cäŋkä 20, Pay Dhie̱e̱c, 2011 Nɛy tin caa juey ɛ jakä gɔaa kɛ juey ɛ la gaatkiɛn laa täkɛ kɛ riɛk mi̱ di̱i̱t mi̱ dee kɛn ɛ jiäk rɛy jiɛcdiɛn (GI) - ɛ tuɔɔk ni̱ kä mi̱ tɔt ɛ wɔ̱ ni̱ kä mi̱ di̱i̱t - kɛ kɔr teekädiɛn, kɛ ruac ëë caa lat ɛ University of California, kä San Francisco.",
+        "hyp": "Kɛ Kate Vidinsky, UCSF News Office | Cäŋkä 20, Pay Dhie̱e̱c, kɛ ruɔ̱n 1991, nɛy tin caa moc kɛ wal kɛ jua̱th ka̱nthɛrä mëë kuiykɛ laa tä kɛ riɛk mi̱ di̱i̱t mi̱ dee tuɔɔk ni̱ kä mi̱ tɔt ɛ wɔ̱ kä mi̱ di̱i̱t ɛlɔ̱ŋ kɛ kɔr teekä, ciee kɛ mëë caa gɔ̱r ɛ University of California, San Francisco."
+      },
+      {
+        "en": "The terminating lobe of the opercle is slightly emarginated behind, the membrane projecting immediately above the notch in the form of a short salient point.",
+        "ref": "Kä löbe min thuɔ̱k kä opercle(gua̱a̱th in thuɔ̱k) ɛ mi̱ tɔt mi̱ ca woc jɔk, kä membi̱ran cuɛ pöröjɛktiŋ kɛ pɛ̈th nhial kä nɔtch rɛydɛ ce̱tkɛ gua̱a̱th mi̱ ciɛk mi̱ ci̱ jɔɔc.",
+        "hyp": "Kä lo̱p in guut kä ɣɔprikli̱ ɛ mi̱ ciɛk-ciɛk ɛ wä jɔk, kä mɛmbrën ɛ mi̱ la bëë nhial ɛ määth ɛ wä nhial ɛ la mi̱ cie point mi̱ tɔt mi̱ te thi̱n ni̱ ciaaŋ."
+      }
+    ],
+    "dinka": [
+      {
+        "en": "A family member or a support person may stay with a patient during recovery.",
+        "ref": "Raan ë paanden wala raan ë kuɔɔny alëu bï rëër kek raan tuany ë thää ë pial guöp.",
+        "hyp": "Ran de baai ka raan ye kɔc kuɔɔny alëu bï ya rëër kenë raan cï tuany në thaa ɣɔn cen rot bɛɛr looi."
+      },
+      {
+        "en": "This levy is one of a number of measures put forward by the Institute for Public Policy Research to address London's housing crisis.",
+        "ref": "Levy kënë ee töŋ de kä juëc cï keek tääu tueŋ në akutnhom de lööŋ ke kɔc ëbɛ̈n bïk tɔŋ de ɣööt ke London gël.",
+        "hyp": "Aloŋ ciin wen ci maatic aloŋ ciem eben aloŋ ɣɔt wen ci guier kuen aloŋ akuma kuen bi ke luoi aloŋ ɣoot aloŋ London."
+      },
+      {
+        "en": "By Kate Vidinsky, UCSF News Office | May 20, 2011 Individuals who are treated for cancer during childhood have a significantly higher risk of developing gastrointestinal (GI) complications -- from mild to severe -- later in life, according to a study led by the University of California, San Francisco.",
+        "ref": "Në Ɣothuraliɛ, Akutnhom de Wël ke UCSF | Pɛɛi Dhetem nïn 20, 2011 Kɔc ye töök në tuany ë Cancer në thɛɛr ke mïïth yiic aye naŋ riääk dït apɛi ë yök de tuany ë nhom (GI) -- jɔɔk në tuany thiin koor agut cï tuany dït apɛi -- në pïïrden yic, cït mɛn cïnë ye lueel në kuɛ̈n cï looi në thukuldït de California, San Francisco.",
+        "hyp": "Raan cɔl Kate Vidinsky, man ye raan de UCSF News Office | Pɛɛi Dhetem pɛɛi nïn 20, pɛɛi de dhiɛ̈ɛ̈th (pɛndiäk) në ruöön de 11, 2511 kɔc cï kek ya töök në tuanytuɛɛny cɔl kek cancer në runken yiic aye naŋ käjuëc ye kek cɔk riääk apɛi në guöp — jɔɔk në kë thiin koor agut cï kë dït apɛi — në pïïr den yic, cï tän cenë ye luɛɛl thïn në puɔ̈ɔ̈c cï looi në University of California, San Francisco."
+      },
+      {
+        "en": "The terminating lobe of the opercle is slightly emarginated behind, the membrane projecting immediately above the notch in the form of a short salient point.",
+        "ref": "Kë ye thök de lobe de opercle ee tɔ̈ ke cï tääu piny amääth në ye kɔ̈u, ku kë ye cɔl membrane ee rot lac looi në notch nhom në tän de kë thiin koor.",
+        "hyp": "Tɛ̈n yenë käŋ röt tääu thïn në baŋdeen ciɛɛm ku cuëëc, man ye cɔlë ‘terminal lobe of the opercle’ ee lac tɔ̈ në ciɛɛl de piny yic, ku ye tɔ̈ në baŋ biyic de abɛ̈k yic."
+      }
+    ],
+    "swahili": [
+      {
+        "en": "A family member or a support person may stay with a patient during recovery.",
+        "ref": "Mwanafamilia au msaidizi anaweza kukaa na mgonjwa wakati wa kupona.",
+        "hyp": "Mtu wa familia au mtu wa msaada anaweza kukaa na mgonjwa wakati wa kupona."
+      },
+      {
+        "en": "This levy is one of a number of measures put forward by the Institute for Public Policy Research to address London's housing crisis.",
+        "ref": "Ushuru huu ni mojawapo ya idadi ya hatua zilizowekwa na Taasisi ya Utafiti wa Sera ya Umma ili kushughulikia shida ya makazi ya London.",
+        "hyp": "Hii ni moja ya hatua kadhaa zilizowekwa mbele na Taasisi ya Utafiti wa Sera ya Umma ili kushughulikia mgogoro wa nyumba wa London."
+      },
+      {
+        "en": "By Kate Vidinsky, UCSF News Office | May 20, 2011 Individuals who are treated for cancer during childhood have a significantly higher risk of developing gastrointestinal (GI) complications -- from mild to severe -- later in life, according to a study led by the University of California, San Francisco.",
+        "ref": "Na Kate Vidinsky, Ofisi ya Habari ya UCSF | May 20, 2011 Individuals who are treated for cancer during childhood have a significantly higher risk of developing gastrointestinal (GI) complications -- from mild to severe -- later in life, according to a study led by the University of California, San Francisco.",
+        "hyp": "Kwa mujibu wa utafiti uliofanywa na Chuo Kikuu cha California, San Francisco (UCSF), watu wanaotibiwa kwa ajili ya saratani wakati wa utoto wana hatari kubwa ya kupata matatizo ya utumbo mdogo (GI) -- kutoka ya wastani hadi makali -- baadaye katika maisha yao."
+      },
+      {
+        "en": "The terminating lobe of the opercle is slightly emarginated behind, the membrane projecting immediately above the notch in the form of a short salient point.",
+        "ref": "Lobe ya kumaliza ya opercle imetolewa kidogo nyuma, utando unajitokeza mara moja juu ya notch kwa namna ya hatua fupi ya kuvutia.",
+        "hyp": "Upande wa mbele wa kichwa kina urefu wa sentimita chache tu, huku upande wa nyuma ukiwa na urefu mdogo sana."
+      }
+    ]
+  },
+  "note": "chrF/BLEU vs unvalidated corpus references; ranks models, does not prove correctness",
+  "seconds": 5626
+}
