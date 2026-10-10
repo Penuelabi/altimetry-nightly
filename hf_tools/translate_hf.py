@@ -45,12 +45,23 @@ def make_api_translator(token):
 
 
 def make_local_translator():
-    from transformers import pipeline
+    import torch
+    from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
-    pipe = pipeline("translation", model=MODEL, src_lang="eng_Latn")
+    tok = AutoTokenizer.from_pretrained(MODEL, src_lang="eng_Latn")
+    model = AutoModelForSeq2SeqLM.from_pretrained(MODEL)
+    model.eval()
 
     def translate(text, tgt):
-        return pipe(text, tgt_lang=tgt, max_length=400)[0]["translation_text"]
+        inputs = tok(text, return_tensors="pt")
+        with torch.no_grad():
+            out = model.generate(
+                **inputs,
+                forced_bos_token_id=tok.convert_tokens_to_ids(tgt),
+                max_new_tokens=300,
+                num_beams=4,
+            )
+        return tok.batch_decode(out, skip_special_tokens=True)[0]
 
     return translate
 
