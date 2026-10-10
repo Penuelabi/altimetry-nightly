@@ -52,9 +52,13 @@ jobs:
           python aa_p5_weekly_advisory.py --selftest
           python aa_p5_weekly_advisory.py --init
       - name: Draft translations with Google Cloud Translation
-        run: python hf_tools/translate_blocks_google.py 2>&1 | tee hf_tools/translate_blocks_google.log
+        run: |
+          set -o pipefail
+          python hf_tools/translate_blocks_google.py 2>&1 | tee hf_tools/translate_blocks_google.log
       - name: Build the weekly advisories
-        run: python aa_p5_weekly_advisory.py 2>&1 | tee hf_tools/weekly_advisory.log
+        run: |
+          set -o pipefail
+          python aa_p5_weekly_advisory.py 2>&1 | tee hf_tools/weekly_advisory.log
       - name: Commit results to this branch
         if: always()
         run: |
@@ -63,7 +67,9 @@ jobs:
           git add aa_config/weekly_blocks.csv aa_config/seasonal_outlook.csv hf_tools/*.log || true
           git add aa_out/weekly/latest || true
           git commit -m "Weekly advisory: blocks, draft translations and advisories [skip ci]" || { echo "nothing to commit"; exit 0; }
+          pushed=0
           for i in 1 2 3 4 5; do
-            git pull --rebase origin ${GITHUB_REF_NAME} && git push origin HEAD:${GITHUB_REF_NAME} && break
+            if git pull --rebase --autostash origin ${GITHUB_REF_NAME} && git push origin HEAD:${GITHUB_REF_NAME}; then pushed=1; break; fi
             sleep $((RANDOM % 10 + 3))
           done
+          [ "$pushed" = 1 ] || { echo "PUSH FAILED"; exit 1; }
