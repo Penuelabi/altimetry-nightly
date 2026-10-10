@@ -1,11 +1,11 @@
-# Anticipatory action plans - status 2026-10-10 01:14 UTC
+# Anticipatory action plans - status 2026-10-10 15:41 UTC
 
 | Plan | County | Stage | Since | River level / readiness / activation (m) | Alert | Missing or stale |
 |---|---|---|---|---|---|---|
-| AAP-FL-PANYIJIAR | Panyijiar | **activated** | 2026-10-07 10:25 | 397.51// | green |  |
+| AAP-FL-PANYIJIAR | Panyijiar | **activated** | 2026-10-07 10:25 | 397.51// | yellow |  |
 | AAP-FL-FANGAK | Fangak | **activated** | 2026-10-07 10:25 | 393.28// | green |  |
-| AAP-FL-LEER | Leer | **activated** | 2026-10-09 14:03 | 400.62// | green |  |
-| AAP-FL-AYOD | Ayod | **activated** | 2026-10-09 14:03 | 399.21// | green |  |
+| AAP-FL-LEER | Leer | **activated** | 2026-10-09 14:03 | 400.62// | yellow |  |
+| AAP-FL-AYOD | Ayod | **activated** | 2026-10-09 14:03 | 399.21// | yellow |  |
 | AAP-FL-TWICEAST | Twic East | **activated** | 2026-10-09 14:03 | 410.11// | green |  |
 | AAP-FL-GUIT | Guit | **activated** | 2026-10-07 10:25 | 393.99// | green |  |
 

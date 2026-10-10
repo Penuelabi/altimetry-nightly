@@ -27,8 +27,8 @@
 | Mayendit | Bahr Al Arab Trib 02 km 4435 | 2.3 | 33.0 | White Nile km 4336 | 24.3 | linked reading 33 days old |
 | Ezo | Jur km 4964 | 0.3 | 31.0 | Ibba km 4410 | 2.5 | linked reading 31 days old |
 | Aweil Centre | Chel km 4862 | 0.0 | 47.0 | Chel km 4942 | 0.0 | linked reading 47 days old |
-| Aweil West | Wadi Boro, River | 0.0 | 37.0 | Lol km 4904 | 0.0 | linked reading 37 days old |
-| Abiemnhom | Bhar-al-arab, River | 0.0 | 39.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 39 days old |
+| Aweil West | Wadi Boro, River | 0.0 | 37.0 | Lol km 4782 | 0.0 | linked reading 37 days old |
+| Abiemnhom | Bhar-al-arab, River | 0.0 | 39.0 | Bahr Al Arab km 4307 | 0.0 | linked reading 39 days old |
 | Nyirol | Fulus km 4165 | 0.0 | 67.0 | Fulus km 4114 | 0.0 | linked reading 67 days old |
 | Tambura | Jur km 4973 | 0.0 | 31.0 | Ibba km 4410 | 69.9 | linked reading 31 days old |
 | Rumbek North | Gulnam km 4574 | 0.0 | 33.0 | Yei km 4546 | 35.6 | linked reading 33 days old |
