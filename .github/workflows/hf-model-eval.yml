@@ -1,0 +1,61 @@
+name: Evaluate open translation models on the corpus sample (manual / on push to hf-translate)
+
+# Each model runs in its own job on CPU and commits eval_results/<model>.json to this branch.
+# Scores compare against the (unvalidated) corpus references: they rank models, they do not prove correctness.
+
+on:
+  workflow_dispatch:
+    inputs:
+      n:
+        description: 'Sentences per language'
+        default: '30'
+  push:
+    branches: [hf-translate]
+    paths:
+      - 'hf_tools/eval_models.py'
+      - '.github/workflows/hf-model-eval.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [nllb-600m, nllb-1.3b, madlad-3b]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Free disk and put the model cache on the big volume
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache/CodeQL || true
+          sudo mkdir -p /mnt/hf && sudo chown $USER /mnt/hf
+          echo "HF_HOME=/mnt/hf" >> "$GITHUB_ENV"
+          df -h / /mnt | cat
+      - name: Install
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers sentencepiece sacrebleu protobuf accelerate
+      - name: Evaluate
+        env:
+          HF_TOKEN: ${{ secrets.HUGGINGFACE }}
+        run: |
+          set -o pipefail
+          mkdir -p eval_results
+          python hf_tools/eval_models.py --model ${{ matrix.model }} --n "${{ github.event.inputs.n || '30' }}" 2>&1 | tee eval_results/${{ matrix.model }}.log
+      - name: Commit results to this branch
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add eval_results/ || true
+          git commit -m "Model evaluation: ${{ matrix.model }} [skip ci]" || { echo "nothing to commit"; exit 0; }
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin ${GITHUB_REF_NAME} && git push origin HEAD:${GITHUB_REF_NAME} && break
+            sleep $((RANDOM % 10 + 3))
+          done
