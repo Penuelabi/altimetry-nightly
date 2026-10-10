@@ -58,8 +58,10 @@ def make_local_translator():
             out = model.generate(
                 **inputs,
                 forced_bos_token_id=tok.convert_tokens_to_ids(tgt),
-                max_new_tokens=300,
-                num_beams=4,
+                max_new_tokens=int(inputs["input_ids"].shape[1] * 2) + 10,
+                num_beams=5,
+                no_repeat_ngram_size=3,
+                repetition_penalty=1.3,
             )
         return tok.batch_decode(out, skip_special_tokens=True)[0]
 
