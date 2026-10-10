@@ -1,41 +1,16 @@
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
 Translating to Nuer (nus_Latn) ...
 HF API failed (StopIteration: ); falling back to local model ...
-Traceback (most recent call last):
-  File "/home/runner/work/altimetry-nightly/altimetry-nightly/hf_tools/translate_hf.py", line 79, in translate
-    return state["fn"](text, tgt)
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/altimetry-nightly/altimetry-nightly/hf_tools/translate_hf.py", line 41, in translate
-    out = client.translation(text, model=MODEL, src_lang="eng_Latn", tgt_lang=tgt)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/huggingface_hub/inference/_client.py", line 3008, in translation
-    provider_helper = get_provider_helper(self.provider, task="translation", model=model_id)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/huggingface_hub/inference/_providers/__init__.py", line 249, in get_provider_helper
-    provider = next(iter(provider_mapping)).provider
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-StopIteration
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/runner/work/altimetry-nightly/altimetry-nightly/hf_tools/translate_hf.py", line 103, in <module>
-    main()
-  File "/home/runner/work/altimetry-nightly/altimetry-nightly/hf_tools/translate_hf.py", line 94, in main
-    translated = " ".join(translate(s, code) for s in split_sentences(p))
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/altimetry-nightly/altimetry-nightly/hf_tools/translate_hf.py", line 94, in <genexpr>
-    translated = " ".join(translate(s, code) for s in split_sentences(p))
-                          ^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/altimetry-nightly/altimetry-nightly/hf_tools/translate_hf.py", line 84, in translate
-    state["fn"] = make_local_translator()
-                  ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/altimetry-nightly/altimetry-nightly/hf_tools/translate_hf.py", line 50, in make_local_translator
-    pipe = pipeline("translation", model=MODEL, src_lang="eng_Latn")
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/pipelines/__init__.py", line 1009, in pipeline
-    task = _resolve_deprecated_task(task)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/pipelines/__init__.py", line 324, in _resolve_deprecated_task
-    raise KeyError(
-KeyError: 'The task translation has been removed from transformers. Use the `text-generation` pipeline with a chat model instead. See the migration guide for more details: https://github.com/huggingface/transformers/blob/main/MIGRATION_GUIDE_V5.md#pipelines'
+Loading weights:   0%|          | 0/512 [00:00<?, ?it/s]Loading weights: 100%|██████████| 512/512 [00:00<00:00, 36353.05it/s]
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[transformers] Both `max_new_tokens` (=300) and `max_length`(=200) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Translating to Dinka (dik_Latn) ...
+Translating to Swahili (swh_Latn) ...
+Saved hf_tools/translations.md
