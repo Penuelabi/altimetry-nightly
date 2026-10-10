@@ -1,0 +1,5 @@
+language,language_name,blocks_total,blocks_validated,blocks_draft_only,files_written,released
+en,English,117,117,0,12,yes
+din,Dinka (Thuongjang),117,0,117,0,no (needs validation)
+nus,Nuer (Thok Naath),117,0,117,0,no (needs validation)
+swa,Swahili,117,0,117,0,no (needs validation)
