@@ -20,7 +20,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 sys.path.insert(0, ROOT)
 
-CODE = {"din": "din", "nus": "nus", "swa": "sw"}
+CODE = {"din": "din", "nus": "nus", "swa": "sw"}   # fallback; aa_config/languages.csv (google_code) adds more
 PH = re.compile(r"\{[A-Za-z_]+\}")
 NOTE = "DRAFT machine translation (Google Cloud Translation): needs native-speaker correction; fill validated_by when checked"
 
@@ -36,7 +36,7 @@ def unwrap(t):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--blocks", default=os.path.join(os.environ.get("AA_CONFIG_DIR", os.path.join(ROOT, "aa_config")), "weekly_blocks.csv"))
-    ap.add_argument("--langs", default="din,nus,swa")
+    ap.add_argument("--langs", default="", help="comma list; default: every language with mt=google in languages.csv")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
 
@@ -50,8 +50,27 @@ def main():
         token = get_token()
         translate = lambda texts, code: google_translate(token, [wrap(t) for t in texts], code, fmt="html")
 
+    langs_csv = os.path.join(os.path.dirname(args.blocks), "languages.csv")
+    if os.path.exists(langs_csv):
+        reg = pd.read_csv(langs_csv, dtype=str, keep_default_na=False)
+        CODE.update({r.code: r.google_code for r in reg.itertuples() if r.mt == "google" and r.google_code})
+    wanted = [l.strip() for l in args.langs.split(",") if l.strip()] or list(CODE)
+    supported = None
+    if not args.selftest:
+        import requests
+        r = requests.get("https://translation.googleapis.com/language/translate/v2/languages",
+                         headers={"Authorization": f"Bearer {token}"}, params={"target": "en"}, timeout=60)
+        r.raise_for_status()
+        supported = {x["language"] for x in r.json()["data"]["languages"]}
+        print(f"Google lists {len(supported)} languages; unsupported codes below are skipped (human translation only)")
     stale_validated = []
-    for lang in [l.strip() for l in args.langs.split(",") if l.strip()]:
+    for lang in wanted:
+        if lang not in set(df.language):
+            print(f"{lang}: no rows in the blocks file (run aa_p5_weekly_advisory.py --init first); skipped")
+            continue
+        if supported is not None and CODE[lang] not in supported:
+            print(f"{lang}: Google does not offer '{CODE[lang]}'; skipped, translate by hand")
+            continue
         todo = []
         for i, r in df[df.language == lang].iterrows():
             if r.block_id not in en.index:

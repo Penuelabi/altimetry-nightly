@@ -1,0 +1,80 @@
+state,county,primary,secondary,confidence,note
+Abyei Administrative Area,Abyei Region,din,ara,medium,Ngok Dinka and Misseriya (Arabic)
+Central Equatoria,Juba,bfa,pga;ara;din;nus,high,"Juba is multilingual; Bari host language, Juba Arabic lingua franca"
+Central Equatoria,Kajo-keji,keo,pga;swa,high,
+Central Equatoria,Morobo,keo,pga;swa,high,
+Central Equatoria,Yei,keo,pga;swa,medium,Kakwa and Pojulu; Pojulu not yet in the language list
+Central Equatoria,Lainya,bfa,pga,low,"Mixed (Pojulu, Mundu, Baka, Kakwa); confirm"
+Central Equatoria,Terekeka,bfa,pga;din,medium,Mundari and Bari; Mundari not yet in the list
+Eastern Equatoria,Kapoeta East,tpo,pga,high,
+Eastern Equatoria,Kapoeta North,tpo,pga,high,
+Eastern Equatoria,Kapoeta South,tpo,pga,high,
+Eastern Equatoria,Torit,lot,pga;swa,medium,
+Eastern Equatoria,Ikotos,lot,pga;swa,medium,
+Eastern Equatoria,Magwi,ach,mhi;swa;pga,high,
+Eastern Equatoria,Lafon,lot,pga,low,Lopit people; Lopit not yet in the list
+Eastern Equatoria,Budi,tpo,pga,low,"Boya, Larim, Lokuwa and others; confirm"
+Jonglei,Bor South,din,pga;nus,high,Dinka Bor / Twic / Nyarweng
+Jonglei,Twic East,din,pga;nus,high,Dinka Bor / Twic / Nyarweng
+Jonglei,Duk,din,pga;nus,high,Dinka Bor / Twic / Nyarweng
+Jonglei,Canal/Pigi,din,nus;pga,medium,
+Jonglei,Akobo,nus,din;pga,high,Lou and Gawaar Nuer; Fangak Nuer and Dinka
+Jonglei,Nyirol,nus,din;pga,high,Lou and Gawaar Nuer; Fangak Nuer and Dinka
+Jonglei,Uror,nus,din;pga,high,Lou and Gawaar Nuer; Fangak Nuer and Dinka
+Jonglei,Fangak,nus,din;pga,high,Lou and Gawaar Nuer; Fangak Nuer and Dinka
+Jonglei,Ayod,nus,din;pga,medium,
+Jonglei,Pibor,mur,nus;pga,high,"Murle; also Anuak, Kachipo, Jie in places"
+Jonglei,Pochalla,anu,mur;pga,medium,
+Lakes,Awerial,din,pga;ara,high,"Dinka Agar, Gok, Atuot, Rek; Atuot not yet in the list"
+Lakes,Cueibet,din,pga;ara,high,"Dinka Agar, Gok, Atuot, Rek; Atuot not yet in the list"
+Lakes,Rumbek Centre,din,pga;ara,high,"Dinka Agar, Gok, Atuot, Rek; Atuot not yet in the list"
+Lakes,Rumbek East,din,pga;ara,high,"Dinka Agar, Gok, Atuot, Rek; Atuot not yet in the list"
+Lakes,Rumbek North,din,pga;ara,high,"Dinka Agar, Gok, Atuot, Rek; Atuot not yet in the list"
+Lakes,Wulu,din,pga;ara,high,"Dinka Agar, Gok, Atuot, Rek; Atuot not yet in the list"
+Lakes,Yirol East,din,pga;ara,high,"Dinka Agar, Gok, Atuot, Rek; Atuot not yet in the list"
+Lakes,Yirol West,din,pga;ara,high,"Dinka Agar, Gok, Atuot, Rek; Atuot not yet in the list"
+Northern Bahr el Ghazal,Aweil Centre,din,ara;pga,high,Malual Dinka; Arabic widely used near Sudan border
+Northern Bahr el Ghazal,Aweil East,din,ara;pga,high,Malual Dinka; Arabic widely used near Sudan border
+Northern Bahr el Ghazal,Aweil North,din,ara;pga,high,Malual Dinka; Arabic widely used near Sudan border
+Northern Bahr el Ghazal,Aweil South,din,ara;pga,high,Malual Dinka; Arabic widely used near Sudan border
+Northern Bahr el Ghazal,Aweil West,din,ara;pga,high,Malual Dinka; Arabic widely used near Sudan border
+Unity,Abiemnhom,din,nus;ara;pga,high,Ruweng Dinka
+Unity,Pariang,din,nus;ara;pga,high,Ruweng Dinka
+Unity,Guit,nus,din;pga,high,
+Unity,Koch,nus,din;pga,high,
+Unity,Leer,nus,din;pga,high,
+Unity,Mayendit,nus,din;pga,high,
+Unity,Panyijiar,nus,din;pga,high,
+Unity,Mayom,nus,din;pga,high,
+Unity,Rubkona,nus,din;ara;pga,high,"Bentiu: Nuer, Dinka, Arabic"
+Upper Nile,Fashoda,shk,din;ara;pga,high,
+Upper Nile,Panyikang,shk,din;ara;pga,high,
+Upper Nile,Malakal,shk,din;nus;ara;pga,high,Malakal town: Juba Arabic widely used
+Upper Nile,Baliet,din,ara;shk;pga,medium,Padang Dinka; Arabic near Sudan border
+Upper Nile,Renk,din,ara;shk;pga,medium,Padang Dinka; Arabic near Sudan border
+Upper Nile,Melut,din,ara;shk;pga,medium,Padang Dinka; Arabic near Sudan border
+Upper Nile,Manyo,din,ara;shk;pga,medium,Padang Dinka; Arabic near Sudan border
+Upper Nile,Luakpiny/Nasir,nus,din;pga,high,Jikany Nuer
+Upper Nile,Ulang,nus,din;pga,high,Jikany Nuer
+Upper Nile,Longochuk,nus,din;pga,high,Jikany Nuer
+Upper Nile,Maiwut,nus,din;pga,high,Jikany Nuer
+Upper Nile,Maban,ara,pga,low,Maban (Mabaan) language not in the list; Arabic and Juba Arabic as fallback
+Warrap,Gogrial East,din,pga;ara,high,"Rek, Twic, Luanyjang Dinka"
+Warrap,Gogrial West,din,pga;ara,high,"Rek, Twic, Luanyjang Dinka"
+Warrap,Tonj East,din,pga;ara,high,"Rek, Twic, Luanyjang Dinka"
+Warrap,Tonj North,din,pga;ara,high,"Rek, Twic, Luanyjang Dinka"
+Warrap,Tonj South,din,pga;ara,high,"Rek, Twic, Luanyjang Dinka"
+Warrap,Twic,din,pga;ara,high,"Rek, Twic, Luanyjang Dinka"
+Western Bahr el Ghazal,Wau,pga,din;ara,medium,"Wau town: Juba Arabic, Dinka, Fertit and Luo languages"
+Western Bahr el Ghazal,Jur River,din,pga;ara,low,Luo (Jur) and Dinka; confirm
+Western Bahr el Ghazal,Raja,pga,ara,low,"Fertit languages (Kara, Binga) not in the list; Arabic and Juba Arabic as fallback"
+Western Equatoria,Yambio,zne,pga;swa,high,Zande
+Western Equatoria,Nzara,zne,pga;swa,high,Zande
+Western Equatoria,Ezo,zne,pga;swa,high,Zande
+Western Equatoria,Ibba,zne,pga;swa,high,Zande
+Western Equatoria,Nagero,zne,pga;swa,high,Zande
+Western Equatoria,Tambura,zne,pga;swa,high,Zande
+Western Equatoria,Maridi,mgd,zne;pga,medium,"Moru, also Avokaya, Mundu, Zande"
+Western Equatoria,Mundri East,mgd,zne;pga,medium,"Moru, also Avokaya, Mundu, Zande"
+Western Equatoria,Mundri West,mgd,zne;pga,medium,"Moru, also Avokaya, Mundu, Zande"
+Western Equatoria,Mvolo,mgd,din;pga,low,Moru and Dinka; confirm

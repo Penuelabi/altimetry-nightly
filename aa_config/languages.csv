@@ -1,0 +1,18 @@
+code,name,iso639_3,script,google_code,mt,enabled,notes
+en,English,eng,Latin,en,master,yes,English master
+din,Dinka (Thuongjang),din,Latin,din,google,yes,"Dinka has several dialects (Bor, Padang, Rek, Agar, Ngok, Twic, Malual...); Google draft follows one standard. Reviewers should say which dialect they checked"
+nus,Nuer (Thok Naath),nus,Latin,nus,google,yes,
+swa,Swahili,swh,Latin,sw,google,yes,Used in Equatoria and by returnees; not a first language for most counties
+ara,Arabic (Modern Standard),arb,Arabic (right to left),ar,google,yes,"Modern Standard Arabic, the written standard. Classical (Quranic) Arabic is not used for public advisories"
+pga,Juba Arabic (Latin letters),pga,Latin,,none,yes,"Lingua franca in Juba, Wau, Malakal and towns. No machine translation exists; translate by hand in a consistent Latin spelling"
+shk,Shilluk (Dhøg Cøllø),shk,Latin,,none,yes,"Fashoda, Panyikang, Malakal. No machine translation"
+ach,Acholi,ach,Latin,ach,google,yes,Magwi. Google draft used only if the Translation API lists Acholi; check dialect with a Magwi speaker
+mur,Murle,mur,Latin,,none,yes,Pibor. No machine translation
+bfa,Bari,bfa,Latin,,none,yes,"Juba, Terekeka, Lainya area. No machine translation"
+tpo,Toposa,tpo,Latin,,none,yes,"Kapoeta East, North, South. No machine translation"
+zne,Zande,zne,Latin,,none,yes,"Western Equatoria (Yambio, Nzara, Ezo, Tambura...). No machine translation"
+mgd,Moru,mgd,Latin,,none,yes,"Mundri, Maridi area. No machine translation"
+lot,Lotuho (Otuho),lot,Latin,,none,yes,"Torit, Ikotos. No machine translation"
+keo,Kakwa,keo,Latin,,none,yes,"Yei, Morobo, Kajo-keji. No machine translation"
+mhi,Madi,mhi,Latin,,none,yes,Magwi (with Acholi). No machine translation
+anu,Anuak (Anywaa),anu,Latin,,none,yes,Pochalla. No machine translation

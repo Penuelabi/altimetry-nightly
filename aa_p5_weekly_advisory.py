@@ -62,7 +62,7 @@ MIN_COVERAGE = 0.9                 # share of blocks that must be validated befo
 KEEP_RUNS = 8
 ALERT_RANK = {'green': 0, 'yellow': 1, 'orange': 2, 'red': 3}
 ALIASES = {'abyeiadministrativearea': 'abyeiregion'}
-LANGS = [('en', 'English'), ('din', 'Dinka (Thuongjang)'), ('nus', 'Nuer (Thok Naath)'), ('swa', 'Swahili')]
+DEFAULT_LANGS = [('en', 'English'), ('din', 'Dinka (Thuongjang)'), ('nus', 'Nuer (Thok Naath)'), ('swa', 'Swahili')]
 STATUS = 'DRAFT: needs validation by SSMS / MHADM before release. Official warnings are issued by SSMS.'
 
 # =========================================================================== #
@@ -221,6 +221,27 @@ def english_blocks():
 # =========================================================================== #
 # SMALL HELPERS (repeated in each add-on so every file runs on its own)       #
 # =========================================================================== #
+def languages():
+    """[(code, name)] from aa_config/languages.csv (enabled rows; English first). Falls back to DEFAULT_LANGS."""
+    df = read_csv(os.path.join(AA_CONFIG, 'languages.csv'), dtype=str, keep_default_na=False)
+    if df is None or not len(df):
+        return list(DEFAULT_LANGS)
+    out = [(r['code'], r['name']) for r in df.to_dict('records') if r.get('enabled', 'yes').lower() != 'no']
+    return [x for x in out if x[0] == 'en'] + [x for x in out if x[0] != 'en'] if out else list(DEFAULT_LANGS)
+
+
+def county_languages():
+    """{county key: [codes]} (primary first) from aa_config/county_languages.csv, or None when the file is absent."""
+    df = read_csv(os.path.join(AA_CONFIG, 'county_languages.csv'), dtype=str, keep_default_na=False)
+    if df is None:
+        return None
+    out = {}
+    for r in df.to_dict('records'):
+        codes = [r['primary'].strip()] + [c.strip() for c in r['secondary'].split(';') if c.strip()]
+        out[ckey(r['county'])] = [c for c in codes if c]
+    return out
+
+
 def ckey(name):
     k = re.sub(r'[^a-z0-9]+', '', str(name).lower())
     return ALIASES.get(k, k)
@@ -288,9 +309,15 @@ def log_indicators(rows):
 BLOCK_COLS = ['block_id', 'group', 'language', 'language_name', 'text', 'en_hash', 'validated_by', 'validated_date', 'notes']
 
 
+def no_mt_codes():
+    df = read_csv(os.path.join(AA_CONFIG, 'languages.csv'), dtype=str, keep_default_na=False)
+    return set() if df is None else {r['code'] for r in df.to_dict('records') if r.get('mt', '') == 'none'}
+
+
 def sync_blocks():
     """Create or update aa_config/weekly_blocks.csv. Never deletes rows, never touches translations or validations."""
     path = os.path.join(AA_CONFIG, 'weekly_blocks.csv')
+    NO_MT = no_mt_codes()
     master = english_blocks()
     old = read_csv(path, dtype=str, keep_default_na=False)
     rows = [] if old is None else old.to_dict('records')
@@ -299,7 +326,7 @@ def sync_blocks():
     today = now_utc().strftime('%Y-%m-%d')
     for bid, (grp, en) in master.items():
         h = en_hash(en)
-        for code, name in LANGS:
+        for code, name in languages():
             i = have.get((bid, code))
             if code == 'en':
                 row = {'block_id': bid, 'group': grp, 'language': 'en', 'language_name': name, 'text': en, 'en_hash': h,
@@ -308,6 +335,8 @@ def sync_blocks():
                 row = {'block_id': bid, 'group': grp, 'language': code, 'language_name': name, 'text': '', 'en_hash': h,
                        'validated_by': '', 'validated_date': '',
                        'notes': 'translate from the English text with a native speaker; fill validated_by when checked'}
+                if code in NO_MT:
+                    row['notes'] = 'no machine translation exists for this language: a native speaker translates by hand; fill validated_by when checked'
             if i is None:
                 rows.append(row)
                 changed = True
@@ -530,18 +559,35 @@ def run(as_of=None, previews=True):
         shutil.rmtree(latest)
     os.makedirs(os.path.join(latest, 'preview_unvalidated'), exist_ok=True)
     summary, coverage = [], []
-    for lang, lname in LANGS:
+    clang = county_languages()
+    state_of = {ckey(r['county']): r['state'] for r in recs}
+    lang_states = {}
+    if clang:
+        for ck, codes in clang.items():
+            for c in codes:
+                lang_states.setdefault(c, set()).add(state_of.get(ck, ''))
+    pop = read_csv(os.path.join(DATA_DIR, 'ssd_county_population_2025.csv'))
+    popmap = {ckey(r['county']): num(r['pop_2025']) or 0 for r in pop.to_dict('records')} if pop is not None else {}
+    status = {}                                    # (area, lang) -> (released, coverage, file)
+    for lang, lname in languages():
         wrote = 0
         for area in areas:
+            if lang != 'en' and clang:
+                st = lang_states.get(lang, set())
+                if (area == 'national' and len(st - {''}) < 3) or (area != 'national' and area not in st):
+                    continue                       # this language is not used there (national: only broad languages)
             B = Blocks(master, lang, usable)
             md, info = compose(area, recs, outlook, news, as_of, B)
             cov = B.coverage()
+            fname = f"advisory_{slug(area)}_{lang}.md"
             if lang == 'en':
                 summary.append(info)
-            if lang == 'en' or cov >= MIN_COVERAGE:
-                with open(os.path.join(latest, f"advisory_{slug(area)}_{lang}.md"), 'w', encoding='utf-8') as f:
+            released = lang == 'en' or cov >= MIN_COVERAGE
+            if released:
+                with open(os.path.join(latest, fname), 'w', encoding='utf-8') as f:
                     f.write(md)
                 wrote += 1
+            status[(area, lang)] = ('yes' if released else 'no', round(cov, 2), fname if released else '')
             if lang != 'en' and previews and drafts.get(lang):
                 P = Blocks(master, lang, usable, drafts, use_drafts=True)
                 pmd, _ = compose(area, recs, outlook, news, as_of, P)
@@ -549,10 +595,23 @@ def run(as_of=None, previews=True):
                           f"{len(P.draft_hit)} draft and {len(P.hit)} validated blocks; the rest are English.\n\n")
                 with open(os.path.join(latest, 'preview_unvalidated', f"advisory_{slug(area)}_{lang}_DRAFT.md"), 'w', encoding='utf-8') as f:
                     f.write(banner + pmd)
+        prim = [ck for ck, codes in (clang or {}).items() if codes and codes[0] == lang]
         coverage.append({'language': lang, 'language_name': lname, 'blocks_total': len(master),
                          'blocks_validated': len(master) if lang == 'en' else len(usable.get(lang, {})),
                          'blocks_draft_only': 0 if lang == 'en' else len(drafts.get(lang, {})),
+                         'counties_primary': len(prim), 'population_primary': int(sum(popmap.get(ck, 0) for ck in prim)),
+                         'counties_any': sum(1 for codes in (clang or {}).values() if lang in codes),
                          'files_written': wrote, 'released': 'yes' if wrote else 'no (needs validation)'})
+    if clang:
+        plan = []
+        for r in sorted(recs, key=lambda r: (r['state'], r['county'])):
+            codes = clang.get(ckey(r['county']), [])
+            for k, code in enumerate(dict.fromkeys(['en'] + codes)):
+                rel, cov, fn = status.get((r['state'], code), ('no', 0.0, ''))
+                plan.append({'state': r['state'], 'county': r['county'], 'population': int(popmap.get(ckey(r['county']), 0)),
+                             'alert_level': r['level'], 'hazard': r['hazard'], 'role': 'english' if code == 'en' else ('primary' if code == codes[0] else 'secondary'),
+                             'language': code, 'state_advisory_file': fn, 'released': rel, 'validated_share': cov})
+        pd.DataFrame(plan).to_csv(os.path.join(latest, 'county_language_plan.csv'), index=False)
     pd.DataFrame(summary).to_csv(os.path.join(latest, 'weekly_summary.csv'), index=False)
     pd.DataFrame(coverage).to_csv(os.path.join(latest, 'language_coverage.csv'), index=False)
     if stale:
@@ -565,12 +624,13 @@ def run(as_of=None, previews=True):
     for d in runs[:-KEEP_RUNS]:
         shutil.rmtree(os.path.join(AA_OUT, 'weekly', d))
     langs_ok = sum(1 for c in coverage if c['released'] == 'yes')
+    nfiles = len([f for f in os.listdir(latest) if f.endswith('.md')])
     log_indicators([
-        dict(pillar='5', activity='Weekly early warning advisory', indicator='Weekly advisories prepared (areas)', value=len(areas),
+        dict(pillar='5', activity='Weekly early warning advisory', indicator='Weekly advisory files released', value=nfiles,
              kind='snapshot', unit='advisories', verification='aa_out/weekly/latest', note=''),
         dict(pillar='2', activity='Translate meteorological information into local languages', indicator='Languages with validated weekly advisory blocks',
              value=langs_ok, kind='snapshot', unit='languages', verification='aa_config/weekly_blocks.csv', note='English counts as 1')])
-    print(f"Wrote {len(areas)} advisories ({', '.join(c['language'] for c in coverage if c['released'] == 'yes')}) to {latest}")
+    print(f"Wrote {nfiles} advisories ({', '.join(c['language'] for c in coverage if c['released'] == 'yes')}) to {latest}")
     return latest
 
 
@@ -589,7 +649,7 @@ def selftest():
     json.dump({'items': [{'date': '2026-10-08', 'counties': ['Magwi'], 'hazard': 'Flood', 'text': 'Test report.', 'source': 'Test'}]}, open(os.path.join(DATA_DIR, 'news.json'), 'w'))
     run(as_of=datetime.datetime(2026, 10, 10))
     blocks = pd.read_csv(os.path.join(AA_CONFIG, 'weekly_blocks.csv'), dtype=str, keep_default_na=False)
-    assert len(blocks) == 4 * len(english_blocks()), 'one row per block per language'
+    assert len(blocks) == len(DEFAULT_LANGS) * len(english_blocks()), 'one row per block per language'
     nat = open(os.path.join(AA_OUT, 'weekly', 'latest', 'advisory_national_en.md'), encoding='utf-8').read()
     assert '3 of 4 counties' in nat and 'Lafon (red' in nat and 'Magwi' in nat and 'Test report.' in nat
     assert 'Dry-spell risk' in nat and 'Flood or waterlogging risk' in nat and 'River gauges at readiness' in nat
