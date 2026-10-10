@@ -1,0 +1,50 @@
+name: HF corpus fetch + translation (manual / on push to hf-translate)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [hf-translate]
+    paths:
+      - 'hf_tools/**'
+      - '.github/workflows/hf-corpus-translate.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hf-corpus-translate
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: |
+          pip install requests huggingface_hub
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers sentencepiece
+      - name: Fetch first 100 corpus rows
+        env:
+          HUGGINGFACE: ${{ secrets.HUGGINGFACE }}
+        run: python hf_tools/fetch_hf_rows.py --out hf_tools/hf_output
+      - name: Translate (HF API, local fallback)
+        env:
+          HUGGINGFACE: ${{ secrets.HUGGINGFACE }}
+        run: python hf_tools/translate_hf.py --out hf_tools/translations.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-output
+          path: hf_tools/hf_output.* hf_tools/translations.md
+      - name: Commit results to this branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add hf_tools/hf_output.json hf_tools/hf_output.csv hf_tools/translations.md || true
+          git commit -m "HF corpus sample and translations [skip ci]" || echo "nothing to commit"
+          git push origin HEAD:${GITHUB_REF_NAME}
