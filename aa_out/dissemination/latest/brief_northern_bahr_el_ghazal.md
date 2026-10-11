@@ -1,6 +1,6 @@
 # Northern Bahr el Ghazal - anticipatory action situation brief
 
-Prepared 2026-10-11 00:31 UTC for the Northern Bahr el Ghazal state TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-10 12 UTC.
+Prepared 2026-10-11 16:06 UTC for the Northern Bahr el Ghazal state TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-11 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -13,9 +13,9 @@ Prepared 2026-10-11 00:31 UTC for the Northern Bahr el Ghazal state TWG-AA. Rain
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
 | Aweil East | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 18 | 0% | 15,726 |
-| Aweil North | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 13 | 0% | 1,375 |
-| Aweil South | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 26 | 0% | 5,505 |
-| Aweil West | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 20 | 0% | 8,943 |
+| Aweil North | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 14 | 0% | 1,375 |
+| Aweil South | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 24 | 2% | 5,505 |
+| Aweil West | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 19 | 0% | 8,943 |
 
 ## Decisions for the group
 - Agree the warning for the 4 counties with an alert and the channels (radio hubs, chiefs, SMS).
