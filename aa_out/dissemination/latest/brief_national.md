@@ -1,11 +1,11 @@
 # South Sudan - anticipatory action situation brief
 
-Prepared 2026-10-10 15:41 UTC for the national TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-10 00 UTC.
+Prepared 2026-10-11 00:31 UTC for the national TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-10 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
-- Counties by alert level: red 3, orange 24, yellow 25, green 27.
+- Counties by alert level: red 2, orange 32, yellow 18, green 27.
 - Validated plans in readiness: 0; activated: 0.
 - Draft plans whose rules are met: 6 (for review, not activations).
 - River gauges at a proposed trigger level: 14 counties (14 at activation level).
@@ -13,58 +13,58 @@ Prepared 2026-10-10 15:41 UTC for the national TWG-AA. Rain and soil data to 202
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Juba | Central Equatoria | **RED** | flood / waterlogging | 52 | 56% | 2,953 |
-| Lafon | Eastern Equatoria | **RED** | drought / dry spell | 40 | 24% | 1,795 |
-| Tambura | Western Equatoria | **RED** | flood / waterlogging | 52 | 52% | 50 |
-| Abyei Region | Abyei Region | **ORANGE** | drought / dry spell | 19 | 0% | 283 |
-| Kajo-keji | Central Equatoria | **ORANGE** | flood / waterlogging | 66 | 78% | 190 |
-| Magwi | Eastern Equatoria | **ORANGE** | flood / waterlogging | 65 | 76% | 843 |
-| Bor South | Jonglei | **ORANGE** | drought / dry spell | 39 | 12% | 7,498 |
-| Canal/Pigi | Jonglei | **ORANGE** | drought / dry spell | 31 | 16% | 2,399 |
-| Nyirol | Jonglei | **ORANGE** | drought / dry spell | 38 | 14% | 814 |
-| Pochalla | Jonglei | **ORANGE** | drought / dry spell | 41 | 26% | 498 |
-| Uror | Jonglei | **ORANGE** | drought / dry spell | 40 | 24% | 1,768 |
-| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 38 | 14% | 1,661 |
-| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 37 | 18% | 6 |
-| Aweil East | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 20 | 0% | 15,726 |
-| Aweil North | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 15 | 0% | 1,375 |
-| Aweil South | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 27 | 0% | 5,505 |
-| Aweil West | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 21 | 0% | 8,943 |
+| Juba | Central Equatoria | **RED** | flood / waterlogging | 52 | 52% | 2,953 |
+| Lafon | Eastern Equatoria | **RED** | drought / dry spell | 36 | 10% | 1,795 |
+| Abyei Region | Abyei Region | **ORANGE** | drought / dry spell | 17 | 0% | 283 |
+| Kajo-keji | Central Equatoria | **ORANGE** | flood / waterlogging | 59 | 70% | 190 |
+| Magwi | Eastern Equatoria | **ORANGE** | flood / waterlogging | 58 | 70% | 843 |
+| Akobo | Jonglei | **ORANGE** | drought / dry spell | 34 | 8% | 1,673 |
+| Bor South | Jonglei | **ORANGE** | drought / dry spell | 33 | 8% | 7,498 |
+| Canal/Pigi | Jonglei | **ORANGE** | drought / dry spell | 28 | 10% | 2,399 |
+| Nyirol | Jonglei | **ORANGE** | drought / dry spell | 28 | 6% | 814 |
+| Pibor | Jonglei | **ORANGE** | drought / dry spell | 36 | 10% | 1,354 |
+| Pochalla | Jonglei | **ORANGE** | drought / dry spell | 38 | 24% | 498 |
+| Uror | Jonglei | **ORANGE** | drought / dry spell | 31 | 6% | 1,768 |
+| Awerial | Lakes | **ORANGE** | drought / dry spell | 34 | 12% | 5,340 |
+| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 32 | 8% | 1,661 |
+| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 34 | 16% | 6 |
+| Aweil East | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 18 | 0% | 15,726 |
+| Aweil North | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 13 | 0% | 1,375 |
+| Aweil South | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 26 | 0% | 5,505 |
+| Aweil West | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 20 | 0% | 8,943 |
 | Mayom | Unity | **ORANGE** | drought / dry spell | 30 | 4% | 22,600 |
-| Pariang | Unity | **ORANGE** | drought / dry spell | 26 | 0% | 4,128 |
-| Malakal | Upper Nile | **ORANGE** | drought / dry spell | 30 | 10% | 6,999 |
-| Renk | Upper Nile | **ORANGE** | drought / dry spell | 15 | 0% | 4,300 |
-| Gogrial East | Warrap | **ORANGE** | drought / dry spell | 30 | 2% | 9,049 |
-| Tonj East | Warrap | **ORANGE** | drought / dry spell | 33 | 12% | 105 |
-| Tonj North | Warrap | **ORANGE** | drought / dry spell | 31 | 6% | 7,001 |
+| Pariang | Unity | **ORANGE** | drought / dry spell | 24 | 0% | 4,128 |
+| Baliet | Upper Nile | **ORANGE** | drought / dry spell | 26 | 2% | 1,252 |
+| Fashoda | Upper Nile | **ORANGE** | drought / dry spell | 24 | 6% | 1,926 |
+| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 32 | 16% | 15,180 |
+| Malakal | Upper Nile | **ORANGE** | drought / dry spell | 28 | 12% | 6,999 |
+| Manyo | Upper Nile | **ORANGE** | drought / dry spell | 14 | 0% | 2,021 |
+| Melut | Upper Nile | **ORANGE** | drought / dry spell | 20 | 2% | 5,600 |
+| Renk | Upper Nile | **ORANGE** | drought / dry spell | 13 | 0% | 4,300 |
+| Ulang | Upper Nile | **ORANGE** | drought / dry spell | 30 | 12% | 5,416 |
+| Gogrial East | Warrap | **ORANGE** | drought / dry spell | 29 | 2% | 9,049 |
+| Tonj East | Warrap | **ORANGE** | drought / dry spell | 34 | 16% | 105 |
+| Tonj North | Warrap | **ORANGE** | drought / dry spell | 32 | 10% | 7,001 |
 | Twic | Warrap | **ORANGE** | drought / dry spell | 24 | 0% | 11,366 |
-| Ezo | Western Equatoria | **ORANGE** | flood / waterlogging | 54 | 58% | 37 |
-| Nzara | Western Equatoria | **ORANGE** | flood / waterlogging | 50 | 52% | 12 |
-| Lainya | Central Equatoria | **YELLOW** | flood / waterlogging | 60 | 72% | 72 |
-| Morobo | Central Equatoria | **YELLOW** | flood / waterlogging | 64 | 80% | 44 |
-| Terekeka | Central Equatoria | **YELLOW** | flood / waterlogging | 43 | 22% | 4,725 |
-| Yei | Central Equatoria | **YELLOW** | flood / waterlogging | 60 | 74% | 154 |
-| Torit | Eastern Equatoria | **YELLOW** | flood / waterlogging | 55 | 66% | 14 |
-| Akobo | Jonglei | **YELLOW** | flood / waterlogging | 41 | 20% | 1,673 |
-| Ayod | Jonglei | **YELLOW** | flood / waterlogging | 37 | 22% | 7,356 |
-| Duk | Jonglei | **YELLOW** | flood / waterlogging | 39 | 26% | 5,015 |
-| Pibor | Jonglei | **YELLOW** | flood / waterlogging | 40 | 20% | 1,354 |
-| Awerial | Lakes | **YELLOW** | flood / waterlogging | 34 | 20% | 5,340 |
-| Wulu | Lakes | **YELLOW** | flood / waterlogging | 40 | 24% | 108 |
-| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 26 | 2% | 165 |
-| Leer | Unity | **YELLOW** | flood / waterlogging | 40 | 28% | 985 |
-| Mayendit | Unity | **YELLOW** | flood / waterlogging | 38 | 22% | 2,032 |
-| Panyijiar | Unity | **YELLOW** | flood / waterlogging | 42 | 24% | 4,064 |
-| Rubkona | Unity | **YELLOW** | flood / waterlogging | 27 | 8% | 16,480 |
-| Luakpiny/Nasir | Upper Nile | **YELLOW** | flood / waterlogging | 37 | 18% | 15,180 |
-| Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 32 | 8% | 1,376 |
-| Gogrial West | Warrap | **YELLOW** | flood / waterlogging | 26 | 0% | 34,800 |
-| Ibba | Western Equatoria | **YELLOW** | flood / waterlogging | 50 | 50% | 0 |
-| Maridi | Western Equatoria | **YELLOW** | flood / waterlogging | 52 | 56% | 4 |
-| Mundri East | Western Equatoria | **YELLOW** | flood / waterlogging | 48 | 48% | 59 |
+| Tambura | Western Equatoria | **ORANGE** | flood / waterlogging | 45 | 36% | 50 |
+| Lainya | Central Equatoria | **YELLOW** | flood / waterlogging | 52 | 58% | 72 |
+| Morobo | Central Equatoria | **YELLOW** | flood / waterlogging | 57 | 72% | 44 |
+| Terekeka | Central Equatoria | **YELLOW** | flood / waterlogging | 40 | 26% | 4,725 |
+| Yei | Central Equatoria | **YELLOW** | flood / waterlogging | 56 | 70% | 154 |
+| Torit | Eastern Equatoria | **YELLOW** | flood / waterlogging | 53 | 58% | 14 |
+| Wulu | Lakes | **YELLOW** | flood / waterlogging | 39 | 22% | 108 |
+| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 25 | 0% | 165 |
+| Rubkona | Unity | **YELLOW** | flood / waterlogging | 27 | 2% | 16,480 |
+| Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 28 | 6% | 1,376 |
+| Gogrial West | Warrap | **YELLOW** | flood / waterlogging | 25 | 2% | 34,800 |
+| Ezo | Western Equatoria | **YELLOW** | flood / waterlogging | 47 | 42% | 37 |
+| Ibba | Western Equatoria | **YELLOW** | flood / waterlogging | 54 | 60% | 0 |
+| Maridi | Western Equatoria | **YELLOW** | flood / waterlogging | 54 | 58% | 4 |
+| Mundri East | Western Equatoria | **YELLOW** | flood / waterlogging | 48 | 44% | 59 |
 | Mundri West | Western Equatoria | **YELLOW** | flood / waterlogging | 49 | 46% | 42 |
-| Nagero | Western Equatoria | **YELLOW** | flood / waterlogging | 47 | 36% | 34 |
-| Yambio | Western Equatoria | **YELLOW** | flood / waterlogging | 50 | 50% | 15 |
+| Nagero | Western Equatoria | **YELLOW** | flood / waterlogging | 43 | 24% | 34 |
+| Nzara | Western Equatoria | **YELLOW** | flood / waterlogging | 49 | 46% | 12 |
+| Yambio | Western Equatoria | **YELLOW** | flood / waterlogging | 52 | 60% | 15 |
 
 ## Anticipatory action plans
 | Plan | County | Stage | Since | Plan status | River / readiness / activation (m) |
@@ -140,9 +140,9 @@ Prepared 2026-10-10 15:41 UTC for the national TWG-AA. Rain and soil data to 202
 
 ## Notes
 - AAP-FL-AYOD activated (draft plan: no community message)
-- AAP-FL-LEER activated (draft plan: no community message)
-- AAP-FL-PANYIJIAR activated (draft plan: no community message)
 - AAP-FL-FANGAK activated (draft plan: no community message)
 - AAP-FL-TWICEAST activated (draft plan: no community message)
 - AAP-FL-GUIT activated (draft plan: no community message)
+- AAP-FL-LEER activated (draft plan: no community message)
+- AAP-FL-PANYIJIAR activated (draft plan: no community message)
 - 3 county gauges have no satellite pass in the last weeks: Manyo, Nyirol, Aweil Centre
