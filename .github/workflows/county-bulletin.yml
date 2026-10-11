@@ -88,8 +88,16 @@ jobs:
           sudo apt-get install -y -q fonts-dejavu-core || true
           python build_report.py 2>&1 | tee "$RUNNER_TEMP/report.log"
 
+      - name: News gate (the weekly email and the social posts wait for the compiled, verified news)
+        id: newsgate
+        continue-on-error: true
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: python3 news_gate.py
+
       - name: Email digest (optional, needs SMTP secrets; weekly on Sunday night, plus manual runs)
-        if: (github.event_name == 'workflow_dispatch' && github.event.inputs.email != 'false') || github.event.schedule == '30 21 * * 0'
+        if: ((github.event_name == 'workflow_dispatch' && github.event.inputs.email != 'false') || github.event.schedule == '30 21 * * 0') && steps.newsgate.outputs.email_ok != 'false'
         continue-on-error: true
         env:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -110,6 +118,7 @@ jobs:
         run: python send_digest.py 2>&1 | tee "$RUNNER_TEMP/digest.log"
 
       - name: Post to Facebook / LinkedIn (optional, needs secrets)
+        if: steps.newsgate.outputs.social_ok != 'false'
         continue-on-error: true
         env:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
