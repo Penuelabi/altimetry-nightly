@@ -1,0 +1,36 @@
+name: GEE test - flood extent check (manual, read-only on Earth Engine)
+on:
+  workflow_dispatch:
+    inputs:
+      bld_counties:
+        description: 'Counties for the building split (blank = default list)'
+        required: false
+        default: ''
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      FLOOD_EXTENT_ASSET: ${{ vars.FLOOD_EXTENT_ASSET }}
+      GEE_TEST_OUT_DIR: ${{ github.workspace }}/analysis_results/flood_extent_check
+      BLD_COUNTIES: ${{ github.event.inputs.bld_counties }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - run: pip install earthengine-api pandas tabulate
+      - run: python gee_test_flood_extent.py
+      - name: Commit the diagnostic tables (analysis_results/flood_extent_check only)
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analysis_results/flood_extent_check || true
+          git diff --cached --quiet || { git commit -m "Flood extent check results [skip ci]"; git pull --rebase -q origin main || true; git push origin HEAD:main; }
+# Read-only on Earth Engine: no export, no asset change. Writes only analysis_results/flood_extent_check/ in the repo.
+# Never emails or posts, and never touches data/exposure_cache.json or any file the live app reads.
