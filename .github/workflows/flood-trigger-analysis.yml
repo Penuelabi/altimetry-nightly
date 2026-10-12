@@ -3,6 +3,9 @@ name: Flood trigger analysis (manual run)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   analyse:
     runs-on: ubuntu-24.04
@@ -31,6 +34,22 @@ jobs:
         run: python flood_trigger_analysis.py --selftest
       - name: Run analysis
         run: python flood_trigger_analysis.py
+      - name: Commit a readable copy of the results to the repo
+        continue-on-error: true
+        run: |
+          mkdir -p analysis_results
+          python3 - <<'PY'
+          import pandas as pd
+          x = pd.read_excel('analysis_out/flood_trigger_analysis.xlsx', sheet_name=None)
+          for k in ('Nested_CV', 'Models', 'Risk_ranking', 'Best_thresholds_insample', 'Notes'):
+              if k in x:
+                  x[k].to_csv(f'analysis_results/{k}.csv', index=False)
+          PY
+          cp -f analysis_out/flood_trigger_features.csv analysis_results/ 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analysis_results
+          git diff --cached --quiet || { git commit -m "Flood trigger analysis results [skip ci]"; git pull --rebase -q origin main || true; git push origin HEAD:main; }
       - name: Keep results
         uses: actions/upload-artifact@v4
         with:
