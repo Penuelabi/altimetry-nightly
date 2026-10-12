@@ -1,27 +1,32 @@
 # Unity - anticipatory action situation brief
 
-Prepared 2026-10-11 16:06 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-11 00 UTC.
+Prepared 2026-10-12 00:52 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-11 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
-- Counties by alert level: red 0, orange 2, yellow 2, green 5.
+- Counties by alert level: red 0, orange 2, yellow 7, green 0.
 - Validated plans in readiness: 0; activated: 0.
 - Draft plans whose rules are met: 3 (for review, not activations).
-- River gauges at a proposed trigger level: 5 counties (5 at activation level).
+- River gauges at a proposed trigger level: 5 counties (0 at activation level).
 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Mayom | Unity | **ORANGE** | drought / dry spell | 30 | 0% | 22,600 |
-| Pariang | Unity | **ORANGE** | drought / dry spell | 28 | 2% | 4,128 |
-| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 27 | 0% | 165 |
-| Rubkona | Unity | **YELLOW** | flood / waterlogging | 30 | 6% | 16,480 |
+| Mayom | Unity | **ORANGE** | drought / dry spell | 18 | 0% | 22,600 |
+| Pariang | Unity | **ORANGE** | drought / dry spell | 16 | 0% | 4,128 |
+| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 13 | 0% | 165 |
+| Guit | Unity | **YELLOW** | flood / waterlogging | 20 | 0% | 3,497 |
+| Koch | Unity | **YELLOW** | flood / waterlogging | 25 | 0% | 513 |
+| Leer | Unity | **YELLOW** | flood / waterlogging | 29 | 2% | 985 |
+| Mayendit | Unity | **YELLOW** | flood / waterlogging | 29 | 4% | 2,032 |
+| Panyijiar | Unity | **YELLOW** | flood / waterlogging | 28 | 4% | 4,064 |
+| Rubkona | Unity | **YELLOW** | flood / waterlogging | 17 | 0% | 16,480 |
 
 ## Anticipatory action plans
 | Plan | County | Stage | Since | Plan status | River / readiness / activation (m) |
 |---|---|---|---|---|---|
-| AAP-FL-PANYIJIAR | Panyijiar | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 397.51// |
+| AAP-FL-PANYIJIAR | Panyijiar | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 397.46// |
 | AAP-FL-LEER | Leer | **activated** | 2026-10-09 14:03 | draft (example) - not validated | 400.62// |
 | AAP-FL-GUIT | Guit | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 393.99// |
 
@@ -57,7 +62,7 @@ Prepared 2026-10-11 16:06 UTC for the Unity state TWG-AA. Rain and soil data to 
 - AAP-FL-PANYIJIAR (draft plan): its activation rule is met. Review the plan and its trigger; this is not an activation.
 - AAP-FL-LEER (draft plan): its activation rule is met. Review the plan and its trigger; this is not an activation.
 - AAP-FL-GUIT (draft plan): its activation rule is met. Review the plan and its trigger; this is not an activation.
-- Agree the warning for the 4 counties with an alert and the channels (radio hubs, chiefs, SMS).
+- Agree the warning for the 9 counties with an alert and the channels (radio hubs, chiefs, SMS).
 - Ask intermediaries to translate and validate templates for: Bari, Dinka (Thuongjang), Juba Arabic, Nuer (Thok Naath), Shilluk (Dhok Cøllø).
 
 ## Notes

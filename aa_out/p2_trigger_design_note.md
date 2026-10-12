@@ -1,6 +1,6 @@
 # River triggers - design note (proposal for validation)
 
-Generated 2026-10-09 14:09 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-10-12 00:52 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
 - **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 36 days before displacement).
@@ -58,7 +58,7 @@ Generated 2026-10-09 14:09 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 
 ## Counties
 Rule used: bulletin flood alert 47, seasonal + regional 18, regional 14.
-At or above a proposed value now: 14: Panyijiar (activation), Fangak (activation), Leer (activation), Ayod (activation), Twic East (activation), Guit (activation), Panyikang (activation), Duk (activation), Fashoda (activation), Renk (activation), Koch (activation), Bor South (activation), Juba (activation), Pariang (activation)
+At or above a proposed value now: 15: Panyijiar (readiness), Fangak (readiness), Leer (readiness), Ayod (readiness), Twic East (readiness), Guit (readiness), Duk (readiness), Panyikang (readiness), Fashoda (readiness), Renk (readiness), Bor South (readiness), Koch (readiness), Manyo (activation), Juba (readiness), Pariang (readiness)
 
 ## How to read and validate
 - POD: share of flood seasons caught on time. FAR: share of the seasons a rule fired with no impact recorded. CSI and TSS combine both; higher is better. Late = fired after displacement had begun (counted as a miss).
