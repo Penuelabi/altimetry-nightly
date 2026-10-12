@@ -288,19 +288,33 @@ def analyse(panel, pred_cols, ycol='y'):
 # ----------------------------------------------------------------------------- #
 # honest validation: nested CV, cluster bootstrap, county effects, risk ranking  #
 # ----------------------------------------------------------------------------- #
-def boot_auc(y, s, clusters, n=300, seed=0):
-    """95% CI of the AUC from a cluster bootstrap (whole counties resampled, because neighbouring months/counties are not independent)."""
-    y, s, cl = np.asarray(y, bool), np.asarray(s, float), np.asarray(clusters)
+def _boot_rows(counties, years, rng):
+    """Row indices for one two-way cluster bootstrap draw: whole counties AND whole years are resampled with replacement,
+    a row is repeated (times its county was drawn) x (times its year was drawn). Years matter here because one flood
+    year (2021) holds ~40% of the events; resampling counties alone would understate the uncertainty."""
+    w = np.ones(len(counties))
+    for cl in (counties, years):
+        if cl is None:
+            continue
+        u = np.unique(cl)
+        cnt = pd.Series(rng.choice(u, len(u), replace=True)).value_counts()
+        w = w * pd.Series(cl).map(cnt).fillna(0).values
+    return np.repeat(np.arange(len(counties)), w.astype(int))
+
+
+def boot_auc(y, s, counties, years=None, n=300, seed=0):
+    """95% CI of the AUC from a cluster bootstrap over counties (and years, if given)."""
+    y, s = np.asarray(y, bool), np.asarray(s, float)
     m = ~np.isnan(s)
-    y, s, cl = y[m], s[m], cl[m]
-    ucl = np.unique(cl)
-    if len(ucl) < 3:
+    y, s = y[m], s[m]
+    cl = np.asarray(counties)[m]
+    yr = None if years is None else np.asarray(years)[m]
+    if len(np.unique(cl)) < 3:
         return np.nan, np.nan
-    idx = {c: np.where(cl == c)[0] for c in ucl}
     rng = np.random.default_rng(seed)
     vals = []
     for _ in range(n):
-        ii = np.concatenate([idx[c] for c in rng.choice(ucl, len(ucl), replace=True)])
+        ii = _boot_rows(cl, yr, rng)
         a = auc(y[ii], s[ii])
         if not np.isnan(a):
             vals.append(a)
@@ -310,10 +324,33 @@ def boot_auc(y, s, clusters, n=300, seed=0):
     return float(lo), float(hi)
 
 
-def pick_lag_threshold(tr, pred, ycol):
-    """Inside a TRAINING set only: best lag (largest |AUC-0.5|), its sign, and the TSS-maximising threshold."""
+def boot_auc_diff(y, s1, s2, counties, years=None, n=300, seed=0):
+    """Paired difference AUC(s1) - AUC(s2) on the same rows, with a two-way cluster bootstrap 95% CI.
+    This is the direct test of 'does the model beat the benchmark' (overlapping separate intervals do not answer it)."""
+    y, s1, s2 = np.asarray(y, bool), np.asarray(s1, float), np.asarray(s2, float)
+    m = ~np.isnan(s1) & ~np.isnan(s2)
+    y, s1, s2 = y[m], s1[m], s2[m]
+    cl = np.asarray(counties)[m]
+    yr = None if years is None else np.asarray(years)[m]
+    d0 = auc(y, s1) - auc(y, s2)
+    rng = np.random.default_rng(seed)
+    vals = []
+    for _ in range(n):
+        ii = _boot_rows(cl, yr, rng)
+        v = auc(y[ii], s1[ii]) - auc(y[ii], s2[ii])
+        if not np.isnan(v):
+            vals.append(v)
+    if len(vals) < 20:
+        return d0, np.nan, np.nan
+    lo, hi = np.percentile(vals, [2.5, 97.5])
+    return float(d0), float(lo), float(hi)
+
+
+def pick_lag_threshold(tr, pred, ycol, min_lag=0):
+    """Inside a TRAINING set only: best lag >= min_lag (largest |AUC-0.5|), its sign, and the TSS-maximising threshold.
+    min_lag=1 forbids same-month values, so what is left is a genuine lead (an early warning, not a confirmation)."""
     best = None
-    for L in range(0, LAGS + 1):
+    for L in range(min_lag, LAGS + 1):
         col = f'{pred}__L{L}'
         if col not in tr:
             continue
@@ -326,7 +363,7 @@ def pick_lag_threshold(tr, pred, ycol):
     t = best_threshold(tr[ycol].values, sign * tr[f'{pred}__L{L}'].values)
     if t is None:
         return None
-    return dict(lag=L, sign=sign, thr=t['threshold'])
+    return dict(lag=L, sign=sign, thr=t['threshold'], skill=best[1])
 
 
 def _contingency(y, warn):
@@ -340,7 +377,7 @@ def _contingency(y, warn):
     return pod, far, csi, pod - pofd
 
 
-def nested_eval(panel, preds, ycol, fold_col, n_boot=300):
+def nested_eval(panel, preds, ycol, fold_col, n_boot=300, min_lag=0):
     """Nested cross-validation of every single predictor. For each held-out year (fold_col='year') or county
     (fold_col='county') the lag, sign and threshold are chosen on the other folds only, then applied to the held-out one.
     Returns one row per predictor with pooled out-of-fold AUC, a county-cluster bootstrap 95% CI and POD/FAR/CSI/TSS."""
@@ -355,7 +392,7 @@ def nested_eval(panel, preds, ycol, fold_col, n_boot=300):
             tr = d[~te]
             if tr[ycol].sum() < 5:
                 continue
-            pk = pick_lag_threshold(tr, pred, ycol)
+            pk = pick_lag_threshold(tr, pred, ycol, min_lag)
             if pk is None:
                 continue
             x = pk['sign'] * d.loc[te, f"{pred}__L{pk['lag']}"].values
@@ -365,9 +402,9 @@ def nested_eval(panel, preds, ycol, fold_col, n_boot=300):
         if not lags:
             continue
         a = auc(d[ycol].values, score)
-        lo, hi = boot_auc(d[ycol].values, score, d['county'].values, n_boot)
+        lo, hi = boot_auc(d[ycol].values, score, d['county'].values, d['year'].values, n_boot)
         pod, far, csi, tss = _contingency(d[ycol].values, warn)
-        rows.append(dict(predictor=pred, validation=f'leave-one-{fold_col}-out', AUC_cv=a, AUC_lo95=lo, AUC_hi95=hi,
+        rows.append(dict(predictor=pred, lags_allowed=f'{min_lag}-{LAGS}', validation=f'leave-one-{fold_col}-out', AUC_cv=a, AUC_lo95=lo, AUC_hi95=hi,
                          POD=pod, FAR=far, CSI=csi, TSS=tss, n_scored=int((~np.isnan(score)).sum()),
                          n_events=int((d[ycol].values & ~np.isnan(score)).sum()),
                          lag_most_chosen=int(pd.Series(lags).mode().iloc[0]), lags_chosen=len(set(lags))))
@@ -378,22 +415,30 @@ def _county_onehot(df, counties):
     return (df['county'].to_numpy(dtype=object)[:, None] == np.array(counties, dtype=object)[None, :]).astype(float)
 
 
-def cv_logistic(d, preds, ycol, fold_col, county_fx=False):
-    """Out-of-fold probabilities of a ridge logistic model on the best lag of each predictor (lag picked on the training
-    folds only). county_fx=True adds one dummy per county (county effects), only valid when folds are years."""
+def cv_logistic(d, preds, ycol, fold_col, county_fx=False, min_lag=0, select_k=None):
+    """Out-of-fold probabilities of a ridge logistic model on the best lag (>= min_lag) of each predictor; lags are picked on
+    the training folds only. select_k=K keeps only the K predictors with the most skill IN THE TRAINING FOLDS, so choosing
+    the predictors is part of the validation (no peeking). county_fx=True adds one dummy per county (year folds only).
+    Returns (oof probabilities, Counter of predictors used across folds)."""
+    from collections import Counter
     from sklearn.linear_model import LogisticRegression
     oof = np.full(len(d), np.nan)
+    used = Counter()
     counties = sorted(d['county'].unique())
     for g in d[fold_col].unique():
         te = (d[fold_col] == g).values
         tr = d[~te]
         if tr[ycol].sum() < 5 or te.sum() == 0:
             continue
-        cols = []
+        picks = []
         for p in preds:
-            pk = pick_lag_threshold(tr, p, ycol)
+            pk = pick_lag_threshold(tr, p, ycol, min_lag)
             if pk:
-                cols.append(f"{p}__L{pk['lag']}")
+                picks.append((pk['skill'], p, f"{p}__L{pk['lag']}"))
+        if select_k:
+            picks = sorted(picks, reverse=True)[:select_k]
+        cols = [c for _, _, c in picks]
+        used.update(p for _, p, _ in picks)
         if not cols and not county_fx:
             continue
         trd, ted = tr.dropna(subset=cols), d[te].dropna(subset=cols)
@@ -409,7 +454,7 @@ def cv_logistic(d, preds, ycol, fold_col, county_fx=False):
             Ztr, Zte = np.hstack([Ztr, _county_onehot(trd, counties)]), np.hstack([Zte, _county_onehot(ted, counties)])
         mdl = LogisticRegression(C=1.0, class_weight='balanced', max_iter=1000).fit(Ztr, trd[ycol].astype(int).values)
         oof[d.index.get_indexer(ted.index)] = mdl.predict_proba(Zte)[:, 1]
-    return oof
+    return oof, used
 
 
 def county_baseline_oof(d, ycol, fold_col='year'):
@@ -448,38 +493,59 @@ def ranking_metrics(d, score, ycol, label, ks=(3, 5)):
     return rows
 
 
+SELECT_K = 4          # ~54 onsets / ~10 events per predictor
+
+
 def model_eval(panel, ycol, pred_cols, n_boot=300):
-    """Combined models with honest validation. Returns (models table, ranking table)."""
+    """Combined models with honest validation, for two lead-time settings:
+         confirmation  = lags 0-4 allowed (same-month river/soil values may be used: tells you a flood is under way)
+         early warning = lags 1-4 only (a genuine lead of at least one month)
+    Every model is compared with the county-history benchmark by a paired two-way bootstrap (dAUC and its 95% CI).
+    Returns (models table, ranking table)."""
     d = panel[panel.season].reset_index(drop=True)
+    yv, cv, yrs = d[ycol].values, d['county'].values, d['year'].values
     river = [p for p in pred_cols if p.startswith(('lvl_', 'lvlz_', 'exc_', 'rise'))]
     climate = [p for p in pred_cols if p.startswith(('rain', 'sm_'))]
-    variants = [('river (levels, anomalies, exceedance)', river, False),
-                ('rain + soil moisture', climate, False),
-                ('all predictors', river + climate, False),
-                ('all predictors + county effects', river + climate, True)]
     small = [p for p in SMALL_MODEL if p in pred_cols]
+    # (label, predictors, county effects, select_k)
+    variants = [('river (levels, anomalies, exceedance)', river, False, None),
+                ('rain + soil moisture', climate, False, None),
+                ('all predictors', river + climate, False, None),
+                ('all predictors + county effects', river + climate, True, None),
+                (f'SELECTED IN FOLD: best {SELECT_K} of all predictors', river + climate, False, SELECT_K),
+                (f'SELECTED IN FOLD: best {SELECT_K} + county effects', river + climate, True, SELECT_K)]
     if len(small) >= 2:
-        variants += [('SMALL model (' + ', '.join(small) + ')', small, False),
-                     ('SMALL model + county effects', small, True)]
-    rows, rank_rows = [], []
-    for fold_col in ('year', 'county'):
-        for label, preds, fx in variants:
-            if not preds or (fx and fold_col == 'county'):
-                continue          # a held-out county has no county effect
-            oof = cv_logistic(d, preds, ycol, fold_col, county_fx=fx)
-            a = auc(d[ycol].values, oof)
-            lo, hi = boot_auc(d[ycol].values, oof, d['county'].values, n_boot)
-            rows.append(dict(model=label, validation=f'leave-one-{fold_col}-out', AUC_cv=a, AUC_lo95=lo, AUC_hi95=hi,
-                             n_scored=int((~np.isnan(oof)).sum()), n_events=int((d[ycol].values & ~np.isnan(oof)).sum())))
-            if fold_col == 'year':
-                rank_rows += ranking_metrics(d, oof, ycol, label)
+        variants.append(('post-hoc small model (' + ', '.join(small) + '; chosen after seeing results, optimistic)',
+                         small, False, None))
     base = county_baseline_oof(d, ycol)          # benchmark: county climatology only
-    a = auc(d[ycol].values, base)
-    lo, hi = boot_auc(d[ycol].values, base, d['county'].values, n_boot)
-    rows.append(dict(model='BENCHMARK county event rate only (no predictors)', validation='leave-one-year-out', AUC_cv=a,
-                     AUC_lo95=lo, AUC_hi95=hi, n_scored=int((~np.isnan(base)).sum()),
-                     n_events=int((d[ycol].values & ~np.isnan(base)).sum())))
-    rank_rows += ranking_metrics(d, base, ycol, 'BENCHMARK county event rate only')
+    rows, rank_rows = [], []
+    a = auc(yv, base)
+    lo, hi = boot_auc(yv, base, cv, yrs, n_boot)
+    rows.append(dict(model='BENCHMARK county event rate only (no predictors)', lead='n/a', validation='leave-one-year-out',
+                     AUC_cv=a, AUC_lo95=lo, AUC_hi95=hi, dAUC_vs_benchmark=0.0, d_lo95=np.nan, d_hi95=np.nan,
+                     beats_benchmark='-', n_scored=int((~np.isnan(base)).sum()), n_events=int((yv & ~np.isnan(base)).sum()),
+                     predictors_used=''))
+    rank_rows += [dict(r, lead='n/a') for r in ranking_metrics(d, base, ycol, 'BENCHMARK county event rate only')]
+    for lead, min_lag in (('confirmation (lag 0-4)', 0), ('early warning (lag 1-4)', 1)):
+        for fold_col in ('year', 'county'):
+            for label, preds, fx, k in variants:
+                if not preds or (fx and fold_col == 'county'):
+                    continue          # a held-out county has no county effect
+                oof, used = cv_logistic(d, preds, ycol, fold_col, county_fx=fx, min_lag=min_lag, select_k=k)
+                a = auc(yv, oof)
+                lo, hi = boot_auc(yv, oof, cv, yrs, n_boot)
+                if fold_col == 'year':
+                    dd, dlo, dhi = boot_auc_diff(yv, oof, base, cv, yrs, n_boot)
+                    verdict = 'yes' if dlo > 0 else ('no (worse)' if dhi < 0 else 'not shown')
+                else:
+                    dd = dlo = dhi = np.nan           # benchmark cannot score an unseen county
+                    verdict = 'n/a (county held out)'
+                rows.append(dict(model=label, lead=lead, validation=f'leave-one-{fold_col}-out', AUC_cv=a, AUC_lo95=lo,
+                                 AUC_hi95=hi, dAUC_vs_benchmark=dd, d_lo95=dlo, d_hi95=dhi, beats_benchmark=verdict,
+                                 n_scored=int((~np.isnan(oof)).sum()), n_events=int((yv & ~np.isnan(oof)).sum()),
+                                 predictors_used='; '.join(f'{p} x{c}' for p, c in used.most_common()) if k else ''))
+                if fold_col == 'year':
+                    rank_rows += [dict(r, lead=lead) for r in ranking_metrics(d, oof, ycol, label)]
     return pd.DataFrame(rows), pd.DataFrame(rank_rows)
 
 
@@ -538,13 +604,22 @@ def selftest():
     models, rank = model_eval(panel, 'y', pc, n_boot=100)
     print(models.round(3).to_string())
     print(rank.round(3).to_string())
-    m_all = models[(models.model == 'all predictors') & (models.validation == 'leave-one-year-out')].iloc[0]
+    yr = models.validation == 'leave-one-year-out'
+    m_all = models[(models.model == 'all predictors') & yr & (models.lead.str.startswith('confirmation'))].iloc[0]
     assert m_all.AUC_cv > .8, m_all
+    # in-fold selection must find the planted predictor, and with a 2-month lead the early-warning model must still work
+    sel = models[models.model.str.startswith('SELECTED IN FOLD: best') & ~models.model.str.contains('county') & yr
+                 & models.lead.str.startswith('early')].iloc[0]
+    assert 'lvl_upstream' in sel.predictors_used and sel.AUC_cv > .8, sel
+    assert sel.beats_benchmark == 'yes' and sel.d_lo95 > 0, sel
 
     # null test: with the target shuffled across months there must be NO significant skill
     sh = panel.copy()
     sh['y'] = np.random.default_rng(7).permutation(sh['y'].values)
     ne0 = nested_eval(sh, pc, 'y', 'year', n_boot=100)
+    m0, _ = model_eval(sh, 'y', pc, n_boot=100)
+    print(m0[['model', 'lead', 'validation', 'AUC_cv', 'd_lo95', 'beats_benchmark']].round(3).to_string())
+    assert not (m0.beats_benchmark == 'yes').any(), 'shuffled target must never beat the benchmark'
     print('null test (shuffled target):\n', ne0.round(3).to_string())
     assert (ne0.AUC_lo95.fillna(0) < .55).all() and (ne0.AUC_cv < .65).all(), ne0
 
@@ -573,7 +648,8 @@ def selftest():
 
 def run_target(panel, pc, ycol, label):
     lag, thr, picks = analyse(panel, pc, ycol)
-    nested = pd.concat([nested_eval(panel, pc, ycol, f) for f in ('year', 'county')], ignore_index=True)
+    nested = pd.concat([nested_eval(panel, pc, ycol, f, min_lag=ml) for ml in (0, 1) for f in ('year', 'county')],
+                       ignore_index=True)
     models, rank = model_eval(panel, ycol, pc)
     for t in (lag, thr, nested, models, rank):
         if not t.empty:
@@ -620,9 +696,10 @@ def main():
         f'Stations within {MAX_KM:.0f} km of a county polygon. Position on the river is approximated by latitude (Nile flows north): south = upstream, north = downstream, within {LOCAL_BAND_DEG} deg = local. Check Station_assignment for east-west reaches (Sobat, Pibor).',
         'River predictors: lvl = monthly max level as percentile of the station\'s own record; lvlz = z-score against the same calendar month in other years (removes the seasonal cycle); exc = share of passes above the station\'s own 90th percentile (flood-stage proxy); rise/rise3 = 1- and 3-month change. Altimetry passes are 10-35 days apart so monthly values are under-sampled.',
         'Lag_AUC and Best_thresholds are IN-SAMPLE screening (lag and cut-off picked on all the data) and are optimistic. Use Nested_CV and Models for skill.',
-        'Nested_CV: for every held-out year (or county) the lag, direction and threshold are chosen on the other folds only. AUC_lo95/hi95 = bootstrap over whole counties. If the interval includes 0.5 there is no demonstrated skill.',
-        'Models: ridge logistic on the best lag of each predictor (lag chosen inside each training fold). "+ county effects" adds a dummy per county; it can only be validated by leaving out years. The BENCHMARK row (a county\'s own event rate) is the bar to beat: predictors only add value if they beat it.',
-        'Risk_ranking: each flood-season month the counties are ranked by out-of-fold model score; recall = share of events falling in the top k, compared with chance (k / counties). lift = precision / base rate.',
+        'Nested_CV: for every held-out year (or county) the lag, direction and threshold are chosen on the other folds only. AUC_lo95/hi95 = two-way cluster bootstrap (whole counties AND whole years resampled; 2021 alone holds ~40% of events). If the interval includes 0.5 there is no demonstrated skill. lags_allowed 1-4 = early warning only (no same-month values).',
+        'Models: ridge logistic on the best lag of each predictor (lag chosen inside each training fold). SELECTED IN FOLD = the best 4 predictors are chosen inside each training fold, so predictor choice is validated too (predictors_used counts how often each was chosen). The post-hoc small model was chosen after seeing earlier results on this data and is optimistic; it is shown only for comparison. "+ county effects" adds a dummy per county; it can only be validated by leaving out years. lead: confirmation = lags 0-4 (same-month values allowed: a flood is under way), early warning = lags 1-4 (at least one month ahead).',
+        'dAUC_vs_benchmark = model AUC minus the county-history benchmark AUC on the same rows, with a paired two-way bootstrap 95% CI. beats_benchmark = yes only if the whole interval is above 0. This, not overlapping intervals, is the test of whether river/rain/soil data add anything.',
+        'Risk_ranking (by lead): each flood-season month the counties are ranked by out-of-fold model score; recall = share of events falling in the top k, compared with chance (k / counties). lift = precision / base rate.',
         'Soil moisture (SMAP L4) starts in 2015; rain is GSMaP v8 gauge-corrected. Both are county means at 5 km.']})
     path = os.path.join(OUT_DIR, 'flood_trigger_analysis.xlsx')
     with pd.ExcelWriter(path) as w:
@@ -639,10 +716,11 @@ def main():
         with open(summ, 'a') as fh:
             fh.write('### Flood trigger analysis (honest validation)\n\n')
             for title, t, cols in (
-                    ('Models vs benchmark', models, ['target', 'model', 'validation', 'AUC_cv', 'AUC_lo95', 'AUC_hi95', 'n_events']),
-                    ('Risk ranking (top-k counties per month)', rank, ['target', 'model', 'top_k', 'recall', 'recall_by_chance', 'lift']),
+                    ('Models vs benchmark', models, ['target', 'model', 'lead', 'validation', 'AUC_cv', 'AUC_lo95', 'AUC_hi95',
+                                                     'dAUC_vs_benchmark', 'd_lo95', 'd_hi95', 'beats_benchmark']),
+                    ('Risk ranking (top-k counties per month)', rank, ['target', 'model', 'lead', 'top_k', 'recall', 'recall_by_chance', 'lift']),
                     ('Single predictors, nested CV (onset target)', nested[nested.target == 'onset'].sort_values('AUC_cv', ascending=False).head(12),
-                     ['predictor', 'validation', 'AUC_cv', 'AUC_lo95', 'AUC_hi95', 'POD', 'FAR', 'TSS'])):
+                     ['predictor', 'lags_allowed', 'validation', 'AUC_cv', 'AUC_lo95', 'AUC_hi95', 'POD', 'FAR', 'TSS'])):
                 if not t.empty:
                     fh.write(f'**{title}**\n\n' + t[cols].round(2).to_markdown(index=False) + '\n\n')
     print(models.round(3).to_string())
