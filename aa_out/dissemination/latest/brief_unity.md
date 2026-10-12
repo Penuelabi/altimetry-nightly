@@ -1,6 +1,6 @@
 # Unity - anticipatory action situation brief
 
-Prepared 2026-10-12 00:52 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-11 12 UTC.
+Prepared 2026-10-12 03:20 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-11 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -13,15 +13,15 @@ Prepared 2026-10-12 00:52 UTC for the Unity state TWG-AA. Rain and soil data to 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Mayom | Unity | **ORANGE** | drought / dry spell | 18 | 0% | 22,600 |
-| Pariang | Unity | **ORANGE** | drought / dry spell | 16 | 0% | 4,128 |
-| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 13 | 0% | 165 |
-| Guit | Unity | **YELLOW** | flood / waterlogging | 20 | 0% | 3,497 |
-| Koch | Unity | **YELLOW** | flood / waterlogging | 25 | 0% | 513 |
-| Leer | Unity | **YELLOW** | flood / waterlogging | 29 | 2% | 985 |
-| Mayendit | Unity | **YELLOW** | flood / waterlogging | 29 | 4% | 2,032 |
-| Panyijiar | Unity | **YELLOW** | flood / waterlogging | 28 | 4% | 4,064 |
-| Rubkona | Unity | **YELLOW** | flood / waterlogging | 17 | 0% | 16,480 |
+| Mayom | Unity | **ORANGE** | drought / dry spell | 30 | 0% | 22,600 |
+| Pariang | Unity | **ORANGE** | drought / dry spell | 28 | 2% | 4,128 |
+| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 27 | 0% | 165 |
+| Guit | Unity | **YELLOW** | flood / waterlogging | 30 | 8% | 3,497 |
+| Koch | Unity | **YELLOW** | flood / waterlogging | 31 | 12% | 513 |
+| Leer | Unity | **YELLOW** | flood / waterlogging | 35 | 16% | 985 |
+| Mayendit | Unity | **YELLOW** | flood / waterlogging | 35 | 14% | 2,032 |
+| Panyijiar | Unity | **YELLOW** | flood / waterlogging | 33 | 8% | 4,064 |
+| Rubkona | Unity | **YELLOW** | flood / waterlogging | 30 | 6% | 16,480 |
 
 ## Anticipatory action plans
 | Plan | County | Stage | Since | Plan status | River / readiness / activation (m) |

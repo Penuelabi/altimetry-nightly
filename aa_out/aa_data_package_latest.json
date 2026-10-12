@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261012_0052",
+ "name": "south-sudan-hydroclimate-aa-20261012_0320",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261012_0052",
- "created": "2026-10-12T00:52:18Z",
+ "version": "20261012_0320",
+ "created": "2026-10-12T03:20:25Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 178715,
-   "hash": "sha256:caaa0e9b4cf4b602ba2d6996916df863f8d6e869530c64791e56f71e7ebbd508",
+   "bytes": 177984,
+   "hash": "sha256:55817aad6688f901ab4060300a3e2986c2aa1155ee9bda9152158caa629a4c3b",
    "rows": 79,
    "schema": {
     "fields": [
@@ -959,7 +959,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 25449,
-   "hash": "sha256:7c4243ac4e1c6fbe7d338c7b300b67cfaf242a3726de888691df96b2e79b45fb",
+   "hash": "sha256:af837271df12ac1be18f398d74d067b55dbc9dfa1a439271163b87d3de7e5ef2",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1421,8 +1421,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1632,
-   "hash": "sha256:e46390404d8310d4e4c9606ba55a1b76845945986ee4265986e27cafa987fce0",
+   "bytes": 1634,
+   "hash": "sha256:8787756d0b9f35c85e669925e802ed6062daf74990f4b2466ea3e9ce464ddf34",
    "rows": 6,
    "schema": {
     "fields": [

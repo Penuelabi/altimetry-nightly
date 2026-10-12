@@ -1,6 +1,6 @@
 # Lakes - anticipatory action situation brief
 
-Prepared 2026-10-12 00:52 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-11 12 UTC.
+Prepared 2026-10-12 03:20 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-10-05; ECMWF run 2026-10-11 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,14 +12,14 @@ Prepared 2026-10-12 00:52 UTC for the Lakes state TWG-AA. Rain and soil data to 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Awerial | Lakes | **ORANGE** | drought / dry spell | 29 | 10% | 5,340 |
-| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 27 | 6% | 1,661 |
-| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 26 | 2% | 3,596 |
-| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 29 | 6% | 6 |
-| Yirol West | Lakes | **ORANGE** | drought / dry spell | 28 | 2% | 2,910 |
-| Cueibet | Lakes | **YELLOW** | flood / waterlogging | 30 | 2% | 531 |
-| Wulu | Lakes | **YELLOW** | flood / waterlogging | 30 | 8% | 108 |
-| Yirol East | Lakes | **YELLOW** | flood / waterlogging | 26 | 0% | 3,725 |
+| Awerial | Lakes | **ORANGE** | drought / dry spell | 36 | 12% | 5,340 |
+| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 34 | 8% | 1,661 |
+| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 30 | 2% | 6 |
+| Wulu | Lakes | **ORANGE** | flood / waterlogging | 40 | 22% | 108 |
+| Yirol West | Lakes | **ORANGE** | drought / dry spell | 37 | 18% | 2,910 |
+| Cueibet | Lakes | **YELLOW** | flood / waterlogging | 32 | 8% | 531 |
+| Rumbek East | Lakes | **YELLOW** | flood / waterlogging | 34 | 12% | 3,596 |
+| Yirol East | Lakes | **YELLOW** | flood / waterlogging | 36 | 10% | 3,725 |
 
 ## Decisions for the group
 - Agree the warning for the 8 counties with an alert and the channels (radio hubs, chiefs, SMS).
