@@ -200,7 +200,7 @@ def fetch_climate(counties):
         for mth in range(1, 13):
             start = ee.Date.fromYMD(y, mth, 1)
             end = start.advance(1, 'month')
-            if pd.Timestamp(y, mth, 1) > pd.Timestamp.utcnow().tz_localize(None):
+            if pd.Timestamp(y, mth, 1) > pd.Timestamp.now('UTC').tz_localize(None):
                 continue
             img = rain.filterDate(start, end).sum().rename('rain_mm')
             if sm is not None:
