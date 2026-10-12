@@ -31,6 +31,9 @@ LAGS = 4
 NEAREST = 3              # stations kept per county and position group (nearest first)
 MAX_KM = 150.0           # stations farther than this from a county are not candidates
 LOCAL_BAND_DEG = 0.15    # |lat difference| below this = "local"; north of it = downstream, south = upstream
+# Small model, 4 predictors for ~54 events. Chosen AFTER seeing the first nested-CV results on this same data, so its score is a
+# little optimistic; it must be confirmed on new years or on the Sentinel-1 target.
+SMALL_MODEL = ('rise3_local', 'rise3_upstream', 'lvl_upstream', 'sm_z')
 FLOOD_SEASON = {7, 8, 9, 10, 11, 12, 1}
 YEARS = (2019, 2025)     # climate + levels are extracted from 2019 so 2020 months have lags
 OUT_DIR = os.environ.get('ANALYSIS_OUT_DIR', '.')
@@ -454,6 +457,10 @@ def model_eval(panel, ycol, pred_cols, n_boot=300):
                 ('rain + soil moisture', climate, False),
                 ('all predictors', river + climate, False),
                 ('all predictors + county effects', river + climate, True)]
+    small = [p for p in SMALL_MODEL if p in pred_cols]
+    if len(small) >= 2:
+        variants += [('SMALL model (' + ', '.join(small) + ')', small, False),
+                     ('SMALL model + county effects', small, True)]
     rows, rank_rows = [], []
     for fold_col in ('year', 'county'):
         for label, preds, fx in variants:
