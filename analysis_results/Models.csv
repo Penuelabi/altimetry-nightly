@@ -1,17 +1,23 @@
 target,model,validation,AUC_cv,AUC_lo95,AUC_hi95,n_scored,n_events
-onset,"river (levels, anomalies, exceedance)",leave-one-year-out,0.5037220843672456,0.4597732096243332,0.5631032758894943,796,52
+onset,"river (levels, anomalies, exceedance)",leave-one-year-out,0.5137325761486835,0.4540565158366758,0.5907125228916498,797,52
 onset,rain + soil moisture,leave-one-year-out,0.476672928967615,0.4233474279358434,0.543094676879635,882,54
-onset,all predictors,leave-one-year-out,0.4927626137303557,0.4452095086971427,0.5502154056104528,796,52
-onset,all predictors + county effects,leave-one-year-out,0.5482320099255583,0.5014242736392093,0.5953373107602202,796,52
-onset,"river (levels, anomalies, exceedance)",leave-one-county-out,0.5892079618494713,0.5120024753324105,0.6954253178297094,794,52
+onset,all predictors,leave-one-year-out,0.5038719669592153,0.4435557253707346,0.5738853622750321,797,52
+onset,all predictors + county effects,leave-one-year-out,0.5633195663397006,0.5024515720922516,0.6210109484609748,797,52
+onset,"SMALL model (rise3_local, rise3_upstream, lvl_upstream, sm_z)",leave-one-year-out,0.5763410612086526,0.5166800320674839,0.6349825965840964,845,52
+onset,SMALL model + county effects,leave-one-year-out,0.6107284896692211,0.5188536618251914,0.6795601857605604,845,52
+onset,"river (levels, anomalies, exceedance)",leave-one-county-out,0.5759925558312655,0.4960965905743502,0.6671757665239042,796,52
 onset,rain + soil moisture,leave-one-county-out,0.5829978529253892,0.5204938625447373,0.6500394545561714,882,54
-onset,all predictors,leave-one-county-out,0.5964389384200705,0.5284692567376574,0.6947829343967399,794,52
+onset,all predictors,leave-one-county-out,0.5907775020678246,0.5060433707297614,0.6935113391044427,796,52
+onset,"SMALL model (rise3_local, rise3_upstream, lvl_upstream, sm_z)",leave-one-county-out,0.6331809783137217,0.5584221308126768,0.7151303153251982,843,52
 onset,BENCHMARK county event rate only (no predictors),leave-one-year-out,0.5284934693147254,0.4280459702847584,0.5925471084670725,882,54
-any flood month,"river (levels, anomalies, exceedance)",leave-one-year-out,0.5237731456218852,0.4527310670783725,0.5944289221283249,791,77
+any flood month,"river (levels, anomalies, exceedance)",leave-one-year-out,0.523459827080997,0.4554726320274228,0.594688803009497,795,77
 any flood month,rain + soil moisture,leave-one-year-out,0.5380771474060879,0.4845334960655919,0.5907093871259881,882,79
-any flood month,all predictors,leave-one-year-out,0.5648441194659682,0.499797459623076,0.6352761775374229,791,77
-any flood month,all predictors + county effects,leave-one-year-out,0.6217032267452436,0.5199063029061779,0.699091185008481,791,77
-any flood month,"river (levels, anomalies, exceedance)",leave-one-county-out,0.5431509830951172,0.4704573950003661,0.6428904067951674,793,77
+any flood month,all predictors,leave-one-year-out,0.5695474441992547,0.4955644576429404,0.636723395173872,795,77
+any flood month,all predictors + county effects,leave-one-year-out,0.6276995984516875,0.5323509665809696,0.7070435199056285,795,77
+any flood month,"SMALL model (rise3_local, rise3_upstream, lvl_upstream, sm_z)",leave-one-year-out,0.6521613979241098,0.5788436167087831,0.72444132744327,844,77
+any flood month,SMALL model + county effects,leave-one-year-out,0.7006044802654973,0.5934184944102865,0.7754451008442536,844,77
+any flood month,"river (levels, anomalies, exceedance)",leave-one-county-out,0.5201118326118326,0.4485354025417366,0.6187142031873712,797,77
 any flood month,rain + soil moisture,leave-one-county-out,0.5703611457036114,0.5145281276684825,0.6320307442985981,882,79
-any flood month,all predictors,leave-one-county-out,0.5805702677211058,0.5109107453572591,0.6616689364355062,793,77
+any flood month,all predictors,leave-one-county-out,0.5680735930735931,0.4947935131133334,0.6523902377377949,797,77
+any flood month,"SMALL model (rise3_local, rise3_upstream, lvl_upstream, sm_z)",leave-one-county-out,0.6650806820298346,0.5937074027724297,0.7349178317093225,844,77
 any flood month,BENCHMARK county event rate only (no predictors),leave-one-year-out,0.6048284124406892,0.442475092846129,0.6809209189117733,882,79
