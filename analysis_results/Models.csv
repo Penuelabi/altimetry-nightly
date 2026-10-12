@@ -1,0 +1,17 @@
+target,model,validation,AUC_cv,AUC_lo95,AUC_hi95,n_scored,n_events
+onset,"river (levels, anomalies, exceedance)",leave-one-year-out,0.5037220843672456,0.4597732096243332,0.5631032758894943,796,52
+onset,rain + soil moisture,leave-one-year-out,0.476672928967615,0.4233474279358434,0.543094676879635,882,54
+onset,all predictors,leave-one-year-out,0.4927626137303557,0.4452095086971427,0.5502154056104528,796,52
+onset,all predictors + county effects,leave-one-year-out,0.5482320099255583,0.5014242736392093,0.5953373107602202,796,52
+onset,"river (levels, anomalies, exceedance)",leave-one-county-out,0.5892079618494713,0.5120024753324105,0.6954253178297094,794,52
+onset,rain + soil moisture,leave-one-county-out,0.5829978529253892,0.5204938625447373,0.6500394545561714,882,54
+onset,all predictors,leave-one-county-out,0.5964389384200705,0.5284692567376574,0.6947829343967399,794,52
+onset,BENCHMARK county event rate only (no predictors),leave-one-year-out,0.5284934693147254,0.4280459702847584,0.5925471084670725,882,54
+any flood month,"river (levels, anomalies, exceedance)",leave-one-year-out,0.5237731456218852,0.4527310670783725,0.5944289221283249,791,77
+any flood month,rain + soil moisture,leave-one-year-out,0.5380771474060879,0.4845334960655919,0.5907093871259881,882,79
+any flood month,all predictors,leave-one-year-out,0.5648441194659682,0.499797459623076,0.6352761775374229,791,77
+any flood month,all predictors + county effects,leave-one-year-out,0.6217032267452436,0.5199063029061779,0.699091185008481,791,77
+any flood month,"river (levels, anomalies, exceedance)",leave-one-county-out,0.5431509830951172,0.4704573950003661,0.6428904067951674,793,77
+any flood month,rain + soil moisture,leave-one-county-out,0.5703611457036114,0.5145281276684825,0.6320307442985981,882,79
+any flood month,all predictors,leave-one-county-out,0.5805702677211058,0.5109107453572591,0.6616689364355062,793,77
+any flood month,BENCHMARK county event rate only (no predictors),leave-one-year-out,0.6048284124406892,0.442475092846129,0.6809209189117733,882,79

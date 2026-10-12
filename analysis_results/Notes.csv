@@ -1,0 +1,11 @@
+note
+"Targets: (1) onset = first month of a flood displacement episode in a county (66 county-months), the main target; (2) any month with flood displacement recorded (99); (3) observed flooded area from Sentinel-1 if data/flood_extent_county_month.csv exists (columns county,year,month,flooded_km2; top quartile within each county) - this one does not depend on when an assessment happened. NOT available this run, so skipped."
+"Displacement is dated by assessment month (IOM DTM), so true onset is probably earlier than recorded; months with no report are not confirmed dry."
+Only counties with at least one flood displacement record are analysed; other months in those counties are the negatives.
+"Stations within 150 km of a county polygon. Position on the river is approximated by latitude (Nile flows north): south = upstream, north = downstream, within 0.15 deg = local. Check Station_assignment for east-west reaches (Sobat, Pibor)."
+River predictors: lvl = monthly max level as percentile of the station's own record; lvlz = z-score against the same calendar month in other years (removes the seasonal cycle); exc = share of passes above the station's own 90th percentile (flood-stage proxy); rise/rise3 = 1- and 3-month change. Altimetry passes are 10-35 days apart so monthly values are under-sampled.
+Lag_AUC and Best_thresholds are IN-SAMPLE screening (lag and cut-off picked on all the data) and are optimistic. Use Nested_CV and Models for skill.
+"Nested_CV: for every held-out year (or county) the lag, direction and threshold are chosen on the other folds only. AUC_lo95/hi95 = bootstrap over whole counties. If the interval includes 0.5 there is no demonstrated skill."
+"Models: ridge logistic on the best lag of each predictor (lag chosen inside each training fold). ""+ county effects"" adds a dummy per county; it can only be validated by leaving out years. The BENCHMARK row (a county's own event rate) is the bar to beat: predictors only add value if they beat it."
+"Risk_ranking: each flood-season month the counties are ranked by out-of-fold model score; recall = share of events falling in the top k, compared with chance (k / counties). lift = precision / base rate."
+Soil moisture (SMAP L4) starts in 2015; rain is GSMaP v8 gauge-corrected. Both are county means at 5 km.
