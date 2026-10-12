@@ -8,7 +8,7 @@ verification passes are done:
     "verified_passes": 10          number of full verification passes completed
 
 Rules (scheduled runs only; manual "Run workflow" runs are never blocked, they only print a warning):
-  * Sunday 21:30 UTC run (the weekly email): compiled must be today's date, with at least MIN_PASSES passes.
+  * Sunday 21:30 UTC run (the weekly email): compiled must be that Sunday's date (a run delayed past UTC midnight still counts as Sunday), with at least MIN_PASSES passes.
   * Other scheduled runs (social posts): compiled must be within SOCIAL_MAX_AGE_DAYS days, same passes rule.
 Writes email_ok / social_ok (true/false) to $GITHUB_OUTPUT and a note to the run summary. It never fails the run.
 """
@@ -39,7 +39,10 @@ def evaluate(event, schedule, today, doc):
     if event != 'schedule':
         return True, True, f'manual run, not gated. {state}'
     if schedule == SUNDAY_EMAIL_SCHEDULE:
-        ok = compiled is not None and age == 0 and verified
+        # GitHub often starts this run hours late, after UTC midnight, so "today" can already be Monday.
+        # The run still belongs to the Sunday it was scheduled for: the most recent Sunday on or before today.
+        sunday = today - datetime.timedelta(days=(today.weekday() + 1) % 7)
+        ok = compiled is not None and compiled == sunday and verified
         why = 'ok' if ok else "this Sunday's news is not compiled and verified yet, so the email and social posts are skipped"
         return ok, ok, f'{why}. {state}'
     ok = compiled is not None and 0 <= age <= SOCIAL_MAX_AGE_DAYS and verified
