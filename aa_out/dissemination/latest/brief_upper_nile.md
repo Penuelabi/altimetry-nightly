@@ -1,6 +1,6 @@
 # Upper Nile - anticipatory action situation brief
 
-Prepared 2026-10-13 02:54 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-10-09; ECMWF run 2026-10-12 12 UTC.
+Prepared 2026-10-13 17:20 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-10-09; ECMWF run 2026-10-13 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,18 +12,18 @@ Prepared 2026-10-13 02:54 UTC for the Upper Nile state TWG-AA. Rain and soil dat
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Baliet | Upper Nile | **ORANGE** | drought / dry spell | 26 | 0% | 1,252 |
-| Fashoda | Upper Nile | **ORANGE** | drought / dry spell | 18 | 0% | 1,926 |
-| Longochuk | Upper Nile | **ORANGE** | drought / dry spell | 36 | 8% | 257 |
-| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 32 | 4% | 15,180 |
-| Maban | Upper Nile | **ORANGE** | drought / dry spell | 27 | 0% | 25 |
-| Maiwut | Upper Nile | **ORANGE** | drought / dry spell | 31 | 8% | 331 |
-| Malakal | Upper Nile | **ORANGE** | drought / dry spell | 19 | 0% | 6,999 |
-| Manyo | Upper Nile | **ORANGE** | drought / dry spell | 9 | 0% | 2,021 |
-| Melut | Upper Nile | **ORANGE** | drought / dry spell | 17 | 0% | 5,600 |
-| Renk | Upper Nile | **ORANGE** | drought / dry spell | 9 | 0% | 4,300 |
-| Ulang | Upper Nile | **ORANGE** | drought / dry spell | 31 | 0% | 5,416 |
-| Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 23 | 0% | 1,376 |
+| Baliet | Upper Nile | **ORANGE** | drought / dry spell | 22 | 0% | 1,252 |
+| Fashoda | Upper Nile | **ORANGE** | drought / dry spell | 15 | 0% | 1,926 |
+| Longochuk | Upper Nile | **ORANGE** | drought / dry spell | 25 | 0% | 257 |
+| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 24 | 0% | 15,180 |
+| Maban | Upper Nile | **ORANGE** | drought / dry spell | 20 | 0% | 25 |
+| Maiwut | Upper Nile | **ORANGE** | drought / dry spell | 22 | 0% | 331 |
+| Malakal | Upper Nile | **ORANGE** | drought / dry spell | 17 | 0% | 6,999 |
+| Manyo | Upper Nile | **ORANGE** | drought / dry spell | 8 | 0% | 2,021 |
+| Melut | Upper Nile | **ORANGE** | drought / dry spell | 14 | 0% | 5,600 |
+| Renk | Upper Nile | **ORANGE** | drought / dry spell | 6 | 0% | 4,300 |
+| Ulang | Upper Nile | **ORANGE** | drought / dry spell | 24 | 0% | 5,416 |
+| Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 18 | 0% | 1,376 |
 
 ## Decisions for the group
 - Agree the warning for the 12 counties with an alert and the channels (radio hubs, chiefs, SMS).

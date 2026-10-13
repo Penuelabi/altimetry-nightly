@@ -23,8 +23,8 @@
 | Wulu | Unknown, River | 7.0 | 42.0 | Ibba km 4410 | 7.0 | linked reading 42 days old |
 | Raja | Wadi Boro, River | 6.9 | 38.0 | Lol km 4904 | 6.9 | linked reading 38 days old |
 | Mayendit | Bahr Al Arab Trib 02 km 4435 | 2.3 | 36.0 | Gulnam km 4574 | 22.3 | linked reading 36 days old |
-| Abiemnhom | Bhar-al-arab, River | 0.0 | 42.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 42 days old |
-| Aweil West | Wadi Boro, River | 0.0 | 40.0 | Lol km 4782 | 0.0 | linked reading 40 days old |
+| Abiemnhom | Bhar-al-arab, River | 0.0 | 42.0 | Bahr Al Arab km 4307 | 0.0 | linked reading 42 days old |
+| Aweil West | Wadi Boro, River | 0.0 | 40.0 | Lol km 4904 | 0.0 | linked reading 40 days old |
 | Aweil Centre | Chel km 4862 | 0.0 | 50.0 | Chel km 4942 | 0.0 | linked reading 50 days old |
 | Nyirol | Fulus km 4165 | 0.0 | 70.0 | Fulus km 4188 | 0.0 | linked reading 70 days old |
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 267.0 | Gulnam km 4669 | 2.9 | linked reading 267 days old |
