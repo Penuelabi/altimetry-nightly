@@ -1,6 +1,6 @@
 # Abyei Region - anticipatory action situation brief
 
-Prepared 2026-10-16 23:58 UTC for the Abyei Region state TWG-AA. Rain and soil data to 2026-10-13; ECMWF run 2026-10-16 12 UTC.
+Prepared 2026-10-17 13:27 UTC for the Abyei Region state TWG-AA. Rain and soil data to 2026-10-14; ECMWF run 2026-10-17 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,7 +12,7 @@ Prepared 2026-10-16 23:58 UTC for the Abyei Region state TWG-AA. Rain and soil d
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Abyei Region | Abyei Region | **ORANGE** | drought / dry spell | 4 | 0% | 283 |
+| Abyei Region | Abyei Region | **ORANGE** | drought / dry spell | 3 | 0% | 283 |
 
 ## Decisions for the group
 - Agree the warning for the 1 counties with an alert and the channels (radio hubs, chiefs, SMS).
