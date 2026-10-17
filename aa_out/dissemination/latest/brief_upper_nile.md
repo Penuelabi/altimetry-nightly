@@ -1,6 +1,6 @@
 # Upper Nile - anticipatory action situation brief
 
-Prepared 2026-10-17 13:27 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-10-14; ECMWF run 2026-10-17 00 UTC.
+Prepared 2026-10-17 23:25 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-10-14; ECMWF run 2026-10-17 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -14,16 +14,16 @@ Prepared 2026-10-17 13:27 UTC for the Upper Nile state TWG-AA. Rain and soil dat
 |---|---|---|---|---|---|---|
 | Baliet | Upper Nile | **ORANGE** | drought / dry spell | 9 | 0% | 1,252 |
 | Fashoda | Upper Nile | **ORANGE** | drought / dry spell | 6 | 0% | 1,926 |
-| Longochuk | Upper Nile | **ORANGE** | drought / dry spell | 13 | 0% | 257 |
-| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 15 | 0% | 15,180 |
+| Longochuk | Upper Nile | **ORANGE** | drought / dry spell | 12 | 0% | 257 |
+| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 12 | 0% | 15,180 |
 | Maban | Upper Nile | **ORANGE** | drought / dry spell | 7 | 0% | 25 |
-| Maiwut | Upper Nile | **ORANGE** | drought / dry spell | 16 | 0% | 331 |
-| Malakal | Upper Nile | **ORANGE** | drought / dry spell | 8 | 0% | 6,999 |
+| Maiwut | Upper Nile | **ORANGE** | drought / dry spell | 11 | 0% | 331 |
+| Malakal | Upper Nile | **ORANGE** | drought / dry spell | 7 | 0% | 6,999 |
 | Manyo | Upper Nile | **ORANGE** | drought / dry spell | 2 | 0% | 2,021 |
 | Melut | Upper Nile | **ORANGE** | drought / dry spell | 4 | 0% | 5,600 |
 | Renk | Upper Nile | **ORANGE** | drought / dry spell | 2 | 0% | 4,300 |
-| Ulang | Upper Nile | **ORANGE** | drought / dry spell | 15 | 0% | 5,416 |
-| Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 9 | 0% | 1,376 |
+| Ulang | Upper Nile | **ORANGE** | drought / dry spell | 13 | 0% | 5,416 |
+| Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 8 | 0% | 1,376 |
 
 ## Decisions for the group
 - Agree the warning for the 12 counties with an alert and the channels (radio hubs, chiefs, SMS).
