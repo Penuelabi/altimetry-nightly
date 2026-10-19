@@ -19,8 +19,8 @@ import ee
 import ee_util
 
 TARGET = os.environ.get('FLOOD_EXTENT_ASSET') or 'projects/sudan-1575919084043/assets/maximum_flood_extent'
-DAYS = int(os.environ.get('EXTENT_DAYS') or '12')
-WATER_VV_DB, FLOODVEG_RISE_DB, HAND_MAX_M, SPECKLE_M = -18, 3, 15, 50
+DAYS = int(os.environ.get('EXTENT_DAYS') or '8')
+WATER_VV_DB, FLOODVEG_RISE_DB, HAND_MAX_M, SPECKLE_M = -18, 6, 5, 50
 
 ee_util.init_ee()
 roi = ee.Geometry.Polygon([[[23.5, 12.5], [35.5, 12.5], [35.5, 3.0], [23.5, 3.0]]])
@@ -28,7 +28,8 @@ end = ee.Date(dt.datetime.utcnow().strftime('%Y-%m-%d')).advance(1, 'day')
 start = end.advance(-DAYS, 'day')
 year = dt.datetime.utcnow().year
 
-s1 = (ee.ImageCollection('COPERNICUS/S1_GRD').filterBounds(roi).filter(ee.Filter.eq('instrumentMode', 'IW'))
+s1 = (ee.ImageCollection('COPERNICUS/S1_GRD').filterBounds(roi)
+     // .filter(ee.Filter.eq('instrumentMode', 'IW'))
       .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
       .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING')).select('VV'))
 smooth = lambda i: i.focalMedian(SPECKLE_M, 'circle', 'meters')
