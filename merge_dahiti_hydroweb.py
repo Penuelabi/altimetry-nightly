@@ -91,6 +91,10 @@ DAHITI_PAUSE_S = 2
 DAHITI_MAX_RETRIES = 3
 DAHITI_MAX_WAIT_S = 10
 DAHITI_STOP_AFTER_429 = 3
+HYDROWEB_TIMEOUT = (30, 300)   # (connect, read) seconds
+HYDROWEB_RETRIES = 3
+HYDROWEB_BACKOFF_S = 30
+DAHITI_STOP_AFTER_403 = 2      # key rejected / IP blocked: every station will fail the same way
 RIVERS_ZIP = os.path.join(OUT_DIR, 'Theia_Hydroweb_Operational_Rivers.zip')
 LAKES_ZIP = os.path.join(OUT_DIR, 'HYDROWEB_LAKES_OPE.zip')
 HYDROWEB_RAW_XLSX = os.path.join(OUT_DIR, 'hydroweb_water_levels_raw.xlsx')
@@ -244,6 +248,7 @@ else:
 
 RUN_STAMP = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 TODAY = pd.Timestamp.today().normalize()
+DOWNLOAD_PROBLEMS = []   # filled by the download steps; printed as a warning block at the end
 END_TS = (pd.Timestamp(END_DATE) if END_DATE else TODAY).normalize()
 END_EXCL = END_TS + pd.Timedelta(days=1)
 print(f"Observations kept up to and including {END_TS:%Y-%m-%d}")
@@ -445,7 +450,7 @@ def download_dahiti():
 
     today = pd.Timestamp.today().strftime('%Y-%m-%d')
     frames, report = [], []
-    streak_429, stopped = 0, False
+    streak_429, streak_403, stopped = 0, 0, False
     for sid in DAHITI_IDS:
         s = seed_series.get(sid, pd.Series(dtype=float))
         full = sid in to_check
@@ -460,8 +465,8 @@ def download_dahiti():
             print(f"  {sid}: no metadata, skipped")
             continue
         if stopped:
-            rep.setdefault('check', 'not checked: rate limited')
-            rep['this_run'] = 'skipped (rate limited)'
+            rep.setdefault('check', 'not checked: API stopped (429/403)')
+            rep['this_run'] = 'skipped (API stopped)'
             report.append(rep)
             continue
 
@@ -473,18 +478,29 @@ def download_dahiti():
         time.sleep(DAHITI_PAUSE_S)
         if st != 'ok':
             streak_429 = streak_429 + 1 if st == 'HTTP 429' else 0
+            streak_403 = streak_403 + 1 if st == 'HTTP 403' else 0
             if full:
                 rep['check'] = f'not checked: {st}'
             rep['this_run'] = st
             report.append(rep)
             print(f"  {sid}: {st}")
+            if streak_403 >= DAHITI_STOP_AFTER_403:
+                stopped = True
+                print("  !! DAHITI answered HTTP 403 for "
+                      f"{streak_403} stations in a row -> the API key is being rejected or this "
+                      "runner's IP is blocked. Stopping DAHITI requests for this run; saved data "
+                      "are used, so DAHITI data are STALE. Check the DAHITI_API_KEY secret "
+                      "(no spaces/quotes, not expired) and test one request outside Actions.")
+                if r is not None and getattr(r, 'text', ''):
+                    print(f"     Server said: {r.text.strip()[:300]}")
+                DOWNLOAD_PROBLEMS.append('DAHITI: HTTP 403 (key rejected or IP blocked)')
             if streak_429 >= DAHITI_STOP_AFTER_429:
                 stopped = True
                 print(f"  DAHITI kept answering HTTP 429 for {streak_429} stations in a row -> "
                       "stopping API requests for this run. Saved data are used; wait a while "
                       "(an hour or more) and rerun to check the remaining stations.")
             continue
-        streak_429 = 0
+        streak_429 = streak_403 = 0
         try:
             d = pd.read_csv(StringIO(r.text), sep=';')
         except Exception:
@@ -590,31 +606,49 @@ def download_hydroweb():
         subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'py-hydroweb'], check=False)
         import py_hydroweb
 
+    # py_hydroweb sets no timeout (the log showed 'connect timeout=None'), so a dead server
+    # hangs the request. Give every HTTP call of this step a default timeout.
+    _orig_send = requests.adapters.HTTPAdapter.send
+
+    def _send_with_timeout(self, request, **kw):
+        if kw.get('timeout') is None:
+            kw['timeout'] = HYDROWEB_TIMEOUT
+        return _orig_send(self, request, **kw)
+
+    requests.adapters.HTTPAdapter.send = _send_with_timeout
     client = py_hydroweb.Client(api_key=HYDROWEB_API_KEY)
     dl_dir = os.path.join(WORK_DIR, 'hydroweb_download')
     os.makedirs(dl_dir, exist_ok=True)
     old_cwd = os.getcwd()
     for collection, target in [('HYDROWEB_RIVERS_OPE', RIVERS_ZIP), ('HYDROWEB_LAKES_OPE', LAKES_ZIP)]:
         print(f"Requesting {collection} for bbox {HYDROWEB_BBOX} ...")
-        local_zip = os.path.join(dl_dir, f"{collection}_{RUN_STAMP}.zip")
-        try:
-            os.chdir(dl_dir)
-            basket = py_hydroweb.DownloadBasket(f"{collection.lower()}_{RUN_STAMP}")
-            basket.add_collection(collection, bbox=HYDROWEB_BBOX)
-            path = client.submit_and_download_zip(basket, zip_filename=local_zip, output_folder=dl_dir)
-            if path is None:
-                print("  Hydroweb could not prepare this download (see message above); "
-                      "keeping previous zip if present.")
-                continue
-            path = path if os.path.isabs(path) else os.path.join(dl_dir, path)
-            if not os.path.exists(path):
-                path = local_zip
-            shutil.copy(path, target)
-            print(f"  saved -> {target} ({os.path.getsize(target) / 1e6:.1f} MB)")
-        except Exception as e:
-            print(f"  {collection} download failed ({e}); keeping previous zip if present.")
-        finally:
-            os.chdir(old_cwd)
+        ok = False
+        for attempt in range(1, HYDROWEB_RETRIES + 1):
+            local_zip = os.path.join(dl_dir, f"{collection}_{RUN_STAMP}_{attempt}.zip")
+            try:
+                os.chdir(dl_dir)
+                basket = py_hydroweb.DownloadBasket(f"{collection.lower()}_{RUN_STAMP}_{attempt}")
+                basket.add_collection(collection, bbox=HYDROWEB_BBOX)
+                path = client.submit_and_download_zip(basket, zip_filename=local_zip, output_folder=dl_dir)
+                if path is None:
+                    raise RuntimeError("Hydroweb could not prepare this download")
+                path = path if os.path.isabs(path) else os.path.join(dl_dir, path)
+                if not os.path.exists(path):
+                    path = local_zip
+                shutil.copy(path, target)
+                print(f"  saved -> {target} ({os.path.getsize(target) / 1e6:.1f} MB)")
+                ok = True
+                break
+            except Exception as e:
+                print(f"  {collection} attempt {attempt}/{HYDROWEB_RETRIES} failed ({str(e)[:160]})")
+                if attempt < HYDROWEB_RETRIES:
+                    time.sleep(HYDROWEB_BACKOFF_S * attempt)
+            finally:
+                os.chdir(old_cwd)
+        if not ok:
+            print(f"  {collection}: giving up, keeping previous zip if present (data may be STALE).")
+            DOWNLOAD_PROBLEMS.append(f"Hydroweb {collection}: download failed, previous zip reused")
+    requests.adapters.HTTPAdapter.send = _orig_send
 
 
 RIVER_COLS = [
@@ -1190,13 +1224,24 @@ ERA5_OUT = ['t2m', 'swvl1', 'evap', 'ro']
 REF_START = ee.Date.fromYMD(CLIM_REF_YEARS[0], 1, 1)
 REF_END = ee.Date.fromYMD(CLIM_REF_YEARS[1] + 1, 1, 1)
 DATES_PER_CALL = 20
+MAX_SINGLE_FAILURES = 4     # stop the climate fetch after this many failed requests in a row
+_single_failures = 0
+CHIRPS_DAYS, ERA5_DAYS = set(), set()
+
+
+def available_days(col):
+    """Set of days (normalised Timestamps) that really have an image in the collection (last ~400 days).
+    A day can be missing INSIDE the range (CHIRPS preliminary has holes), so 'day <= last date'
+    is not enough: first() on an empty day returns null and Image.rename fails on it."""
+    recent = col.filterDate((TODAY - pd.Timedelta(days=400)).strftime('%Y-%m-%d'),
+                            (TODAY + pd.Timedelta(days=1)).strftime('%Y-%m-%d'))
+    ms = recent.aggregate_array('system:time_start').getInfo() or []
+    return {pd.Timestamp(m, unit='ms').normalize() for m in ms}
 
 
 def last_available(col):
-    recent = col.filterDate((TODAY - pd.Timedelta(days=400)).strftime('%Y-%m-%d'),
-                            (TODAY + pd.Timedelta(days=1)).strftime('%Y-%m-%d'))
-    ms = recent.aggregate_max('system:time_start').getInfo()
-    return pd.Timestamp(ms, unit='ms').normalize() if ms else pd.Timestamp('1900-01-01')
+    days = available_days(col)
+    return max(days) if days else pd.Timestamp('1900-01-01')
 
 
 _clim_cache = {}
@@ -1213,11 +1258,14 @@ def doy_climatology(doy):
 
 
 def window_image(date_key):
-    """15-day antecedent image for one observation date + (days CHIRPS, days ERA5 observed)."""
+    """15-day antecedent image for one observation date + (days CHIRPS, days ERA5 observed).
+    Each day uses real data when GEE has an image for that exact day, otherwise the fallback chain
+    (CHIRPS -> ERA5-Land precipitation -> day-of-year climatology), so no null images are built."""
     day = pd.Timestamp(date_key).normalize()
     days = [day - pd.Timedelta(days=k) for k in range(WINDOW_DAYS - 1, -1, -1)]
-    n_ch = sum(d <= CHIRPS_LAST for d in days)
-    n_er = sum(d <= ERA5_LAST for d in days)
+    has_ch = [d in CHIRPS_DAYS for d in days]
+    has_er = [d in ERA5_DAYS for d in days]
+    n_ch, n_er = sum(has_ch), sum(has_er)
     start, end = days[0].strftime('%Y-%m-%d'), (day + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
     if n_ch == WINDOW_DAYS and n_er == WINDOW_DAYS:
         er = ERA5.filterDate(start, end)
@@ -1228,17 +1276,17 @@ def window_image(date_key):
         ])
         return img.toFloat(), n_ch, n_er
     imgs = []
-    for d in days:
+    for d, ch_ok, er_ok in zip(days, has_ch, has_er):
         d0, d1 = d.strftime('%Y-%m-%d'), (d + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
         doy = int(d.dayofyear)
-        if d <= ERA5_LAST:
+        if er_ok:
             er_day = ee.Image(ERA5.filterDate(d0, d1).first())
             era = er_day.select(ERA5_IN, ERA5_OUT)
         else:
             era = doy_climatology(doy)[1]
-        if d <= CHIRPS_LAST:
-            rain = ee.Image(CHIRPS.filterDate(d0, d1).first()).rename('rain')
-        elif d <= ERA5_LAST:
+        if ch_ok:
+            rain = ee.Image(CHIRPS.filterDate(d0, d1).first()).select(['rain']).rename('rain')
+        elif er_ok:
             rain = er_day.select(['total_precipitation_sum'], ['rain']).multiply(1000)
         else:
             rain = doy_climatology(doy)[0]
@@ -1264,6 +1312,9 @@ def fetch_dates(groups):
             for r in rows.itertuples()])
         red = img.reduceRegions(collection=pts, reducer=ee.Reducer.mean(), scale=5000, tileScale=4)
         fcs.append(red.map(lambda f: ee.Feature(None, f.toDictionary())))
+    global _single_failures
+    if _single_failures >= MAX_SINGLE_FAILURES:
+        return pd.DataFrame()          # circuit breaker: the same error keeps coming back
     err = ''
     for attempt in range(2):
         try:
@@ -1271,22 +1322,38 @@ def fetch_dates(groups):
             return pd.DataFrame([f['properties'] for f in res])
         except Exception as e:
             err = str(e)
-            if 'memory' in err.lower() or 'too many' in err.lower() or 'timed out' in err.lower():
-                break
+            low = err.lower()
+            if 'memory' in low or 'too many' in low or 'timed out' in low:
+                break                  # size problem: splitting the request can help
+            if 'required and may not be null' in low or 'not found' in low or 'invalid' in low:
+                break                  # deterministic error: retrying the same request is pointless
             print(f"    request failed ({err[:120]}); retrying")
             time.sleep(10)
     n_rows = sum(len(r) for _, r in groups)
-    if len(groups) > 1:
-        h = len(groups) // 2
-        print(f"    splitting {len(groups)} dates into {h} + {len(groups) - h}")
-        return pd.concat([fetch_dates(groups[:h]), fetch_dates(groups[h:])], ignore_index=True)
-    if n_rows > 1:
-        date_key, rows = groups[0]
-        h = n_rows // 2
-        print(f"    {date_key}: splitting {n_rows} stations into {h} + {n_rows - h}")
-        return pd.concat([fetch_dates([(date_key, rows.iloc[:h])]),
-                          fetch_dates([(date_key, rows.iloc[h:])])], ignore_index=True)
-    print(f"    {groups[0][0]} / {groups[0][1].station_uid.iloc[0]}: failed ({err[:120]}); retried next run")
+    size_error = any(k in err.lower() for k in ('memory', 'too many', 'timed out'))
+    if size_error or not err:
+        if len(groups) > 1:
+            h = len(groups) // 2
+            print(f"    splitting {len(groups)} dates into {h} + {len(groups) - h}")
+            return pd.concat([fetch_dates(groups[:h]), fetch_dates(groups[h:])], ignore_index=True)
+        if n_rows > 1:
+            date_key, rows = groups[0]
+            h = n_rows // 2
+            print(f"    {date_key}: splitting {n_rows} stations into {h} + {n_rows - h}")
+            return pd.concat([fetch_dates([(date_key, rows.iloc[:h])]),
+                              fetch_dates([(date_key, rows.iloc[h:])])], ignore_index=True)
+    # Not a size problem (or already down to one station): splitting would just repeat the same error.
+    # Try each date once on its own (a single bad date should not sink the others), then give up.
+    if len(groups) > 1 and not size_error:
+        parts = [fetch_dates([g]) for g in groups]
+        return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame()
+    _single_failures += 1
+    print(f"    {groups[0][0]} ({n_rows} stations): failed ({err[:160]}); retried next run "
+          f"[{_single_failures}/{MAX_SINGLE_FAILURES}]")
+    if _single_failures >= MAX_SINGLE_FAILURES:
+        print(f"    !! {MAX_SINGLE_FAILURES} failed requests with no success in between -> stopping the "
+              "climate fetch for this run (the rows stay blank and are retried next run).")
+        DOWNLOAD_PROBLEMS.append('GEE climate fetch aborted after repeated errors: ' + err[:120])
     return pd.DataFrame()
 
 
@@ -1343,15 +1410,24 @@ print(f"Climate requests: {len(need)} station-dates checked, {len(todo)} to fetc
       f"retried blanks, {int(stale.sum())} gap-filled refreshes)")
 
 if len(todo):
-    CHIRPS_LAST, ERA5_LAST = last_available(CHIRPS), last_available(ERA5)
+    CHIRPS_DAYS, ERA5_DAYS = available_days(CHIRPS), available_days(ERA5)
+    CHIRPS_LAST = max(CHIRPS_DAYS) if CHIRPS_DAYS else pd.Timestamp('1900-01-01')
+    ERA5_LAST = max(ERA5_DAYS) if ERA5_DAYS else pd.Timestamp('1900-01-01')
     print(f"Latest data in GEE: CHIRPS {CHIRPS_LAST:%Y-%m-%d}, ERA5-Land {ERA5_LAST:%Y-%m-%d} "
           "(later days are gap-filled)")
+    _chirps_holes = [d for d in pd.date_range(TODAY - pd.Timedelta(days=60), CHIRPS_LAST)
+                     if d not in CHIRPS_DAYS]
+    if _chirps_holes:
+        print(f"  CHIRPS has no image for {len(_chirps_holes)} day(s) inside the last 60 days "
+              f"(e.g. {', '.join(f'{d:%Y-%m-%d}' for d in _chirps_holes[:5])}); those days are gap-filled.")
     groups = [(k, grp) for k, grp in todo.groupby('date_key')]
     calls = [groups[i:i + DATES_PER_CALL] for i in range(0, len(groups), DATES_PER_CALL)]
     print(f"Fetching 15-day climate for {len(todo)} station-dates "
           f"({len(groups)} dates, {len(calls)} requests)...")
     for b, chunk in enumerate(calls):
         new = fetch_dates(chunk)
+        if not new.empty:
+            _single_failures = 0
         if new.empty:
             print(f"  request {b + 1}/{len(calls)}: nothing returned")
             continue
@@ -1867,3 +1943,17 @@ if UPLOAD_TO_GEE:
                 if asset_exists(p):
                     ee.data.deleteAsset(p)
             print("Some uploads failed; merged_observations is unchanged and the rows retry next run.")
+
+
+# --- Run health: say loudly when the data are stale, instead of ending with a green tick --------
+if DOWNLOAD_PROBLEMS:
+    print("\n" + "!" * 70)
+    print("RUN FINISHED WITH PROBLEMS - the merged data may be STALE:")
+    for _p in DOWNLOAD_PROBLEMS:
+        print(f"  - {_p}")
+        print(f"::warning title=Altimetry nightly::{_p}")      # shows as an annotation on the GitHub run
+    print("!" * 70)
+    if os.environ.get('GITHUB_STEP_SUMMARY'):
+        with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as _f:
+            _f.write("### Altimetry run finished with problems (data may be stale)\n"
+                     + "".join(f"- {_p}\n" for _p in DOWNLOAD_PROBLEMS))
