@@ -603,7 +603,7 @@ def download_hydroweb():
     try:
         import py_hydroweb
     except ImportError:
-        subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'py-hydroweb'], check=False)
+        subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'py-hydroweb>=1.3.3'], check=False)
         import py_hydroweb
 
     # py_hydroweb sets no timeout (the log showed 'connect timeout=None'), so a dead server
