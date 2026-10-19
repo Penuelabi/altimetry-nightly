@@ -19,7 +19,7 @@ import ee
 import ee_util
 
 TARGET = os.environ.get('FLOOD_EXTENT_ASSET') or 'projects/sudan-1575919084043/assets/maximum_flood_extent'
-DAYS = int(os.environ.get('EXTENT_DAYS') or '8')
+DAYS = int(os.environ.get('EXTENT_DAYS') or '12')
 WATER_VV_DB, FLOODVEG_RISE_DB, HAND_MAX_M, SPECKLE_M = -18, 6, 5, 50
 
 ee_util.init_ee()
