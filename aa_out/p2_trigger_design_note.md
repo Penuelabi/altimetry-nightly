@@ -1,6 +1,6 @@
 # River triggers - design note (proposal for validation)
 
-Generated 2026-10-12 19:28 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-10-19 16:49 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
 - **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 24 days before displacement).
@@ -19,7 +19,7 @@ Generated 2026-10-12 19:28 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 | level | P90 | 108 | 52 | 35 | 6 | 11 | 32 | 67% | 44% | 0.42 | 0.10 | 2 |
 | level | 5yr | 108 | 52 | 17 | 7 | 28 | 13 | 33% | 35% | 0.26 | 0.09 | 10 |
 | level | 2yr | 108 | 52 | 42 | 6 | 4 | 40 | 81% | 45% | 0.46 | 0.09 | 26 |
-| level | P80 | 108 | 52 | 43 | 6 | 3 | 44 | 83% | 47% | 0.45 | 0.04 | 23 |
+| level | P80 | 108 | 52 | 43 | 6 | 3 | 43 | 83% | 47% | 0.45 | 0.06 | 23 |
 | level | 2yr-0.25m | 108 | 52 | 45 | 3 | 4 | 49 | 87% | 51% | 0.45 | -0.01 | 22 |
 | level | P70 | 108 | 52 | 47 | 3 | 2 | 52 | 90% | 51% | 0.45 | -0.02 | 22 |
 | level | 10yr | 108 | 52 | 1 | 1 | 50 | 3 | 2% | 60% | 0.02 | -0.03 |  |

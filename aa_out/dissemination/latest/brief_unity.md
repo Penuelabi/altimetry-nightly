@@ -1,6 +1,6 @@
 # Unity - anticipatory action situation brief
 
-Prepared 2026-10-18 23:45 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-14; ECMWF run 2026-10-18 12 UTC.
+Prepared 2026-10-19 16:49 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-14; ECMWF run 2026-10-19 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -13,22 +13,22 @@ Prepared 2026-10-18 23:45 UTC for the Unity state TWG-AA. Rain and soil data to 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Mayom | Unity | **ORANGE** | drought / dry spell | 4 | 0% | 22,600 |
+| Mayom | Unity | **ORANGE** | drought / dry spell | 6 | 0% | 22,600 |
 | Pariang | Unity | **ORANGE** | drought / dry spell | 3 | 0% | 4,128 |
-| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 2 | 0% | 165 |
-| Guit | Unity | **YELLOW** | flood / waterlogging | 5 | 0% | 3,497 |
-| Koch | Unity | **YELLOW** | flood / waterlogging | 7 | 0% | 513 |
-| Leer | Unity | **YELLOW** | flood / waterlogging | 10 | 0% | 985 |
+| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 3 | 0% | 165 |
+| Guit | Unity | **YELLOW** | flood / waterlogging | 6 | 0% | 3,497 |
+| Koch | Unity | **YELLOW** | flood / waterlogging | 8 | 0% | 513 |
+| Leer | Unity | **YELLOW** | flood / waterlogging | 13 | 2% | 985 |
 | Mayendit | Unity | **YELLOW** | flood / waterlogging | 10 | 0% | 2,032 |
 | Panyijiar | Unity | **YELLOW** | flood / waterlogging | 12 | 0% | 4,064 |
-| Rubkona | Unity | **YELLOW** | flood / waterlogging | 4 | 0% | 16,480 |
+| Rubkona | Unity | **YELLOW** | flood / waterlogging | 5 | 0% | 16,480 |
 
 ## Anticipatory action plans
 | Plan | County | Stage | Since | Plan status | River / readiness / activation (m) |
 |---|---|---|---|---|---|
 | AAP-FL-PANYIJIAR | Panyijiar | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 397.46// |
-| AAP-FL-LEER | Leer | **activated** | 2026-10-09 14:03 | draft (example) - not validated | 400.62// |
-| AAP-FL-GUIT | Guit | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 393.99// |
+| AAP-FL-LEER | Leer | **activated** | 2026-10-09 14:03 | draft (example) - not validated | 400.67// |
+| AAP-FL-GUIT | Guit | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 394.42// |
 
 ### Actions due within 7 days
 | Plan | Action | Lead | Due | Status |
@@ -69,3 +69,4 @@ Prepared 2026-10-18 23:45 UTC for the Unity state TWG-AA. Rain and soil data to 
 - AAP-FL-GUIT activated (draft plan: no community message)
 - AAP-FL-LEER activated (draft plan: no community message)
 - AAP-FL-PANYIJIAR activated (draft plan: no community message)
+- 1 county gauges have no satellite pass in the last weeks: Abiemnhom

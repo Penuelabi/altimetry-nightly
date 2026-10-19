@@ -1,6 +1,6 @@
 # Lakes - anticipatory action situation brief
 
-Prepared 2026-10-18 23:45 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-10-14; ECMWF run 2026-10-18 12 UTC.
+Prepared 2026-10-19 16:49 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-10-14; ECMWF run 2026-10-19 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,15 +12,18 @@ Prepared 2026-10-18 23:45 UTC for the Lakes state TWG-AA. Rain and soil data to 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Awerial | Lakes | **ORANGE** | drought / dry spell | 12 | 0% | 5,340 |
-| Cueibet | Lakes | **ORANGE** | drought / dry spell | 13 | 0% | 531 |
+| Awerial | Lakes | **ORANGE** | drought / dry spell | 13 | 0% | 5,340 |
+| Cueibet | Lakes | **ORANGE** | drought / dry spell | 16 | 0% | 531 |
 | Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 13 | 0% | 1,661 |
-| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 13 | 0% | 3,596 |
-| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 10 | 0% | 6 |
-| Yirol West | Lakes | **ORANGE** | drought / dry spell | 14 | 0% | 2,910 |
-| Wulu | Lakes | **YELLOW** | flood / waterlogging | 19 | 0% | 108 |
+| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 15 | 0% | 3,596 |
+| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 13 | 0% | 6 |
+| Yirol West | Lakes | **ORANGE** | drought / dry spell | 16 | 0% | 2,910 |
+| Wulu | Lakes | **YELLOW** | flood / waterlogging | 23 | 2% | 108 |
 | Yirol East | Lakes | **YELLOW** | flood / waterlogging | 14 | 0% | 3,725 |
 
 ## Decisions for the group
 - Agree the warning for the 8 counties with an alert and the channels (radio hubs, chiefs, SMS).
 - Ask intermediaries to translate and validate templates for: Bari, Dinka (Thuongjang), Juba Arabic, Nuer (Thok Naath), Shilluk (Dhok Cøllø).
+
+## Notes
+- 1 county gauges have no satellite pass in the last weeks: Wulu
