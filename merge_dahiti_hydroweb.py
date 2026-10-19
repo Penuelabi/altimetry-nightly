@@ -629,7 +629,9 @@ def download_hydroweb():
                 os.chdir(dl_dir)
                 basket = py_hydroweb.DownloadBasket(f"{collection.lower()}_{RUN_STAMP}_{attempt}")
                 basket.add_collection(collection, bbox=HYDROWEB_BBOX)
-                path = client.submit_and_download_zip(basket, zip_filename=local_zip, output_folder=dl_dir)
+                # py-hydroweb >= 1.3.3 only accepts a bare file name here (path-traversal fix); the folder goes in output_folder
+                path = client.submit_and_download_zip(basket, zip_filename=os.path.basename(local_zip),
+                                                      output_folder=dl_dir)
                 if path is None:
                     raise RuntimeError("Hydroweb could not prepare this download")
                 path = path if os.path.isabs(path) else os.path.join(dl_dir, path)
@@ -641,6 +643,8 @@ def download_hydroweb():
                 break
             except Exception as e:
                 print(f"  {collection} attempt {attempt}/{HYDROWEB_RETRIES} failed ({str(e)[:160]})")
+                if 'not a valid file name' in str(e) or 'must exist' in str(e):
+                    break          # a bug in our call, not the server: retrying only creates more server-side downloads
                 if attempt < HYDROWEB_RETRIES:
                     time.sleep(HYDROWEB_BACKOFF_S * attempt)
             finally:
