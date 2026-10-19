@@ -20,7 +20,12 @@ with that exact name).
 import hashlib
 import json
 import os
+import socket
+import ssl
 import sys
+import time
+
+import httplib2
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -28,6 +33,14 @@ from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
+
+# Network hiccups (e.g. ssl.SSLEOFError "EOF occurred in violation of protocol") happen on GitHub runners.
+# One dropped connection must not lose a whole nightly run, so every transfer is retried.
+ATTEMPTS = 4
+CHUNK_BYTES = 8 * 1024 * 1024
+RETRY_STATUS = (429, 500, 502, 503, 504)
+NETWORK_ERRORS = (ssl.SSLError, ConnectionError, TimeoutError, socket.timeout, OSError,
+                  httplib2.HttpLib2Error)
 
 # Files the pipeline reads and/or writes in the Drive folder
 SYNC_FILES = [
@@ -100,6 +113,49 @@ def md5(path):
     return h.hexdigest()
 
 
+def _is_retryable(e):
+    if isinstance(e, HttpError):
+        status = getattr(e.resp, 'status', 0)
+        return status in RETRY_STATUS or 'rateLimitExceeded' in str(e) or 'userRateLimitExceeded' in str(e)
+    return isinstance(e, NETWORK_ERRORS)
+
+
+def with_retries(fn, what):
+    """Run fn(); on a network error or HTTP 429/5xx wait and try again (ATTEMPTS tries in all)."""
+    for attempt in range(1, ATTEMPTS + 1):
+        try:
+            return fn()
+        except Exception as e:
+            if not _is_retryable(e) or attempt == ATTEMPTS:
+                raise
+            wait = 5 * attempt
+            print(f"    {what}: {type(e).__name__}: {str(e)[:100]} - retry {attempt}/{ATTEMPTS - 1} in {wait} s")
+            time.sleep(wait)
+
+
+def _download_file(svc, file_id, path):
+    with open(path, 'wb') as fh:
+        dl = MediaIoBaseDownload(fh, svc.files().get_media(fileId=file_id, supportsAllDrives=True),
+                                 chunksize=CHUNK_BYTES)
+        done = False
+        while not done:
+            _, done = dl.next_chunk(num_retries=5)
+
+
+def _upload_file(svc, folder_id, name, path, record):
+    """Resumable upload in chunks; a fresh request is made on every retry."""
+    media = MediaFileUpload(path, resumable=True, chunksize=CHUNK_BYTES)
+    if record is not None:
+        req = svc.files().update(fileId=record['id'], media_body=media, supportsAllDrives=True)
+    else:
+        req = svc.files().create(body={'name': name, 'parents': [folder_id]}, media_body=media,
+                                 fields='id', supportsAllDrives=True)
+    resp = None
+    while resp is None:
+        _, resp = req.next_chunk(num_retries=5)
+    return resp
+
+
 def pull(svc, folder_id, local_dir, sync_files=None, pull_only=None):
     sync_files = SYNC_FILES if sync_files is None else sync_files
     pull_only = PULL_ONLY if pull_only is None else pull_only
@@ -114,19 +170,16 @@ def pull(svc, folder_id, local_dir, sync_files=None, pull_only=None):
             print(f"  - {name}: empty placeholder on Drive (filled in by push after the run)")
             continue
         path = os.path.join(local_dir, name)
-        with open(path, 'wb') as fh:
-            dl = MediaIoBaseDownload(fh, svc.files().get_media(fileId=f['id'], supportsAllDrives=True),
-                                     chunksize=8 * 1024 * 1024)
-            done = False
-            while not done:
-                _, done = dl.next_chunk()
+        with_retries(lambda f=f, path=path: _download_file(svc, f['id'], path), f"pull {name}")
         print(f"  pulled {name} ({os.path.getsize(path) / 1e6:.1f} MB)")
 
 
 def push(svc, folder_id, local_dir, sync_files=None):
+    """Upload every changed file. A file that still fails after the retries is reported and the
+    rest are still uploaded; the command exits with an error at the end if anything was not saved."""
     sync_files = SYNC_FILES if sync_files is None else sync_files
     remote = folder_files(svc, folder_id)
-    missing = []
+    missing, failed = [], []
     for name in sync_files:
         path = os.path.join(local_dir, name)
         if not os.path.exists(path):
@@ -135,25 +188,33 @@ def push(svc, folder_id, local_dir, sync_files=None):
         if f is not None and f.get('md5Checksum') == md5(path):
             print(f"  = {name}: unchanged")
             continue
-        media = MediaFileUpload(path, resumable=True)
         try:
-            if f is not None:
-                svc.files().update(fileId=f['id'], media_body=media, supportsAllDrives=True).execute()
-                print(f"  pushed {name} ({os.path.getsize(path) / 1e6:.1f} MB)")
-            else:
-                svc.files().create(body={'name': name, 'parents': [folder_id]}, media_body=media,
-                                   fields='id', supportsAllDrives=True).execute()
-                print(f"  created {name}")
+            with_retries(lambda name=name, path=path, f=f: _upload_file(svc, folder_id, name, path, f),
+                         f"push {name}")
+            print(f"  {'pushed' if f is not None else 'created'} {name} "
+                  f"({os.path.getsize(path) / 1e6:.1f} MB)")
         except HttpError as e:
             if 'storageQuotaExceeded' in str(e) or 'storage quota' in str(e).lower():
                 missing.append(name)
             else:
-                raise
+                print(f"  !! {name}: NOT saved to Drive ({type(e).__name__}: {str(e)[:160]})")
+                failed.append(name)
+        except Exception as e:
+            print(f"  !! {name}: NOT saved to Drive ({type(e).__name__}: {str(e)[:160]})")
+            failed.append(name)
     if missing:
         print("\nThese files don't exist in your Drive folder yet, and a service account "
               "can't create files in a personal Drive:\n  " + "\n  ".join(missing) +
               "\nCreate them once: run the pipeline in Colab, or upload an empty file with "
               "each name to the folder. Later runs will then update them.")
+    if failed:
+        print("\n" + "!" * 70 + "\nThese files were NOT saved to Drive (network errors after "
+              f"{ATTEMPTS} tries):\n  " + "\n  ".join(failed) +
+              "\nDrive still holds their previous versions, so the next run starts from the old state.\n"
+              + "!" * 70)
+        for name in failed:
+            print(f"::error title=Drive push failed::{name} was not saved to Drive")
+    if missing or failed:
         sys.exit(1)
 
 
