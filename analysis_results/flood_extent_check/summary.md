@@ -1,26 +1,26 @@
-# Flood extent check, run 2026-10-12 05:55 UTC
+# Flood extent check, run 2026-10-19 13:56 UTC
 
-Asset window 2026-09-30 to 2026-10-11, 59 scenes, updated 2026-10-11 10:29
+Asset window 2026-10-15 to 2026-10-19, 21 scenes, updated 2026-10-19 12:57
 
 | part | km2 | % of country |
 |---|---|---|
-| asset | 465,208 | 72.4 |
-| rebuilt | 199,342 | 31.0 |
-| water_any | 5,132 | 0.8 |
-| rise_only | 194,210 | 30.2 |
-| water_median | 4,578 | 0.7 |
-| median_version | 173,374 | 27.0 |
-| asset_in_jrc | 3,877 | 0.6 |
+| asset | 311,312 | 48.4 |
+| rebuilt | 132,034 | 20.5 |
+| water_any | 2,866 | 0.4 |
+| rise_only | 129,169 | 20.1 |
+| water_median | 2,744 | 0.4 |
+| median_version | 127,691 | 19.9 |
+| asset_in_jrc | 3,117 | 0.5 |
 | lowland | 565,766 | 88.0 |
 | total | 642,880 | 100.0 |
 
 |   asset |   buildings | county     |   median_version |   rise_only |   water |
 |--------:|------------:|:-----------|-----------------:|------------:|--------:|
-|     142 |       58491 | Rubkona    |              130 |          97 |      33 |
-|     641 |       78686 | Bor South  |              587 |         623 |       1 |
-|    3735 |      154263 | Aweil East |             3723 |        3723 |       0 |
-|    2280 |       84246 | Tonj North |             2282 |        2281 |       1 |
-|      38 |       16341 | Fangak     |               44 |          45 |       0 |
-|     406 |       31826 | Pibor      |              214 |         395 |       0 |
-|     191 |       13685 | Leer       |               77 |         180 |       1 |
-|     130 |       20980 | Panyijiar  |              108 |         130 |       0 |
+|       0 |       58491 | Rubkona    |                0 |           0 |       0 |
+|     902 |       78686 | Bor South  |              846 |         863 |       1 |
+|    3246 |      154263 | Aweil East |             3252 |        3250 |       2 |
+|      27 |       84246 | Tonj North |               27 |          27 |       0 |
+|      28 |       16341 | Fangak     |               26 |          26 |       0 |
+|     205 |       31826 | Pibor      |              202 |         202 |       0 |
+|     105 |       13685 | Leer       |              112 |         112 |       0 |
+|      55 |       20980 | Panyijiar  |               53 |          52 |       1 |
