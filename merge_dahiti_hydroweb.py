@@ -156,6 +156,10 @@ CATCHMENT_BBOX = [13.0, -12.0, 40.0, 24.0]  # Nile basin incl. Lake Victoria/Kag
 UPLOAD_TO_GEE = True
 ASSET_FOLDER = f'projects/{PROJECT_ID}/assets/altimetry'
 ROWS_PER_PART = 3000
+# Set GEE_FULL_REBUILD=1 (or tick the box when starting the workflow by hand) to rebuild the GEE
+# merged_observations table from the full merged table instead of appending only new rows. Use it after a
+# run whose Drive save failed: Drive then lacks the upload ledger, and appending would duplicate rows.
+FORCE_GEE_REBUILD = os.environ.get('GEE_FULL_REBUILD', '').strip().lower() in ('1', 'true', 'yes')
 
 MASTER_CSV = os.path.join(OUT_DIR, f'{OUTPUT_BASENAME}.csv')
 MASTER_XLSX = os.path.join(OUT_DIR, f'{OUTPUT_BASENAME}.xlsx')
@@ -1891,7 +1895,11 @@ if UPLOAD_TO_GEE:
     master = pd.read_csv(MASTER_CSV)
     master_keys = obs_key(master)
 
-    if os.path.exists(GEE_LEDGER) and asset_exists(target):
+    if FORCE_GEE_REBUILD:
+        done_keys, rebuild = set(), True
+        print("GEE_FULL_REBUILD is set -> merged_observations will be rebuilt from the full merged table "
+              "(nothing is appended, so no duplicates).")
+    elif os.path.exists(GEE_LEDGER) and asset_exists(target):
         done_keys, rebuild = set(pd.read_csv(GEE_LEDGER)['key']), False
     else:
         done_keys, rebuild = set(), True       # first run, or saved rows were changed

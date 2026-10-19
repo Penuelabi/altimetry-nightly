@@ -5,6 +5,11 @@ on:
     - cron: '0 21 * * *'    # 00:00 Cairo in summer (UTC+3)
     - cron: '0 22 * * *'    # 00:00 Cairo in winter (UTC+2)
   workflow_dispatch:         # "Run workflow" button for a manual run
+    inputs:
+      gee_full_rebuild:
+        description: 'Rebuild the GEE merged_observations table from the full merged data (use after a failed Drive save, to avoid duplicate rows)'
+        type: boolean
+        default: false
 
 concurrency:
   group: altimetry-nightly   # never two runs writing the same files at once
@@ -20,6 +25,7 @@ jobs:
       DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
       DAHITI_API_KEY: ${{ secrets.DAHITI_API_KEY }}
       HYDROWEB_API_KEY: ${{ secrets.HYDROWEB_API_KEY }}
+      GEE_FULL_REBUILD: ${{ inputs.gee_full_rebuild }}   # empty on scheduled runs
       PYTHONUNBUFFERED: '1'
 
     steps:
