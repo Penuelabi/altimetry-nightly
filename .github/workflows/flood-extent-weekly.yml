@@ -29,7 +29,9 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install earthengine-api pandas numpy
-      - run: python export_flood_extent.py 2>&1 | tee "$RUNNER_TEMP/extent.log"
+      - name: Export flood extent
+        shell: bash   # bash -eo pipefail: a Python failure is no longer hidden by tee
+        run: python export_flood_extent.py 2>&1 | tee "$RUNNER_TEMP/extent.log"
       - name: Summary
         if: always()
         run: |

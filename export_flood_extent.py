@@ -3,7 +3,7 @@
 Weekly export of the current maximum flood extent to a CONSTANT asset name, shared so anyone can read it.
 
 Method = the one the app uses for its same-season baseline (Sentinel-1 descending VV, 50 m focal median, open water VV < -18 dB,
-flooded vegetation = VV rise >= 3 dB over the Feb-Mar dry-season median, terrain <= 15 m HAND), but the maximum over the last
+flooded vegetation = VV rise >= 6 dB over the Feb-Mar dry-season median, terrain <= 5 m HAND), but the maximum over the last
 EXTENT_DAYS days (default 12, i.e. at least one full Sentinel-1 repeat cycle) instead of a fixed late-September window.
 
 Writes (1 = flooded, 0 = not) to FLOOD_EXTENT_ASSET (default projects/sudan-1575919084043/assets/maximum_flood_extent).
@@ -44,7 +44,7 @@ water = ee.Image(ee.Algorithms.If(dry.size().gt(0), water.Or(rise), water))
 lowland = ee.Image('MERIT/Hydro/v1_0_1').select('hnd').lte(HAND_MAX_M)
 img = (water.And(lowland).unmask(0).rename('flooded').byte()
        .set({'window_start': start.format('YYYY-MM-dd'), 'window_end': end.advance(-1, 'day').format('YYYY-MM-dd'),
-             'scenes': n_wet, 'method': 'Sentinel-1 descending VV, max over window, open water + flooded vegetation, HAND<=15 m',
+             'scenes': n_wet, 'method': 'Sentinel-1 descending VV, max over window, open water + flooded vegetation, HAND<=5 m',
              'updated_utc': dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M')}))
 
 
