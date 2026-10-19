@@ -118,22 +118,48 @@ layers.append(('health', count_points(HEALTH, 'health')))
 n = payam.size().getInfo()
 lst = payam.toList(n)
 base = []
+FAILED = []
 for i in range(0, n, CHUNK):
     sub = ee.FeatureCollection(lst.slice(i, i + CHUNK))
     sub = sub.map(lambda f: ee.Feature(None, {k: f.get(k) for k in [K_PAYAM, K_PCODE, K_COUNTY, K_STATE] if k}).setGeometry(f.geometry()))
     rows = None
     for name, fn in layers:
+        part = None
         try:
             res = sub.map(fn).select(['.*'], None, False).getInfo()['features']
             part = pd.DataFrame([r['properties'] for r in res])
-            rows = part if rows is None else rows.join(part.drop(columns=[c for c in part.columns if c in rows.columns]))
         except Exception as e:
-            print(f'  layer {name} failed on chunk {i}: {str(e)[:160]}')
+            print(f'  layer {name} failed on chunk {i}: {str(e)[:160]} -> retrying payam by payam', flush=True)
+            # Retry each payam on its own (smaller computation); a payam that still fails stays empty.
+            recs = []
+            m = int(sub.size().getInfo())
+            sl = sub.toList(m)
+            for j in range(m):
+                one = ee.FeatureCollection([ee.Feature(sl.get(j))])
+                got = None
+                for attempt in (1, 2):
+                    try:
+                        got = one.map(fn).select(['.*'], None, False).getInfo()['features'][0]['properties']
+                        break
+                    except Exception as e2:
+                        if attempt == 2:
+                            print(f'    {name}: payam #{i + j} failed twice: {str(e2)[:100]}', flush=True)
+                            FAILED.append((name, i + j))
+                recs.append(got if got is not None else {})
+            part = pd.DataFrame(recs)
+            # keep identifying columns from the base properties so the row still joins correctly
+            if part.empty or len(part) != m:
+                continue
+        if part is None or part.empty:
+            continue
+        rows = part if rows is None else rows.join(part.drop(columns=[c for c in part.columns if c in rows.columns]))
     if rows is not None:
         base.append(rows)
     print(f'chunk {i}-{min(i + CHUNK, n)} done', flush=True)
 
 df = pd.concat(base, ignore_index=True)
+if FAILED:
+    print(f'::warning title=Infrastructure exposure incomplete::{len(FAILED)} layer/payam values are empty: {FAILED[:20]}')
 ren = {K_PAYAM: 'payam', K_PCODE: 'payam_pcode', K_COUNTY: 'county', K_STATE: 'state'}
 df = df.rename(columns={k: v for k, v in ren.items() if k})
 for c in df.columns:
