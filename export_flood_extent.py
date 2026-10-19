@@ -28,8 +28,7 @@ end = ee.Date(dt.datetime.utcnow().strftime('%Y-%m-%d')).advance(1, 'day')
 start = end.advance(-DAYS, 'day')
 year = dt.datetime.utcnow().year
 
-s1 = (ee.ImageCollection('COPERNICUS/S1_GRD').filterBounds(roi)
-     // .filter(ee.Filter.eq('instrumentMode', 'IW'))
+s1 = (ee.ImageCollection('COPERNICUS/S1_GRD').filterBounds(roi).filter(ee.Filter.eq('instrumentMode', 'IW'))
       .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
       .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING')).select('VV'))
 smooth = lambda i: i.focalMedian(SPECKLE_M, 'circle', 'meters')
