@@ -97,7 +97,14 @@ except Exception:
 
 # buildings: open-buildings temporal, latest year, fractional count summed at 4 m then aggregated
 try:
-    b = ee.ImageCollection(BUILDINGS).sort('system:time_start', False).first().select('building_fractional_count')
+    # The collection is split into many tiles per year: mosaic ALL tiles of the latest year that covers the payams
+    # (.first() would return one single tile, usually far from South Sudan -> all-zero counts).
+    bcol = ee.ImageCollection(BUILDINGS).filterBounds(payam.geometry())
+    b_t = bcol.aggregate_max('system:time_start')
+    b = (bcol.filter(ee.Filter.eq('system:time_start', b_t)).mosaic()
+         .select('building_fractional_count').unmask(0))
+    print('buildings: latest year with tiles over the payams:', ee.Date(b_t).format('YYYY-MM-dd').getInfo(),
+          '| tiles:', bcol.filter(ee.Filter.eq('system:time_start', b_t)).size().getInfo(), flush=True)
     b100 = b.reduceResolution(ee.Reducer.sum(), True, 4096).reproject('EPSG:4326', None, 100)
 
     def bld(f):
