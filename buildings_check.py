@@ -63,4 +63,11 @@ try:
     print('F) NEW METHOD: 4 m sample sum x 64                      ->', ee.Number(fv).multiply(64).getInfo())
 except Exception as e:
     print('F) FAILED', str(e)[:120])
+
+# G: sample on a 30 m grid x 3600 (what infrastructure_exposure.py uses if it must stay fast)
+try:
+    gv = mos.reduceRegion(ee.Reducer.sum(), geom, 30, crs='EPSG:4326', maxPixels=1e11, tileScale=16).get(band)
+    print('G) 30 m sample sum x 3600                               ->', ee.Number(gv).multiply(3600).getInfo())
+except Exception as e:
+    print('G) FAILED', str(e)[:120])
 print('\nExpected for Juba Town: tens of thousands of buildings. Report which of A-E is in that range.')

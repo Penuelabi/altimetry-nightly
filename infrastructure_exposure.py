@@ -97,10 +97,11 @@ except Exception:
     roads = None
 
 # buildings: open-buildings temporal. Tiles are stored at 0.5 m; building_fractional_count per 0.5 m pixel sums to the
-# number of buildings. Summing every 0.5 m pixel for 512 payams is far too heavy, so each payam is SAMPLED on a 4 m grid
-# and the sample sum is multiplied by (4 / 0.5)^2 = 64. (reduceResolution(sum) was tested and returns about 1/625 of
-# the true value, so it is not used.) Checked on Juba Town: about 50,000 buildings.
-BUILD_SAMPLE_M, BUILD_NATIVE_M = 4, 0.5
+# number of buildings. Summing every 0.5 m pixel for 512 payams is far too heavy (a 4 m sample timed out even payam by
+# payam), so each payam is SAMPLED on a 30 m grid and the sample sum is multiplied by (30 / 0.5)^2 = 3600.
+# Checked on Juba Town (17 km2): 30 m x 3600 = 50,082 versus 50,457 with a 4 m sample x 64 (0.7 % apart).
+# (reduceResolution(sum) was tested and returns about 1/625 of the true value, so it is not used.)
+BUILD_SAMPLE_M, BUILD_NATIVE_M = 30, 0.5
 BUILD_FACTOR = (BUILD_SAMPLE_M / BUILD_NATIVE_M) ** 2
 try:
     # The collection is split into many tiles per year: mosaic ALL tiles of the latest year that covers the payams
