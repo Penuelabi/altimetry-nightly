@@ -5,7 +5,8 @@ facilities (counts only) and road length. Flood-prone ground = JRC surface water
 Output: infra_exposure_payam.csv (+ .json by county) in INFRA_OUT_DIR. Needs GEE_SERVICE_ACCOUNT_KEY.
 Each layer is optional: a failure is logged and its columns stay empty.
 """
-import json, os, re, sys, traceback
+import json, os, re, sys, time, traceback
+from concurrent.futures import ThreadPoolExecutor
 import ee
 import pandas as pd
 
@@ -130,41 +131,57 @@ n = payam.size().getInfo()
 lst = payam.toList(n)
 base = []
 FAILED = []
+HEAVY = {'buildings'}                 # too heavy for a 40-payam batch: go straight to one payam per request
+WORKERS = int(os.environ.get('INFRA_WORKERS', '8'))   # parallel Earth Engine requests for the heavy layers
+RETRYABLE = ('timed out', 'memory', 'too many', 'internal error', 'try again', 'rate', 'quota', 'unavailable')
+
+
+def per_payam(sub, i, name, fn):
+    """Run one layer payam by payam, WORKERS requests in parallel, 2 attempts each. Returns a DataFrame (empty dict = failed)."""
+    m = int(sub.size().getInfo())
+    sl = sub.toList(m)
+    done = [0]
+
+    def one_payam(j):
+        one = ee.FeatureCollection([ee.Feature(sl.get(j))])
+        for attempt in (1, 2):
+            try:
+                got = one.map(fn).select(['.*'], None, False).getInfo()['features'][0]['properties']
+                done[0] += 1
+                if done[0] % 10 == 0 or done[0] == m:
+                    print(f'    {name}: {done[0]}/{m} payams done in chunk {i}', flush=True)
+                return j, got
+            except Exception as e2:
+                if attempt == 2 or not any(t in str(e2).lower() for t in RETRYABLE):
+                    print(f'    {name}: payam #{i + j} failed: {str(e2)[:100]}', flush=True)
+                    FAILED.append((name, i + j))
+                    return j, {}
+                time.sleep(10)
+
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        out = dict(ex.map(one_payam, range(m)))
+    return pd.DataFrame([out.get(j, {}) for j in range(m)])
+
+
 for i in range(0, n, CHUNK):
     sub = ee.FeatureCollection(lst.slice(i, i + CHUNK))
     sub = sub.map(lambda f: ee.Feature(None, {k: f.get(k) for k in [K_PAYAM, K_PCODE, K_COUNTY, K_STATE] if k}).setGeometry(f.geometry()))
     rows = None
     for name, fn in layers:
         part = None
-        try:
-            res = sub.map(fn).select(['.*'], None, False).getInfo()['features']
-            part = pd.DataFrame([r['properties'] for r in res])
-        except Exception as e:
-            retryable = any(t in str(e).lower() for t in ('timed out', 'memory', 'too many', 'internal error', 'try again'))
-            print(f'  layer {name} failed on chunk {i}: {str(e)[:160]}' + (' -> retrying payam by payam' if retryable else ' -> not a timeout, leaving empty'), flush=True)
-            if not retryable:
-                FAILED.append((name, f'chunk {i}'))
-                continue
-            # Retry each payam on its own (smaller computation); a payam that still fails stays empty.
-            recs = []
-            m = int(sub.size().getInfo())
-            sl = sub.toList(m)
-            for j in range(m):
-                one = ee.FeatureCollection([ee.Feature(sl.get(j))])
-                got = None
-                for attempt in (1, 2):
-                    try:
-                        got = one.map(fn).select(['.*'], None, False).getInfo()['features'][0]['properties']
-                        break
-                    except Exception as e2:
-                        if attempt == 2:
-                            print(f'    {name}: payam #{i + j} failed twice: {str(e2)[:100]}', flush=True)
-                            FAILED.append((name, i + j))
-                recs.append(got if got is not None else {})
-            part = pd.DataFrame(recs)
-            # keep identifying columns from the base properties so the row still joins correctly
-            if part.empty or len(part) != m:
-                continue
+        if name in HEAVY:
+            part = per_payam(sub, i, name, fn)
+        else:
+            try:
+                res = sub.map(fn).select(['.*'], None, False).getInfo()['features']
+                part = pd.DataFrame([r['properties'] for r in res])
+            except Exception as e:
+                retryable = any(t in str(e).lower() for t in RETRYABLE)
+                print(f'  layer {name} failed on chunk {i}: {str(e)[:160]}' + (' -> retrying payam by payam' if retryable else ' -> not a timeout, leaving empty'), flush=True)
+                if not retryable:
+                    FAILED.append((name, f'chunk {i}'))
+                    continue
+                part = per_payam(sub, i, name, fn)
         if part is None or part.empty:
             continue
         rows = part if rows is None else rows.join(part.drop(columns=[c for c in part.columns if c in rows.columns]))
