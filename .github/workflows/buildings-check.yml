@@ -1,0 +1,25 @@
+name: Buildings check, one payam (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      payam:
+        description: 'Payam name (ADM3_EN)'
+        required: false
+        default: 'Juba Town'
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      PAYAM_NAME: ${{ github.event.inputs.payam }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - run: pip install earthengine-api
+      - name: Buildings check
+        shell: bash
+        run: python buildings_check.py
