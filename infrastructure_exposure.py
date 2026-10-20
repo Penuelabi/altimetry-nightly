@@ -102,7 +102,9 @@ try:
     bcol = ee.ImageCollection(BUILDINGS).filterBounds(payam.geometry())
     b_t = bcol.aggregate_max('system:time_start')
     b = (bcol.filter(ee.Filter.eq('system:time_start', b_t)).mosaic()
-         .select('building_fractional_count').unmask(0))
+         .select('building_fractional_count').unmask(0)
+         # a mosaic of tiles from several UTM zones has no default projection; give it a 4 m one for reduceResolution
+         .setDefaultProjection(ee.Projection('EPSG:4326').atScale(4)))
     print('buildings: latest year with tiles over the payams:', ee.Date(b_t).format('YYYY-MM-dd').getInfo(),
           '| tiles:', bcol.filter(ee.Filter.eq('system:time_start', b_t)).size().getInfo(), flush=True)
     b100 = b.reduceResolution(ee.Reducer.sum(), True, 4096).reproject('EPSG:4326', None, 100)
@@ -136,7 +138,11 @@ for i in range(0, n, CHUNK):
             res = sub.map(fn).select(['.*'], None, False).getInfo()['features']
             part = pd.DataFrame([r['properties'] for r in res])
         except Exception as e:
-            print(f'  layer {name} failed on chunk {i}: {str(e)[:160]} -> retrying payam by payam', flush=True)
+            retryable = any(t in str(e).lower() for t in ('timed out', 'memory', 'too many', 'internal error', 'try again'))
+            print(f'  layer {name} failed on chunk {i}: {str(e)[:160]}' + (' -> retrying payam by payam' if retryable else ' -> not a timeout, leaving empty'), flush=True)
+            if not retryable:
+                FAILED.append((name, f'chunk {i}'))
+                continue
             # Retry each payam on its own (smaller computation); a payam that still fails stays empty.
             recs = []
             m = int(sub.size().getInfo())
