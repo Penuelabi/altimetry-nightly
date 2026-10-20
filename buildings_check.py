@@ -56,4 +56,11 @@ try:
     print('E) mean x (area/16 m2)                                  ->', ee.Number(mean).multiply(npix).getInfo())
 except Exception as e:
     print('E) FAILED', str(e)[:120])
+
+# F: the method now used in infrastructure_exposure.py: sample on a 4 m EPSG:4326 grid, multiply by (4/0.5)^2 = 64
+try:
+    fv = mos.reduceRegion(ee.Reducer.sum(), geom, 4, crs='EPSG:4326', maxPixels=1e11, tileScale=16).get(band)
+    print('F) NEW METHOD: 4 m sample sum x 64                      ->', ee.Number(fv).multiply(64).getInfo())
+except Exception as e:
+    print('F) FAILED', str(e)[:120])
 print('\nExpected for Juba Town: tens of thousands of buildings. Report which of A-E is in that range.')

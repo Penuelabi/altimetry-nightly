@@ -95,25 +95,27 @@ try:
 except Exception:
     roads = None
 
-# buildings: open-buildings temporal, latest year, fractional count summed at 4 m then aggregated
+# buildings: open-buildings temporal. Tiles are stored at 0.5 m; building_fractional_count per 0.5 m pixel sums to the
+# number of buildings. Summing every 0.5 m pixel for 512 payams is far too heavy, so each payam is SAMPLED on a 4 m grid
+# and the sample sum is multiplied by (4 / 0.5)^2 = 64. (reduceResolution(sum) was tested and returns about 1/625 of
+# the true value, so it is not used.) Checked on Juba Town: about 50,000 buildings.
+BUILD_SAMPLE_M, BUILD_NATIVE_M = 4, 0.5
+BUILD_FACTOR = (BUILD_SAMPLE_M / BUILD_NATIVE_M) ** 2
 try:
     # The collection is split into many tiles per year: mosaic ALL tiles of the latest year that covers the payams
     # (.first() would return one single tile, usually far from South Sudan -> all-zero counts).
     bcol = ee.ImageCollection(BUILDINGS).filterBounds(payam.geometry())
     b_t = bcol.aggregate_max('system:time_start')
-    b = (bcol.filter(ee.Filter.eq('system:time_start', b_t)).mosaic()
-         .select('building_fractional_count').unmask(0)
-         # a mosaic of tiles from several UTM zones has no default projection; give it a 4 m one for reduceResolution
-         .setDefaultProjection(ee.Projection('EPSG:4326').atScale(4)))
+    b = bcol.filter(ee.Filter.eq('system:time_start', b_t)).mosaic().select('building_fractional_count').unmask(0)
     print('buildings: latest year with tiles over the payams:', ee.Date(b_t).format('YYYY-MM-dd').getInfo(),
           '| tiles:', bcol.filter(ee.Filter.eq('system:time_start', b_t)).size().getInfo(), flush=True)
-    b100 = b.reduceResolution(ee.Reducer.sum(), True, 4096).reproject('EPSG:4326', None, 100)
 
     def bld(f):
         g = f.geometry()
-        r = b100.addBands(b100.multiply(fp_geo.reproject('EPSG:4326', None, 100)).rename('b_risk')).reduceRegion(
-            ee.Reducer.sum(), g, 100, maxPixels=1e10, tileScale=16)
-        return f.set({'buildings_total': r.get('building_fractional_count'), 'buildings_at_risk': r.get('b_risk')})
+        both = b.addBands(b.multiply(fp_geo).rename('b_risk'))
+        r = both.reduceRegion(ee.Reducer.sum(), g, BUILD_SAMPLE_M, crs='EPSG:4326', maxPixels=1e11, tileScale=16)
+        return f.set({'buildings_total': ee.Number(r.get('building_fractional_count')).multiply(BUILD_FACTOR),
+                      'buildings_at_risk': ee.Number(r.get('b_risk')).multiply(BUILD_FACTOR)})
 except Exception:
     bld = None
 
