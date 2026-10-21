@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261021_0010",
+ "name": "south-sudan-hydroclimate-aa-20261021_1449",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261021_0010",
- "created": "2026-10-21T00:10:39Z",
+ "version": "20261021_1449",
+ "created": "2026-10-21T14:49:26Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -134,7 +134,7 @@
      {
       "check": "data_end_date freshness",
       "status": "pass",
-      "detail": "latest 2026-10-17 (4 days old, limit 7)"
+      "detail": "latest 2026-10-18 (3 days old, limit 7)"
      },
      {
       "check": "county coverage",
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 180357,
-   "hash": "sha256:2ae3963502c6f0f1249c9d4c3f092c5bcb840dc7f1d96ed32717e8f289a15bae",
+   "bytes": 180390,
+   "hash": "sha256:880ecb7fc4f6e1940e79e9a17a9560f80fde610e79545900db84cf338f8fbf42",
    "rows": 79,
    "schema": {
     "fields": [
@@ -513,10 +513,6 @@
       "type": "string"
      },
      {
-      "name": "p_wet_1020",
-      "type": "number"
-     },
-     {
       "name": "p_wet_1021",
       "type": "number"
      },
@@ -570,6 +566,10 @@
      },
      {
       "name": "p_wet_1103",
+      "type": "number"
+     },
+     {
+      "name": "p_wet_1104",
       "type": "number"
      },
      {
@@ -1421,8 +1421,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 1629,
-   "hash": "sha256:08f7db29f3634f3a6b97b2da2421fc6926d49a976aad4ff83859559bca892f76",
+   "bytes": 1626,
+   "hash": "sha256:b21f7f2d50582dddd879e7afb0dca0e4ff93f066bfa4323a395ac09a4a07b3f9",
    "rows": 6,
    "schema": {
     "fields": [
