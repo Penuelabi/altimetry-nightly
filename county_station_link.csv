@@ -2,7 +2,7 @@ county,state,station_uid,station_name,river,relation,confidence,distance_km,last
 Abiemnhom,Unity,dahiti:18741,"Bhar-al-arab, River","Bhar-al-arab, River",upstream,high,0.0,2026-09-01,394.044,Below 2-yr level,18.1818,-0.0025
 Abyei Region,Abyei Region,hydroweb:7825,Bhar Al Arab km 4390,Bhar Al Arab km 4390,downstream,high,15.0,2026-09-28,394.42,Below 2-yr level,0.0,-0.0019
 Akobo,Jonglei,dahiti:23353,"Pipor, River","Pipor, River",upstream,high,0.0,2026-10-09,402.236,Below 2-yr level,0.0,0.0066
-Aweil Centre,Northern Bahr el Ghazal,hydroweb:101700,Chel km 4862,Chel km 4862,local,high,0.0,2026-08-24,447.5,Below 2-yr level,0.0,-0.0019
+Aweil Centre,Northern Bahr el Ghazal,hydroweb:101700,Chel km 4862,Chel km 4862,local,high,0.0,2026-10-17,447.46,Below 2-yr level,0.0,0.0181
 Aweil East,Northern Bahr el Ghazal,hydroweb:203695,Lol km 4620,Lol km 4620,audit-override,medium,0.0,2026-10-15,412.13,Below 2-yr level,0.0,0.01
 Aweil North,Northern Bahr el Ghazal,hydroweb:7906,Lol km 4838,Lol km 4838,audit-override,medium,0.0,2026-09-22,448.77,Below 2-yr level,0.0,-0.0244
 Aweil South,Northern Bahr el Ghazal,hydroweb:7813,Bahr km 4651,Bahr km 4651,local,high,0.0,2026-09-26,421.5,Below 2-yr level,0.0,-0.0022
@@ -65,15 +65,15 @@ Rumbek North,Lakes,hydroweb:104260,Gulnam km 4574,Gulnam km 4574,local,high,0.0,
 Tambura,Western Equatoria,hydroweb:108191,Jur km 4973,Jur km 4973,downstream,high,0.0,2026-10-06,484.6,Below 2-yr level,0.0,0.0185
 Terekeka,Central Equatoria,dahiti:15556,"White Nile, River","White Nile, River",audit-override,medium,0.0,2026-09-25,446.73,Below 2-yr level,50.0,-0.0123
 Tonj East,Warrap,hydroweb:104261,Bahr Al Arab Trib 02 km 4435,Bahr Al Arab Trib 02 km 4435,local,high,9.2,2026-10-04,394.37,Below 2-yr level,35.0,0.0011
-Tonj North,Warrap,dahiti:2687,"Unknown, River","Unknown, River",local,high,0.0,2026-09-01,392.768,Below 2-yr level,71.9298,-0.0046
-Tonj South,Warrap,dahiti:2686,"Unknown, River","Unknown, River",local,high,30.2,2026-09-01,475.086,Below 2-yr level,0.0,-0.1018
+Tonj North,Warrap,dahiti:2687,"Unknown, River","Unknown, River",local,high,0.0,2026-09-11,392.973,Below 2-yr level,87.7193,0.0205
+Tonj South,Warrap,dahiti:2686,"Unknown, River","Unknown, River",local,high,30.2,2026-09-11,474.922,Below 2-yr level,0.0,-0.0164
 Torit,Eastern Equatoria,hydroweb:7853,White Nile km 4934,White Nile km 4934,audit-override,medium,53.2,2026-10-04,459.35,Above 2-yr level,67.0213,-0.025
 Twic,Warrap,hydroweb:103547,Lol Trib01 km 4417,Lol Trib01 km 4417,local,high,0.0,2026-09-30,400.4,Below 2-yr level,34.0909,0.0159
 Twic East,Jonglei,dahiti:17749,"White Nile, River","White Nile, River",audit-override,medium,0.0,2026-09-23,410.105,Above 2-yr level,93.75,-0.0028
 Ulang,Upper Nile,hydroweb:113241,Sobat Trib 01 km 4390,Sobat Trib 01 km 4390,upstream,high,0.1,2026-10-07,402.38,Below 2-yr level,0.0,0.002
 Uror,Jonglei,hydroweb:106719,Fulus km 4188,Fulus km 4188,local,high,25.3,2026-09-29,395.22,Below 2-yr level,7.1429,-0.0059
 Wau,Western Bahr el Ghazal,hydroweb:111154,Jur km 4808,Jur km 4808,upstream,high,0.0,2026-10-11,446.6,Below 2-yr level,0.0,0.004
-Wulu,Lakes,dahiti:2686,"Unknown, River","Unknown, River",local,high,7.0,2026-09-01,475.086,Below 2-yr level,0.0,-0.1018
+Wulu,Lakes,dahiti:2686,"Unknown, River","Unknown, River",local,high,7.0,2026-09-11,474.922,Below 2-yr level,0.0,-0.0164
 Yambio,Western Equatoria,hydroweb:111296,Ibba km 4410,Ibba km 4410,audit-override,medium,21.3,2026-10-11,475.1,Below 2-yr level,0.0,-0.007
 Yei,Central Equatoria,hydroweb:203361,Yei km 4848,Yei km 4848,local,high,35.3,2026-10-10,628.27,Below 2-yr level,0.0,-0.0138
 Yirol East,Lakes,hydroweb:7890,White Nile km 4716,White Nile km 4716,upstream,high,21.3,2026-09-25,422.09,Below 2-yr level,25.0,-0.0067
