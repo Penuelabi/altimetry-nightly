@@ -1,6 +1,6 @@
 # Western Equatoria - anticipatory action situation brief
 
-Prepared 2026-10-21 14:49 UTC for the Western Equatoria state TWG-AA. Rain and soil data to 2026-10-18; ECMWF run 2026-10-21 00 UTC.
+Prepared 2026-10-22 00:18 UTC for the Western Equatoria state TWG-AA. Rain and soil data to 2026-10-18; ECMWF run 2026-10-21 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,9 +12,9 @@ Prepared 2026-10-21 14:49 UTC for the Western Equatoria state TWG-AA. Rain and s
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Mundri East | Western Equatoria | **YELLOW** | flood / waterlogging | 27 | 0% | 59 |
-| Mundri West | Western Equatoria | **YELLOW** | flood / waterlogging | 31 | 4% | 42 |
-| Mvolo | Western Equatoria | **YELLOW** | flood / waterlogging | 26 | 2% | 135 |
+| Mundri East | Western Equatoria | **YELLOW** | flood / waterlogging | 26 | 4% | 59 |
+| Mundri West | Western Equatoria | **YELLOW** | flood / waterlogging | 26 | 4% | 42 |
+| Mvolo | Western Equatoria | **YELLOW** | flood / waterlogging | 22 | 0% | 135 |
 
 ## Decisions for the group
 - Agree the warning for the 3 counties with an alert and the channels (radio hubs, chiefs, SMS).
