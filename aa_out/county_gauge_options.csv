@@ -1,7 +1,7 @@
 county,state,primary_station,primary_uid,primary_km,primary_age_days,backup_station,backup_uid,backup_km,backup_age_days,backup_same_river,confidence_original,verdict,confidence_checked,confidence_changed,use_backup
 Abiemnhom,Unity,"Bhar-al-arab, River",dahiti:18741,0.0,51.0,Bahr Al Arab km 4333,hydroweb:104262,0.0,18.0,False,high,REVIEW DATA AGE,medium,True,False
 Abyei Region,Abyei Region,Bhar Al Arab km 4390,hydroweb:7825,15.0,24.0,Bhr Lgzl Trib 04 km 4385,hydroweb:103101,16.7,24.0,False,high,OK,high,False,False
-Akobo,Jonglei,"Pipor, River",dahiti:23353,0.0,13.0,"Pibor, River",dahiti:23354,0.0,13.0,False,high,OK (gauge on the county),high,False,False
+Akobo,Jonglei,"Pipor, River",dahiti:23353,0.0,13.0,"Pibor, River",dahiti:23354,0.0,9.0,False,high,OK (gauge on the county),high,False,False
 Aweil Centre,Northern Bahr el Ghazal,Chel km 4862,hydroweb:101700,0.0,5.0,Chel km 4942,hydroweb:102143,0.0,30.0,False,high,OK (gauge on the county),high,False,False
 Aweil East,Northern Bahr el Ghazal,Lol km 4620,hydroweb:203695,0.0,7.0,Lol km 4696,hydroweb:200088,0.0,21.0,False,medium,OK (gauge on the county),medium,False,False
 Aweil North,Northern Bahr el Ghazal,Lol km 4838,hydroweb:7906,0.0,30.0,Lol km 4729,hydroweb:111156,0.0,11.0,False,medium,OK (gauge on the county),medium,False,False
@@ -26,8 +26,8 @@ Ikotos,Eastern Equatoria,Pager km 5350,hydroweb:102552,65.9,27.0,Pager km 5355,h
 Juba,Central Equatoria,Nile km 5018,hydroweb:203765,0.0,23.0,Nile km 4884,hydroweb:201333,0.0,23.0,False,high,OK (gauge on the county),high,False,False
 Jur River,Western Bahr el Ghazal,Jur km 4780,hydroweb:102830,0.0,26.0,Nahr Al Jur km 4656,hydroweb:203696,0.0,7.0,False,high,OK (gauge on the county),high,False,False
 Kajo-keji,Central Equatoria,Nile km 5018,hydroweb:203765,0.3,23.0,White Nile km 4994,hydroweb:7856,19.6,8.0,False,medium,OK (gauge on the county),medium,False,False
-Kapoeta East,Eastern Equatoria,Pibor km 4625,hydroweb:101872,150.9,31.0,Turkwel Trib01 km 323,hydroweb:110390,11.2,5.0,False,high,REVIEW LINK,low,True,True
-Kapoeta North,Eastern Equatoria,Pibor km 4625,hydroweb:101872,127.0,31.0,Nile km 4843,hydroweb:201330,150.2,23.0,False,high,REVIEW LINK,low,True,True
+Kapoeta East,Eastern Equatoria,Pibor km 4625,hydroweb:101872,150.9,4.0,Turkwel Trib01 km 323,hydroweb:110390,11.2,5.0,False,high,REVIEW LINK,medium,True,True
+Kapoeta North,Eastern Equatoria,Pibor km 4625,hydroweb:101872,127.0,4.0,Lotilla km 4712,hydroweb:7909,99.8,4.0,False,high,REVIEW LINK,medium,True,True
 Kapoeta South,Eastern Equatoria,Pager km 5355,hydroweb:106718,133.7,23.0,Pager km 5350,hydroweb:102552,136.0,27.0,False,indicative,REVIEW LINK,low,True,True
 Koch,Unity,Bhr Lgzl Trib 03 km 4333,hydroweb:111298,0.5,11.0,White Nile km 4218,hydroweb:7900,1.0,6.0,False,high,OK (gauge on the county),high,False,False
 Lafon,Eastern Equatoria,Nile km 4826,hydroweb:201328,32.9,23.0,White Nile km 4826,hydroweb:7966,32.9,8.0,False,medium,OK,medium,False,False
@@ -54,14 +54,14 @@ Nzara,Western Equatoria,Jur km 4973,hydroweb:108191,23.4,16.0,Ibba km 4410,hydro
 Panyijiar,Unity,Gulnam km 4574,hydroweb:104260,22.2,18.0,White Nile km 4528,hydroweb:7879,0.0,8.0,False,high,OK,high,False,False
 Panyikang,Upper Nile,"White Nile, River",dahiti:15557,0.0,27.0,"White Nile, River",dahiti:17743,0.0,29.0,False,medium,OK (gauge on the county),medium,False,False
 Pariang,Unity,Bahr Al Arab km 4263,hydroweb:111300,17.2,11.0,Bhar El Gazal km 4143,hydroweb:7829,0.0,6.0,False,high,OK,high,False,False
-Pibor,Jonglei,Lotilla km 4712,hydroweb:7909,0.0,31.0,Pibor km 4497,hydroweb:7938,35.1,19.0,False,high,REVIEW DATA AGE,medium,True,False
+Pibor,Jonglei,Lotilla km 4712,hydroweb:7909,0.0,4.0,Pibor km 4625,hydroweb:101872,0.0,4.0,False,high,OK (gauge on the county),high,False,False
 Pochalla,Jonglei,Baro Trib 01 km 4483,hydroweb:102319,14.8,29.0,Baro Trib 01 km 4543,hydroweb:107881,17.2,17.0,False,medium,OK,medium,False,False
 Raja,Western Bahr el Ghazal,"Wadi Boro, River",dahiti:23344,6.9,47.0,Chel km 5095,hydroweb:107357,0.0,20.0,False,high,REVIEW DATA AGE,medium,True,False
 Renk,Upper Nile,White Nile km 3750,hydroweb:201707,0.0,9.0,White Nile km 3679,hydroweb:7970,0.0,29.0,False,high,OK (gauge on the county),high,False,False
 Rubkona,Unity,Bahr Al Arab km 4333,hydroweb:104262,14.1,18.0,Bahr Al Arab km 4263,hydroweb:111300,0.0,11.0,False,high,OK,high,False,False
 Rumbek Centre,Lakes,Gulnam km 4631,hydroweb:110221,0.0,276.0,Gulnam km 4669,hydroweb:104259,2.9,18.0,False,high,REVIEW DATA AGE,medium,True,False
-Rumbek East,Lakes,Gulnam km 4669,hydroweb:104259,0.0,18.0,White Nile km 4528,hydroweb:7879,41.1,8.0,False,high,OK (gauge on the county),high,False,False
-Rumbek North,Lakes,Gulnam km 4574,hydroweb:104260,0.0,18.0,Bahr Al Arab Trib 02 km 4435,hydroweb:104261,45.2,18.0,False,high,OK (gauge on the county),high,False,False
+Rumbek East,Lakes,Gulnam km 4669,hydroweb:104259,0.0,18.0,Yei km 4546,hydroweb:104992,1.2,4.0,False,high,OK (gauge on the county),high,False,False
+Rumbek North,Lakes,Gulnam km 4574,hydroweb:104260,0.0,18.0,Yei km 4546,hydroweb:104992,35.6,4.0,False,high,OK (gauge on the county),high,False,False
 Tambura,Western Equatoria,Jur km 4973,hydroweb:108191,0.0,16.0,Jur km 4964,hydroweb:108192,0.0,16.0,False,high,OK (gauge on the county),high,False,False
 Terekeka,Central Equatoria,"White Nile, River",dahiti:15556,0.0,27.0,"White Nile, River",dahiti:11761,0.0,8.0,False,medium,OK (gauge on the county),medium,False,False
 Tonj East,Warrap,Bahr Al Arab Trib 02 km 4435,hydroweb:104261,9.2,18.0,Bahr Al Arab Trib 02 km 4426,hydroweb:103843,9.8,20.0,False,high,OK (gauge on the county),high,False,False
@@ -77,4 +77,4 @@ Wulu,Lakes,"Unknown, River",dahiti:2686,7.0,41.0,Ibba km 4410,hydroweb:111296,7.
 Yambio,Western Equatoria,Ibba km 4410,hydroweb:111296,21.3,11.0,Jur km 4973,hydroweb:108191,60.3,16.0,False,medium,OK,medium,False,False
 Yei,Central Equatoria,Yei km 4848,hydroweb:203361,35.3,12.0,Dungu km 3554,hydroweb:103545,58.2,22.0,False,high,OK,high,False,False
 Yirol East,Lakes,White Nile km 4716,hydroweb:7890,21.3,27.0,White Nile km 4568,hydroweb:7883,0.0,14.0,False,high,OK,high,False,False
-Yirol West,Lakes,Yei km 4546,hydroweb:104992,43.7,31.0,Gulnam km 4669,hydroweb:104259,33.2,18.0,False,high,REVIEW DATA AGE,medium,True,False
+Yirol West,Lakes,Yei km 4546,hydroweb:104992,43.7,4.0,Gulnam km 4669,hydroweb:104259,33.2,18.0,False,high,OK,high,False,False
