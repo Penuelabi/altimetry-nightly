@@ -1,6 +1,6 @@
 # Lakes - anticipatory action situation brief
 
-Prepared 2026-10-22 14:51 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-10-19; ECMWF run 2026-10-22 00 UTC.
+Prepared 2026-10-23 00:15 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-10-19; ECMWF run 2026-10-22 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,12 +12,12 @@ Prepared 2026-10-22 14:51 UTC for the Lakes state TWG-AA. Rain and soil data to 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Awerial | Lakes | **ORANGE** | drought / dry spell | 20 | 0% | 5,340 |
+| Awerial | Lakes | **ORANGE** | drought / dry spell | 24 | 0% | 5,340 |
 | Cueibet | Lakes | **ORANGE** | drought / dry spell | 17 | 0% | 531 |
 | Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 17 | 0% | 1,661 |
-| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 19 | 0% | 3,596 |
-| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 14 | 0% | 6 |
-| Yirol West | Lakes | **ORANGE** | drought / dry spell | 22 | 0% | 2,910 |
+| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 18 | 0% | 3,596 |
+| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 12 | 0% | 6 |
+| Yirol West | Lakes | **ORANGE** | drought / dry spell | 21 | 0% | 2,910 |
 | Wulu | Lakes | **YELLOW** | flood / waterlogging | 26 | 2% | 108 |
 | Yirol East | Lakes | **YELLOW** | flood / waterlogging | 18 | 0% | 3,725 |
 
