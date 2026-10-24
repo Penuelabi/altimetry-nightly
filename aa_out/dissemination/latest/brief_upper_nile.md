@@ -1,6 +1,6 @@
 # Upper Nile - anticipatory action situation brief
 
-Prepared 2026-10-24 13:40 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-10-20; ECMWF run 2026-10-24 00 UTC.
+Prepared 2026-10-24 23:42 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-10-20; ECMWF run 2026-10-24 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -23,7 +23,7 @@ Prepared 2026-10-24 13:40 UTC for the Upper Nile state TWG-AA. Rain and soil dat
 | Melut | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 5,600 |
 | Renk | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 4,300 |
 | Ulang | Upper Nile | **ORANGE** | drought / dry spell | 11 | 0% | 5,416 |
-| Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 1 | 0% | 1,376 |
+| Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 2 | 0% | 1,376 |
 
 ## Decisions for the group
 - Agree the warning for the 12 counties with an alert and the channels (radio hubs, chiefs, SMS).

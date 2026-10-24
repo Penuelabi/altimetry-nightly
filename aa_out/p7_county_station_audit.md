@@ -25,6 +25,6 @@
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 278.0 | Gulnam km 4669 | 2.9 | linked reading 278 days old |
 | Nyirol | Fulus km 4165 | 0.0 | 81.0 | Fulus km 4114 | 0.0 | linked reading 81 days old |
 | Tonj North | Unknown, River | 0.0 | 43.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 43 days old |
-| Twic East | White Nile, River | 0.0 | 31.0 | White Nile km 4536 | 0.0 | linked reading 31 days old |
+| Twic East | White Nile, River | 0.0 | 31.0 | White Nile, River | 0.0 | linked reading 31 days old |
 
 Rules: review when the linked gauge is over 100 km from the county, its latest reading is over 30 days old, or a fresh gauge is at least 25 km closer. The link file is not changed by this audit.
