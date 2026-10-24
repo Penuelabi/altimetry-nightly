@@ -5,8 +5,8 @@
 | Verdict | Counties |
 | --- | --- |
 | OK (gauge on the county) | 42 |
-| OK | 23 |
-| REVIEW DATA AGE | 11 |
+| OK | 24 |
+| REVIEW DATA AGE | 10 |
 | REVIEW LINK | 3 |
 
 ## Counties to review
@@ -18,11 +18,10 @@
 | Kapoeta North | Pibor km 4625 | 127.0 | 6.0 | Lotilla km 4712 | 99.8 | linked gauge 127 km from the county; closer fresh gauge Lotilla km 4712 (100 km) |
 | Tonj South | Unknown, River | 30.2 | 43.0 | Ibba km 4410 | 30.2 | linked reading 43 days old |
 | Cueibet | Gulnam km 4631 | 25.6 | 278.0 | Gulnam km 4574 | 41.2 | linked reading 278 days old |
-| Pochalla | Baro Trib 01 km 4483 | 14.8 | 31.0 | Baro Trib 01 km 4543 | 17.2 | linked reading 31 days old |
 | Wulu | Unknown, River | 7.0 | 43.0 | Ibba km 4410 | 7.0 | linked reading 43 days old |
 | Raja | Wadi Boro, River | 6.9 | 49.0 | Chel km 5095 | 0.0 | linked reading 49 days old |
-| Abiemnhom | Bhar-al-arab, River | 0.0 | 53.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 53 days old |
 | Aweil West | Wadi Boro, River | 0.0 | 51.0 | Lol km 4833 | 0.0 | linked reading 51 days old |
+| Abiemnhom | Bhar-al-arab, River | 0.0 | 53.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 53 days old |
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 278.0 | Gulnam km 4669 | 2.9 | linked reading 278 days old |
 | Nyirol | Fulus km 4165 | 0.0 | 81.0 | Fulus km 4114 | 0.0 | linked reading 81 days old |
 | Tonj North | Unknown, River | 0.0 | 43.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 43 days old |
