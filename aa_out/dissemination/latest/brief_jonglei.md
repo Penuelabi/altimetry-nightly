@@ -1,11 +1,11 @@
 # Jonglei - anticipatory action situation brief
 
-Prepared 2026-10-24 23:42 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-10-20; ECMWF run 2026-10-24 12 UTC.
+Prepared 2026-10-25 14:02 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-10-20; ECMWF run 2026-10-25 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
-- Counties by alert level: red 0, orange 9, yellow 2, green 0.
+- Counties by alert level: red 0, orange 8, yellow 3, green 0.
 - Validated plans in readiness: 0; activated: 0.
 - Draft plans whose rules are met: 3 (for review, not activations).
 - River gauges at a proposed trigger level: 5 counties (0 at activation level).
@@ -13,16 +13,16 @@ Prepared 2026-10-24 23:42 UTC for the Jonglei state TWG-AA. Rain and soil data t
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Akobo | Jonglei | **ORANGE** | drought / dry spell | 17 | 0% | 1,673 |
+| Akobo | Jonglei | **ORANGE** | drought / dry spell | 16 | 2% | 1,673 |
 | Bor South | Jonglei | **ORANGE** | drought / dry spell | 24 | 0% | 7,498 |
 | Canal/Pigi | Jonglei | **ORANGE** | drought / dry spell | 3 | 0% | 2,399 |
-| Duk | Jonglei | **ORANGE** | drought / dry spell | 13 | 0% | 5,015 |
 | Nyirol | Jonglei | **ORANGE** | drought / dry spell | 9 | 0% | 814 |
-| Pibor | Jonglei | **ORANGE** | drought / dry spell | 23 | 2% | 1,354 |
-| Pochalla | Jonglei | **ORANGE** | drought / dry spell | 21 | 0% | 498 |
-| Twic East | Jonglei | **ORANGE** | drought / dry spell | 16 | 0% | 6,132 |
-| Uror | Jonglei | **ORANGE** | drought / dry spell | 15 | 0% | 1,768 |
-| Ayod | Jonglei | **YELLOW** | flood / waterlogging | 8 | 0% | 7,356 |
+| Pibor | Jonglei | **ORANGE** | drought / dry spell | 28 | 6% | 1,354 |
+| Pochalla | Jonglei | **ORANGE** | drought / dry spell | 25 | 2% | 498 |
+| Twic East | Jonglei | **ORANGE** | drought / dry spell | 14 | 0% | 6,132 |
+| Uror | Jonglei | **ORANGE** | drought / dry spell | 14 | 0% | 1,768 |
+| Ayod | Jonglei | **YELLOW** | flood / waterlogging | 7 | 0% | 7,356 |
+| Duk | Jonglei | **YELLOW** | flood / waterlogging | 13 | 0% | 5,015 |
 | Fangak | Jonglei | **YELLOW** | flood / waterlogging | 2 | 0% | 4,546 |
 
 ## Anticipatory action plans
