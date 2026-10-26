@@ -1,6 +1,6 @@
 # River triggers - design note (proposal for validation)
 
-Generated 2026-10-19 16:49 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-10-26 05:53 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
 - **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 24 days before displacement).
