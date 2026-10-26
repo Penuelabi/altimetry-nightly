@@ -1,9 +1,9 @@
 # River triggers - design note (proposal for validation)
 
-Generated 2026-10-26 05:53 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-10-26 07:52 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
-- **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 24 days before displacement).
+- **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 36 days before displacement).
 - **Readiness: S85** (a lower rule of the same kind that catches at least 60% of flood seasons on time and as many as activation; best TSS; median 46 days before displacement).
 - Names: P = percentile of the gauge record; 2yr/5yr/10yr = return levels; S = seasonal percentile (how unusual for the time of year); R = rise since the dry-season low against the gauge's usual rise; U = Sudd regional upstream index x100; A+U = both.
 - Counties without a reliable gauge use the regional rule if they are Sudd counties (readiness U60, activation U70), otherwise the bulletin flood alert. Each county's values and suggested plan rules are in aa_triggers.csv.
@@ -29,7 +29,7 @@ Generated 2026-10-26 05:53 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 | regional | U80 | 108 | 52 | 37 | 10 | 5 | 25 | 71% | 35% | 0.48 | 0.27 | 0 |
 | regional | U70 | 108 | 52 | 46 | 6 | 0 | 38 | 88% | 42% | 0.51 | 0.21 | 31 |
 | regional | U50 | 108 | 52 | 50 | 2 | 0 | 56 | 96% | 52% | 0.46 | -0.04 | 62 |
-| regional | U55 | 108 | 52 | 50 | 2 | 0 | 56 | 96% | 52% | 0.46 | -0.04 | 31 |
+| regional | U55 | 108 | 52 | 50 | 2 | 0 | 56 | 96% | 52% | 0.46 | -0.04 | 61 |
 | regional | U60 | 108 | 52 | 50 | 2 | 0 | 56 | 96% | 52% | 0.46 | -0.04 | 31 |
 | regional | U65 | 108 | 52 | 47 | 5 | 0 | 56 | 90% | 52% | 0.44 | -0.10 | 46 |
 | rise | R50 | 108 | 52 | 34 | 4 | 14 | 25 | 65% | 40% | 0.44 | 0.21 | 38 |
@@ -40,21 +40,21 @@ Generated 2026-10-26 05:53 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 | seasonal | S80 | 108 | 52 | 39 | 2 | 11 | 30 | 75% | 42% | 0.48 | 0.21 | 52 |
 | seasonal | S70 | 108 | 52 | 45 | 2 | 5 | 39 | 87% | 45% | 0.49 | 0.17 | 53 |
 | seasonal | S95 | 108 | 52 | 19 | 3 | 30 | 14 | 37% | 39% | 0.29 | 0.12 | 21 |
-| seasonal+regional | S85+U70 | 108 | 52 | 27 | 7 | 18 | 9 | 52% | 21% | 0.44 | 0.36 | -1 |
-| seasonal+regional | S80+U70 | 108 | 52 | 30 | 7 | 15 | 14 | 58% | 27% | 0.45 | 0.33 | -2 |
-| seasonal+regional | S85+U55 | 108 | 52 | 32 | 5 | 15 | 18 | 62% | 33% | 0.46 | 0.29 | 24 |
+| seasonal+regional | S85+U70 | 108 | 52 | 27 | 7 | 18 | 11 | 52% | 24% | 0.43 | 0.32 | -1 |
+| seasonal+regional | S85+U55 | 108 | 52 | 34 | 4 | 14 | 19 | 65% | 33% | 0.48 | 0.31 | 36 |
 | seasonal+regional | S85+U60 | 108 | 52 | 32 | 5 | 15 | 18 | 62% | 33% | 0.46 | 0.29 | 24 |
-| seasonal+regional | S90+U70 | 108 | 52 | 19 | 6 | 27 | 6 | 37% | 19% | 0.33 | 0.26 | -1 |
-| seasonal+regional | S80+U55 | 108 | 52 | 37 | 4 | 11 | 27 | 71% | 40% | 0.47 | 0.23 | 24 |
+| seasonal+regional | S80+U70 | 108 | 52 | 30 | 7 | 15 | 17 | 58% | 31% | 0.43 | 0.27 | -2 |
+| seasonal+regional | S90+U55 | 108 | 52 | 28 | 4 | 20 | 16 | 54% | 33% | 0.41 | 0.25 | 36 |
+| seasonal+regional | S80+U55 | 108 | 52 | 38 | 3 | 11 | 27 | 73% | 40% | 0.48 | 0.25 | 50 |
 | seasonal+regional | S80+U60 | 108 | 52 | 37 | 4 | 11 | 27 | 71% | 40% | 0.47 | 0.23 | 24 |
-| seasonal+regional | S90+U55 | 108 | 52 | 24 | 5 | 23 | 15 | 46% | 34% | 0.36 | 0.19 | 22 |
+| seasonal+regional | S90+U70 | 108 | 52 | 19 | 6 | 27 | 8 | 37% | 24% | 0.32 | 0.22 | -1 |
 | seasonal+regional | S90+U60 | 108 | 52 | 24 | 5 | 23 | 15 | 46% | 34% | 0.36 | 0.19 | 22 |
 
 ### The chosen rules, impact = flood displacement only
 | candidate | events | hits | late | misses | false_alarms | POD | FAR | CSI | TSS | median_lead_days |
 |---|---|---|---|---|---|---|---|---|---|---|
 | S85 | 19 | 11 | 3 | 5 | 47 | 58% | 77% | 0.17 | 0.05 | 46 |
-| S85+U55 | 19 | 8 | 5 | 6 | 42 | 42% | 76% | 0.13 | -0.05 | 24 |
+| S85+U55 | 19 | 10 | 4 | 5 | 43 | 53% | 75% | 0.16 | 0.04 | 36 |
 
 ## Counties
 Rule used: bulletin flood alert 47, seasonal + regional 18, regional 14.
