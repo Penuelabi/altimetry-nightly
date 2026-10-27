@@ -25,7 +25,8 @@ STEP 3  Merge, keep only observations not merged yet, and for those:
             long gap, high uncertainty -> qc_status. No interpolation of levels.
           * 15-day antecedent CHIRPS rainfall + ERA5-Land soil moisture,
             evapotranspiration, 2 m temperature, runoff (GEE, local buffer), gap-filled:
-              rainfall : CHIRPS -> ERA5-Land precipitation -> CHIRPS day-of-year climatology
+              rainfall : CHIRPS -> GSMaP near-real-time (JAXA, sum of 24 hourly images) -> ERA5-Land
+                         precipitation -> CHIRPS day-of-year climatology
               ERA5-Land: ERA5-Land -> ERA5-Land day-of-year climatology
           * rows already in the merged file with blank climate are back-filled;
             derived columns (min / max / average, seasonal baseline, QC) are added or
@@ -120,6 +121,13 @@ CLIM_REF_YEARS = (2016, 2025)
 
 UPDATE_MASTER_CLIMATE = True
 REFRESH_GAPFILLED_DAYS = 60
+
+# GSMaP near-real-time rainfall (JAXA): fills days CHIRPS has not published yet. NRT values are
+# provisional and are replaced by CHIRPS on a later run (see REFRESH_GAPFILLED_DAYS).
+USE_GSMAP = True
+GSMAP_ID = 'JAXA/GPM_L3/GSMaP/v8/operational'
+GSMAP_BAND = 'hourlyPrecipRateGC'     # gauge-adjusted rate (mm/h); 'hourlyPrecipRate' = unadjusted
+GSMAP_HOURS_PER_DAY = 24              # a day is used only when all 24 hourly images exist
 
 HYDROWEB_BBOX = [25.9, -3.8, 36.4, 15.9]
 
@@ -216,7 +224,7 @@ DDATE = 'date [yyyy-mm-dd]'
 
 CLIMATE_COLS_OUT = ['last_15_days_Rainfall_mm', 'last_15_days_Soil_Moisture',
                     'last_15_days_Evapotranspiration', 'last_15_days_Temp_C', 'last_15_days_runoff']
-GAPFILL_COLS = ['rain_days_gapfilled', 'era5_days_gapfilled']
+GAPFILL_COLS = ['rain_days_gapfilled', 'era5_days_gapfilled', 'rain_days_nrt']
 LEVEL_STAT_COLS = ['minimium', 'maxmium', 'average', 'deviation from average']
 SEASONAL_COLS = ['seasonal_median_m', 'seasonal_mad_m', 'seasonal_pctile', 'seasonal_z',
                  'base_n_obs', 'base_n_years', 'level_class']
@@ -1234,7 +1242,8 @@ REF_END = ee.Date.fromYMD(CLIM_REF_YEARS[1] + 1, 1, 1)
 DATES_PER_CALL = 20
 MAX_SINGLE_FAILURES = 4     # stop the climate fetch after this many failed requests in a row
 _single_failures = 0
-CHIRPS_DAYS, ERA5_DAYS = set(), set()
+CHIRPS_DAYS, ERA5_DAYS, GSMAP_DAYS = set(), set(), set()
+GSMAP = ee.ImageCollection(GSMAP_ID).select([GSMAP_BAND], ['rain'])
 
 
 def available_days(col):
@@ -1245,6 +1254,21 @@ def available_days(col):
                             (TODAY + pd.Timedelta(days=1)).strftime('%Y-%m-%d'))
     ms = recent.aggregate_array('system:time_start').getInfo() or []
     return {pd.Timestamp(m, unit='ms').normalize() for m in ms}
+
+
+def gsmap_available_days():
+    """Days (last ~400) for which GSMaP has all hourly images, so a daily sum is not undercounted."""
+    if not USE_GSMAP:
+        return set()
+    try:
+        recent = GSMAP.filterDate((TODAY - pd.Timedelta(days=400)).strftime('%Y-%m-%d'),
+                                  (TODAY + pd.Timedelta(days=1)).strftime('%Y-%m-%d'))
+        ms = recent.aggregate_array('system:time_start').getInfo() or []
+    except Exception as e:
+        print(f"  GSMaP not available ({str(e)[:120]}); continuing without it")
+        return set()
+    counts = pd.Series(pd.to_datetime(ms, unit='ms').normalize()).value_counts()
+    return set(counts[counts >= GSMAP_HOURS_PER_DAY].index)
 
 
 def last_available(col):
@@ -1266,14 +1290,16 @@ def doy_climatology(doy):
 
 
 def window_image(date_key):
-    """15-day antecedent image for one observation date + (days CHIRPS, days ERA5 observed).
+    """15-day antecedent image for one observation date + (days CHIRPS, days ERA5 observed, days GSMaP used).
     Each day uses real data when GEE has an image for that exact day, otherwise the fallback chain
-    (CHIRPS -> ERA5-Land precipitation -> day-of-year climatology), so no null images are built."""
+    (CHIRPS -> GSMaP near-real-time -> ERA5-Land precipitation -> day-of-year climatology),
+    so no null images are built."""
     day = pd.Timestamp(date_key).normalize()
     days = [day - pd.Timedelta(days=k) for k in range(WINDOW_DAYS - 1, -1, -1)]
     has_ch = [d in CHIRPS_DAYS for d in days]
     has_er = [d in ERA5_DAYS for d in days]
-    n_ch, n_er = sum(has_ch), sum(has_er)
+    has_gs = [(not ch) and d in GSMAP_DAYS for d, ch in zip(days, has_ch)]
+    n_ch, n_er, n_gs = sum(has_ch), sum(has_er), sum(has_gs)
     start, end = days[0].strftime('%Y-%m-%d'), (day + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
     if n_ch == WINDOW_DAYS and n_er == WINDOW_DAYS:
         er = ERA5.filterDate(start, end)
@@ -1282,9 +1308,9 @@ def window_image(date_key):
             er.select(ERA5_IN[:2], ['t2m_mean', 'swvl1_mean']).mean(),
             er.select(ERA5_IN[2:], ['evap_sum', 'ro_sum']).sum(),
         ])
-        return img.toFloat(), n_ch, n_er
+        return img.toFloat(), n_ch, n_er, 0
     imgs = []
-    for d, ch_ok, er_ok in zip(days, has_ch, has_er):
+    for d, ch_ok, er_ok, gs_ok in zip(days, has_ch, has_er, has_gs):
         d0, d1 = d.strftime('%Y-%m-%d'), (d + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
         doy = int(d.day_of_year)
         if er_ok:
@@ -1294,6 +1320,8 @@ def window_image(date_key):
             era = doy_climatology(doy)[1]
         if ch_ok:
             rain = ee.Image(CHIRPS.filterDate(d0, d1).first()).select(['rain']).rename('rain')
+        elif gs_ok:
+            rain = GSMAP.filterDate(d0, d1).sum().rename('rain')      # mm/h x 24 hourly images = mm/day
         elif er_ok:
             rain = er_day.select(['total_precipitation_sum'], ['rain']).multiply(1000)
         else:
@@ -1305,18 +1333,18 @@ def window_image(date_key):
         col.select(['t2m', 'swvl1']).mean().rename(['t2m_mean', 'swvl1_mean']),
         col.select(['evap', 'ro']).sum().rename(['evap_sum', 'ro_sum']),
     ])
-    return img.toFloat(), n_ch, n_er
+    return img.toFloat(), n_ch, n_er, n_gs
 
 
 def fetch_dates(groups):
     """groups: list of (date_key, rows). Returns a DataFrame, splitting the request on failure."""
     fcs = []
     for date_key, rows in groups:
-        img, n_ch, n_er = window_image(date_key)
+        img, n_ch, n_er, n_gs = window_image(date_key)
         pts = ee.FeatureCollection([
             ee.Feature(ee.Geometry.Point([float(r.longitude), float(r.latitude)])
                        .buffer(BUFFER_M.get(r.type, 5000), 100),
-                       {'uid': r.station_uid, 'date': date_key, 'n_chirps': n_ch, 'n_era5': n_er})
+                       {'uid': r.station_uid, 'date': date_key, 'n_chirps': n_ch, 'n_era5': n_er, 'n_gsmap': n_gs})
             for r in rows.itertuples()])
         red = img.reduceRegions(collection=pts, reducer=ee.Reducer.mean(), scale=5000, tileScale=4)
         fcs.append(red.map(lambda f: ee.Feature(None, f.toDictionary())))
@@ -1366,7 +1394,7 @@ def fetch_dates(groups):
 
 
 clim_cols = ['station_uid', 'date_key', 'rain_sum', 't2m_mean', 'swvl1_mean',
-             'evap_sum', 'ro_sum', 'n_chirps', 'n_era5', 'complete', 'fetched_on']
+             'evap_sum', 'ro_sum', 'n_chirps', 'n_era5', 'n_gsmap', 'complete', 'fetched_on']
 VAL_COLS = ['rain_sum', 't2m_mean', 'swvl1_mean', 'evap_sum', 'ro_sum']
 clim = (pd.read_csv(CLIMATE_CACHE) if os.path.exists(CLIMATE_CACHE)
         else pd.DataFrame(columns=clim_cols))
@@ -1419,10 +1447,12 @@ print(f"Climate requests: {len(need)} station-dates checked, {len(todo)} to fetc
 
 if len(todo):
     CHIRPS_DAYS, ERA5_DAYS = available_days(CHIRPS), available_days(ERA5)
+    GSMAP_DAYS = gsmap_available_days()
     CHIRPS_LAST = max(CHIRPS_DAYS) if CHIRPS_DAYS else pd.Timestamp('1900-01-01')
     ERA5_LAST = max(ERA5_DAYS) if ERA5_DAYS else pd.Timestamp('1900-01-01')
-    print(f"Latest data in GEE: CHIRPS {CHIRPS_LAST:%Y-%m-%d}, ERA5-Land {ERA5_LAST:%Y-%m-%d} "
-          "(later days are gap-filled)")
+    GSMAP_LAST = max(GSMAP_DAYS) if GSMAP_DAYS else pd.Timestamp('1900-01-01')
+    print(f"Latest data in GEE: CHIRPS {CHIRPS_LAST:%Y-%m-%d}, ERA5-Land {ERA5_LAST:%Y-%m-%d}, "
+          f"GSMaP NRT {GSMAP_LAST:%Y-%m-%d} (later days are gap-filled)")
     _chirps_holes = [d for d in pd.date_range(TODAY - pd.Timedelta(days=60), CHIRPS_LAST)
                      if d not in CHIRPS_DAYS]
     if _chirps_holes:
@@ -1452,7 +1482,7 @@ if len(todo):
         print(f"  request {b + 1}/{len(calls)} done ({len(new)} station-dates)")
 
 c = clim.copy()
-for col in VAL_COLS + ['n_chirps', 'n_era5']:
+for col in VAL_COLS + ['n_chirps', 'n_era5', 'n_gsmap']:
     c[col] = pd.to_numeric(c[col], errors='coerce')
 c['last_15_days_Rainfall_mm'] = c.rain_sum
 c['last_15_days_Soil_Moisture'] = c.swvl1_mean
@@ -1461,6 +1491,7 @@ c['last_15_days_Temp_C'] = c.t2m_mean - 273.15
 c['last_15_days_runoff'] = c.ro_sum * 1000
 c['rain_days_gapfilled'] = (WINDOW_DAYS - c.n_chirps).clip(lower=0)
 c['era5_days_gapfilled'] = (WINDOW_DAYS - c.n_era5).clip(lower=0)
+c['rain_days_nrt'] = c.n_gsmap.fillna(0)
 clim_out = (c[['station_uid', 'date_key'] + CLIMATE_COLS_OUT + GAPFILL_COLS]
             .drop_duplicates(['station_uid', 'date_key'], keep='last'))
 df = df.merge(clim_out, on=['station_uid', 'date_key'], how='left')
@@ -1510,6 +1541,7 @@ final = pd.DataFrame({
     'last_15_days_runoff': df['last_15_days_runoff'],
     'rain_days_gapfilled': df['rain_days_gapfilled'],
     'era5_days_gapfilled': df['era5_days_gapfilled'],
+    'rain_days_nrt': df['rain_days_nrt'],
     'Elevation_Max': df['Elevation_Max'],
     'Elevation_Mean': df['Elevation_Mean'],
     'Elevation_Min': df['Elevation_Min'],
@@ -1554,7 +1586,8 @@ notes = pd.DataFrame([
                        f"buffer {BUFFER_M['river']} m (river) / {BUFFER_M['lake']} m (lake) around the "
                        "station - LOCAL conditions, not the upstream catchment. "
                        "Days not yet published are gap-filled (see *_gapfilled)."),
-    ('last_15_days_Rainfall_mm', 'CHIRPS daily, summed (mm). Missing CHIRPS days: ERA5-Land '
+    ('last_15_days_Rainfall_mm', 'CHIRPS daily, summed (mm). Missing CHIRPS days: GSMaP near-real-time '
+                                 '(sum of 24 hourly rates), else ERA5-Land '
                                  'total_precipitation_sum, else CHIRPS day-of-year mean '
                                  f'{CLIM_REF_YEARS[0]}-{CLIM_REF_YEARS[1]}.'),
     ('last_15_days_Soil_Moisture', 'ERA5-Land volumetric_soil_water_layer_1, mean (m3/m3, 0-7 cm)'),
@@ -1562,6 +1595,9 @@ notes = pd.DataFrame([
     ('last_15_days_Temp_C', 'ERA5-Land temperature_2m, mean (deg C)'),
     ('last_15_days_runoff', 'ERA5-Land runoff_sum, summed (mm)'),
     ('rain_days_gapfilled', 'Days of the 15-day window without CHIRPS data (filled as above). 0 = all observed.'),
+    ('rain_days_nrt', 'Days of the 15-day window filled with provisional GSMaP near-real-time rainfall '
+                      f'({GSMAP_BAND}). Counted inside rain_days_gapfilled; replaced by CHIRPS once published. '
+                      '0 = none.'),
     ('era5_days_gapfilled', 'Days of the 15-day window without ERA5-Land data, filled with the ERA5-Land '
                             f'day-of-year mean {CLIM_REF_YEARS[0]}-{CLIM_REF_YEARS[1]}. 0 = all observed.'),
     ('Elevation_*', f'SRTM 30 m within {ELEV_BUFFER_M} m of the station (m)'),
