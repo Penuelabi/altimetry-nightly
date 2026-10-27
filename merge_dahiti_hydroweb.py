@@ -1024,7 +1024,7 @@ def seasonal_baseline(frame):
             'base_n_obs', 'base_n_years']
     out = pd.DataFrame(np.nan, index=frame.index, columns=cols)
     for uid, grp in frame.groupby('station_uid'):
-        doy = grp['day_dt'].dt.dayofyear.to_numpy()
+        doy = grp['day_dt'].dt.day_of_year.to_numpy()
         yr = grp['day_dt'].dt.year.to_numpy()
         w = grp['wse'].to_numpy(float)
         in_ref = (yr >= REF_YEARS[0]) & (yr <= REF_YEARS[1])
@@ -1286,7 +1286,7 @@ def window_image(date_key):
     imgs = []
     for d, ch_ok, er_ok in zip(days, has_ch, has_er):
         d0, d1 = d.strftime('%Y-%m-%d'), (d + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-        doy = int(d.dayofyear)
+        doy = int(d.day_of_year)
         if er_ok:
             er_day = ee.Image(ERA5.filterDate(d0, d1).first())
             era = er_day.select(ERA5_IN, ERA5_OUT)

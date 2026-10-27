@@ -853,11 +853,11 @@ def selftest():
     for uid, base in (('dahiti:1', 400.0), ('dahiti:2', 380.0)):
         for d in days:
             trend = 0.5 if d.year >= 2019 else 0.0           # persistent high water from 2019, as in the Sudd
-            seas = 1.2 * np.exp(-((d.dayofyear - 260) / 45.0) ** 2)
-            boost = 0.6 if d.year in flood_years and 200 < d.dayofyear < 340 else 0.0
+            seas = 1.2 * np.exp(-((d.day_of_year - 260) / 45.0) ** 2)
+            boost = 0.6 if d.year in flood_years and 200 < d.day_of_year < 340 else 0.0
             rows.append({'station_uid': uid, 'date': d, 'level': base + trend + seas + boost + rng.normal(0, 0.04)})
     m = pd.DataFrame(rows)
-    doy, yr = m['date'].dt.dayofyear.to_numpy(), m['date'].dt.year.to_numpy()
+    doy, yr = m['date'].dt.day_of_year.to_numpy(), m['date'].dt.year.to_numpy()
     spct = np.full(len(m), np.nan)
     for uid in m['station_uid'].unique():                    # seasonal percentile, as merge_dahiti_hydroweb.py does
         i = np.where(m['station_uid'].to_numpy() == uid)[0]

@@ -40,7 +40,7 @@ jobs:
 
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install packages
         run: pip install pandas numpy matplotlib geopandas google-api-python-client google-auth earthengine-api

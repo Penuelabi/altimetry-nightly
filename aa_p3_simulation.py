@@ -434,7 +434,7 @@ def selftest():
             'status': 'draft', '_ready': eng.compile_rule('river_level_m >= readiness_level_m'),
             '_act': eng.compile_rule("river_level_m >= activation_level_m or alert_level == 'red'")}
     days = pd.date_range('2024-05-01', '2025-02-28', freq='10D')
-    lv = 10 + 1.5 * np.exp(-((days.dayofyear - 255) / 40.0) ** 2)
+    lv = 10 + 1.5 * np.exp(-((days.day_of_year - 255) / 40.0) ** 2)
     levels = pd.DataFrame({'station_uid': 'x:1', 'date': days, 'level': lv})
     values = {'nowhere': {'station_uid': 'x:1', 'readiness_level_m': 10.8, 'activation_level_m': 11.3}}
     tl, trans, summ = simulate(plan, 2024, levels, values)
