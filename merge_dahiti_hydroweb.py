@@ -28,6 +28,8 @@ STEP 3  Merge, keep only observations not merged yet, and for those:
               rainfall : CHIRPS -> GSMaP near-real-time (JAXA, sum of 24 hourly images) -> ERA5-Land
                          precipitation -> CHIRPS day-of-year climatology
               ERA5-Land: ERA5-Land -> ERA5-Land day-of-year climatology
+          * ECMWF IFS open data fills ERA5-Land soil moisture, runoff and 2 m temperature for the
+            days ERA5-Land has not published (adapted to ERA5-Land, see ecmwf_gapfill.py)
           * rows already in the merged file with blank climate are back-filled;
             derived columns (min / max / average, seasonal baseline, QC) are added or
             refreshed in saved rows
@@ -129,6 +131,15 @@ GSMAP_ID = 'JAXA/GPM_L3/GSMaP/v8/operational'
 GSMAP_BAND = 'hourlyPrecipRateGC'     # gauge-adjusted rate (mm/h); 'hourlyPrecipRate' = unadjusted
 GSMAP_HOURS_PER_DAY = 24              # a day is used only when all 24 hourly images exist
 
+# ECMWF IFS open data (see ecmwf_gapfill.py): real recent soil moisture, runoff and 2 m temperature,
+# adapted to ERA5-Land, for the days ERA5-Land has not published yet. Evaporation is not in IFS open
+# data and keeps the day-of-year average. Never stops the run: any failure falls back to the average.
+USE_ECMWF_FILL = True
+ECMWF_LOOKBACK_DAYS = 40              # how far back to try to collect IFS days (adaptation needs overlap)
+ECMWF_IFS_CACHE = os.path.join(OUT_DIR, 'cache_ecmwf_ifs_daily.csv')
+ERA5_DAILY_CACHE = os.path.join(OUT_DIR, 'cache_era5_daily_stations.csv')
+ERA5_DOY_CLIM_CACHE = os.path.join(OUT_DIR, 'cache_era5_doy_clim_stations.csv')
+
 HYDROWEB_BBOX = [25.9, -3.8, 36.4, 15.9]
 
 # --- Seasonal baseline for level classification -------------------------------
@@ -224,7 +235,7 @@ DDATE = 'date [yyyy-mm-dd]'
 
 CLIMATE_COLS_OUT = ['last_15_days_Rainfall_mm', 'last_15_days_Soil_Moisture',
                     'last_15_days_Evapotranspiration', 'last_15_days_Temp_C', 'last_15_days_runoff']
-GAPFILL_COLS = ['rain_days_gapfilled', 'era5_days_gapfilled', 'rain_days_nrt']
+GAPFILL_COLS = ['rain_days_gapfilled', 'era5_days_gapfilled', 'rain_days_nrt', 'era5_days_ifs']
 LEVEL_STAT_COLS = ['minimium', 'maxmium', 'average', 'deviation from average']
 SEASONAL_COLS = ['seasonal_median_m', 'seasonal_mad_m', 'seasonal_pctile', 'seasonal_z',
                  'base_n_obs', 'base_n_years', 'level_class']
@@ -1300,6 +1311,7 @@ def window_image(date_key):
     has_er = [d in ERA5_DAYS for d in days]
     has_gs = [(not ch) and d in GSMAP_DAYS for d, ch in zip(days, has_ch)]
     n_ch, n_er, n_gs = sum(has_ch), sum(has_er), sum(has_gs)
+    miss_er = ','.join(d.strftime('%Y-%m-%d') for d, ok in zip(days, has_er) if not ok)
     start, end = days[0].strftime('%Y-%m-%d'), (day + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
     if n_ch == WINDOW_DAYS and n_er == WINDOW_DAYS:
         er = ERA5.filterDate(start, end)
@@ -1308,7 +1320,7 @@ def window_image(date_key):
             er.select(ERA5_IN[:2], ['t2m_mean', 'swvl1_mean']).mean(),
             er.select(ERA5_IN[2:], ['evap_sum', 'ro_sum']).sum(),
         ])
-        return img.toFloat(), n_ch, n_er, 0
+        return img.toFloat(), n_ch, n_er, 0, ''
     imgs = []
     for d, ch_ok, er_ok, gs_ok in zip(days, has_ch, has_er, has_gs):
         d0, d1 = d.strftime('%Y-%m-%d'), (d + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
@@ -1333,18 +1345,19 @@ def window_image(date_key):
         col.select(['t2m', 'swvl1']).mean().rename(['t2m_mean', 'swvl1_mean']),
         col.select(['evap', 'ro']).sum().rename(['evap_sum', 'ro_sum']),
     ])
-    return img.toFloat(), n_ch, n_er, n_gs
+    return img.toFloat(), n_ch, n_er, n_gs, miss_er
 
 
 def fetch_dates(groups):
     """groups: list of (date_key, rows). Returns a DataFrame, splitting the request on failure."""
     fcs = []
     for date_key, rows in groups:
-        img, n_ch, n_er, n_gs = window_image(date_key)
+        img, n_ch, n_er, n_gs, miss_er = window_image(date_key)
         pts = ee.FeatureCollection([
             ee.Feature(ee.Geometry.Point([float(r.longitude), float(r.latitude)])
                        .buffer(BUFFER_M.get(r.type, 5000), 100),
-                       {'uid': r.station_uid, 'date': date_key, 'n_chirps': n_ch, 'n_era5': n_er, 'n_gsmap': n_gs})
+                       {'uid': r.station_uid, 'date': date_key, 'n_chirps': n_ch, 'n_era5': n_er, 'n_gsmap': n_gs,
+                        'era5_missing': miss_er})
             for r in rows.itertuples()])
         red = img.reduceRegions(collection=pts, reducer=ee.Reducer.mean(), scale=5000, tileScale=4)
         fcs.append(red.map(lambda f: ee.Feature(None, f.toDictionary())))
@@ -1393,8 +1406,106 @@ def fetch_dates(groups):
     return pd.DataFrame()
 
 
+# --- ECMWF IFS gap-fill helpers (ERA5-Land values at the stations; see ecmwf_gapfill.py) ----
+def _station_features(st):
+    return ee.FeatureCollection([
+        ee.Feature(ee.Geometry.Point([float(r.longitude), float(r.latitude)])
+                   .buffer(BUFFER_M.get(r.type, 5000), 100), {'uid': r.station_uid})
+        for r in st.itertuples()])
+
+
+def ensure_era5_daily(st, dates):
+    """ERA5-Land daily t2m (K), swvl1, runoff (m) at the stations for the given days (cached)."""
+    cols = ['date', 'station_uid', 't2m_k', 'swvl1', 'ro_m']
+    old = (pd.read_csv(ERA5_DAILY_CACHE, dtype={'date': str, 'station_uid': str})
+           if os.path.exists(ERA5_DAILY_CACHE) else pd.DataFrame(columns=cols))
+    todo = [d for d in dates if d not in set(old.date)]
+    rows = []
+    if todo:
+        pts = _station_features(st)
+        for d in todo:
+            d1 = (pd.Timestamp(d) + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+            img = (ee.Image(ERA5.filterDate(d, d1).first())
+                   .select(['temperature_2m', 'volumetric_soil_water_layer_1', 'runoff_sum'],
+                           ['t2m_k', 'swvl1', 'ro_m']).toFloat())
+            try:
+                res = (img.reduceRegions(pts, ee.Reducer.mean(), scale=5000, tileScale=4)
+                       .map(lambda f: ee.Feature(None, f.toDictionary())).getInfo()['features'])
+            except Exception as e:
+                print(f"  ERA5-Land daily {d}: failed ({str(e)[:100]})")
+                continue
+            r = pd.DataFrame([f['properties'] for f in res]).rename(columns={'uid': 'station_uid'})
+            r['date'] = d
+            rows.append(r[cols])
+    if rows:
+        old = pd.concat([old] + rows, ignore_index=True)
+        old.to_csv(ERA5_DAILY_CACHE, index=False)
+    return old
+
+
+def ensure_doy_clim(st, doys):
+    """Day-of-year ERA5-Land average at the stations (the values window_image used as the fill), cached."""
+    cols = ['station_uid', 'doy', 't2m', 'swvl1', 'ro']
+    old = (pd.read_csv(ERA5_DOY_CLIM_CACHE, dtype={'station_uid': str})
+           if os.path.exists(ERA5_DOY_CLIM_CACHE) else pd.DataFrame(columns=cols))
+    todo = [d for d in doys if d not in set(old.doy.astype(int))]
+    rows = []
+    if todo:
+        pts = _station_features(st)
+        for doy in todo:
+            img = doy_climatology(int(doy))[1].select(['t2m', 'swvl1', 'ro']).toFloat()
+            try:
+                res = (img.reduceRegions(pts, ee.Reducer.mean(), scale=5000, tileScale=4)
+                       .map(lambda f: ee.Feature(None, f.toDictionary())).getInfo()['features'])
+            except Exception as e:
+                print(f"  ERA5-Land climatology doy {doy}: failed ({str(e)[:100]})")
+                continue
+            r = pd.DataFrame([f['properties'] for f in res]).rename(columns={'uid': 'station_uid'})
+            r['doy'] = int(doy)
+            rows.append(r[cols])
+    if rows:
+        old = pd.concat([old] + rows, ignore_index=True)
+        old.to_csv(ERA5_DOY_CLIM_CACHE, index=False)
+    return old
+
+
+def ecmwf_fill_columns(c):
+    """Replace the day-of-year fill of missing ERA5-Land days by adapted ECMWF IFS values."""
+    import ecmwf_gapfill as eg
+    st = (stations[['station_uid', 'type', 'latitude', 'longitude']]
+          .dropna(subset=['latitude', 'longitude']).drop_duplicates('station_uid').reset_index(drop=True))
+    ifs = eg.update_ifs_cache(st, ECMWF_IFS_CACHE, TODAY, lookback_days=ECMWF_LOOKBACK_DAYS,
+                              workdir=WORK_DIR)
+    ifs_days = set(ifs.loc[ifs.station_uid != eg.MISS_UID, 'date'])
+    if not ifs_days:
+        print("ECMWF IFS: no days reachable; missing days stay on the day-of-year average")
+        return c
+    era5_days = ERA5_DAYS or available_days(ERA5)
+    win_start = TODAY - pd.Timedelta(days=eg.ADAPT_WINDOW_DAYS)
+    pair_days = sorted(d for d in ifs_days if win_start <= pd.Timestamp(d) and pd.Timestamp(d) in era5_days)
+    era5_daily = ensure_era5_daily(st, pair_days)
+    adapt = eg.fit_adaptation(ifs, era5_daily, TODAY)
+    if adapt is None:
+        print(f"ECMWF IFS: {len(pair_days)} day(s) overlap ERA5-Land, need {eg.MIN_PAIR_DAYS} to adapt it; "
+              "not used yet")
+        return c
+    adapted = eg.adapt_ifs(ifs, adapt)
+    miss_days = set()
+    for v in c['era5_missing'].dropna().astype(str):
+        miss_days.update(x for x in v.split(',') if x)
+    use_days = miss_days & set(adapted.date)
+    doys = sorted({int(pd.Timestamp(d).day_of_year) for d in use_days})
+    doy_clim = ensure_doy_clim(st, doys)
+    c = eg.apply_ifs_fill(c, adapted, doy_clim)
+    n_rows = int((c['era5_days_ifs'] > 0).sum())
+    print(f"ECMWF IFS fill: adapted on {len(pair_days)} paired day(s); {len(use_days)} missing day(s) "
+          f"covered by IFS, {n_rows} climate rows updated (evaporation stays on the average)")
+    return c
+
+
+
 clim_cols = ['station_uid', 'date_key', 'rain_sum', 't2m_mean', 'swvl1_mean',
-             'evap_sum', 'ro_sum', 'n_chirps', 'n_era5', 'n_gsmap', 'complete', 'fetched_on']
+             'evap_sum', 'ro_sum', 'n_chirps', 'n_era5', 'n_gsmap', 'era5_missing', 'complete', 'fetched_on']
 VAL_COLS = ['rain_sum', 't2m_mean', 'swvl1_mean', 'evap_sum', 'ro_sum']
 clim = (pd.read_csv(CLIMATE_CACHE) if os.path.exists(CLIMATE_CACHE)
         else pd.DataFrame(columns=clim_cols))
@@ -1484,6 +1595,13 @@ if len(todo):
 c = clim.copy()
 for col in VAL_COLS + ['n_chirps', 'n_era5', 'n_gsmap']:
     c[col] = pd.to_numeric(c[col], errors='coerce')
+c['era5_days_ifs'] = 0.0
+if USE_ECMWF_FILL:
+    try:
+        c = ecmwf_fill_columns(c)
+    except Exception as e:
+        print(f"ECMWF IFS gap-fill skipped ({type(e).__name__}: {str(e)[:150]})")
+        c['era5_days_ifs'] = 0.0
 c['last_15_days_Rainfall_mm'] = c.rain_sum
 c['last_15_days_Soil_Moisture'] = c.swvl1_mean
 c['last_15_days_Evapotranspiration'] = -c.evap_sum * 1000
@@ -1542,6 +1660,7 @@ final = pd.DataFrame({
     'rain_days_gapfilled': df['rain_days_gapfilled'],
     'era5_days_gapfilled': df['era5_days_gapfilled'],
     'rain_days_nrt': df['rain_days_nrt'],
+    'era5_days_ifs': df['era5_days_ifs'],
     'Elevation_Max': df['Elevation_Max'],
     'Elevation_Mean': df['Elevation_Mean'],
     'Elevation_Min': df['Elevation_Min'],
@@ -1598,6 +1717,10 @@ notes = pd.DataFrame([
     ('rain_days_nrt', 'Days of the 15-day window filled with provisional GSMaP near-real-time rainfall '
                       f'({GSMAP_BAND}). Counted inside rain_days_gapfilled; replaced by CHIRPS once published. '
                       '0 = none.'),
+    ('era5_days_ifs', 'Days of the 15-day window whose ERA5-Land soil moisture, runoff and 2 m temperature were '
+                      'replaced by ECMWF IFS open-data values adapted to ERA5-Land (rolling 60-day offset / '
+                      'ratio per station). Counted inside era5_days_gapfilled; replaced by ERA5-Land once '
+                      'published. Evaporation is always the day-of-year average on those days. 0 = none.'),
     ('era5_days_gapfilled', 'Days of the 15-day window without ERA5-Land data, filled with the ERA5-Land '
                             f'day-of-year mean {CLIM_REF_YEARS[0]}-{CLIM_REF_YEARS[1]}. 0 = all observed.'),
     ('Elevation_*', f'SRTM 30 m within {ELEV_BUFFER_M} m of the station (m)'),
