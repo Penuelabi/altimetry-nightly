@@ -1,5 +1,5 @@
-# SMSGate private server configuration. deploy_gcp.sh fills the <> values and stores the result in Secret Manager
-# (it is mounted into the container at /config/config.yml; CONFIG_PATH points there). Never commit the filled file.
+# SMSGate private server configuration. deploy_gcp.sh vm fills the <> values and copies this file to the VM as
+# /opt/smsgate/config.yml (mounted at /app/config.yml). Never commit the filled file.
 # Check the current key names against config.example.yml in github.com/capcom6/sms-gateway before deploying.
 gateway:
   mode: private
@@ -7,7 +7,7 @@ gateway:
 http:
   listen: 0.0.0.0:3000
 database:
-  host: <CLOUD_SQL_PRIVATE_IP>
+  host: mariadb
   port: 3306
   user: smsgate
   password: <DB_PASSWORD>

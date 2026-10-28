@@ -1,0 +1,3 @@
+{$SMSGATE_DOMAIN} {
+	reverse_proxy smsgate:3000
+}

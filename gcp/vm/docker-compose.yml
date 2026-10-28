@@ -1,0 +1,45 @@
+# SMSGate private server + MariaDB + Caddy (automatic HTTPS) on one small VM.
+# Files live in /opt/smsgate on the VM; secrets are in /opt/smsgate/.env and config.yml (never committed).
+services:
+  mariadb:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: smsgate
+      MARIADB_USER: smsgate
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    command: ["--innodb-buffer-pool-size=96M", "--max-connections=30", "--performance-schema=OFF"]
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+  smsgate:
+    image: ghcr.io/android-sms-gateway/server:latest
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    volumes:
+      - ./config.yml:/app/config.yml:ro
+  # optional background worker, off to save memory on a 1 GB VM:
+  # smsgate-worker:
+  #   image: ghcr.io/android-sms-gateway/server:latest
+  #   command: /app/app worker
+  #   volumes: ["./config.yml:/app/config.yml:ro"]
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      SMSGATE_DOMAIN: ${SMSGATE_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+    depends_on: [smsgate]
+volumes:
+  dbdata:
+  caddydata:

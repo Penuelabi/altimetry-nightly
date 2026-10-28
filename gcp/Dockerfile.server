@@ -1,2 +1,0 @@
-# Re-hosts the SMSGate private server in Artifact Registry (Cloud Run cannot pull from ghcr.io directly)
-FROM ghcr.io/android-sms-gateway/server:latest
