@@ -4,7 +4,7 @@ import { go, openRegister, setState, signOut, startSession, useApp, type RosterE
 import { api, ApiFail, explain } from '../api';
 import { useOnline, usePlace } from '../net';
 import { Field, Seg } from '../ui';
-import { BUILD, checkForUpdate, installUpdate, useUpdate } from '../update';
+import { BUILD, NATIVE, applyNow, checkForUpdate, installApk, useUpdate } from '../update';
 
 async function sha(text: string) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -182,14 +182,19 @@ export function Account() {
 
 function AppVersion() {
   const u = useUpdate();
-  const line = u.state === 'checking' ? 'Checking…' : u.state === 'available' ? `New version ${u.latest} from ${u.date} is ready.` : u.state === 'current' ? `You have the latest version (${u.date}).` : u.state === 'error' ? u.msg : '';
+  const line = {
+    idle: '', checking: 'Checking…', current: `Up to date (${u.date}).`, downloading: `Downloading version ${u.latest} in the background…`,
+    ready: `Version ${u.latest} is downloaded. It starts the next time you close and reopen the app.`,
+    'needs-apk': `Version ${u.latest} needs a one-time install of the new Android app.`, error: u.msg ?? ''
+  }[u.state];
   return (
     <div className="col g6" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>
-      <div className="between"><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>App version</span><span className="mono" style={{ fontSize: 12 }}>{BUILD}</span></div>
+      <div className="between"><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>App version</span><span className="mono" style={{ fontSize: 12 }}>{BUILD} · shell {NATIVE}</span></div>
+      <div className="sub">Updates download by themselves when there is signal.</div>
       {line && <div className="msg">{line}</div>}
-      {u.state === 'available'
-        ? <button className="btn" onClick={installUpdate}>Download & install update</button>
-        : <button className="btn plain" onClick={checkForUpdate}>Check for updates</button>}
+      {u.state === 'ready' ? <button className="btn" onClick={applyNow}>Restart now with the new version</button>
+        : u.state === 'needs-apk' ? <button className="btn" onClick={installApk}>Download & install</button>
+        : <button className="btn plain" onClick={checkForUpdate}>Check now</button>}
     </div>
   );
 }

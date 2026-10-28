@@ -29,6 +29,9 @@ jobs:
           distribution: temurin
           java-version: 21
       - run: npm ci
+      # Shell version: bump apps/pwa/native-version whenever the Android part changes (plugins, permissions,
+      # Capacitor). Screen packages that need a newer shell are only offered after the APK is installed.
+      - run: echo "VITE_NATIVE_VERSION=$(cat apps/pwa/native-version)" >> "$GITHUB_ENV"
       # VITE_DEMO shows the sample-data demo on the sign-in screen; drop it once the server is deployed.
       - run: npm run build -w apps/pwa
         env:
@@ -86,3 +89,14 @@ jobs:
             --notes "Test build of the Duk County · Abuk Project app from branch abuk-app ($GITHUB_SHA).
           On the phone: download abuk-project-latest.apk, open it, and allow \"install unknown apps\" for your browser when Android asks.
           Sign in with your worker ID and access key, or tap \"Open demo with sample data\" to try it without the server."
+      - name: Publish the screen update package (downloaded silently by the app)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ZIP="$RUNNER_TEMP/abuk-web-${GITHUB_SHA::7}-n$VITE_NATIVE_VERSION.zip"
+          (cd apps/pwa/dist && zip -qr "$ZIP" .)
+          gh release delete abuk-web-latest --yes --cleanup-tag || true
+          gh release create abuk-web-latest "$ZIP" --prerelease --target "$GITHUB_SHA" \
+            --title "Abuk screens (latest)" \
+            --notes "Screen update package for the Abuk Project Android app ($GITHUB_SHA, needs Android shell $VITE_NATIVE_VERSION). The app downloads it by itself; nothing to install."
