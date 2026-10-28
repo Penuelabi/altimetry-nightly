@@ -95,6 +95,37 @@ describe('farm register', () => {
   });
 });
 
+import { herdCount, herdLabel, opAllowed, type Herd, type LivestockEvent } from '../src';
+describe('livestock, forest & fish register', () => {
+  const herd: Herd = { id: 'hd1', species: 'goat', ownerType: 'group', ownerId: 'g4', ownerName: 'Group 4' };
+  it('labels a herd', () => expect(herdLabel(herd)).toBe('Goat · Group 4'));
+  it('derives head count from the event log, not a stored number', () => {
+    let r = seedRegister();
+    r = applyOps(r, [
+      { op: 'upsert', kind: 'herd', item: herd },
+      { op: 'upsert', kind: 'livestockEvent', item: { id: 'e1', herdId: 'hd1', kind: 'opening', date: '2026-10-01', qty: 10, note: '', by: 'w1' } },
+      { op: 'upsert', kind: 'livestockEvent', item: { id: 'e2', herdId: 'hd1', kind: 'birth', date: '2026-10-10', qty: 2, note: '', by: 'w1' } },
+      { op: 'upsert', kind: 'livestockEvent', item: { id: 'e3', herdId: 'hd1', kind: 'death', date: '2026-10-15', qty: 1, note: 'disease', by: 'w1' } },
+      { op: 'upsert', kind: 'livestockEvent', item: { id: 'e4', herdId: 'hd1', kind: 'milk', date: '2026-10-20', qty: 3, note: 'litres', by: 'w1' } as LivestockEvent }
+    ]);
+    expect(herdCount(r, 'hd1')).toBe(11); // 10 + 2 - 1, milk doesn't change the count
+  });
+  it('lets any signed-in worker log events but not define a herd', () => {
+    const reg = seedRegister();
+    const ev = { op: 'upsert' as const, kind: 'livestockEvent' as const, item: { id: 'e5', herdId: 'hd1', kind: 'birth' as const, date: '2026-10-01', qty: 1, note: '', by: 'w1' } };
+    expect(opAllowed('Field worker', ev, reg)).toBe(true);
+    expect(opAllowed('Field worker', { op: 'upsert', kind: 'herd', item: herd }, reg)).toBe(false);
+    expect(opAllowed('Group lead', { op: 'upsert', kind: 'herd', item: herd }, reg)).toBe(true);
+  });
+  it('validates the new kinds', () => {
+    expect(opError({ op: 'upsert', kind: 'herd', item: { id: 'hd2', species: 'camel' as Herd['species'], ownerType: 'group', ownerId: 'g1', ownerName: 'Group 1' } })).toMatch(/species/);
+    expect(opError({ op: 'upsert', kind: 'livestockEvent', item: { id: 'e6', herdId: '', kind: 'birth', date: '', qty: 0, note: '', by: '' } })).toMatch(/herd/);
+    expect(opError({ op: 'upsert', kind: 'forestLog', item: { id: 'f1', product: 'honey', date: '2026-10-01', qty: 2, unit: 'kg', lat: null, lon: null, by: 'w1', note: '' } })).toBe('');
+    expect(opError({ op: 'upsert', kind: 'forestLog', item: { id: 'f2', product: 'honey', date: '2026-10-01', qty: 0, unit: 'kg', lat: null, lon: null, by: 'w1', note: '' } })).toMatch(/quantity/);
+    expect(opError({ op: 'upsert', kind: 'fishLog', item: { id: 'p1', species: 'tilapia', kind: 'catch', date: '2026-10-01', weightKg: 4, qty: null, processed: 'none', pond: '', by: 'w1', note: '' } })).toBe('');
+  });
+});
+
 import { conditionSummary } from '../src';
 describe('plot condition', () => {
   const base = { moisture: 'wet', water: 'none', floodDepthCm: '', around: 'dry', aroundDepthCm: '', aroundDistanceM: '', trend: '', surface: [] as string[], crackWidth: '' };
