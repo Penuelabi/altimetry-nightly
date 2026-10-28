@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { get, set } from 'idb-keyval';
-import type { GaugeReading, HomeLayout, Lang, PublicUser, PullResult, Screen, SyncKind, SyncRecord } from '@abuk/core';
+import type { GaugeReading, HomeLayout, Lang, PublicUser, PullResult, SatelliteIndices, Screen, SyncKind, SyncRecord } from '@abuk/core';
 import { HARV, LEADS, MEMBERS, MON, SOURCES, STORE, TASKS, applyOps, seedRegister, type FarmOp, type Harvest, type MonRecord, type Register, type Task } from '@abuk/core';
 
 export interface Session { token: string; user: PublicUser; expires: string; demo?: boolean }
@@ -28,6 +28,7 @@ export interface State {
   accounts: Account[]; roster: RosterEntry[];
   // Satellite values for a small circle around where the phone last asked (light: two numbers).
   satHere: { lat: number; lon: number; at: string; floodPct: number | null; soil: number | null; radiusKm: number } | null;
+  satIndices: SatelliteIndices | null;
   autoPull: { state: 'running' | 'ok' | 'error'; at: string; msg?: string } | null;
   // Crop checks from every phone (server, last 3 weeks), for the flood model and SMS alerts.
   checksAll: { id: string; at: string; by: string; plot: string; crop: string; lat: number | null; lon: number | null; water: string; depthCm: number | null; around: string; aroundDepthCm: number | null; trend: string }[];
@@ -44,7 +45,7 @@ const initial: State = {
   offer: 'open',
   leads: LEADS.map(([name, g, rows]) => ({ id: name, name: `${name} · ${g}`, rows, phone: 'number on server', on: true })),
   alertLog: [], gauge: null, where: null,
-  accounts: [], roster: [], satHere: null, autoPull: null, checksAll: [],
+  accounts: [], roster: [], satHere: null, satIndices: null, autoPull: null, checksAll: [],
   farm: seedRegister(), farmOps: [], regTab: 'plots'
 };
 

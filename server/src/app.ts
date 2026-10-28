@@ -8,7 +8,7 @@ import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, changeUsers, checkKey, c
 import { readJson, updateJson } from './adapters/github';
 import { photoGet, photoPut, sheetsAppend } from './adapters/google';
 import { parseInbound, sendSms } from './adapters/sms';
-import { geeSummary, pull, terrain } from './sources';
+import { geeSummary, pull, satelliteIndices, terrain } from './sources';
 import { overview, recentChecks } from './dashboard';
 
 type Env = { Variables: { me: Session } };
@@ -137,6 +137,12 @@ app.get('/api/sources/gee', auth(), async c => {
   const p = coords(c), radius = Math.min(200, Math.max(1, Number(c.req.query('radius')) || 20));
   if (!p) return c.json({ error: 'invalid', message: 'lat and lon are required' }, 400);
   return c.json(await geeSummary(p.lat, p.lon, radius));
+});
+
+app.get('/api/sources/satellite', auth(), async c => {
+  const p = coords(c), radius = Math.min(200, Math.max(1, Number(c.req.query('radius')) || 20));
+  if (!p) return c.json({ error: 'invalid', message: 'lat and lon are required' }, 400);
+  return c.json(await satelliteIndices(p.lat, p.lon, radius));
 });
 
 // Payam / county / state for a point (also works offline in the app from the same boundaries).

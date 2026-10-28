@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { conditionSummary, signinError, whereIs, type GaugeReading, type PlotCondition, type PublicUser, type Register, type SigninResponse, type SyncKind } from '@abuk/core';
+import { conditionSummary, signinError, whereIs, type GaugeReading, type PlotCondition, type PublicUser, type Register, type SatelliteIndices, type SigninResponse, type SyncKind } from '@abuk/core';
 import { DayBars } from './DayBars';
 import { DashMap, type CheckPoint, type DashMapHandle } from './DashMap';
 
@@ -58,6 +58,15 @@ export function Dashboard() {
   const [kind, setKind] = useState<string>('all');
   const [who, setWho] = useState<string>('all');
   const mapRef = useRef<DashMapHandle>(null);
+  const [sat, setSat] = useState<SatelliteIndices | null>(null);
+
+  const loadSat = async () => {
+    if (!session) return;
+    try {
+      const r = await fetch('/api/sources/satellite?lat=7.33&lon=31.65&radius=20', { headers: { authorization: `Bearer ${session.token}` } });
+      if (r.ok) setSat(await r.json());
+    } catch { /* silently fail */ }
+  };
 
   const load = async (fresh = false) => {
     if (!session) return;
@@ -71,7 +80,7 @@ export function Dashboard() {
     } catch (e) { setErr((e as Error).message); }
     finally { setBusy(false); }
   };
-  useEffect(() => { load(); const iv = setInterval(() => load(), 120_000); return () => clearInterval(iv); }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); loadSat(); const iv = setInterval(() => load(), 120_000); return () => clearInterval(iv); }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const since = useMemo(() => new Date(Date.now() - range * 864e5).toISOString(), [range, data]);
   const inRange = useMemo(() => (data?.records ?? []).filter(r => r.at >= since), [data, since]);
@@ -172,15 +181,17 @@ export function Dashboard() {
       </div>
 
       <div className="panel">
-        <h2>Satellite indices · GEE</h2>
-        <div className="note">NDVI, VCI, SPEI and SPI from Google Earth Engine (Sentinel-2 / CHIRPS). Values are area averages for registered plots. Connect a GEE service account to enable live data.</div>
+        <h2>Satellite indices · GEE{sat?.asOf ? ` · ${sat.asOf}` : ''}</h2>
+        <div className="note">NDVI, VCI, SPEI and SPI from Google Earth Engine (Sentinel-2 / CHIRPS). Values are area averages around Duk project plots. Cached 6 h per location.</div>
         <div className="tiles" style={{ marginTop: 8 }}>
-          <Tile k="NDVI" v="—" s="Vegetation greenness (Sentinel-2)" />
-          <Tile k="VCI" v="—" s="Vegetation condition vs historical" />
-          <Tile k="SPEI" v="—" s="Drought severity (precip + temp)" />
-          <Tile k="SPI" v="—" s="Rainfall anomaly (CHIRPS)" />
+          <Tile k="NDVI" v={sat?.ndvi ?? '—'} s="Vegetation greenness (MODIS)" />
+          <Tile k="VCI" v={sat?.vci != null ? `${sat.vci}%` : '—'} s="Vegetation condition vs historical" />
+          <Tile k="SPEI" v={sat?.spei ?? '—'} s="Drought severity (TerraClimate PDSI)" />
+          <Tile k="SPI" v={sat?.spi ?? '—'} s="Rainfall anomaly (CHIRPS)" />
         </div>
-        <div className="note" style={{ marginTop: 6, fontSize: 11 }}>Integration: set GEE_SERVICE_ACCOUNT in server/.env and add plot centroids to the /api/admin/satellite endpoint. Indices update weekly from Sentinel-2 (NDVI, VCI) and CHIRPS (SPI, SPEI).</div>
+        {sat?.precipMm != null && <div className="note" style={{ marginTop: 6, fontSize: 12 }}>30-day rainfall: <strong>{sat.precipMm} mm</strong></div>}
+        {sat?.errors.length ? <div className="note" style={{ marginTop: 6, fontSize: 11, color: '#c03020' }}>{sat.errors.join('; ')}</div> : null}
+        {!sat && <div className="note" style={{ marginTop: 6, fontSize: 11 }}>Set GEE_PROJECT and GOOGLE_SERVICE_ACCOUNT_JSON in server/.env to enable. <button style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11 }} onClick={loadSat}>Retry</button></div>}
       </div>
 
       <div className="panel">

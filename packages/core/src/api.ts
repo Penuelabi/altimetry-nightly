@@ -17,6 +17,16 @@ export interface PullResult {
 }
 export interface Terrain { elevation: number | null; slopePct: number | null }
 
+export interface SatelliteIndices {
+  ndvi: number | null;
+  vci: number | null;
+  spi: number | null;
+  spei: number | null;
+  precipMm: number | null;
+  asOf: string;
+  errors: string[];
+}
+
 export type SyncKind = 'task' | 'harvest' | 'monitor' | 'plot' | 'offer' | 'store' | 'payout' | 'voice' | 'pest' | 'alert';
 export interface SyncRecord { id: string; kind: SyncKind; at: string; by: string; data: Record<string, unknown> }
 

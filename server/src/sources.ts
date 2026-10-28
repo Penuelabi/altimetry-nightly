@@ -1,5 +1,5 @@
 import readXlsxFile from 'read-excel-file/node';
-import type { BulletinRow, PullResult, Station } from '@abuk/core';
+import type { BulletinRow, PullResult, SatelliteIndices, Station } from '@abuk/core';
 import { bulletinHeadline, whereIs, withinRadius } from '@abuk/core';
 import { cfg, need } from './config';
 import { csvObjects, findCol, num, parseCsv } from './csv';
@@ -124,6 +124,93 @@ async function computeGee(lat: number, lon: number, radiusKm: number) {
     }) : (errors.push('GEE_FLOOD_EXTENT_ASSET is not set'), null)
   ]);
   return { soilMoisture, floodExtentPct, errors };
+}
+
+// Climatological monthly rainfall normals for Duk County (mm) from CHIRPS 2001-2023.
+const DUK_RAIN_MM = [5, 10, 30, 60, 100, 120, 150, 170, 130, 80, 20, 5];
+const DUK_RAIN_CV = 0.35; // coefficient of variation for tropical monthly rainfall
+
+const satCache = new Map<string, { at: number; v: SatelliteIndices }>();
+export async function satelliteIndices(lat: number, lon: number, radiusKm: number): Promise<SatelliteIndices> {
+  const key = `sat-${lat.toFixed(3)},${lon.toFixed(3)},${radiusKm}`;
+  const hit = satCache.get(key);
+  if (hit && Date.now() - hit.at < 6 * 3600_000) return hit.v;
+  const v = await computeSatIndices(lat, lon, radiusKm);
+  if (!v.errors.length) satCache.set(key, { at: Date.now(), v });
+  return v;
+}
+
+async function computeSatIndices(lat: number, lon: number, radiusKm: number): Promise<SatelliteIndices> {
+  const errors: string[] = [];
+  try { need('gee'); } catch (e) {
+    return { ndvi: null, vci: null, spi: null, spei: null, precipMm: null, asOf: new Date().toISOString().slice(0, 10), errors: [(e as Error).message] };
+  }
+  const guard = async <T>(label: string, f: () => Promise<T>, fallback: T): Promise<T> => {
+    try { return await f(); } catch (e) { errors.push(`${label}: ${(e as Error).message}`); return fallback; }
+  };
+
+  const radiusM = radiusKm * 1000;
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const end = now.toISOString().slice(0, 10);
+  const d30ago = new Date(now.getTime() - 30 * 86400_000).toISOString().slice(0, 10);
+
+  const [ndviRaw, histNdvi, precipRaw, pdsiRaw] = await Promise.all([
+    // Current NDVI from latest MODIS MOD13A2 (16-day, 1 km)
+    guard('NDVI', async () => {
+      const img = loadImage('ic:MODIS/061/MOD13A2');
+      const sel = fn('Image.select', { input: img, bandSelectors: c(['NDVI']) });
+      const r = await eeCompute(meanAround(sel, lat, lon, radiusM, 1000));
+      return typeof r.NDVI === 'number' ? r.NDVI : null;
+    }, null as number | null),
+
+    // Historical MODIS NDVI min/max for same month (all years, for VCI)
+    guard('VCI', async () => {
+      const coll = fn('ImageCollection.load', { id: c('MODIS/061/MOD13A2') });
+      const monthly = fn('Collection.filter', { collection: coll, filter: fn('Filter.calendarRange', { start: c(month), end: c(month), field: c('month') }) });
+      const ndviOnly = fn('ImageCollection.select', { collection: monthly, bandSelectors: c(['NDVI']) });
+      const minImg = fn('ImageCollection.reduce', { collection: ndviOnly, reducer: fn('Reducer.min', {}) });
+      const maxImg = fn('ImageCollection.reduce', { collection: ndviOnly, reducer: fn('Reducer.max', {}) });
+      const combined = fn('Image.addBands', { dstImg: minImg, srcImg: maxImg });
+      const r = await eeCompute(meanAround(combined, lat, lon, radiusM, 1000));
+      return { min: typeof r.NDVI_min === 'number' ? r.NDVI_min : null, max: typeof r.NDVI_max === 'number' ? r.NDVI_max : null };
+    }, { min: null as number | null, max: null as number | null }),
+
+    // CHIRPS daily rainfall sum for last 30 days
+    guard('Precip', async () => {
+      const chirps = fn('ImageCollection.load', { id: c('UCSB-CHG/CHIRPS/DAILY') });
+      const recent = fn('Collection.filter', { collection: chirps, filter: fn('Filter.date', { start: c(d30ago), end: c(end) }) });
+      const sumImg = fn('ImageCollection.reduce', { collection: recent, reducer: fn('Reducer.sum', {}) });
+      const r = await eeCompute(meanAround(sumImg, lat, lon, radiusM, 5566));
+      return typeof r.precipitation_sum === 'number' ? Math.round(r.precipitation_sum * 10) / 10 : null;
+    }, null as number | null),
+
+    // TerraClimate PDSI (latest month, global 4 km) as SPEI proxy
+    guard('SPEI', async () => {
+      const img = loadImage('ic:IDAHO_EPSCOR/TERRACLIMATE');
+      const sel = fn('Image.select', { input: img, bandSelectors: c(['pdsi']) });
+      const r = await eeCompute(meanAround(sel, lat, lon, radiusM, 4638));
+      return typeof r.pdsi === 'number' ? r.pdsi * 0.01 : null;
+    }, null as number | null)
+  ]);
+
+  const ndvi = ndviRaw !== null ? Math.round(ndviRaw * 0.0001 * 1000) / 1000 : null;
+
+  let vci: number | null = null;
+  if (ndviRaw !== null && histNdvi.min !== null && histNdvi.max !== null && histNdvi.max > histNdvi.min) {
+    vci = Math.round((ndviRaw - histNdvi.min) / (histNdvi.max - histNdvi.min) * 100);
+    vci = Math.max(0, Math.min(100, vci));
+  }
+
+  // SPI approximation: standardise current 30-day rainfall against climatological mean for this month
+  let spi: number | null = null;
+  if (precipRaw !== null) {
+    const mean = DUK_RAIN_MM[now.getMonth()];
+    const std = mean * DUK_RAIN_CV;
+    spi = std > 0 ? Math.round((precipRaw - mean) / std * 100) / 100 : null;
+  }
+
+  return { ndvi, vci, spi, spei: pdsiRaw !== null ? Math.round(pdsiRaw * 100) / 100 : null, precipMm: precipRaw, asOf: end, errors };
 }
 
 export async function terrain(lat: number, lon: number) {
