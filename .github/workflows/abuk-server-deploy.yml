@@ -120,12 +120,13 @@ jobs:
         env:
           DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
           SMS_USER: ${{ secrets.SMS_GATE_USER }}
+          SMS_URL: ${{ vars.SMS_GATE_URL || 'https://api.sms-gate.app/3rdparty/v1' }}
         run: |
           set -euo pipefail
           ENVS="^|^GITHUB_ACCESS_REPO=$ACCESS_REPO|SHEET_ID=$SHEET_ID|GEE_PROJECT=$PROJECT"
           ENVS="$ENVS|GEE_SOIL_MOISTURE_ASSET=${{ vars.ABUK_GEE_SOIL_ASSET || 'ic:NASA/SMAP/SPL4SMGP/008' }}|GEE_SOIL_MOISTURE_BAND=${{ vars.ABUK_GEE_SOIL_BAND || 'sm_rootzone' }}"
           ENVS="$ENVS|GEE_FLOOD_EXTENT_ASSET=${{ vars.ABUK_GEE_FLOOD_ASSET || 'projects/sudan-1575919084043/assets/maximum_flood_extent' }}"
-          ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER"
+          ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER|SMS_API_URL=$SMS_URL"
           [ -n "$DRIVE_FOLDER_ID" ] && ENVS="$ENVS|DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID"
           if ! gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --source . \
             --allow-unauthenticated --memory 512Mi --max-instances 3 --service-account "$RUNTIME_SA" \
@@ -138,3 +139,21 @@ jobs:
           echo "### Abuk server: $URL" >> "$GITHUB_STEP_SUMMARY"
           echo "::notice::Abuk server deployed at $URL"
           curl -fsS "$URL/api/health" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Register the incoming-SMS webhook with SMSGate
+        env:
+          SMS_USER: ${{ secrets.SMS_GATE_USER }}
+          SMS_PASS: ${{ secrets.SMS_GATE_PASSWORD }}
+          SMS_URL: ${{ vars.SMS_GATE_URL || 'https://api.sms-gate.app/3rdparty/v1' }}
+        run: |
+          set -euo pipefail
+          [ -n "$SMS_USER" ] || { echo "SMS_GATE_USER not set; skipping."; exit 0; }
+          URL="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')"
+          HOOK="$(gcloud secrets versions access latest --secret abuk-sms-webhook --project "$PROJECT")"
+          echo "::add-mask::$HOOK"
+          # A fixed id makes this idempotent: re-running a deploy replaces the same webhook.
+          code=$(curl -sS -o resp.json -w '%{http_code}' -u "$SMS_USER:$SMS_PASS" -H 'content-type: application/json' \
+            -X POST "${SMS_URL%/}/webhooks" \
+            -d "{\"id\":\"abuk-gauge\",\"url\":\"$URL/api/sms/inbound?secret=$HOOK\",\"event\":\"sms:received\"}")
+          if [ "$code" -ge 300 ]; then echo "::error::SMSGate webhook registration returned HTTP $code (check SMS_GATE_USER / SMS_GATE_PASSWORD)"; exit 1; fi
+          echo "::notice::Incoming SMS from the gateway phone now go to the Abuk server (gauge readings)."
+
