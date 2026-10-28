@@ -4,7 +4,7 @@ import type { BulletinRow, PullResult, Station } from '@abuk/core';
 import { withinRadius } from '@abuk/core';
 import { cfg, need } from './config';
 import { csvObjects, findCol, num } from './csv';
-import { driveDownload, driveFind, driveList, eeCompute, loadImage, meanAround, terrainExpr } from './adapters/google';
+import { c, driveDownload, driveFind, driveList, eeCompute, fn, loadImage, meanAround, terrainExpr } from './adapters/google';
 
 const text = async (parent: string, name: string) => {
   const f = await driveFind(parent, name);
@@ -117,7 +117,9 @@ export async function geeSummary(lat: number, lon: number, radiusKm: number) {
     }
     if (!cfg.floodAsset) errors.push('GEE_FLOOD_EXTENT_ASSET is not set');
     else {
-      const r = await eeCompute(meanAround(loadImage(cfg.floodAsset), lat, lon, radiusKm * 1000, 30));
+      // 1 = flooded, 0 = not; unmask so pixels left blank count as dry instead of being dropped from the mean.
+      const img = fn('Image.unmask', { input: loadImage(cfg.floodAsset), value: c(0) });
+      const r = await eeCompute(meanAround(img, lat, lon, radiusKm * 1000, 30));
       const v = Object.values(r).find(x => typeof x === 'number');
       floodExtentPct = typeof v === 'number' ? Math.round(v * 1000) / 10 : null;
     }

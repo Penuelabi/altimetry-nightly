@@ -123,7 +123,8 @@ jobs:
         run: |
           set -euo pipefail
           ENVS="^|^GITHUB_ACCESS_REPO=$ACCESS_REPO|SHEET_ID=$SHEET_ID|GEE_PROJECT=$PROJECT"
-          ENVS="$ENVS|GEE_SOIL_MOISTURE_ASSET=${{ vars.ABUK_GEE_SOIL_ASSET }}|GEE_FLOOD_EXTENT_ASSET=${{ vars.ABUK_GEE_FLOOD_ASSET }}"
+          ENVS="$ENVS|GEE_SOIL_MOISTURE_ASSET=${{ vars.ABUK_GEE_SOIL_ASSET || 'ic:NASA/SMAP/SPL4SMGP/008' }}|GEE_SOIL_MOISTURE_BAND=${{ vars.ABUK_GEE_SOIL_BAND || 'sm_rootzone' }}"
+          ENVS="$ENVS|GEE_FLOOD_EXTENT_ASSET=${{ vars.ABUK_GEE_FLOOD_ASSET || 'projects/sudan-1575919084043/assets/maximum_flood_extent' }}"
           ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER"
           [ -n "$DRIVE_FOLDER_ID" ] && ENVS="$ENVS|DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID"
           if ! gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --source . \
