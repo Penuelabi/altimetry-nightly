@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# SMSGate recipients are personal data: never commit them
+sms_recipients*.csv

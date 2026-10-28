@@ -15,6 +15,7 @@ Pillars 1, 2, 3 and 5. They read the files the app already produces and never mo
 | `aa_p3_simulation.py` | 3 Anticipatory action | Replays past seasons through a plan (same rules as the engine), drills with a raised river or injected alerts, multi-season review of hits, late, misses and false alarms; exercise packs with injects and an evaluation sheet | Simulation packs prepared; exercises conducted (once `conducted_date` is filled); retrospective plan tests | `aa_out/simulations/SIM-.../` (exercise_pack.md, timeline.csv, evaluation.csv, hydrograph.png) |
 | `aa_p5_dissemination.py` | 5 Coordination (also 2, local languages) | National and state TWG-AA situation briefs with decisions needed; SMS (<= 160 characters) and radio scripts per county in every language with a validated template; distribution plan per coordination group; feedback and meetings logs | Briefs prepared; warning messages prepared; subnational TWG-AA groups active; radio hubs / community groups registered; languages with validated templates | `aa_out/dissemination/latest/`, `dissemination_log.csv` |
 | `aa_p5_indicator_tracker.py` | 5 Coordination | Quarterly progress report against yearly targets for the TWG-AA meeting: last four quarters, year to date, % achieved, plan decisions, gaps, next steps | Reads all of the above, plus meetings held, items sent and community feedback | `p5_indicator_report_<YYYYQn>.md/.csv/.png` |
+| `aa_p5_sms_gateway.py` | 5 Coordination (also 2) | Sends the SMS texts from `aa_p5_dissemination.py` through an Android phone running [SMSGate](https://sms-gate.app) (REST API; Local, Cloud or Private mode). Dry run by default; live sending needs `--send`, `SMS_GATE_ENABLED=yes` and the message listed in `aa_config/sms_release.csv` with `approved_by` / `approved_date`. Recipients (phone numbers) stay outside the public repo: `SMS_RECIPIENTS_FILE` or the `SMS_RECIPIENTS_CSV` secret | Warning SMS released | `aa_out/sms_send_log.csv` (no numbers) |
 
 ## How they connect to the app
 
@@ -132,3 +133,11 @@ All seven self-tests pass on pandas 3.0 and pandas 2.2 (Colab). The full chain w
 with its real `data/` files and county-gauge links, and synthetic stand-ins for the Drive files (altimetry series,
 station status, bulletin, county shapes). The numbers in those test outputs are not results; run the scorecard on
 the real altimetry before discussing levels with partners.
+
+## SMS delivery through SMSGate (`aa_p5_sms_gateway.py`)
+
+Secrets / environment: `SMS_GATE_USER`, `SMS_GATE_PASSWORD` (from the SMSGate app home screen), optional `SMS_GATE_URL`
+(default `https://api.sms-gate.app/3rdparty/v1`; Local mode `http://<phone-ip>:8080`), `SMS_GATE_SIM`, `SMS_MAX_PER_RUN`
+(default 200), and `SMS_RECIPIENTS_CSV` or `SMS_RECIPIENTS_FILE` (columns `phone,county,language,group_id`, international
+format). It uses the same REST call as the official Python and Go clients, so no extra package is needed. It is not part
+of `aa-addons.yml`: nothing is sent automatically, in line with the safeguards above.
