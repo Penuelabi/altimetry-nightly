@@ -1,0 +1,78 @@
+name: Abuk server deploy (Cloud Run)
+
+# Run from Actions → "Abuk server deploy" → Run workflow (branch abuk-app).
+# Secrets never leave GitHub/Google: GitHub secrets are copied into Secret Manager
+# and mounted into the Cloud Run service.
+#
+# Repository variables:  GCP_PROJECT (required), GCP_REGION (default europe-west1),
+#   ABUK_ACCESS_REPO (owner/repo holding users.json), ABUK_SHEET_ID,
+#   ABUK_GEE_SOIL_ASSET, ABUK_GEE_FLOOD_ASSET, ABUK_ALLOWED_ORIGIN
+# Repository secrets:    GCP_DEPLOY_KEY (falls back to GEE_SERVICE_ACCOUNT_KEY), GEE_SERVICE_ACCOUNT_KEY,
+#   DRIVE_FOLDER_ID, ABUK_GITHUB_TOKEN, SMS_GATE_USER, SMS_GATE_PASSWORD
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    env:
+      PROJECT: ${{ vars.GCP_PROJECT }}
+      REGION: ${{ vars.GCP_REGION || 'europe-west1' }}
+      SERVICE: abuk-server
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check settings
+        run: |
+          [ -n "$PROJECT" ] || { echo "::error::Set the repository variable GCP_PROJECT"; exit 1; }
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_DEPLOY_KEY || secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Enable services
+        run: gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com sheets.googleapis.com drive.googleapis.com earthengine.googleapis.com --project "$PROJECT"
+      - name: Store secrets in Secret Manager
+        env:
+          GOOGLE_SA: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+          GH_ACCESS_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN }}
+          SMS_PASS: ${{ secrets.SMS_GATE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          G="gcloud --project=$PROJECT"
+          RUNTIME_SA="$($G projects describe "$PROJECT" --format='value(projectNumber)')-compute@developer.gserviceaccount.com"
+          MOUNTS=""
+          put() {  # put NAME ENV_VAR VALUE  (empty VALUE keeps any existing version)
+            if ! $G secrets describe "$1" >/dev/null 2>&1; then
+              [ -n "$3" ] || return 0
+              $G secrets create "$1" --replication-policy=automatic >/dev/null
+            fi
+            [ -n "$3" ] && printf '%s' "$3" | $G secrets versions add "$1" --data-file=- >/dev/null
+            $G secrets add-iam-policy-binding "$1" --member="serviceAccount:$RUNTIME_SA" --role=roles/secretmanager.secretAccessor >/dev/null
+            MOUNTS="$MOUNTS,$2=$1:latest"
+          }
+          # Generated once, then kept: rotating SESSION_SECRET signs everyone out.
+          gen() { $G secrets describe "$1" >/dev/null 2>&1 && put "$1" "$2" "" || put "$1" "$2" "$(openssl rand -base64 48)"; }
+          put abuk-google-sa GOOGLE_SERVICE_ACCOUNT_JSON "$GOOGLE_SA"
+          put abuk-github-token GITHUB_TOKEN "$GH_ACCESS_TOKEN"
+          put abuk-sms-password SMS_API_KEY "$SMS_PASS"
+          gen abuk-session-secret SESSION_SECRET
+          gen abuk-sms-webhook SMS_WEBHOOK_SECRET
+          echo "MOUNTS=${MOUNTS#,}" >> "$GITHUB_ENV"
+      - name: Deploy
+        env:
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+          SMS_USER: ${{ secrets.SMS_GATE_USER }}
+        run: |
+          set -euo pipefail
+          ENVS="^|^GITHUB_ACCESS_REPO=${{ vars.ABUK_ACCESS_REPO }}|SHEET_ID=${{ vars.ABUK_SHEET_ID }}|GEE_PROJECT=$PROJECT"
+          ENVS="$ENVS|GEE_SOIL_MOISTURE_ASSET=${{ vars.ABUK_GEE_SOIL_ASSET }}|GEE_FLOOD_EXTENT_ASSET=${{ vars.ABUK_GEE_FLOOD_ASSET }}"
+          ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER"
+          [ -n "$DRIVE_FOLDER_ID" ] && ENVS="$ENVS|DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID"
+          gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --source . \
+            --allow-unauthenticated --memory 512Mi --max-instances 3 \
+            --set-env-vars "$ENVS" --set-secrets "$MOUNTS"
+          URL="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')"
+          echo "### Abuk server: $URL" >> "$GITHUB_STEP_SUMMARY"
+          curl -fsS "$URL/api/health" | tee -a "$GITHUB_STEP_SUMMARY"

@@ -16,7 +16,8 @@ export type Group = keyof typeof GROUPS;
 
 export const cfg = {
   get port() { return Number(env('PORT')) || 8787; },
-  get allowedOrigin() { return env('ALLOWED_ORIGIN') || '*'; },
+  // Comma-separated; the Android app's WebView origin is https://localhost.
+  get allowedOrigins() { return (env('ALLOWED_ORIGIN') || '*').split(',').map(s => s.trim()).filter(Boolean); },
   get sessionSecret() { return env('SESSION_SECRET'); },
   get serviceAccount() { return env('GOOGLE_SERVICE_ACCOUNT_JSON'); },
   get driveFolder() { return env('DRIVE_FOLDER_ID') || '1EyYopiOghPmHyJyBuH8DCp9PJv1zvCzV'; },
@@ -32,6 +33,7 @@ export const cfg = {
   get smsKey() { return env('SMS_API_KEY'); },
   get smsUser() { return env('SMS_USERNAME'); },
   get smsSender() { return env('SMS_SENDER_ID'); },
+  get smsApiUrl() { return (env('SMS_API_URL') || 'https://api.sms-gate.app/3rdparty/v1').replace(/\/$/, ''); },
   get smsWebhookSecret() { return env('SMS_WEBHOOK_SECRET'); }
 };
 

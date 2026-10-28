@@ -34,7 +34,7 @@ Missing values don't crash the server. The affected endpoint returns `503 not_co
 | `DRIVE_FOLDER_ID` | Defaults to the colab_waterlevel folder `1EyYopiOghPmHyJyBuH8DCp9PJv1zvCzV`. |
 | `SHEET_ID` | Google Sheet that receives synced records. It needs one tab per kind: `task`, `harvest`, `monitor`, `plot`, `offer`, `store`, `payout`, `voice`, `pest`. |
 | `GEE_PROJECT`, `GEE_SOIL_MOISTURE_ASSET`, `GEE_SOIL_MOISTURE_BAND`, `GEE_FLOOD_EXTENT_ASSET` | Earth Engine assets. Prefix an ImageCollection with `ic:` to use its newest image. The flood asset should be a 0/1 water mask. |
-| `SMS_PROVIDER` (`africastalking` or `twilio`), `SMS_API_KEY`, `SMS_USERNAME`, `SMS_SENDER_ID` | Flood alerts and gauge replies. For Twilio, `SMS_USERNAME` is the account SID. |
+| `SMS_PROVIDER` (`smsgate`, `africastalking` or `twilio`), `SMS_API_URL`, `SMS_API_KEY`, `SMS_USERNAME`, `SMS_SENDER_ID` | Flood alerts and gauge replies. For SMSGate (as in altimetry-nightly), use the username and password from the gateway app. For Twilio, `SMS_USERNAME` is the account SID. |
 | `SMS_WEBHOOK_SECRET` | Point the provider's inbound-SMS webhook at `/api/sms/inbound?secret=…`. |
 | `ALLOWED_ORIGIN` | The PWA's origin, for CORS. |
 
@@ -80,5 +80,6 @@ Phone numbers never ship in the app. Add them to `config/leads.json` in the acce
 
 ## Deploying
 
-- **Server:** any Node 22 host (Cloud Run, Render, Fly). The start command is `npm start -w server`.
+- **Server, on Cloud Run:** run the workflow `.github/workflows/abuk-server-deploy.yml` by hand. It copies GitHub secrets into Secret Manager, generates the session and webhook secrets once, and deploys `Dockerfile`. The service URL and `/api/health` appear in the run summary. Any other Node 22 host works too: `npm start -w server`.
+- **Android APK:** `.github/workflows/abuk-apk.yml` builds on every push to `abuk-app` and attaches the APK to the `abuk-apk-latest` release. To point it at the server, set the repository variable `ABUK_API_URL`.
 - **PWA:** `npm run build -w apps/pwa` produces static files in `apps/pwa/dist`. Serve them over HTTPS so the service worker and GPS work.

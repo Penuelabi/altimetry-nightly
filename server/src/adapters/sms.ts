@@ -24,10 +24,23 @@ export async function sendSms(to: string[], message: string): Promise<SendResult
       return { to: n, ok: res.ok, detail: res.ok ? 'queued' : `${res.status}` };
     }));
   }
-  throw new Error(`Unknown SMS_PROVIDER "${cfg.smsProvider}" (use africastalking or twilio)`);
+  if (cfg.smsProvider === 'smsgate') {
+    // SMSGate (sms-gate.app): an Android phone sends the texts, as in the altimetry-nightly pipeline.
+    const auth = Buffer.from(`${cfg.smsUser}:${cfg.smsKey}`).toString('base64');
+    const res = await fetch(`${cfg.smsApiUrl}/messages`, {
+      method: 'POST', headers: { authorization: `Basic ${auth}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ textMessage: { text: message }, phoneNumbers: to })
+    });
+    const ok = res.ok, detail = ok ? 'queued on gateway phone' : `${res.status}`;
+    return to.map(n => ({ to: n, ok, detail }));
+  }
+  throw new Error(`Unknown SMS_PROVIDER "${cfg.smsProvider}" (use smsgate, africastalking or twilio)`);
 }
 
-// Inbound webhooks: Africa's Talking posts from/text, Twilio posts From/Body.
-export function parseInbound(form: Record<string, string>) {
-  return { from: form.from || form.From || '', text: form.text || form.Body || '' };
+// Inbound webhooks: Africa's Talking posts from/text, Twilio posts From/Body,
+// SMSGate posts JSON {event: 'sms:received', payload: {phoneNumber, message}}.
+export function parseInbound(body: Record<string, unknown>) {
+  const p = (body.payload ?? {}) as Record<string, string>;
+  const f = body as Record<string, string>;
+  return { from: f.from || f.From || p.phoneNumber || '', text: f.text || f.Body || p.message || '' };
 }

@@ -102,5 +102,6 @@ describe('http', () => {
   it('parses provider webhooks', () => {
     expect(parseInbound({ from: '+211', text: 'G 4.1' })).toEqual({ from: '+211', text: 'G 4.1' });
     expect(parseInbound({ From: '+211', Body: 'G 4.1' })).toEqual({ from: '+211', text: 'G 4.1' });
+    expect(parseInbound({ event: 'sms:received', payload: { phoneNumber: '+211', message: 'G 4.1' } })).toEqual({ from: '+211', text: 'G 4.1' });
   });
 });

@@ -12,7 +12,7 @@ import { pull, terrain } from './sources';
 type Env = { Variables: { me: Session } };
 export const app = new Hono<Env>();
 
-app.use('/api/*', cors({ origin: o => (cfg.allowedOrigin === '*' || o === cfg.allowedOrigin ? o : null), allowHeaders: ['authorization', 'content-type'] }));
+app.use('/api/*', cors({ origin: o => (cfg.allowedOrigins.includes('*') || cfg.allowedOrigins.includes(o) ? o : null), allowHeaders: ['authorization', 'content-type'] }));
 
 app.onError((e, c) => {
   if (e instanceof NotConfigured) return c.json({ error: 'not_configured', missing: e.keys, message: e.message }, 503);
@@ -155,7 +155,8 @@ const replyFor = (r: GaugeReading) => r.status === 'ok' ? `Abuk: gauge ${r.v!.to
 // Public webhook for the SMS provider; protected by a shared secret in the URL.
 app.post('/api/sms/inbound', async c => {
   if (!cfg.smsWebhookSecret || c.req.query('secret') !== cfg.smsWebhookSecret) return c.json({ error: 'unauthorized' }, 401);
-  const { from, text } = parseInbound(await c.req.parseBody() as Record<string, string>);
+  const isJson = (c.req.header('content-type') || '').includes('json');
+  const { from, text } = parseInbound(isJson ? await c.req.json() : await c.req.parseBody() as Record<string, string>);
   if (!/^\s*g/i.test(text)) return c.json({ ignored: true });
   const r = await recordGauge(from, text);
   sendSms([from], replyFor(r)).catch(e => console.error('reply failed', e));
