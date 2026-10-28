@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { conditionSummary, signinError, whereIs, type GaugeReading, type PlotCondition, type PublicUser, type Register, type SigninResponse, type SyncKind } from '@abuk/core';
 import { DayBars } from './DayBars';
-import { DashMap, type CheckPoint } from './DashMap';
+import { DashMap, type CheckPoint, type DashMapHandle } from './DashMap';
 
 interface Rec { id: string; kind: SyncKind; at: string; by: string; data: Record<string, unknown> }
 interface Overview { generated: string; records: Rec[]; errors: string[]; users: (PublicUser & { lastSeen: string | null })[]; farm: Register; farmChanges: { sha: string; message: string; date: string }[]; gauge: GaugeReading[] }
@@ -57,6 +57,7 @@ export function Dashboard() {
   const [range, setRange] = useState(30);
   const [kind, setKind] = useState<string>('all');
   const [who, setWho] = useState<string>('all');
+  const mapRef = useRef<DashMapHandle>(null);
 
   const load = async (fresh = false) => {
     if (!session) return;
@@ -155,7 +156,7 @@ export function Dashboard() {
       <div className="cols">
         <div className="panel">
           <h2>Map · plots and crop checks</h2>
-          <DashMap plots={data?.farm.plots ?? []} points={points} />
+          <DashMap ref={mapRef} plots={data?.farm.plots ?? []} points={points} />
           <div className="note">Outlines: mapped plots. Dots: crop checks with GPS; ringed dots need attention. Click a dot for details.</div>
         </div>
         <div className="panel">
@@ -167,6 +168,32 @@ export function Dashboard() {
               ))}{!flags.length && <tr><td colSpan={3} className="note">Nothing flagged in this period.</td></tr>}</tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <div className="panel">
+        <h2>Plots · {data?.farm.plots.length ?? 0}</h2>
+        <div className="tbl-wrap" style={{ maxHeight: 460 }}>
+          <table className="tbl"><thead><tr><th>#</th><th>Code</th><th>Zone</th><th>Crop</th><th>Holder</th><th>Group</th><th style={{ textAlign: 'right' }}>Area (ha)</th><th style={{ textAlign: 'right' }}>Checks</th><th>GPS</th></tr></thead>
+            <tbody>{(data?.farm.plots ?? []).map((p, i) => {
+              const grp = data?.farm.groups.find(g => g.id === p.groupId);
+              const plotChecks = inRange.filter(r => r.kind === 'monitor' && r.data.plot === p.code).length;
+              const hasBoundary = p.boundary.length > 2;
+              return (
+                <tr key={p.id} style={{ cursor: hasBoundary ? 'pointer' : 'default' }} onClick={() => mapRef.current?.focusPlot(p.id)}>
+                  <td>{i + 1}</td>
+                  <td><strong>{p.code}</strong></td>
+                  <td>{p.zone}</td>
+                  <td>{p.crop}{p.crops?.length ? `, ${p.crops.join(', ')}` : ''}</td>
+                  <td>{p.holder}</td>
+                  <td>{grp?.name ?? p.groupId}</td>
+                  <td className="num" style={{ textAlign: 'right' }}>{p.areaHa != null ? p.areaHa.toFixed(1) : '—'}</td>
+                  <td className="num" style={{ textAlign: 'right' }}>{plotChecks}</td>
+                  <td>{hasBoundary ? 'mapped' : p.boundary[0] ? 'pin' : '—'}</td>
+                </tr>
+              );
+            })}{!data?.farm.plots.length && <tr><td colSpan={9} className="note">No plots registered yet.</td></tr>}</tbody>
+          </table>
         </div>
       </div>
 
