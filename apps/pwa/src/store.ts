@@ -20,11 +20,17 @@ export interface State {
   tasks: Task[]; harvests: Harvest[]; monLog: MonRecord[]; plots: Plot[];
   sourcesOn: Record<string, boolean>; radius: number; lastPull: PullResult | null;
   outbox: SyncRecord[]; lastSync: string | null;
+  photoQueue: string[]; // photo keys saved on this phone, waiting to upload
   present: boolean[]; stock: number[]; doneP: string[];
   offer: 'open' | 'accepted' | 'countered';
   leads: Lead[]; alertLog: string[]; gauge: GaugeReading[] | null;
   where: Where | null;
   accounts: Account[]; roster: RosterEntry[];
+  // Satellite values for a small circle around where the phone last asked (light: two numbers).
+  satHere: { lat: number; lon: number; at: string; floodPct: number | null; soil: number | null; radiusKm: number } | null;
+  autoPull: { state: 'running' | 'ok' | 'error'; at: string; msg?: string } | null;
+  // Crop checks from every phone (server, last 3 weeks), for the flood model and SMS alerts.
+  checksAll: { id: string; at: string; by: string; plot: string; crop: string; lat: number | null; lon: number | null; water: string; depthCm: number | null; around: string; aroundDepthCm: number | null; trend: string }[];
   farm: Register; farmOps: FarmOp[]; regTab: 'plots' | 'crops' | 'groups' | 'batches' | 'runs';
 }
 
@@ -33,12 +39,12 @@ const initial: State = {
   screen: 'home', hist: [], species: 'balanites', zone: 'basin',
   tasks: TASKS, harvests: HARV, monLog: MON, plots: [],
   sourcesOn: Object.fromEntries(SOURCES.map(s => [s.id, true])), radius: 20, lastPull: null,
-  outbox: [], lastSync: null,
+  outbox: [], lastSync: null, photoQueue: [],
   present: MEMBERS.map((_, i) => i !== 4 && i !== 8), stock: STORE.map(s => s[2]), doneP: [],
   offer: 'open',
   leads: LEADS.map(([name, g, rows]) => ({ id: name, name: `${name} · ${g}`, rows, phone: 'number on server', on: true })),
   alertLog: [], gauge: null, where: null,
-  accounts: [], roster: [],
+  accounts: [], roster: [], satHere: null, autoPull: null, checksAll: [],
   farm: seedRegister(), farmOps: [], regTab: 'plots'
 };
 

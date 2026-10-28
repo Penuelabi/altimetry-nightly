@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { set as idbSet } from 'idb-keyval';
-import { ACTIVITIES, CRACK_WIDTH, MIN_PHOTOS, PESTS, SOIL_MOISTURE, SURFACE, WATER_AROUND, WATER_STATE, WATER_TREND, conditionSummary, plotLabel, type PlotCondition, type Term, SKIES, STAGES, EW_ID, monitorError, normId, whereIs } from '@abuk/core';
+import { savePhoto } from '../photos';
+import { ACTIVITIES, CRACK_WIDTH, MIN_PHOTOS, pestOptions, SOIL_MOISTURE, SURFACE, WATER_AROUND, WATER_STATE, WATER_TREND, conditionSummary, plotLabel, type PlotCondition, type Term, SKIES, STAGES, EW_ID, monitorError, normId, whereIs } from '@abuk/core';
 import { record, setState, today, useApp } from '../store';
 import { oneFix, useOnline, type Fix } from '../net';
 import { Field, Seg } from '../ui';
@@ -48,10 +48,10 @@ export function Monitor() {
     const bad = monitorError({ ...m, photos: photos.length });
     if (bad) return setErr(bad);
     const ew = normId(m.ew);
-    const photoKeys = await Promise.all(photos.map(async (b, i) => { const k = `photo-${Date.now()}-${i}`; await idbSet(k, b).catch(() => {}); return k; }));
+    const photoKeys = await Promise.all(photos.map(b => savePhoto(b, 'check')));
     const at = new Date(), place = fix ? whereIs(fix.lat, fix.lon) : null;
     const rid = record('monitor', { ...m, ew, gps: fix && { lat: fix.lat, lon: fix.lon, acc: fix.acc }, place, stampedAt: at.toISOString(), weather: { source: wx.live ? 'open-meteo' : wx.w ? 'last reading' : 'entered', edited: [...edited.current].filter(k => ['temp', 'rain', 'sky'].includes(k)) }, photos: photoKeys });
-    setState(st => ({ monLog: [{ plot: m.plot.split(' · ')[0], crop: m.crop, acts: m.acts.join(', '), ew, date: today(), cond: m.cond, synced: false, rid, field: conditionSummary(m.condition) }, ...st.monLog] }));
+    setState(st => ({ monLog: [{ plot: m.plot.split(' · ')[0], crop: m.crop, acts: m.acts.join(', '), ew, date: today(), cond: m.cond, synced: false, rid, field: conditionSummary(m.condition), at: at.toISOString(), ...(fix ? { lat: fix.lat, lon: fix.lon } : {}), water: m.condition.water, depthCm: Number(m.condition.floodDepthCm) || null, around: m.condition.around, aroundDepthCm: Number(m.condition.aroundDepthCm) || null, trend: m.condition.trend }, ...st.monLog].slice(0, 300) }));
     setM({ ...m, notes: '', pests: [], condition: { ...m.condition, surface: [], crackWidth: '', floodDepthCm: '', aroundDepthCm: '', aroundDistanceM: '' } }); setPhotos([]); setSaved(true);
     edited.current.clear();
   };
@@ -119,7 +119,7 @@ export function Monitor() {
         </div>
         <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Pests or disease seen</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          {PESTS.map(p => <button key={p} className={'chip' + (m.pests.includes(p) ? ' on' : '')} style={{ minHeight: 36, padding: '0 10px', fontSize: 12.5 }} onClick={() => tog('pests', p)}>{m.pests.includes(p) ? '✓ ' : ''}{p}</button>)}
+          {['None', ...pestOptions(m.crop, '', s.farm.crops.find(c => c.name === m.crop)).map(o => o.name).slice(0, 12)].map(p => <button key={p} className={'chip' + (m.pests.includes(p) ? ' on' : '')} style={{ minHeight: 36, padding: '0 10px', fontSize: 12.5 }} onClick={() => tog('pests', p)}>{m.pests.includes(p) ? '✓ ' : ''}{p}</button>)}
         </div>
       </div>
       <div className="col g10">

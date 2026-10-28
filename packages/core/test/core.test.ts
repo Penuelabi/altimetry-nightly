@@ -4,6 +4,7 @@ import { basinDepth, recessDays, moundRows, headline, parseGauge, monitorError, 
 describe('flood model', () => {
   it('matches the design numbers', () => {
     expect(recessDays()).toBe(37);
+    expect(recessDays({ d0: 0.5, rate: -0.01 })).toBeNull();
     expect(basinDepth(0)).toBeCloseTo(0.92);
     expect(basinDepth(100)).toBe(0);
   });
@@ -107,5 +108,84 @@ describe('plot condition', () => {
   it('summarises in plain words', () => {
     expect(conditionSummary({ ...base, moisture: 'dry', surface: ['cracking', 'silt'], crackWidth: 'wide' })).toBe('Dry, wide cracks, silt deposited');
     expect(conditionSummary({ ...base, water: 'flooded', floodDepthCm: '30', around: 'surrounding', aroundDepthCm: '60', trend: 'falling' })).toBe('Wet, flooded 30 cm, water surrounding 60 cm, falling');
+  });
+});
+
+
+import { fitModel, briefing, season, DEFAULT_MODEL } from '../src';
+describe('fitting the flood model to measurements', () => {
+  const now = new Date('2026-10-28T12:00:00Z'), here = { lat: 7.731, lon: 31.402 };
+  const obs = (plot: string, daysAgo: number, cm: number | null, water = 'flooded', dLat = 0) => ({ at: new Date(now.getTime() - daysAgo * 864e5).toISOString(), plot, lat: here.lat + dLat, lon: here.lon, depthCm: cm, water });
+  it('falls back to the design figures, labelled, when nothing is measured', () => {
+    expect(fitModel([], [], here, now)).toEqual(DEFAULT_MODEL);
+  });
+  it('uses repeat readings of a plot for the rate and brings depth forward to today', () => {
+    const m = fitModel([obs('B‑07', 4, 60), obs('B‑07', 2, 54)], [], here, now);
+    expect(m.rate).toBeCloseTo(0.03);
+    expect(m.d0).toBeCloseTo(0.48);
+    expect(m.measured).toBe(true);
+    expect(m.rateSrc).toMatch(/repeat depth reading/);
+  });
+  it('uses the Bor gauge trend when there is only one depth reading', () => {
+    const m = fitModel([obs('B‑07', 0, 40)], [{ at: new Date(now.getTime() - 4 * 864e5).toISOString(), v: 4.2 }, { at: now.toISOString(), v: 4.12 }], here, now);
+    expect(m.rate).toBeCloseTo(0.02);
+    expect(m.rateSrc).toMatch(/Bor gauge/);
+    expect(m.d0).toBeCloseTo(0.4);
+  });
+  it('ignores plots far from the phone', () => {
+    expect(fitModel([obs('X', 1, 80, 'flooded', 0.5)], [], here, now).measured).toBe(false);
+  });
+});
+
+describe('home briefing', () => {
+  const now = new Date('2026-10-28T08:00:00Z');
+  const base = { now, name: 'Achol Deng', place: { lat: 7.731, lon: 31.402, payam: 'Duk Padiet' }, gauge: [], station: null, checks: [], weather: null };
+  it('says plainly when there is no data', () => {
+    const b = briefing(base);
+    expect(b.headline).toMatch(/No field reports nearby yet/);
+    expect(b.tiles.map(t => t.v)).toEqual(['—', '—', '—']);
+    expect(b.kicker).toMatch(/Flood season, week \d+ · Duk Padiet/);
+  });
+  it('reports the gauge change and nearby wet plots', () => {
+    const b = briefing({ ...base,
+      gauge: [{ at: '2026-10-27T07:00:00Z', v: 4.15 }, { at: '2026-10-28T07:00:00Z', v: 4.12 }],
+      checks: [{ at: '2026-10-27T09:00:00Z', plot: 'B‑07', lat: 7.731, lon: 31.402, water: 'flooded', depthCm: 25, around: 'surrounding', aroundDepthCm: 50, trend: 'falling' }],
+      weather: { temp: 33.6, rain24: 0, sky: 'Sunny', at: '' }, satellite: { floodPct: 12.5, soil: 0.34, radiusKm: 2 } });
+    expect(b.tiles[0]).toMatchObject({ v: '4.12 m', s: '↓ 3 cm since last' });
+    expect(b.headline).toMatch(/The plots are draining/);
+    expect(b.body.join(' ')).toMatch(/B‑07 25 cm/);
+    expect(b.body.join(' ')).toMatch(/12.5% of the land within 2 km .* \(wet\)/);
+    expect(b.tiles[2].v).toBe('34°');
+  });
+  it('knows the season', () => {
+    expect(season(new Date('2026-03-10')).name).toBe('Dry season');
+    expect(season(new Date('2026-12-20')).name).toBe('Recession');
+  });
+});
+
+import { leadAlert, bulletinInputs } from '../src';
+describe('lead SMS alerts', () => {
+  const now = new Date('2026-10-28T08:00:00Z');
+  const base = { reg: seedRegister(), bulletin: null, rainNext7: 11, days: 5, payam: 'Padiet', now };
+  it('names the lead group plots with their latest check and warns when water rises', () => {
+    const a = leadAlert({ ...base, lead: { id: 'L1', name: 'Achol Deng', rows: '' }, model: { d0: 0.6, rate: 0.015, d0Src: '', rateSrc: '', measured: true },
+      checks: [{ at: '2026-10-27T09:00:00Z', plot: 'B‑07', water: 'flooded', depthCm: 40, around: 'edge', trend: 'rising' }, { at: '2026-10-20T09:00:00Z', plot: 'B‑07', water: 'none', depthCm: null, around: 'dry', trend: '' }] });
+    expect(a.group).toBe('Group 4');
+    expect(a.level).toBe('warn');
+    expect(a.en).toContain('B-07 flooded 40cm rising');
+    expect(a.en).toMatch(/^[\x00-\x7F]*$/);
+  });
+  it('forecasts mound rows topped when the basin is rising', () => {
+    const a = leadAlert({ ...base, lead: { id: 'L2', name: 'Deng Bol', rows: '' }, checks: [], model: { d0: 0.8, rate: -0.02, d0Src: '', rateSrc: '', measured: true } });
+    expect(a.en).toContain('RISING');
+    expect(a.en).toContain('B-05');
+    expect(a.level).toBe('warn');
+  });
+  it('carries the county bulletin alert', () => {
+    const b = bulletinInputs({ alert_level: 'orange', alert_hazard: 'drought / dry spell', p_dry_spell_7d_in_15d: '0.46', week1_rain_median_mm: '10.9' });
+    const a = leadAlert({ ...base, bulletin: b, rainNext7: null, lead: { id: 'L3', name: 'Kuol Arok', rows: '' }, checks: [], model: { d0: 0, rate: 0.02, d0Src: '', rateSrc: '', measured: true } });
+    expect(a.en).toContain('County: ORANGE drought / dry spell');
+    expect(a.en).toContain('Rain next 7d 11mm');
+    expect(a.level).toBe('watch');
   });
 });

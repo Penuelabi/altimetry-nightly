@@ -2,14 +2,14 @@ import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from '@hono/node-server/serve-static';
 import type { GaugeReading, Role, SyncRecord } from '@abuk/core';
-import { applyOps, editAllowed, normId, opError, parseGauge, removeAllowed, seedRegister, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
-import { cfg, health, NotConfigured } from './config';
+import { applyOps, editAllowed, normId, opAllowed, opError, parseGauge, seedRegister, seedStore, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
+import { cfg, health, missing, NotConfigured } from './config';
 import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, changeUsers, checkKey, checkPin, issueSession, loadUsers, makeUser, pinFields, readSession, toPublic, type Session } from './auth';
 import { readJson, updateJson } from './adapters/github';
-import { sheetsAppend } from './adapters/google';
+import { photoGet, photoPut, sheetsAppend } from './adapters/google';
 import { parseInbound, sendSms } from './adapters/sms';
 import { geeSummary, pull, terrain } from './sources';
-import { overview } from './dashboard';
+import { overview, recentChecks } from './dashboard';
 
 type Env = { Variables: { me: Session } };
 export const app = new Hono<Env>();
@@ -165,23 +165,51 @@ app.post('/api/sources/extra', auth(['Admin']), async c => {
 // ---- admin dashboard ----
 app.get('/api/admin/overview', auth(['Admin']), async c => c.json(await overview(c.req.query('fresh') === '1')));
 
+// Recent crop checks from all phones: the flood model and SMS alerts work from the whole farm, not one phone.
+app.get('/api/checks/recent', auth(), async c => c.json(await recentChecks()));
+
 // ---- farm register (plots, crops, groups, batches, processing runs) ----
 const FARM_PATH = 'config/farm.json';
-app.get('/api/farm', auth(), async c => c.json((await readJson<Register>(FARM_PATH, seedRegister())).data));
+// Registers saved before the store ledger existed get the starting store and items.
+const withStore = (r: Register): Register => ({ ...seedStore(), ...r });
+app.get('/api/farm', auth(), async c => c.json(withStore((await readJson<Register>(FARM_PATH, seedRegister())).data)));
 
 // Ops arrive in the order they were made on the phone (possibly offline); all of a batch commit together.
 app.post('/api/farm/ops', auth(), async c => {
   const me = c.get('me');
   const { ops = [] } = await c.req.json<{ ops?: FarmOp[] }>();
-  if (!editAllowed(me.role)) return c.json({ error: 'forbidden', message: 'Only admins and group leads can change the farm register.' }, 403);
+  // The current register is only needed to check a worker's crop change (adding a pest name).
+  const needCur = !editAllowed(me.role) && ops.some(o => o.op === 'upsert' && o.kind === 'crop');
+  const cur = needCur ? withStore((await readJson<Register>(FARM_PATH, seedRegister())).data) : seedRegister();
   for (const o of ops) {
-    if (o.op === 'remove' && !removeAllowed(me.role)) return c.json({ error: 'forbidden', message: 'Only admins can delete from the farm register.' }, 403);
+    if (!opAllowed(me.role, o, cur)) return c.json({ error: 'forbidden', message: o.op === 'remove' ? 'Only admins can delete from the farm register.' : 'Only admins and group leads can make this change to the farm register.' }, 403);
     const bad = opError(o);
     if (bad) return c.json({ error: 'invalid', message: `Farm change rejected: ${bad}.` }, 400);
   }
-  if (!ops.length) return c.json((await readJson<Register>(FARM_PATH, seedRegister())).data);
-  const r = await updateJson<Register>(FARM_PATH, seedRegister(), `farm: ${ops.length} change${ops.length > 1 ? 's' : ''} by ${me.id}`, reg => applyOps(reg, ops.slice(0, 200)));
+  if (!ops.length) return c.json(withStore((await readJson<Register>(FARM_PATH, seedRegister())).data));
+  const r = await updateJson<Register>(FARM_PATH, seedRegister(), `farm: ${ops.length} change${ops.length > 1 ? 's' : ''} by ${me.id}`, reg => applyOps(withStore(reg), ops.slice(0, 200)));
   return c.json(r.data);
+});
+
+// ---- photos (crop checks, pest checks, crops) ----
+const PHOTO_KEY = /^[a-z]+-[a-z0-9-]{4,80}$/;
+app.put('/api/photos/:key', auth(), async c => {
+  const key = c.req.param('key') ?? '';
+  if (!PHOTO_KEY.test(key)) return c.json({ error: 'invalid', message: 'Bad photo name.' }, 400);
+  if (missing('photos').length) return c.json({ error: 'not_configured', message: 'Photo storage is not set up on the server yet.' }, 503);
+  const type = c.req.header('content-type') || 'image/jpeg';
+  if (!/^image\/(jpeg|png|webp)$/.test(type)) return c.json({ error: 'invalid', message: 'Only JPEG, PNG or WebP photos.' }, 400);
+  const body = new Uint8Array(await c.req.arrayBuffer());
+  if (!body.length || body.length > 4_000_000) return c.json({ error: 'invalid', message: 'Photo is empty or larger than 4 MB.' }, 400);
+  await photoPut(cfg.photoBucket, `photos/${key}`, body, type);
+  return c.json({ ok: true, key });
+});
+app.get('/api/photos/:key', auth(), async c => {
+  const key = c.req.param('key') ?? '';
+  if (!PHOTO_KEY.test(key) || missing('photos').length) return c.json({ error: 'not_found' }, 404);
+  const r = await photoGet(cfg.photoBucket, `photos/${key}`);
+  if (!r) return c.json({ error: 'not_found' }, 404);
+  return new Response(r.body, { headers: { 'content-type': r.headers.get('content-type') || 'image/jpeg', 'cache-control': 'private, max-age=31536000, immutable' } });
 });
 
 // ---- offline records ----

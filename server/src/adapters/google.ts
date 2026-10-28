@@ -1,7 +1,7 @@
 import { SignJWT, importPKCS8 } from 'jose';
 import { cfg, need } from '../config';
 
-const SCOPES = ['https://www.googleapis.com/auth/drive.readonly', 'https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/earthengine'];
+const SCOPES = ['https://www.googleapis.com/auth/drive.readonly', 'https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/earthengine', 'https://www.googleapis.com/auth/devstorage.read_write'];
 let cached: { token: string; exp: number } | null = null;
 
 export async function googleToken(fetcher = fetch): Promise<string> {
@@ -117,4 +117,20 @@ export function terrainExpr(lat: number, lon: number): Node {
   const dem = fn('Image.load', { id: c('USGS/SRTMGL1_003') });
   const both = fn('Image.addBands', { dstImg: dem, srcImg: fn('Terrain.slope', { input: dem }) });
   return meanAround(both, lat, lon, 45, 30);
+}
+
+// Photos in a private Cloud Storage bucket. Writing with ifGenerationMatch=0 makes a re-sent upload a no-op.
+export async function photoPut(bucket: string, name: string, body: Uint8Array, type: string) {
+  const res = await fetch(`https://storage.googleapis.com/upload/storage/v1/b/${bucket}/o?uploadType=media&ifGenerationMatch=0&name=${encodeURIComponent(name)}`, {
+    method: 'POST', headers: { authorization: `Bearer ${await googleToken()}`, 'content-type': type }, body
+  });
+  if (res.status === 412) return; // already stored
+  if (!res.ok) throw new Error(`photo upload → ${res.status} ${(await res.text()).slice(0, 200)}`);
+}
+
+export async function photoGet(bucket: string, name: string): Promise<Response | null> {
+  const res = await fetch(`https://storage.googleapis.com/storage/v1/b/${bucket}/o/${encodeURIComponent(name)}?alt=media`, { headers: { authorization: `Bearer ${await googleToken()}` } });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`photo read → ${res.status}`);
+  return res;
 }

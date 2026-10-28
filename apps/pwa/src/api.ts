@@ -1,7 +1,7 @@
 import type { ApiError } from '@abuk/core';
 import { getState, setState } from './store';
 
-const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ?? '';
+export const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ?? '';
 
 export class ApiFail extends Error {
   constructor(public status: number, public body: ApiError) { super(body.message || body.error); }

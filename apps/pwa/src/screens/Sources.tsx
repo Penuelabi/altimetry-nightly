@@ -3,6 +3,7 @@ import { SOURCES, type PullResult } from '@abuk/core';
 import { go, setState, useApp } from '../store';
 import { api, explain } from '../api';
 import { useOnline, usePlace } from '../net';
+import { pullSources } from '../daily';
 import { Field, Seg, Toggle } from '../ui';
 
 interface Extra { kind: 'GitHub' | 'Drive'; url: string; by: string; at: string }
@@ -36,14 +37,7 @@ export function Sources() {
     if (!online) return setMsg('No signal. Pull is queued and will run when the phone reconnects.');
     setPulling(true); setMsg('');
     try {
-      const q = `lat=${at.lat}&lon=${at.lon}&radius=${s.radius}`;
-      // Earth Engine runs alongside; its numbers drop in when ready instead of holding up the rest.
-      setGeeBusy(true);
-      const gee = api<PullResult['gee']>(`/api/sources/gee?${q}`)
-        .then(g => setState(st => (st.lastPull ? { lastPull: { ...st.lastPull, gee: g } } : {})), () => {})
-        .finally(() => setGeeBusy(false));
-      const r = await api<PullResult>(`/api/sources/pull?${q}`);
-      setState(st => ({ lastPull: { ...r, gee: st.lastPull?.gee.soilMoisture != null || st.lastPull?.gee.floodExtentPct != null ? st.lastPull.gee : r.gee } }));
+      const { r, gee } = await pullSources({ lat: at.lat, lon: at.lon, radius: s.radius }, setGeeBusy);
       setMsg(r.errors.length ? `Pulled with ${r.errors.length} problem${r.errors.length > 1 ? 's' : ''}: ${r.errors.join('; ')}` : 'Pulled. Satellite soil moisture and flood extent follow in a moment.');
       setPulling(false);
       await gee;
@@ -62,6 +56,7 @@ export function Sources() {
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
       <p className="body" style={{ fontSize: 13.5 }}>Pulled from the colab_waterlevel Drive folder and Earth Engine, filtered to where this phone is. Only rows inside the radius are downloaded and kept for offline use.</p>
+      <div className="sub" style={{ lineHeight: 1.45 }}>Automatic: every source downloads by itself once a day whenever the phone has signal (and again if you move more than half the radius). {s.autoPull ? (s.autoPull.state === 'running' ? 'Downloading now…' : s.autoPull.state === 'ok' ? `Last automatic download ${when(s.autoPull.at)}.` : `Last automatic try ${when(s.autoPull.at)} failed: ${s.autoPull.msg}. It will try again within the hour.`) : ''}</div>
       <div className="card accent">
         <div className="kick sm">Current location</div>
         <div className="num" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 10px', fontSize: 13 }}>

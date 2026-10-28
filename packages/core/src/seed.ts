@@ -24,7 +24,7 @@ export const T = {
 };
 
 export const TITLES: Record<'en' | 'ar', Record<Exclude<Screen, 'species'>, string>> = {
-  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'River gauge', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable bottles', p2p: 'Phone‑to‑phone sync', register: 'Farm register' },
+  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'River gauge', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable batches', p2p: 'Phone‑to‑phone sync', register: 'Farm register' },
   ar: { home: 'مشروع أبوك', map: 'خريطة المزرعة', flood: 'نموذج الفيضان', season: 'تقويم المحاصيل', tasks: 'المهام', plot: 'القطعة B‑07', harvest: 'سجل الحصاد', process: 'المعالجة', market: 'السوق', guide: 'دليل الأنواع', monitor: 'فحص المحصول', sources: 'مصادر البيانات', signin: 'تسجيل الدخول', admin: 'الوصول والمفاتيح', tools: 'أدوات الحقل', alerts: 'تنبيهات الفيضان', gauge: 'قراءة المقياس', voice: 'صور وصوت', pest: 'فحص الآفات', payout: 'أيام العمل والأجور', store: 'مخزن البذور', trace: 'تتبع الزجاجات', p2p: 'مزامنة الهواتف', register: 'سجل المزرعة' }
 };
 
@@ -83,7 +83,8 @@ export const SOURCES: Source[] = [
   { id: 'payam', kind: 'GitHub', name: 'Payam, county and state boundaries', path: 'South-Sudan-Admin-Geojson › ssd_A3.json (517 payams)', size: '340 KB, in the app', last: 'works offline', feeds: 'payam / county / state from GPS', on: true }
 ];
 
-export interface MonRecord { plot: string; crop: string; acts: string; ew: string; date: string; cond: number; synced: boolean; rid?: string; field?: string }
+// Location and water fields are kept on the phone so the home briefing and flood model can use nearby checks.
+export interface MonRecord { plot: string; crop: string; acts: string; ew: string; date: string; cond: number; synced: boolean; rid?: string; field?: string; at?: string; lat?: number; lon?: number; water?: string; depthCm?: number | null; around?: string; aroundDepthCm?: number | null; trend?: string }
 export const MON: MonRecord[] = [
   { plot: 'B‑03', crop: 'Jute mallow', acts: 'Weeding', ew: 'EW‑014', date: '27 Oct', cond: 4, synced: true },
   { plot: 'S‑04', crop: 'Groundnut', acts: 'Harvest, Pest scouting', ew: 'EW‑014', date: '25 Oct', cond: 3, synced: true },
@@ -97,7 +98,7 @@ export const TOOLS: [string, Screen, string, string][] = [
   ['iv', 'pest', 'Pest photo check', 'Match a photo to the local library; worker confirms'],
   ['v', 'payout', 'Work days & payout', "Roll‑call, then each member's share of sales"],
   ['vi', 'store', 'Seed & input store', 'Stock reserved against planting windows'],
-  ['vii', 'trace', 'Traceable bottles', 'QR on each oil bottle: plot, harvest, co‑op'],
+  ['vii', 'trace', 'Traceable batches', 'QR label on each product: crop, plot GPS, harvest, co‑op'],
   ['viii', 'p2p', 'Phone‑to‑phone sync', 'Swap records by Bluetooth in the field']
 ];
 

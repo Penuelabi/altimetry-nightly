@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
-import { P2P_PEERS, PICTO, STORE, TOOLS, editAllowed, newId, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
+import { P2P_PEERS, PARTS, PICTO, STORE, TOOLS, bulletinInputs, pestInfo, pestOptions, plotLabel, type Part, editAllowed, leadAlert, newId, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
 import { farmChange, go, openRegister, record, setState, useApp, type Lead } from '../store';
 import { api, explain } from '../api';
-import { useOnline, usePlace } from '../net';
+import { oneFix, useOnline, usePlace } from '../net';
 import { Check, Chevron, Field, Icon, Seg, Toggle } from '../ui';
+import { allChecks, useHereData, useModel } from './common';
+import { loadChecks } from '../daily';
+import { savePhoto } from '../photos';
 
 export function Tools() {
   return (
@@ -21,85 +24,83 @@ export function Tools() {
 }
 
 // ---- i Flood SMS alerts ----
-// Sent from the phone's own Messages app: the app fills in the numbers and the text,
-// the person presses Send, and the SMS goes from their SIM like any other text.
-const ALERT_TEXT = {
-  en: (rise: boolean, days: number) => rise
-    ? 'ABUK FLOOD: water to top rows B-03 B-04 B-05 B-08 in ~4 days. Lift seed & tools to ridge. Check mounds. Reply 1=OK. -Abuk Project'
-    : `ABUK: no flood risk to mound rows next ${days} days. Basin falling 2-3 cm/day. Sowing opens ~4 Dec. -Abuk Project`,
-  ar: (rise: boolean, days: number) => rise
-    ? 'أبوك - فيضان: سيصل الماء إلى قمم صفوف B-03 B-04 B-05 B-08 خلال 4 أيام تقريباً. انقلوا البذور والأدوات إلى المرتفع وافحصوا التلال. ردّوا 1 للتأكيد. -مشروع أبوك'
-    : `أبوك: لا خطر فيضان على صفوف التلال خلال ${days} أيام. منسوب الحوض ينخفض 2-3 سم يومياً. تبدأ الزراعة نحو 4 ديسمبر. -مشروع أبوك`
-};
-
-// sms: link understood by Android Messages; recipients separated by commas.
+// One message per group lead, built from live data (see leadAlert): their own plots' latest crop checks
+// from every phone, the fitted water model, rain forecast and the county bulletin. Sent from the phone's
+// own Messages app: the app fills in the number and text, the person presses Send, and it goes from their SIM.
 const smsLink = (numbers: string[], body: string) => `sms:${numbers.join(',')}?body=${encodeURIComponent(body)}`;
 const openMessages = (href: string) => { const a = document.createElement('a'); a.href = href; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); };
+const LEVEL_WORD = { warn: 'Warning', watch: 'Watch', clear: 'All clear' } as const;
 
 export function Alerts() {
-  const s = useApp(), online = useOnline();
+  const s = useApp(), online = useOnline(), place = usePlace(), model = useModel(), { weather } = useHereData();
   const role = s.session?.user.role ?? '';
   const canSend = role === 'Admin' || role === 'Group lead', isAdmin = role === 'Admin';
   const [days, setDays] = useState(5);
-  const [rise, setRise] = useState(false);
   const [msg, setMsg] = useState('');
   const [editing, setEditing] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
+  const [sent, setSent] = useState<Record<string, boolean>>({});
   useEffect(() => {
     if (!online) return;
     api<{ id: string; name: string; group: string; rows: string; phone: string; lang: 'en' | 'ar' }[]>(`/api/leads${canSend ? '?full=1' : ''}`)
       .then(ls => setState(st => ({ leads: ls.map(l => ({ ...l, on: st.leads.find(x => x.id === l.id)?.on ?? true })) })), () => {});
+    loadChecks().catch(() => {});
   }, [online, canSend]);
   const leads = s.leads.filter(l => /^\+211\d{9}$/.test(l.phone));
-  const chosen = leads.filter(l => l.on);
-  const en = chosen.filter(l => l.lang !== 'ar'), ar = chosen.filter(l => l.lang === 'ar');
-  const textEn = ALERT_TEXT.en(rise, days), textAr = ALERT_TEXT.ar(rise, days);
+  const bulletin = s.lastPull?.bulletin ? bulletinInputs(s.lastPull.bulletin.values) : null;
+  const checks = allChecks(s);
+  const alerts = leads.map(l => ({ l, a: leadAlert({ lead: l, reg: s.farm, checks, model, bulletin, rainNext7: weather?.rainNext7 ?? null, days, payam: place.payam, now: new Date() }) }));
+  const warn = alerts.filter(x => x.a.level === 'warn').length, watch = alerts.filter(x => x.a.level === 'watch').length;
+  const fresh = [s.autoPull?.state === 'ok' ? `data ${new Date(s.autoPull.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : '', `${checks.length} crop checks`, bulletin?.dataEnd ? `bulletin to ${bulletin.dataEnd}` : 'no bulletin yet'].filter(Boolean).join(' · ');
 
-  const send = (lang: 'en' | 'ar') => {
-    const to = lang === 'ar' ? ar : en, text = lang === 'ar' ? textAr : textEn;
-    if (!to.length) return;
-    openMessages(smsLink(to.map(l => l.phone), text));
+  const send = (l: Lead, text: string, level: string) => {
+    openMessages(smsLink([l.phone], text));
+    setSent(x => ({ ...x, [l.id]: true }));
     const stamp = new Date().toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    setState(st => ({ alertLog: [`${stamp} · opened Messages for ${to.length} lead${to.length > 1 ? 's' : ''} (${lang === 'ar' ? 'Arabic' : 'English'})`, ...st.alertLog].slice(0, 20) }));
-    record('alert', { lang, to: to.map(l => l.id), text, scenario: rise ? 'rise' : 'falling', days });
-    setMsg('Messages opened. Check the recipients and press Send there; the text goes from this phone’s SIM.');
+    setState(st => ({ alertLog: [`${stamp} · opened Messages for ${l.name} (${level})`, ...st.alertLog].slice(0, 20) }));
+    record('alert', { lang: l.lang ?? 'en', to: [l.id], text, level, days });
+    setMsg('Messages opened. Press Send there; the text goes from this phone’s SIM. Then come back for the next lead.');
   };
 
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <div className="body" style={{ fontSize: 13.5 }}>Text group leads when the flood model forecasts a mound crest will be overtopped. The message is sent from this phone through its Messages app, so it reaches any phone, no app or data needed.</div>
+      <div className="body" style={{ fontSize: 13.5 }}>Each group lead gets their own text: the latest crop check on each of their plots, the basin water forecast, rain for the next 7 days and the county alert. It is sent from this phone’s Messages app, so it reaches any phone.</div>
       <div className="col g6">
-        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Warn when overtopping is forecast within</div>
+        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Look ahead for mound rows going under water</div>
         <Seg items={[[3, '3 days'], [5, '5 days'], [7, '7 days']]} value={days} onPick={setDays} />
       </div>
-      <button className="btn plain between" style={{ minHeight: 44, padding: '0 12px', fontSize: 13, alignItems: 'center', display: 'flex' }} onClick={() => setRise(!rise)}><span>Scenario: river rises 8 cm</span><span className="it" style={{ color: 'var(--color-accent-800)' }}>{rise ? 'on' : 'off'}</span></button>
       <div style={{ borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)', padding: '10px 0', fontSize: 13.5 }}>
-        {rise ? `Forecast: B‑03, B‑04, B‑05, B‑08 overtopped in ~${Math.min(days, 4)} days. Send the alert now.` : `Water is falling. No crest at risk in the next ${days} days; an all-clear message is optional.`}
+        {leads.length ? (warn ? `${warn} lead${warn > 1 ? 's' : ''} need a warning now${watch ? `, ${watch} to watch` : ''}.` : watch ? `${watch} lead${watch > 1 ? 's' : ''} to watch; no warning needed.` : 'All clear for every group; an update is optional.') : 'No recipients yet.'}
+        <div className="sub" style={{ marginTop: 4 }}>{fresh}</div>
       </div>
       <div>
-        <div className="kick sm" style={{ marginBottom: 6 }}>SMS · English · {textEn.length} characters</div>
-        <div className="mono" style={{ border: '1px solid var(--color-neutral-800)', borderRadius: 12, padding: 12, background: 'var(--color-neutral-100)', fontSize: 12.5, lineHeight: 1.5 }}>{textEn}</div>
-        <div className="kick sm" style={{ margin: '10px 0 6px' }}>SMS · Arabic (for leads who chose Arabic)</div>
-        <div dir="rtl" style={{ border: '1px solid var(--color-neutral-800)', borderRadius: 12, padding: 12, background: 'var(--color-neutral-100)', fontSize: 13.5, lineHeight: 1.6 }}>{textAr}</div>
-        <div style={{ fontSize: 11, color: 'var(--color-neutral-700)', marginTop: 4 }}>Arabic texts are longer and may go as 2–3 SMS. Have a native speaker check the Arabic wording before the season.</div>
-      </div>
-      <div>
-        <div className="between rule-b" style={{ paddingBottom: 4 }}><span className="kick sm">Recipients · {chosen.length} of {leads.length} selected</span>{isAdmin && <button className="link" style={{ padding: 0, fontSize: 12 }} onClick={() => setEditing(!editing)}>{editing ? 'Done' : 'Add or edit'}</button>}</div>
+        <div className="between rule-b" style={{ paddingBottom: 4 }}><span className="kick sm">Group leads · {leads.length}</span>{isAdmin && <button className="link" style={{ padding: 0, fontSize: 12 }} onClick={() => setEditing(!editing)}>{editing ? 'Done' : 'Add or edit'}</button>}</div>
         {editing ? <LeadEditor onSaved={() => setEditing(false)} /> : <>
-          {leads.map(l => (
-            <div key={l.id} className="rowg" style={{ alignItems: 'center' }}>
-              <span><span style={{ display: 'block', fontSize: 14 }}>{l.name}{l.group ? ` · ${l.group}` : ''}</span><span className="sub num">{l.rows ? `${l.rows} · ` : ''}{l.phone} · {l.lang === 'ar' ? 'Arabic' : 'English'}</span></span>
-              <Toggle on={l.on} label={`Send to ${l.name}`} onClick={() => setState(st => ({ leads: st.leads.map(x => x.id === l.id ? { ...x, on: !x.on } : x) }))} />
-            </div>
-          ))}
+          {alerts.map(({ l, a }) => {
+            const text = l.lang === 'ar' ? a.ar : a.en;
+            return (
+              <div key={l.id} style={{ borderBottom: '1px solid var(--color-divider)', padding: '10px 0' }}>
+                <button className="between" style={{ width: '100%', textAlign: 'left', background: 'none', border: 0, padding: 0, alignItems: 'baseline' }} onClick={() => setOpen(open === l.id ? null : l.id)}>
+                  <span><span style={{ display: 'block', fontSize: 14 }}>{l.name} · {a.group}</span><span className="sub num">{a.plots.length ? a.plots.map(p => p.code).join(' ') : 'no plots linked'} · {l.phone}</span></span>
+                  <span className="it" style={{ fontSize: 12.5, color: a.level === 'clear' ? 'var(--color-neutral-600)' : 'var(--color-accent-800)', fontWeight: a.level === 'warn' ? 600 : 400 }}>{LEVEL_WORD[a.level]}{sent[l.id] ? ' · sent' : ''}</span>
+                </button>
+                {a.reasons.length > 0 && <div className="sub" style={{ marginTop: 4 }}>{a.reasons.join('; ')}</div>}
+                {open === l.id && <div className="col g8" style={{ marginTop: 8 }}>
+                  <div className="kick sm">SMS · {l.lang === 'ar' ? 'Arabic' : 'English'} · {text.length} characters{l.lang !== 'ar' ? ` · ${Math.ceil(text.length / 153)} SMS` : ''}</div>
+                  <div dir={l.lang === 'ar' ? 'rtl' : undefined} className={l.lang === 'ar' ? '' : 'mono'} style={{ border: '1px solid var(--color-neutral-800)', borderRadius: 12, padding: 12, background: 'var(--color-neutral-100)', fontSize: 12.5, lineHeight: 1.5 }}>{text}</div>
+                  {canSend && <button className="btn md" onClick={() => send(l, text, a.level)}>Send to {l.name.split(' ')[0]} from this phone</button>}
+                </div>}
+                {open !== l.id && canSend && <button className="link" style={{ padding: 0, fontSize: 12.5, marginTop: 4 }} onClick={() => setOpen(l.id)}>Preview and send</button>}
+              </div>
+            );
+          })}
           {!leads.length && <div className="note" style={{ padding: '8px 0' }}>{!online ? 'Recipients load when the phone has signal.' : isAdmin ? 'No recipients yet. Tap “Add or edit” to add group leads and their phone numbers.' : 'No recipients yet. Ask an admin to add group leads.'}</div>}
         </>}
       </div>
+      <div className="note">A lead is matched to a group by the group name or the group’s lead in the Farm register; their plots are that group’s plots. Plots with no crop check in two weeks say so. Have a native speaker check the Arabic wording.</div>
       {msg && <div className="msg">{msg}</div>}
-      {canSend ? <>
-        <button className="btn lg" disabled={!en.length} onClick={() => send('en')}>Send from this phone · English ({en.length})</button>
-        {ar.length > 0 && <button className="btn" onClick={() => send('ar')}>Send Arabic copy ({ar.length})</button>}
-      </> : <div className="note">Only admins and group leads send alerts.</div>}
-      {s.alertLog.map((a, i) => <div key={i} className="num" style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>{a}</div>)}
+      {!canSend && <div className="note">Only admins and group leads send alerts.</div>}
+      {s.alertLog.map((x, i) => <div key={i} className="num" style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>{x}</div>)}
     </div>
   );
 }
@@ -282,65 +283,90 @@ export function Voice() {
 }
 
 // ---- iv Pest photo check ----
+// Pest check: the worker identifies the pest from a short list for the crop and plant part, helped by
+// the signs and first action from the pest library. Photos, plot, crop, GPS and time are saved with it;
+// a name typed under "Other" is added to the crop in the Farm register so others can pick it next time.
+// No automatic photo recognition yet: an extension worker confirms before treatment is advised.
 export function Pest() {
   const place = usePlace();
   const s = useApp();
-  const [photo, setPhoto] = useState<Blob | null>(null);
-  const [plot, setPlot] = useState(s.farm.plots[0]?.code ?? '');
-  const [st, setSt] = useState<'idle' | 'busy' | 'done'>('idle');
-  const [answered, setAnswered] = useState('');
+  const plots = s.farm.plots;
+  const [plotId, setPlotId] = useState(plots[0]?.id ?? '');
+  const plot = plots.find(p => p.id === plotId);
+  const [crop, setCrop] = useState(plot?.crop ?? s.farm.crops[0]?.name ?? '');
+  const [part, setPart] = useState<Part | ''>('');
+  const [pest, setPest] = useState('');
+  const [other, setOther] = useState('');
+  const [share, setShare] = useState<'' | 'few' | 'some' | 'many'>('');
+  const [photos, setPhotos] = useState<Blob[]>([]);
+  const [done, setDone] = useState('');
+  const [err, setErr] = useState('');
   const file = useRef<HTMLInputElement>(null);
-  const url = photo ? URL.createObjectURL(photo) : '';
-  useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);
-  const me = s.session?.user.id ?? 'EW‑014';
-  useEffect(() => { if (st !== 'busy') return; const t = setTimeout(() => setSt('done'), 1400); return () => clearTimeout(t); }, [st]);
-  const answer = async (ok: boolean) => {
-    const key = photo ? `pest-${Date.now()}` : null;
-    if (key && photo) await idbSet(key, photo).catch(() => {});
-    record('pest', { plot, photo: key, suggestion: 'Fall armyworm', confirmed: ok, by: me, place });
-    setAnswered(ok ? `Confirmed by ${me}. Recorded for plot ${plot}; treat within 3 days and scout neighbouring plots.` : 'Sent to the county extension office with the photo for a second opinion.');
+  const urls = useMemo(() => photos.map(p => URL.createObjectURL(p)), [photos]);
+  useEffect(() => () => urls.forEach(u => URL.revokeObjectURL(u)), [urls]);
+  const me = s.session?.user.id ?? '';
+  const cropRec = s.farm.crops.find(c => c.name === crop) ?? null;
+  const opts = pestOptions(crop, part, cropRec);
+  const name = pest === '__other' ? other.trim() : pest;
+  const info = pest && pest !== '__other' && pest !== '__unsure' ? pestInfo(pest) : null;
+  const pickPlot = (id: string) => { setPlotId(id); const p = plots.find(x => x.id === id); if (p?.crop) setCrop(p.crop); setPest(''); };
+
+  const save = async () => {
+    if (!photos.length) return setErr('Take at least one photo of the damage.');
+    if (!part) return setErr('Choose the part of the plant.');
+    if (!pest || (pest === '__other' && !name)) return setErr('Choose the pest, “Not sure”, or type its name under Other.');
+    if (!share) return setErr('Choose how many plants are affected.');
+    setErr('');
+    const fix = await oneFix(8000).catch(() => null);
+    const keys = await Promise.all(photos.map(b => savePhoto(b, 'pest')));
+    const unsure = pest === '__unsure';
+    record('pest', { plot: plot?.code ?? '', plotId, crop, part, pest: unsure ? '' : name, unsure, affected: share, photos: keys, by: me, at: new Date().toISOString(), gps: fix && { lat: fix.lat, lon: fix.lon, acc: fix.acc }, place: { payam: place.payam, county: place.county, state: place.state }, suggested: info ? info.action : '' });
+    if (pest === '__other' && cropRec && !(cropRec.pests ?? []).some(n => n.toLowerCase() === name.toLowerCase()))
+      farmChange({ op: 'upsert', kind: 'crop', item: { ...cropRec, pests: [...(cropRec.pests ?? []), name] } });
+    setDone(unsure ? 'Saved with photos as “not sure”. The extension worker will look at it and reply.' : `Saved: ${name} on ${crop} (${PARTS.find(p => p[0] === part)?.[1].toLowerCase()}), plot ${plot?.code ?? ''}. The extension worker confirms before treatment.`);
+    setPhotos([]); setPest(''); setOther(''); setShare(''); setPart('');
   };
-  const reset = () => { setPhoto(null); setSt('idle'); setAnswered(''); };
+
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <button onClick={() => file.current?.click()} className="photo" style={{ height: 190, padding: 0, overflow: 'hidden', cursor: 'pointer', width: '100%' }}>
-        {url ? <img src={url} alt="Crop photo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span>Tap to take a photo of the damaged leaf or plant</span>}
-      </button>
-      <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={e => { const f = e.target.files?.[0]; if (f) { setPhoto(f); setSt('idle'); setAnswered(''); } e.target.value = ''; }} />
       <div className="grid2">
-        <Field label="Plot"><select className="input" value={plot} onChange={e => setPlot(e.target.value)}>{s.farm.plots.map(p => <option key={p.id}>{p.code}</option>)}</select></Field>
-        <button className="btn plain" style={{ alignSelf: 'end' }} onClick={() => file.current?.click()}>{photo ? 'Retake photo' : 'Take photo'}</button>
+        <Field label="Plot"><select className="input" value={plotId} onChange={e => pickPlot(e.target.value)}>{plots.map(p => <option key={p.id} value={p.id}>{plotLabel(p, s.farm)}</option>)}</select></Field>
+        <Field label="Crop"><select className="input" value={crop} onChange={e => { setCrop(e.target.value); setPest(''); }}>{s.farm.crops.map(c => <option key={c.id}>{c.name}</option>)}</select></Field>
       </div>
-      {photo && st === 'idle' && <button className="btn lg" onClick={() => setSt('busy')}>Compare with local library</button>}
-      {st === 'busy' && <div className="it" style={{ fontSize: 13.5, color: 'var(--color-accent-800)' }}>Comparing with reference photos from {place.state || 'South Sudan'}…</div>}
-      {st === 'done' && (
-        <div className="col g12">
-          <div>
-            <div className="section">Closest matches · example results</div>
-            {([['Fall armyworm', 78], ['Stem borer', 12], ['Leaf blight', 6]] as const).map(([n, p]) => (
-              <div key={n} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 40px', gap: 8, alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--color-divider)' }}>
-                <span style={{ fontSize: 14 }}>{n}</span>
-                <span style={{ height: 8, border: '1px solid var(--color-accent)', borderRadius: 2, position: 'relative' }}><span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: p + '%', background: 'var(--color-accent-300)' }} /></span>
-                <span className="num" style={{ fontSize: 13, textAlign: 'right' }}>{p}%</span>
-              </div>
-            ))}
-          </div>
-          <div className="card accent" style={{ gap: 4 }}>
-            <div className="kick sm">Suggested, needs confirmation</div>
-            <div style={{ fontSize: 14, lineHeight: 1.45 }}>Fall armyworm. Hand‑pick egg masses and larvae at dawn; spray neem‑seed extract into leaf whorls within 3 days; check 20 plants per plot again in a week.</div>
-          </div>
-          {!answered ? (
-            <div className="grid2" style={{ gap: 8 }}>
-              <button className="btn plain" style={{ minHeight: 44, fontSize: 13.5 }} onClick={() => answer(false)}>Not this</button>
-              <button className="btn" style={{ minHeight: 44, fontSize: 13.5 }} onClick={() => answer(true)}>Confirm ({me})</button>
-            </div>
-          ) : <>
-            <div className="it" style={{ fontSize: 13, color: 'var(--color-accent-800)', borderTop: '1px solid var(--color-divider)', paddingTop: 8 }}>{answered}</div>
-            <button className="btn plain" onClick={reset}>Check another photo</button>
-          </>}
+      <div className="col g6">
+        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Part of the plant</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{PARTS.map(([k, l]) => <button key={k} className={'chip' + (part === k ? ' on' : '')} style={{ minHeight: 36, padding: '0 10px', fontSize: 12.5 }} onClick={() => { setPart(k); setPest(''); }}>{l}</button>)}</div>
+      </div>
+      <div className="col g6">
+        <div className="between"><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Photos of the damage (close-up, then the whole plant)</span><span className="num" style={{ fontSize: 12.5 }}>{photos.length}</span></div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 6 }}>
+          {urls.map((u, i) => <div key={u} style={{ position: 'relative' }}><img src={u} alt={`Pest photo ${i + 1}`} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 8 }} /><button aria-label={`Remove photo ${i + 1}`} onClick={() => setPhotos(p => p.filter((_, j) => j !== i))} style={{ position: 'absolute', top: 4, right: 4, width: 24, height: 24, borderRadius: '50%', border: 'none', background: 'rgba(0,0,0,.55)', color: '#fff', fontSize: 14, lineHeight: '24px', padding: 0 }}>×</button></div>)}
+          <button className="photo" style={{ aspectRatio: '1', minHeight: 0 }} onClick={() => file.current?.click()}>+ Photo</button>
         </div>
-      )}
-      <div className="sub" style={{ lineHeight: 1.5 }}>Your photo and decision are saved and synced. The matches shown are examples until a reference photo library for {place.state || 'the area'} is loaded; an extension worker always confirms before any treatment is advised.</div>
+        <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={e => { const f = e.target.files?.[0]; if (f) { setPhotos(p => [...p, f]); setDone(''); } e.target.value = ''; }} />
+      </div>
+      <Field label={`Pest or disease${part ? '' : ' (choose the plant part first to narrow the list)'}`}>
+        <select className="input" value={pest} onChange={e => setPest(e.target.value)}>
+          <option value="">Choose…</option>
+          {opts.map(o => <option key={o.name} value={o.name}>{o.name}{o.info ? ` · ${o.info.type}` : ' · added by workers'}</option>)}
+          <option value="__unsure">Not sure (send photos for an opinion)</option>
+          <option value="__other">Other (type the name)</option>
+        </select>
+      </Field>
+      {pest === '__other' && <Field label="Name you know it by"><input className="input" value={other} onChange={e => setOther(e.target.value)} placeholder="Local or English name" /></Field>}
+      {info && <div className="card accent" style={{ gap: 6 }}>
+        <div className="kick sm">Check it matches · {info.type}</div>
+        <div style={{ fontSize: 13.5, lineHeight: 1.45 }}><b>Look for:</b> {info.signs}</div>
+        <div style={{ fontSize: 13.5, lineHeight: 1.45 }}><b>First action (suggested):</b> {info.action}</div>
+      </div>}
+      <div className="col g6">
+        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Plants affected in the plot</div>
+        <Seg items={[['few', 'Under 10%'], ['some', '10–30%'], ['many', 'Over 30%']]} value={share} onPick={v => setShare(v as typeof share)} fontSize={12.5} />
+      </div>
+      {err && <div className="msg">{err}</div>}
+      <button className="btn lg" onClick={save}>Save pest check</button>
+      {done && <div className="it" style={{ fontSize: 13, color: 'var(--color-accent-800)' }}>{done}</div>}
+      <div className="sub" style={{ lineHeight: 1.5 }}>GPS, time, payam ({place.payam}) and your ID are added when you save. The list shows pests common on {crop || 'this crop'}{part ? ` for this plant part` : ''} in South Sudan, then general ones, then names other workers have added. Photos are not yet recognised automatically; an extension worker confirms before treatment.</div>
     </div>
   );
 }
@@ -415,37 +441,7 @@ export function Payout() {
 }
 
 // ---- vi Seed & input store ----
-export function Store() {
-  const s = useApp();
-  const [msg, setMsg] = useState('');
-  const short = STORE.filter((x, i) => s.stock[i] < x[3]);
-  return (
-    <div className="pad g12" style={{ paddingTop: 14 }}>
-      <div className="body" style={{ fontSize: 13.5 }}>Stock in the Abuk store, reserved against the next planting windows from the flood model.</div>
-      <div style={{ borderTop: '1px solid var(--color-divider)' }}>
-        {STORE.map(([name, unit, , need, use, step], i) => {
-          const have = s.stock[i], low = have < need;
-          return (
-            <div key={name} className="col g6" style={{ padding: '10px 0', borderBottom: '1px solid var(--color-divider)', gap: 5 }}>
-              <div className="between"><span style={{ fontSize: 14 }}>{name}</span><span className="head num" style={{ fontSize: 19 }}>{have.toLocaleString('en')} {unit}</span></div>
-              <div style={{ position: 'relative', height: 7, border: '1px solid var(--color-divider)', borderRadius: 2 }}><span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: Math.min(100, have / need * 100) + '%', background: low ? 'var(--color-accent-300)' : 'var(--color-neutral-400)' }} /></div>
-              <div className="between" style={{ alignItems: 'center' }}>
-                <span style={{ fontSize: 11.5, color: low ? 'var(--color-accent-800)' : 'var(--color-neutral-700)' }}>{low ? `short ${(need - have).toLocaleString('en')} ${unit} · ${use}` : `${need.toLocaleString('en')} ${unit} reserved · ${use}`}</span>
-                <button className="btn plain" style={{ minHeight: 30, padding: '0 9px', fontSize: 11.5, flex: 'none' }} onClick={() => {
-                  setState(st => ({ stock: st.stock.map((q, j) => (j === i ? Math.max(0, q - step) : q)) }));
-                  record('store', { item: name, issued: step, unit, to: 'Group 4' });
-                  setMsg(`Issued ${step} ${unit} ${name.toLowerCase()} to Group 4.`);
-                }}>Issue {step} {unit}</button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {msg && <div className="msg">{msg}</div>}
-      <button className="btn" onClick={() => { record('store', { request: short.map(x => x[0]) }); setMsg('Request queued for the project office: ' + short.map(x => x[0].toLowerCase()).join(', ') + '.'); }}>Request {short.length} short items</button>
-    </div>
-  );
-}
+export { Store } from './Store';
 
 // ---- vii Traceable bottles ----
 export function Trace() {
@@ -455,20 +451,27 @@ export function Trace() {
   const b = batches[Math.min(i, batches.length - 1)];
   const can = editAllowed(s.session?.user.role ?? '');
   if (!b) return (
-    <div className="pad"><p className="body">No bottle batches yet.</p>{can && <button className="btn" onClick={() => openRegister('batches')}>+ Add a bottle batch</button>}</div>
+    <div className="pad"><p className="body">No product batches yet.</p>{can && <button className="btn" onClick={() => openRegister('batches')}>+ Add a product batch</button>}</div>
   );
   const plot = s.farm.plots.find(p => p.id === b.plotId);
   const group = plot && s.farm.groups.find(g => g.id === plot.groupId);
-  const origin = plot?.boundary[0] ? `${plot.boundary[0].lat.toFixed(2)}° N ${plot.boundary[0].lon.toFixed(2)}° E` : b.place;
-  const rows: [string, string][] = [['Plot', `${plot?.code ?? '—'} · ${group ? `${group.name} (${group.members.length} farmers)` : plot?.holder || 'individual'}`], ['Fruit collected', b.fruit || '—'], ['Pressed', b.pressed], ['Batch size', `${b.bottles} × 1 L`], ['Origin', origin || '—'], ['Cooperative', 'Abuk Project, 160 farmers']];
+  const gps = b.lat != null && b.lon != null ? `${b.lat.toFixed(4)}° N ${b.lon.toFixed(4)}° E` : plot?.boundary[0] ? `${plot.boundary[0].lat.toFixed(4)}° N ${plot.boundary[0].lon.toFixed(4)}° E` : '';
+  const product = b.product ?? 'Balanites oil', unit = b.unit ?? '1 L bottle';
+  const run = b.runId ? s.farm.runs.find(r => r.id === b.runId) : null;
+  const members = s.farm.groups.reduce((n, g) => n + g.members.length, 0);
+  const rows: [string, string][] = ([
+    ['Product', `${product}${b.crop ? ` · from ${b.crop}` : ''}`], ['Plot', `${plot?.code ?? '—'} · ${group ? `${group.name} (${group.members.length} farmers)` : plot?.holder || 'individual'}`],
+    ['GPS', gps], ['Harvested', b.fruit], ['Processed', run ? `${run.date}: ${run.steps.filter(x => x.out).map(x => x.name).join(' → ')}` : ''], ['Packed', `${b.pressed}${b.packedBy ? ` by ${b.packedBy}` : ''}`],
+    ['Batch size', `${b.bottles} × ${unit}`], ['Quality', b.quality ?? ''], ['Origin', b.place], ['Cooperative', `Abuk Project${members ? `, ${members} farmers` : ''}`]
+  ] as [string, string][]).filter(([, v]) => v);
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <Field label="Batch"><select className="input mono" value={Math.min(i, batches.length - 1)} onChange={e => setI(Number(e.target.value))}>{batches.map((x, j) => <option key={x.id} value={j}>{x.code} · {x.bottles} bottles</option>)}</select></Field>
+      <Field label="Batch"><select className="input mono" value={Math.min(i, batches.length - 1)} onChange={e => setI(Number(e.target.value))}>{batches.map((x, j) => <option key={x.id} value={j}>{x.code} · {x.product ?? 'Balanites oil'} · {x.bottles}</option>)}</select></Field>
       <div className="box" style={{ display: 'grid', gridTemplateColumns: '128px 1fr', gap: 14, alignItems: 'center', padding: 12 }}>
         <svg viewBox="0 0 25 25" width="128" height="128" style={{ display: 'block', background: 'var(--color-neutral-100)' }}>{qrCells(b.code).map(c => <rect key={`${c.x}-${c.y}`} x={c.x} y={c.y} width="1" height="1" fill="var(--color-text)" />)}</svg>
         <div className="col" style={{ gap: 3 }}>
           <div className="kick sm">Bottle label</div>
-          <div className="head" style={{ fontSize: 20, lineHeight: 1.1 }}>Desert date oil, 1 L</div>
+          <div className="head" style={{ fontSize: 20, lineHeight: 1.1 }}>{product}, {unit}</div>
           <div className="num" style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Batch {b.code}</div>
           <div className="it" style={{ fontSize: 10.5, color: 'var(--color-neutral-600)' }}>placeholder QR pattern</div>
         </div>
@@ -478,7 +481,7 @@ export function Trace() {
         {rows.map(([k, v]) => <div key={k} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 8, padding: '8px 0', borderBottom: '1px solid var(--color-divider)', fontSize: 13.5 }}><span style={{ color: 'var(--color-neutral-700)' }}>{k}</span><span>{v}</span></div>)}
       </div>
       <button className="btn" onClick={() => window.print()}>Print labels for this batch</button>
-      {can && <button className="btn plain" onClick={() => openRegister('batches')}>+ Add or edit bottle batches</button>}
+      {can && <button className="btn plain" onClick={() => openRegister('batches')}>+ Add or edit product batches</button>}
     </div>
   );
 }

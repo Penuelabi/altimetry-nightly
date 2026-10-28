@@ -10,9 +10,12 @@ const IMAGERY = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imag
 const LABELS = 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
 const ACCENT = '#b68235';
 
-export function LiveMap({ here, gps, acc, bufferM = 150, plots, track, closed, height = 330 }: {
-  here: LatLon; gps: boolean; acc: number | null; bufferM?: number; plots: LatLon[][]; track: LatLon[]; closed: boolean; height?: number;
+// onTap: when given, tapping the map reports the point (used to draw a plot boundary by hand).
+export function LiveMap({ here, gps, acc, bufferM = 150, plots, track, closed, height = 330, onTap }: {
+  here: LatLon; gps: boolean; acc: number | null; bufferM?: number; plots: LatLon[][]; track: LatLon[]; closed: boolean; height?: number; onTap?: (p: LatLon) => void;
 }) {
+  const tap = useRef(onTap);
+  tap.current = onTap;
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layers = useRef<L.LayerGroup | null>(null);
@@ -23,6 +26,7 @@ export function LiveMap({ here, gps, acc, bufferM = 150, plots, track, closed, h
     L.tileLayer(IMAGERY, { maxZoom: 19, attribution: 'Imagery © Esri, Maxar, Earthstar' }).addTo(m);
     L.tileLayer(LABELS, { maxZoom: 19 }).addTo(m);
     layers.current = L.layerGroup().addTo(m);
+    m.on('click', e => tap.current?.({ lat: e.latlng.lat, lon: e.latlng.lng }));
     map.current = m;
     return () => { m.remove(); map.current = null; };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

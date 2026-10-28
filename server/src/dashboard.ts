@@ -41,3 +41,29 @@ export function parseRow(kind: SyncKind, r: string[]): DashRecord | null {
   try { data = JSON.parse(json || '{}'); } catch { data = { raw: json }; }
   return { id, kind, at, by: by || '', data };
 }
+
+// Recent crop checks from every phone, cut down to what the flood model and alerts need
+// (plot, time, place, water on and around the plot). Any signed-in worker may read these.
+export interface CheckLite { id: string; at: string; by: string; plot: string; crop: string; lat: number | null; lon: number | null; water: string; depthCm: number | null; around: string; aroundDepthCm: number | null; trend: string; field: string }
+let checksCache: { at: number; v: CheckLite[] } | null = null;
+const numOrNull = (x: unknown) => (x === '' || x == null || isNaN(Number(x)) ? null : Number(x));
+
+export function checkFrom(r: DashRecord): CheckLite {
+  const d = r.data as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const cond = (d.condition ?? {}) as Record<string, unknown>;
+  return {
+    id: r.id, at: String(d.stampedAt || r.at), by: r.by, plot: String(d.plot ?? '').split(' · ')[0], crop: String(d.crop ?? ''),
+    lat: numOrNull(d.gps?.lat), lon: numOrNull(d.gps?.lon),
+    water: String(cond.water ?? ''), depthCm: numOrNull(cond.floodDepthCm), around: String(cond.around ?? ''), aroundDepthCm: numOrNull(cond.aroundDepthCm),
+    trend: String(cond.trend ?? ''), field: String(d.notes ?? '')
+  };
+}
+
+export async function recentChecks(days = 21): Promise<CheckLite[]> {
+  if (checksCache && Date.now() - checksCache.at < 5 * 60_000) return checksCache.v;
+  const since = Date.now() - days * 864e5;
+  const v = (await sheetsRead('monitor')).map(r => parseRow('monitor', r)).filter((x): x is DashRecord => !!x)
+    .map(checkFrom).filter(c => c.plot && Date.parse(c.at) >= since).sort((a, b) => b.at.localeCompare(a.at)).slice(0, 2000);
+  checksCache = { at: Date.now(), v };
+  return v;
+}

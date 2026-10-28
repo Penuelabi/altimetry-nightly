@@ -1,8 +1,8 @@
 import readXlsxFile from 'read-excel-file/node';
 import type { BulletinRow, PullResult, Station } from '@abuk/core';
-import { whereIs, withinRadius } from '@abuk/core';
+import { bulletinHeadline, whereIs, withinRadius } from '@abuk/core';
 import { cfg, need } from './config';
-import { csvObjects, findCol, num } from './csv';
+import { csvObjects, findCol, num, parseCsv } from './csv';
 import { c, driveDownload, driveFind, eeCompute, fn, loadImage, meanAround, terrainExpr } from './adapters/google';
 
 const text = async (parent: string, name: string) => {
@@ -30,8 +30,14 @@ export function bulletinFrom(rows: unknown[][], county: string): BulletinRow | n
   const row = body.find(r => String(r[ci >= 0 ? ci : 0] ?? '').trim().toLowerCase() === county.toLowerCase());
   if (!row) return null;
   const values = Object.fromEntries(cols.map((c, i) => [c, row[i] instanceof Date ? (row[i] as Date).toISOString().slice(0, 10) : (row[i] as string | number) ?? '']));
-  const pick = (re: RegExp) => { const k = findCol(cols, re); return k ? String(values[k] ?? '') : ''; };
-  return { county, issued: pick(/issue|run|date/i), alert: pick(/alert|level|colour|color/i), headline: pick(/headline|message|advice|summary/i), values };
+  // Exact workflow column names first, then looser matches for older layouts.
+  const pick = (exact: string[], re: RegExp) => { const k = exact.find(e => cols.includes(e)) ?? findCol(cols, re); return k ? String(values[k] ?? '').trim() : ''; };
+  return {
+    county, values,
+    issued: pick(['data_end_date', 'run_utc'], /issue|run|date/i),
+    alert: pick(['alert_level'], /alert|level|colour|color/i),
+    headline: bulletinHeadline(values) || pick([], /headline|message|advice|summary/i)
+  };
 }
 
 export function ifsFrom(csv: string, stationUids: string[]) {
@@ -66,10 +72,15 @@ export async function pull(lat: number, lon: number, radiusKm: number): Promise<
     guard('station_status.csv', async () => stationsFrom(await text(root, 'station_status.csv'), lat, lon, radiusKm), { rows: [], fallback: true }),
     guard('county bulletin', async () => {
       const folder = await driveFind(root, 'county_bulletin');
-      const f = folder && await driveFind(folder.id, 'county_bulletin_latest.xlsx');
-      if (!f) throw new Error('county_bulletin_latest.xlsx not found');
-      const [sheet] = await readXlsxFile(await driveDownload(f));
-      return bulletinFrom(sheet.data as unknown[][], county);
+      if (!folder) throw new Error('county_bulletin folder not found');
+      // The CSV is the plain table; the workbook's first sheet may be a formatted cover.
+      const csv = await driveFind(folder.id, 'county_bulletin_latest.csv');
+      if (csv) return bulletinFrom(parseCsv((await driveDownload(csv)).toString('utf8')), county);
+      const f = await driveFind(folder.id, 'county_bulletin_latest.xlsx');
+      if (!f) throw new Error('county_bulletin_latest.csv not found');
+      const sheets = await readXlsxFile(await driveDownload(f));
+      for (const sh of sheets) { const b = bulletinFrom(sh.data as unknown[][], county); if (b) return b; }
+      return null;
     }, null),
     guard('cache_ecmwf_ifs_daily.csv', () => text(root, 'cache_ecmwf_ifs_daily.csv'), '')
   ]);

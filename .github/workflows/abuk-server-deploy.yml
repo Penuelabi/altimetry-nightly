@@ -54,7 +54,7 @@ jobs:
         run: |
           # Each API separately, so one missing permission names itself; errors go to the run annotations.
           need=0
-          for api in run cloudbuild artifactregistry secretmanager sheets drive earthengine; do
+          for api in run cloudbuild artifactregistry secretmanager sheets drive earthengine storage; do
             if out=$(gcloud services enable "$api.googleapis.com" --project "$PROJECT" 2>&1); then echo "enabled $api"
             else
               msg=$(echo "$out" | grep -E "ERROR|PERMISSION|denied|disabled|billing" | head -2 | tr '\n' ' ')
@@ -94,6 +94,16 @@ jobs:
           gen abuk-session-secret SESSION_SECRET
           gen abuk-sms-webhook SMS_WEBHOOK_SECRET
           echo "MOUNTS=${MOUNTS#,}" >> "$GITHUB_ENV"
+      - name: Photo bucket (private; created once)
+        run: |
+          B="abuk-photos-$PROJECT"
+          if ! gcloud storage buckets describe "gs://$B" --project "$PROJECT" >/dev/null 2>&1; then
+            gcloud storage buckets create "gs://$B" --project "$PROJECT" --location "$REGION" --uniform-bucket-level-access --public-access-prevention \
+              || { echo "::warning::Could not create the photo bucket gs://$B. Photos stay on phones until it exists (grant the deploy account Storage Admin)."; exit 0; }
+          fi
+          gcloud storage buckets add-iam-policy-binding "gs://$B" --member="serviceAccount:$RUNTIME_SA" --role=roles/storage.objectAdmin >/dev/null \
+            || echo "::warning::Could not grant the service account access to gs://$B"
+          echo "PHOTO_BUCKET=$B" >> "$GITHUB_ENV"
       - name: First admin (only if users.json has none)
         if: env.ADMIN_NAME != ''
         env:
@@ -128,6 +138,7 @@ jobs:
           ENVS="$ENVS|GEE_FLOOD_EXTENT_ASSET=${{ vars.ABUK_GEE_FLOOD_ASSET || 'projects/sudan-1575919084043/assets/maximum_flood_extent' }}"
           ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER|SMS_API_URL=$SMS_URL"
           [ -n "$DRIVE_FOLDER_ID" ] && ENVS="$ENVS|DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID"
+          [ -n "${PHOTO_BUCKET:-}" ] && ENVS="$ENVS|PHOTO_BUCKET=$PHOTO_BUCKET"
           if ! gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --source . \
             --allow-unauthenticated --memory 512Mi --max-instances 3 --service-account "$RUNTIME_SA" \
             --set-env-vars "$ENVS" --set-secrets "$MOUNTS" 2> deploy.err; then

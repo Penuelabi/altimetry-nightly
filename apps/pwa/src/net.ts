@@ -2,6 +2,7 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { FARM, applyOps, whereIs, type Register, type SyncRecord } from '@abuk/core';
 import { api, ApiFail } from './api';
 import { getState, setState, useApp } from './store';
+import { uploadPhotos } from './photos';
 
 const sub = (cb: () => void) => { addEventListener('online', cb); addEventListener('offline', cb); return () => { removeEventListener('online', cb); removeEventListener('offline', cb); }; };
 export const useOnline = () => useSyncExternalStore(sub, () => navigator.onLine);
@@ -36,7 +37,7 @@ export async function syncNow() {
       monLog: st.monLog.map(m => (m.rid && ok.has(m.rid) ? { ...m, synced: true } : m))
     }));
   } catch { /* stays queued; retried on the next tick */ }
-  finally { busy = false; }
+  finally { busy = false; uploadPhotos().catch(() => {}); }
 }
 
 // Flush the outbox when signal returns and every minute while online.

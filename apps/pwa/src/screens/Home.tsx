@@ -1,7 +1,7 @@
-import { recessDays, ZONES, type Task } from '@abuk/core';
+import { briefing, DEFAULT_MODEL, recessDays, SLOPE_STEP, ZONES, type Task } from '@abuk/core';
 import { go, openRegister, setState, tab, useApp } from '../store';
 import { Check, Stat } from '../ui';
-import { basinOpacity, moundLines, toggleTask, useGreet, useL } from './common';
+import { allChecks, basinOpacity, moundLines, toggleTask, useGreet, useHereData, useL, useModel } from './common';
 import { usePlace } from '../net';
 
 const MONTHS = 'JFMAMJJASOND'.split('');
@@ -24,7 +24,17 @@ const TaskRow = ({ t, round, meta }: { t: Task; round?: boolean; meta?: boolean 
 );
 
 function Ledger() {
-  const s = useApp(), L = useL(), greet = useGreet();
+  const s = useApp(), L = useL(), place = usePlace(), model = useModel();
+  const { weather, sat } = useHereData();
+  const station = s.lastPull?.stations.rows[0];
+  const b = briefing({
+    now: new Date(), name: s.session?.user.name ?? '', place,
+    gauge: (s.gauge ?? []).filter(g => g.status === 'ok' && g.v != null).map(g => ({ at: g.at, v: g.v as number })),
+    station: station ? { name: station.name, km: station.km, level: station.lastLevel, vs2yr: station.vs2yr, ratePerDay: station.ratePerDay, levelClass: station.levelClass } : null,
+    checks: allChecks(s).flatMap(c => (c.lat != null && c.lon != null ? [{ ...c, lat: c.lat, lon: c.lon }] : [])),
+    weather, satellite: sat, rate: { v: model.rate, measured: model.rateSrc !== DEFAULT_MODEL.rateSrc }
+  });
+  const sow = recessDays(model);
   const today = s.tasks.filter(t => t.due === 'today').slice(0, 3);
   const open = s.tasks.filter(t => !t.done).length;
   const BTN: [string, () => void, boolean, string?][] = [
@@ -36,14 +46,16 @@ function Ledger() {
   return (
     <div className="pad g18" style={{ paddingTop: 18 }}>
       <div>
-        <div className="kick muted num">{dateLine()} · Flood season, week 11</div>
-        <h1 className="h1" style={{ margin: '6px 0 8px', fontSize: 34, lineHeight: 1.02, letterSpacing: '-.01em' }}>{greet}. The basin is draining.</h1>
-        <p className="body">The White Nile at Bor fell 3 cm overnight. Mound row B‑05 is still under water; the rest of the Balanites rows are clear. Recession sowing opens in about <strong style={{ fontWeight: 600 }}>{recessDays()} days</strong>.</p>
+        <div className="kick muted num">{b.kicker}</div>
+        <h1 className="h1" style={{ margin: '6px 0 8px', fontSize: 34, lineHeight: 1.02, letterSpacing: '-.01em' }}>{b.headline}</h1>
+        <p className="body">{b.body.join(' ')}{model.measured && sow != null && sow > 0 ? <> Recession sowing opens in about <strong style={{ fontWeight: 600 }}>{sow} days</strong> (flood model, from measurements).</> : null}</p>
       </div>
       <button onClick={() => go('flood')} className="box grid3" style={{ background: 'transparent', padding: 0, textAlign: 'left' }}>
-        <div style={{ padding: '10px 12px', borderRight: '1px solid var(--color-divider)' }}><div className="lbl">Bor gauge</div><div className="head num" style={{ fontSize: 24 }}>4.12 m</div><div style={{ fontSize: 11.5, color: 'var(--color-accent-700)' }}>↓ 3 cm / day</div></div>
-        <div style={{ padding: '10px 12px', borderRight: '1px solid var(--color-divider)' }}><div className="lbl">Basin depth</div><div className="head num" style={{ fontSize: 24 }}>0.92 m</div><div className="sub">mounds 1.0 m</div></div>
-        <div style={{ padding: '10px 12px' }}><div className="lbl">Today</div><div className="head num" style={{ fontSize: 24 }}>34°</div><div className="sub">no rain</div></div>
+        {b.tiles.map((t, i) => (
+          <div key={t.k} style={{ padding: '10px 12px', borderRight: i < 2 ? '1px solid var(--color-divider)' : undefined, minWidth: 0 }}>
+            <div className="lbl">{t.k}</div><div className="head num" style={{ fontSize: 24 }}>{t.v}</div><div className="sub" style={{ lineHeight: 1.3 }}>{t.s}</div>
+          </div>
+        ))}
       </button>
       <div>
         <div className="between rule-b"><h2 className="h2">{L.tasks}</h2><button className="link" onClick={() => go('tasks')}>{L.seeAll} · {open} open</button></div>
@@ -67,7 +79,7 @@ function Ledger() {
 }
 
 function Almanac() {
-  const s = useApp(), L = useL(), greet = useGreet();
+  const s = useApp(), L = useL(), greet = useGreet(), sow = recessDays(useModel());
   const today = s.tasks.filter(t => t.due === 'today').slice(0, 3);
   const hatch = (c: string, w: number) => `repeating-linear-gradient(${w}deg,${c} 0 1px,transparent 1px 5px)`;
   const cell = { display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontStyle: 'italic', color: 'var(--color-neutral-700)', borderLeft: '1px solid var(--color-divider)' } as const;
@@ -88,7 +100,7 @@ function Almanac() {
         <div className="between sub" style={{ marginTop: 10 }}><span>Today ▲ late flood</span><span>Recession opens ~4 Dec</span></div>
       </div>
       <div>
-        <div className="kick">Next window · in {recessDays()} days</div>
+        <div className="kick">Next window · {sow == null ? 'water not falling yet' : sow <= 0 ? 'open now' : `in ${sow} days`}</div>
         <h1 className="h1" style={{ margin: '4px 0 6px', fontSize: 32 }}>Sow the recession silt.</h1>
         <p className="body">As water leaves the basin, broadcast cowpea, Feterita sorghum and jute mallow between the Balanites mounds. Seed stock check is on this week's list.</p>
       </div>
@@ -107,7 +119,7 @@ function Almanac() {
 }
 
 const ZINFO = {
-  basin: { kicker: 'Zone 3 · 22 ha · 0.92 m water', head: 'Mounds clear except B‑05.', body: `Balanites anchor. Water is falling 2–3 cm a day; recession sowing of cowpea, sorghum and kudra follows in about ${recessDays()} days.`, stats: [['Trees', '1,936'], ['Mound rows', '24'], ['Groups', '7']] },
+  basin: { kicker: 'Zone 3 · 22 ha', head: 'Balanites mounds and recession crops.', body: 'Balanites anchor on raised mounds; recession sowing of cowpea, sorghum and kudra follows the falling water.', stats: [['Trees', '1,936'], ['Mound rows', '24'], ['Groups', '7']] },
   slope: { kicker: 'Zone 2 · 8 ha · 0.22 m water', head: 'Groundnut lifted; sesame drying.', body: 'Transition soils between ridge and basin. Rainfed groundnut, sesame, millet and okra finish before the flood climbs the slope.', stats: [['Plots', '11'], ['Slope', '0.6%'], ['Groups', '3']] },
   ridge: { kicker: 'Zone 1 · 10 ha · dry', head: 'Moringa cut due on R‑02.', body: 'Safe from flood. High‑density Moringa leaf blocks, gum arabic tapping rows, shea and tamarind on the boundary.', stats: [['Moringa', '62k'], ['Gum trees', '410'], ['Groups', '2']] }
 } as const;
@@ -115,7 +127,12 @@ const ZONE_TASK = { basin: 'Basin', ridge: 'Ridge', slope: 'Slope' } as const;
 
 function Field() {
   const s = useApp(), L = useL();
-  const z = ZINFO[s.zone], place = usePlace();
+  const z = ZINFO[s.zone], place = usePlace(), model = useModel(), sow = recessDays(model);
+  // Live line for the basin and slope: fitted water depth and fall rate near the phone.
+  const live = s.zone === 'ridge' ? '' : (() => {
+    const d = s.zone === 'basin' ? model.d0 : Math.max(0, model.d0 - SLOPE_STEP);
+    return ` · ${Math.round(d * 100)} cm water${model.measured ? '' : ' (estimate)'}`;
+  })();
   const lbl = { fontFamily: 'Lora', fontSize: 10, letterSpacing: 1.2 };
   return (
     <div className="col">
@@ -124,10 +141,10 @@ function Field() {
           <rect x="0" y="0" width="360" height="70" fill="var(--color-accent-100)" />
           <rect x="0" y="70" width="360" height="50" fill="var(--color-neutral-100)" />
           <rect x="0" y="120" width="360" height="130" fill="var(--color-neutral-200)" />
-          <rect x="0" y="120" width="360" height="130" fill="var(--color-neutral-500)" fillOpacity={basinOpacity()} />
+          <rect x="0" y="120" width="360" height="130" fill="var(--color-neutral-500)" fillOpacity={basinOpacity(model.d0)} />
           <path d="M0 70 C90 62 180 78 360 68" fill="none" stroke="var(--color-neutral-500)" strokeDasharray="3 3" />
           <path d="M0 120 C100 112 220 128 360 118" fill="none" stroke="var(--color-neutral-500)" strokeDasharray="3 3" />
-          {moundLines([150, 163, 176, 189, 202, 215, 228, 241]).map(l => <line key={l.y} x1="20" x2="340" y1={l.y} y2={l.y} stroke={l.c} strokeWidth="2" />)}
+          {moundLines([150, 163, 176, 189, 202, 215, 228, 241], model.d0).map(l => <line key={l.y} x1="20" x2="340" y1={l.y} y2={l.y} stroke={l.c} strokeWidth="2" />)}
           <text x="14" y="22" {...lbl} fill="var(--color-accent-800)">1 · DRY RIDGE · 10 HA</text>
           <text x="14" y="88" {...lbl} fill="var(--color-neutral-700)">2 · SLOPE · 8 HA</text>
           <text x="14" y="138" {...lbl} fill="var(--color-neutral-900)">3 · FLOODPLAIN BASIN · 22 HA</text>
@@ -143,9 +160,9 @@ function Field() {
           ))}
         </div>
         <div>
-          <div className="kick">{z.kicker}</div>
+          <div className="kick">{z.kicker}{live}</div>
           <h1 className="h1" style={{ margin: '4px 0 6px', fontSize: 30, lineHeight: 1.05 }}>{z.head}</h1>
-          <p className="body">{z.body}</p>
+          <p className="body">{z.body}{s.zone === 'basin' ? ` ${model.rate > 0 ? `Water is falling ${(model.rate * 100).toFixed(1)} cm a day (${model.rateSrc === DEFAULT_MODEL.rateSrc ? 'design estimate' : 'measured'})${sow != null && sow > 0 ? `; the basin should be dry in about ${sow} days.` : '.'}` : 'The water is not falling yet.'}` : ''}</p>
         </div>
         <div className="grid3" style={{ borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
           {z.stats.map(([k, v]) => <Stat key={k} k={k} v={v} />)}

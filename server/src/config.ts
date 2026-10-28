@@ -10,7 +10,8 @@ export const GROUPS = {
   gee: ['GOOGLE_SERVICE_ACCOUNT_JSON', 'GEE_PROJECT'],
   github: ['GITHUB_ACCESS_REPO', 'GITHUB_TOKEN'],
   sms: ['SMS_PROVIDER', 'SMS_API_KEY', 'SMS_USERNAME'],
-  smsInbound: ['SMS_WEBHOOK_SECRET']
+  smsInbound: ['SMS_WEBHOOK_SECRET'],
+  photos: ['GOOGLE_SERVICE_ACCOUNT_JSON', 'PHOTO_BUCKET']
 } as const;
 export type Group = keyof typeof GROUPS;
 
@@ -34,7 +35,8 @@ export const cfg = {
   get smsUser() { return env('SMS_USERNAME'); },
   get smsSender() { return env('SMS_SENDER_ID'); },
   get smsApiUrl() { return (env('SMS_API_URL') || 'https://api.sms-gate.app/3rdparty/v1').replace(/\/$/, ''); },
-  get smsWebhookSecret() { return env('SMS_WEBHOOK_SECRET'); }
+  get smsWebhookSecret() { return env('SMS_WEBHOOK_SECRET'); },
+  get photoBucket() { return env('PHOTO_BUCKET'); }
 };
 
 export const missing = (g: Group) => GROUPS[g].filter(k => !env(k) && !(k === 'DRIVE_FOLDER_ID'));

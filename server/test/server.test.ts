@@ -49,6 +49,11 @@ describe('sources', () => {
     const b = bulletinFrom([['County', 'Alert level', 'Headline'], ['Bor South', 'yellow', 'x'], ['Duk', 'orange', 'Dry spell possible (46%)']], 'Duk');
     expect(b).toMatchObject({ alert: 'orange', headline: 'Dry spell possible (46%)' });
   });
+  it('reads the nightly workflow bulletin columns', () => {
+    const b = bulletinFrom([['county', 'state', 'data_end_date', 'rain_30d_mm', 'antecedent_summary', 'advisory_flags', 'alert_level', 'alert_text'],
+      ['Duk', 'Jonglei', '2026-10-24', '85.27', 'Root-zone soil dry', 'Dry spell possible (46%) | Exposure', 'orange', 'ORANGE: drought / dry spell']], 'Duk');
+    expect(b).toMatchObject({ issued: '2026-10-24', alert: 'orange', headline: 'ORANGE: drought / dry spell' });
+  });
   it('takes the latest IFS row per station', () => {
     const r = ifsFrom('station_uid,date,t2m,ro\nA,2026-10-27,33.1,0.1\nA,2026-10-28,34.0,0\nB,2026-10-28,1,1', ['A']);
     expect(r).toEqual([{ station: 'A', date: '2026-10-28', values: { t2m: 34, ro: 0 } }]);
@@ -115,12 +120,15 @@ describe('farm register http', () => {
     process.env.SESSION_SECRET = 'x'.repeat(40);
     const { user } = makeUser([], 'Nyandeng Ajak', 'Extension worker', 30);
     const { token } = await issueSession(user);
-    const r = await app.request('/api/farm/ops', { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ ops: [] }) });
+    const r = await app.request('/api/farm/ops', { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ ops: [{ op: 'upsert', kind: 'plot', item: { id: 'X-1', code: 'X-1' } }] }) });
     expect(r.status).toBe(403);
+    const ok = opAllowed('Extension worker', { op: 'upsert', kind: 'move', item: { id: 'm1', storeId: 'ST-01', itemId: 'COWP-SEED', date: '2026-10-28', dir: 'out', qty: 5, party: 'Group 4', orderId: '', by: 'EW-014', note: '' } }, seedRegister());
+    expect(ok).toBe(true);
   });
 });
 
 import { parseRow } from '../src/dashboard';
+import { opAllowed, seedRegister } from '@abuk/core';
 describe('dashboard', () => {
   it('parses synced sheet rows', () => {
     expect(parseRow('monitor', ['r1', '2026-10-28T09:00:00Z', 'EW‑014', '{"plot":"B‑07"}'])).toMatchObject({ kind: 'monitor', by: 'EW‑014', data: { plot: 'B‑07' } });

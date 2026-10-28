@@ -3,6 +3,7 @@ import { ICONS, SPECIES, T, TITLES, type NavKey, type Screen } from '@abuk/core'
 import { back, setState, tab, useApp } from './store';
 import { syncNow, useAutoSync, useLocationWatch, useOnline, usePlace } from './net';
 import { UpdateBanner } from './update';
+import { useDailyRefresh } from './daily';
 import { Icon } from './ui';
 import { Home } from './screens/Home';
 import { MapScreen } from './screens/Map';
@@ -45,6 +46,7 @@ export function App() {
   useEffect(() => { if (s.session && s.session.token !== startToken.current) setUnlocked(true); }, [s.session]);
   useAutoSync();
   useLocationWatch();
+  useDailyRefresh();
   const place = usePlace();
   useEffect(() => { const t = setTimeout(() => setSplash(false), 1100); return () => clearTimeout(t); }, []);
 
