@@ -51,7 +51,19 @@ jobs:
           credentials_json: ${{ secrets.GCP_DEPLOY_KEY || secrets.GEE_SERVICE_ACCOUNT_KEY }}
       - uses: google-github-actions/setup-gcloud@v2
       - name: Enable services
-        run: gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com sheets.googleapis.com drive.googleapis.com earthengine.googleapis.com --project "$PROJECT"
+        run: |
+          # Each API separately, so one missing permission names itself; errors go to the run annotations.
+          need=0
+          for api in run cloudbuild artifactregistry secretmanager sheets drive earthengine; do
+            if out=$(gcloud services enable "$api.googleapis.com" --project "$PROJECT" 2>&1); then echo "enabled $api"
+            else
+              msg=$(echo "$out" | grep -E "ERROR|PERMISSION|denied|disabled|billing" | head -2 | tr '\n' ' ')
+              echo "::warning::Could not enable $api.googleapis.com: ${msg:-$out}"
+              case $api in run|cloudbuild|artifactregistry|secretmanager) need=1;; esac
+            fi
+          done
+          # Not fatal on its own: the APIs may already be on. Later steps fail clearly if not.
+          [ $need = 0 ] || echo "::warning::Core APIs could not be enabled by this account. If later steps fail, grant it Service Usage Admin or enable the APIs in the console."
       - name: Store secrets in Secret Manager
         env:
           GOOGLE_SA: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
@@ -59,6 +71,7 @@ jobs:
           SMS_PASS: ${{ secrets.SMS_GATE_PASSWORD }}
         run: |
           set -euo pipefail
+          trap 'echo "::error::Secret Manager step failed at line $LINENO (see the log above); the account needs Secret Manager Admin."' ERR
           G="gcloud --project=$PROJECT"
           RUNTIME_SA="$($G projects describe "$PROJECT" --format='value(projectNumber)')-compute@developer.gserviceaccount.com"
           MOUNTS=""
@@ -106,9 +119,13 @@ jobs:
           ENVS="$ENVS|GEE_SOIL_MOISTURE_ASSET=${{ vars.ABUK_GEE_SOIL_ASSET }}|GEE_FLOOD_EXTENT_ASSET=${{ vars.ABUK_GEE_FLOOD_ASSET }}"
           ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER"
           [ -n "$DRIVE_FOLDER_ID" ] && ENVS="$ENVS|DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID"
-          gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --source . \
+          if ! gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --source . \
             --allow-unauthenticated --memory 512Mi --max-instances 3 \
-            --set-env-vars "$ENVS" --set-secrets "$MOUNTS"
+            --set-env-vars "$ENVS" --set-secrets "$MOUNTS" 2> deploy.err; then
+            cat deploy.err
+            echo "::error::$(grep -E 'ERROR|PERMISSION|denied' deploy.err | head -3 | tr '\n' ' ')"
+            exit 1
+          fi
           URL="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')"
           echo "### Abuk server: $URL" >> "$GITHUB_STEP_SUMMARY"
           curl -fsS "$URL/api/health" | tee -a "$GITHUB_STEP_SUMMARY"
