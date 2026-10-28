@@ -148,3 +148,24 @@ describe('alert recipients', () => {
     expect((await app.request('/api/leads', { method: 'PUT', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: '{"leads":[]}' })).status).toBe(403);
   });
 });
+
+import { checkPin, pinFields } from '../src/auth';
+describe('PIN sign-in', () => {
+  const base = () => { const { user } = makeUser([], 'Achol Deng', 'Group lead', 90); return user; };
+  it('needs a PIN to have been set', () => {
+    expect(checkPin({ users: [base()] }, 'EW-001', '4821')).toMatchObject({ ok: false, error: expect.stringMatching(/No PIN set/) });
+  });
+  it('accepts the right PIN and counts a wrong one as a miss', () => {
+    const u = { ...base(), ...pinFields('4821') };
+    expect(checkPin({ users: [u] }, 'ew-001', '4821').ok).toBe(true);
+    expect(checkPin({ users: [u] }, 'EW‑001', '0000')).toMatchObject({ ok: false, fail: true });
+  });
+  it('refuses while locked, even with the right PIN', () => {
+    const u = { ...base(), ...pinFields('4821'), pinLockedUntil: new Date(Date.now() + 60_000).toISOString() };
+    expect(checkPin({ users: [u] }, 'EW‑001', '4821')).toMatchObject({ ok: false, error: expect.stringMatching(/Too many wrong PINs/) });
+  });
+  it('rejects badly formed PINs at the door', async () => {
+    const r = await app.request('/api/auth/signin-pin', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: 'EW-001', pin: '12' }) });
+    expect(r.status).toBe(400);
+  });
+});

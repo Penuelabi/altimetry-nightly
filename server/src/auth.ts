@@ -6,7 +6,7 @@ import { cfg, need } from './config';
 import { readJson, updateJson } from './adapters/github';
 
 // users.json in the private GitHub repo. Only scrypt hashes of keys are stored.
-export interface StoredUser { id: string; name: string; role: Role; salt: string; hash: string; on: boolean; created: string; expires: string; lastSeen?: string; note?: string }
+export interface StoredUser { id: string; name: string; role: Role; salt: string; hash: string; on: boolean; created: string; expires: string; lastSeen?: string; note?: string; pinSalt?: string; pinHash?: string; pinFails?: number; pinLockedUntil?: string }
 export interface UsersFile { users: StoredUser[] }
 export const USERS_PATH = 'users.json';
 
@@ -61,6 +61,22 @@ export function checkKey(file: UsersFile, rawId: string, key: string, now = new 
 }
 
 const secret = () => { need('session'); return new TextEncoder().encode(cfg.sessionSecret); };
+// 4-digit PINs are guessable, so they lock after PIN_MAX_FAILS wrong tries; the access key still works.
+export const PIN = /^\d{4}$/;
+export const PIN_MAX_FAILS = 5, PIN_LOCK_MIN = 15;
+export function pinFields(pin: string) { const pinSalt = randomBytes(16).toString('hex'); return { pinSalt, pinHash: hashKey(pin, pinSalt), pinFails: 0, pinLockedUntil: undefined }; }
+
+export type PinVerdict = Verdict | { ok: false; error: string; fail: true };
+export function checkPin(file: UsersFile, rawId: string, pin: string, now = new Date()): PinVerdict {
+  const u = file.users.find(x => x.id === normId(rawId));
+  if (!u || !u.on) return { ok: false, error: 'No active worker with that ID. Ask your admin.' };
+  if (new Date(u.expires) < now) return { ok: false, error: 'Your access has expired. Ask your admin for a new key.' };
+  if (!u.pinHash || !u.pinSalt) return { ok: false, error: 'No PIN set yet. Sign in once with your access key, then set a PIN.' };
+  if (u.pinLockedUntil && new Date(u.pinLockedUntil) > now) return { ok: false, error: `Too many wrong PINs. Try again after ${new Date(u.pinLockedUntil).toTimeString().slice(0, 5)}, or use your access key.` };
+  if (!keyMatches(pin, { salt: u.pinSalt, hash: u.pinHash })) return { ok: false, error: 'Wrong PIN.', fail: true };
+  return { ok: true, user: u };
+}
+
 export async function issueSession(u: StoredUser) {
   const exp = Math.min(Date.parse(u.expires), Date.now() + 30 * 864e5);
   const token = await new SignJWT({ role: u.role, name: u.name }).setProtectedHeader({ alg: 'HS256' }).setSubject(u.id).setIssuedAt().setExpirationTime(Math.floor(exp / 1000)).sign(secret());

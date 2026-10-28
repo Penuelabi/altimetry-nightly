@@ -2,9 +2,9 @@ import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from '@hono/node-server/serve-static';
 import type { GaugeReading, Role, SyncRecord } from '@abuk/core';
-import { applyOps, editAllowed, opError, parseGauge, removeAllowed, seedRegister, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
+import { applyOps, editAllowed, normId, opError, parseGauge, removeAllowed, seedRegister, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
 import { cfg, health, NotConfigured } from './config';
-import { EXPIRY_DAYS, changeUsers, checkKey, issueSession, loadUsers, makeUser, readSession, toPublic, type Session } from './auth';
+import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, changeUsers, checkKey, checkPin, issueSession, loadUsers, makeUser, pinFields, readSession, toPublic, type Session } from './auth';
 import { readJson, updateJson } from './adapters/github';
 import { sheetsAppend } from './adapters/google';
 import { parseInbound, sendSms } from './adapters/sms';
@@ -56,6 +56,43 @@ app.post('/api/auth/signin', async c => {
   // lastSeen is best-effort; a failed commit must not block sign-in.
   changeUsers(`seen ${v.user.id}`, f => ({ users: f.users.map(u => u.id === v.user.id ? { ...u, lastSeen: new Date().toISOString() } : u) })).catch(() => {});
   return c.json({ ...s, user: toPublic(v.user) });
+});
+
+// Names for the sign-in drop-down: active workers' ID and name only (no roles, keys or contacts).
+app.get('/api/auth/roster', async c => {
+  const f = await loadUsers();
+  return c.json(f.users.filter(u => u.on && new Date(u.expires) > new Date()).map(u => ({ id: u.id, name: u.name, hasPin: !!u.pinHash })).sort((a, b) => a.name.localeCompare(b.name)));
+});
+
+app.post('/api/auth/signin-pin', async c => {
+  if (limited(c.req.header('x-forwarded-for') || 'local')) return c.json({ error: 'too_many', message: 'Too many tries. Wait a minute.' }, 429);
+  const { id = '', pin = '' } = await c.req.json<{ id?: string; pin?: string }>();
+  if (!PIN.test(pin)) return c.json({ error: 'invalid', message: 'The PIN has 4 digits.' }, 400);
+  const v = checkPin(await loadUsers(true), id, pin);
+  if (!v.ok) {
+    if ('fail' in v) {
+      // Count the miss; the fifth in a row locks PIN sign-in for this worker for a while.
+      const nid = normId(id);
+      await changeUsers(`pin miss ${nid}`, f => ({ users: f.users.map(u => {
+        if (u.id !== nid) return u;
+        const n = (u.pinFails ?? 0) + 1;
+        return { ...u, pinFails: n, pinLockedUntil: n >= PIN_MAX_FAILS ? new Date(Date.now() + PIN_LOCK_MIN * 60_000).toISOString() : u.pinLockedUntil };
+      }) })).catch(() => {});
+    }
+    return c.json({ error: 'denied', message: v.error }, 401);
+  }
+  const s = await issueSession(v.user);
+  changeUsers(`seen ${v.user.id}`, f => ({ users: f.users.map(u => u.id === v.user.id ? { ...u, lastSeen: new Date().toISOString(), pinFails: 0, pinLockedUntil: undefined } : u) })).catch(() => {});
+  return c.json({ ...s, user: toPublic(v.user) });
+});
+
+app.post('/api/auth/pin', auth(), async c => {
+  const { pin = '' } = await c.req.json<{ pin?: string }>();
+  if (!PIN.test(pin)) return c.json({ error: 'invalid', message: 'The PIN has 4 digits.' }, 400);
+  if (/^(\d)\1{3}$|^(0123|1234|2345|3456|4567|5678|6789|9876|8765|7654|6543|5432|4321|3210)$/.test(pin)) return c.json({ error: 'invalid', message: 'Choose a PIN that is harder to guess than 1111 or 1234.' }, 400);
+  const me = c.get('me');
+  await changeUsers(`set PIN ${me.id} (hash only)`, f => ({ users: f.users.map(u => (u.id === me.id ? { ...u, ...pinFields(pin) } : u)) }));
+  return c.json({ ok: true });
 });
 
 app.get('/api/me', auth(), c => c.json(c.get('me')));

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { ICONS, SPECIES, T, TITLES, type NavKey, type Screen } from '@abuk/core';
 import { back, setState, tab, useApp } from './store';
 import { syncNow, useAutoSync, useLocationWatch, useOnline, usePlace } from './net';
@@ -40,6 +40,9 @@ export function App() {
   const online = useOnline();
   const [splash, setSplash] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
+  // The PIN lock is for opening the app with a saved session; someone who just signed in is already verified.
+  const startToken = useRef(s.session?.token);
+  useEffect(() => { if (s.session && s.session.token !== startToken.current) setUnlocked(true); }, [s.session]);
   useAutoSync();
   useLocationWatch();
   const place = usePlace();

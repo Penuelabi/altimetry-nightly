@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { signinError, type SigninResponse } from '@abuk/core';
-import { go, openRegister, setState, useApp } from '../store';
-import { api, explain } from '../api';
+import { go, openRegister, setState, signOut, startSession, useApp, type RosterEntry } from '../store';
+import { api, ApiFail, explain } from '../api';
 import { useOnline, usePlace } from '../net';
 import { Field, Seg } from '../ui';
 import { BUILD, checkForUpdate, installUpdate, useUpdate } from '../update';
@@ -25,37 +25,83 @@ function PinBoxes({ value, onChange, label }: { value: string; onChange: (v: str
 
 const Lockup = () => <img src="/lockup.png" alt="South Sudan Hydro-Climate Watch" style={{ width: '100%', maxWidth: 300, display: 'block', margin: '0 auto 4px' }} />;
 
+const localPin = async (pin: string) => { const salt = crypto.getRandomValues(new Uint32Array(4)).join('-'); return { salt, hash: await sha(salt + pin) }; };
+const OTHER = '__other__';
+
 export function SignIn() {
-  const online = useOnline(), place = usePlace();
-  const [id, setId] = useState('');
+  const s = useApp(), online = useOnline(), place = usePlace();
+  // Everyone the phone knows: workers who signed in here before, plus the project roster when online.
+  useEffect(() => { if (online) api<RosterEntry[]>('/api/auth/roster').then(r => setState({ roster: r }), () => {}); }, [online]);
+  const people = [...s.accounts.map(a => ({ id: a.user.id, name: a.user.name, hasPin: !!a.pin })), ...s.roster.filter(r => !s.accounts.some(a => a.user.id === r.id))]
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const [pick, setPick] = useState(s.accounts[0]?.user.id ?? '');
+  const [typed, setTyped] = useState('');
+  const id = pick === OTHER ? typed : pick;
+  const acc = s.accounts.find(a => a.user.id === id);
+  const hasPin = !!acc?.pin || !!s.roster.find(r => r.id === id)?.hasPin;
+  const [method, setMethod] = useState<'pin' | 'key'>(hasPin ? 'pin' : 'key');
+  useEffect(() => { setMethod(hasPin ? 'pin' : 'key'); setErr(''); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
   const [key, setKey] = useState('');
+  const [pin, setPin] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
-  const submit = async () => {
+
+  const withKey = async () => {
     const bad = signinError(id, key);
     if (bad) return setErr(bad);
-    if (!online) return setErr('First sign‑in needs signal. Move to where the phone has network and try again.');
+    if (!online) return setErr('Signing in with the key needs signal. Move to where the phone has network, or use your PIN.');
     setBusy(true);
     try {
       const r = await api<SigninResponse>('/api/auth/signin', { body: { id, key } });
-      setState({ session: { token: r.token, user: r.user, expires: r.expires }, screen: 'signin', hist: [] });
+      startSession({ token: r.token, user: r.user, expires: r.expires });
+      // First time with the key: open the account page so they can set a PIN.
+      if (!acc?.pin) setState({ screen: 'signin', hist: [] });
     } catch (e) { setErr(explain(e)); }
     finally { setBusy(false); }
   };
+
+  const withPin = async (v: string) => {
+    setPin(v); setErr('');
+    if (v.length < 4) return;
+    // On a phone this worker used before, the PIN works offline against the stored session.
+    if (acc?.pin && Date.parse(acc.expires) > Date.now() && await sha(acc.pin.salt + v) === acc.pin.hash) return startSession(acc);
+    if (!online) { setPin(''); return setErr(acc?.pin ? 'Wrong PIN.' : 'This phone has not seen your PIN yet. Use it once with signal, or sign in with your access key.'); }
+    setBusy(true);
+    try {
+      const r = await api<SigninResponse>('/api/auth/signin-pin', { body: { id, pin: v } });
+      startSession({ token: r.token, user: r.user, expires: r.expires, pin: await localPin(v) });
+    } catch (e) { setPin(''); setErr(explain(e)); }
+    finally { setBusy(false); }
+  };
+
   const demo = () => setState({ session: { token: 'demo', demo: true, expires: new Date(Date.now() + 864e5).toISOString(), user: { id: 'EW‑014', name: 'Achol Deng', role: 'Admin', meta: 'Group 4 · demo', on: true, expires: '' } } });
   return (
     <div className="pad" style={{ padding: '22px 18px 24px' }}>
       <Lockup />
       <div>
         <div className="kick">{place.payam} · Abuk Project</div>
-        <h1 className="h1" style={{ margin: '4px 0 6px', fontSize: 34, lineHeight: 1.02 }}>Sign in with your access key.</h1>
-        <p className="body" style={{ fontSize: 13.5 }}>Your project admin gives you a worker ID and a one‑time access key. Ask them for a new one if it is lost.</p>
+        <h1 className="h1" style={{ margin: '4px 0 6px', fontSize: 34, lineHeight: 1.02 }}>Who is signing in?</h1>
       </div>
-      <Field label="Worker ID"><input className="input" style={{ minHeight: 44, fontSize: 16, padding: '0 12px', textTransform: 'uppercase' }} placeholder="EW‑000" value={id} onChange={e => { setId(e.target.value.toUpperCase()); setErr(''); }} autoCapitalize="characters" /></Field>
-      <Field label="Access key"><input className="input mono" type="password" style={{ minHeight: 44, padding: '0 12px' }} placeholder="abk_…" value={key} onChange={e => { setKey(e.target.value.trim()); setErr(''); }} autoComplete="current-password" /></Field>
+      <Field label="Worker">
+        <select className="input" style={{ minHeight: 44, fontSize: 16 }} value={pick} onChange={e => { setPick(e.target.value); setPin(''); setKey(''); }}>
+          <option value="" disabled>{people.length ? 'Choose your name' : online ? 'Loading names…' : 'Connect once to load names'}</option>
+          {people.map(p => <option key={p.id} value={p.id}>{p.name} · {p.id}</option>)}
+          <option value={OTHER}>My name is not listed: type my ID</option>
+        </select>
+      </Field>
+      {pick === OTHER && <Field label="Worker ID"><input className="input" style={{ minHeight: 44, fontSize: 16, textTransform: 'uppercase' }} placeholder="EW‑000" value={typed} onChange={e => { setTyped(e.target.value.toUpperCase()); setErr(''); }} autoCapitalize="characters" /></Field>}
+      {id && <>
+        <Seg items={[['pin', '4‑digit PIN'], ['key', 'Access key']]} value={method} onPick={m => { setMethod(m); setErr(''); setPin(''); }} />
+        {method === 'pin'
+          ? <><PinBoxes value={pin} onChange={withPin} label="PIN" />{!hasPin && <div className="note">No PIN yet for {id}. Sign in once with your access key, then set a PIN.</div>}</>
+          : <>
+            <Field label="Access key"><input className="input mono" type="password" style={{ minHeight: 44, padding: '0 12px' }} placeholder="abk_…" value={key} onChange={e => { setKey(e.target.value.trim()); setErr(''); }} autoComplete="current-password" onKeyDown={e => e.key === 'Enter' && withKey()} /></Field>
+            <button className="btn lg" onClick={withKey} disabled={busy}>{busy ? 'Checking…' : 'Sign in'}</button>
+          </>}
+      </>}
+      {busy && method === 'pin' && <div className="note">Checking…</div>}
       {err && <div className="msg">{err}</div>}
-      <button className="btn lg" onClick={submit} disabled={busy}>{busy ? 'Checking…' : 'Sign in'}</button>
-      <div className="note" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>First sign‑in needs signal. After that, a 4‑digit PIN unlocks the app offline for 30 days.</div>
+      <div className="note" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>The access key from your admin is needed once. Then use your PIN: it works on any phone with signal, and offline on phones you have used before. 5 wrong PINs lock PIN sign‑in for 15 minutes.</div>
       {(import.meta.env.DEV || import.meta.env.VITE_DEMO === '1') && <button className="link" onClick={demo}>Open demo with sample data (test build)</button>}
     </div>
   );
@@ -71,7 +117,7 @@ export function PinLock({ onUnlock }: { onUnlock: () => void }) {
     if (v.length < 4 || !s.pin) return;
     if (await sha(s.pin.salt + v) === s.pin.hash) return onUnlock();
     const n = tries + 1; setTries(n); setPin('');
-    if (n >= 5) { setState({ session: null, pin: null }); return; }
+    if (n >= 5) { signOut(); return; }
     setErr(`Wrong PIN. ${5 - n} tries left before you must sign in with your key again.`);
   };
   return (
@@ -83,7 +129,7 @@ export function PinLock({ onUnlock }: { onUnlock: () => void }) {
       </div>
       <PinBoxes value={pin} onChange={check} label="PIN" />
       {err && <div className="msg">{err}</div>}
-      <button className="link" style={{ alignSelf: 'flex-start' }} onClick={() => setState({ session: null, pin: null })}>Forgot PIN? Sign in with your key</button>
+      <button className="link" style={{ alignSelf: 'flex-start' }} onClick={signOut}>Forgot PIN? Sign in with your key</button>
     </div>
   );
 }
@@ -96,9 +142,17 @@ export function Account() {
   const setNewPin = async (v: string) => {
     setPin(v); setPinMsg('');
     if (v.length < 4) return;
-    const salt = crypto.getRandomValues(new Uint32Array(4)).join('-');
-    setState({ pin: { salt, hash: await sha(salt + v) } });
-    setPin(''); setPinMsg('PIN set. It unlocks the app without signal.');
+    setPin('');
+    if (!s.session?.demo) {
+      try { await api('/api/auth/pin', { body: { pin: v } }); }
+      catch (e) {
+        if (!(e instanceof ApiFail) || e.status !== 0) return setPinMsg(explain(e));
+        setPinMsg('Saved on this phone only (no signal). Set it again with signal to use it on other phones.');
+      }
+    }
+    const p = await localPin(v);
+    setState(st => ({ pin: p, accounts: st.accounts.map(a => (a.user.id === st.session?.user.id ? { ...a, pin: p } : a)) }));
+    setPinMsg(m => m || 'PIN set. Use it to sign in next time, on this phone even without signal.');
   };
   const exp = new Date(s.session!.expires).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   return (
@@ -121,7 +175,7 @@ export function Account() {
       {u.role === 'Admin' && <button className="btn plain" onClick={() => go('admin')}>Manage users & access keys</button>}
       <AppVersion />
       <button className="btn lg" onClick={() => setState({ screen: 'home', hist: [] })}>Continue</button>
-      <button className="link" style={{ color: 'var(--color-neutral-700)', fontSize: 13 }} onClick={() => setState({ session: null, pin: null })}>Sign out{s.outbox.length ? ` (${s.outbox.length} records still waiting to sync stay on this phone)` : ''}</button>
+      <button className="link" style={{ color: 'var(--color-neutral-700)', fontSize: 13 }} onClick={signOut}>Sign out{s.outbox.length ? ` (${s.outbox.length} records still waiting to sync stay on this phone)` : ''}</button>
     </div>
   );
 }

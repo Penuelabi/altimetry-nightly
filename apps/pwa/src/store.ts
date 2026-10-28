@@ -5,6 +5,10 @@ import { HARV, LEADS, MEMBERS, MON, SOURCES, STORE, TASKS, applyOps, seedRegiste
 
 export interface Session { token: string; user: PublicUser; expires: string; demo?: boolean }
 export interface Plot { id: string; mode: 'walk' | 'pin'; pts: { lat: number; lon: number }[]; ha: number; elevation: number | null; slopePct: number | null; at: string }
+// Workers who have signed in on this phone: their session and a local PIN hash, so the PIN
+// works offline and signing out does not forget them.
+export interface Account { user: PublicUser; token: string; expires: string; pin: { salt: string; hash: string } | null }
+export interface RosterEntry { id: string; name: string; hasPin: boolean }
 export interface Where { lat: number; lon: number; acc: number | null; payam: string; county: string; state: string; at: string }
 export interface Lead { id: string; name: string; group?: string; rows: string; phone: string; lang?: 'en' | 'ar'; on: boolean }
 
@@ -20,6 +24,7 @@ export interface State {
   offer: 'open' | 'accepted' | 'countered';
   leads: Lead[]; alertLog: string[]; gauge: GaugeReading[] | null;
   where: Where | null;
+  accounts: Account[]; roster: RosterEntry[];
   farm: Register; farmOps: FarmOp[]; regTab: 'plots' | 'crops' | 'groups' | 'batches' | 'runs';
 }
 
@@ -33,6 +38,7 @@ const initial: State = {
   offer: 'open',
   leads: LEADS.map(([name, g, rows]) => ({ id: name, name: `${name} · ${g}`, rows, phone: 'number on server', on: true })),
   alertLog: [], gauge: null, where: null,
+  accounts: [], roster: [],
   farm: seedRegister(), farmOps: [], regTab: 'plots'
 };
 
@@ -94,3 +100,13 @@ export const today = () => new Date().toLocaleDateString('en-GB', { day: 'numeri
 export function farmChange(...ops: FarmOp[]) {
   setState(st => ({ farm: applyOps(st.farm, ops), farmOps: [...st.farmOps, ...ops] }));
 }
+
+// Signs a worker in on this phone and remembers them for next time.
+export function startSession(a: Omit<Account, 'pin'> & { pin?: Account['pin'] }) {
+  setState(st => {
+    const old = st.accounts.find(x => x.user.id === a.user.id);
+    const acc: Account = { user: a.user, token: a.token, expires: a.expires, pin: a.pin ?? old?.pin ?? null };
+    return { session: { token: acc.token, user: acc.user, expires: acc.expires }, pin: acc.pin, accounts: [acc, ...st.accounts.filter(x => x.user.id !== acc.user.id)], screen: 'home', hist: [] };
+  });
+}
+export const signOut = () => setState({ session: null, pin: null });
