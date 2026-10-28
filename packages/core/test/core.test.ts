@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { basinDepth, recessDays, moundRows, headline, parseGauge, monitorError, harvestError, signinError, withinRadius, polygonHa, qrCells, normId } from '../src';
+import { basinDepth, recessDays, moundRows, headline, parseGauge, monitorError, harvestError, signinError, withinRadius, polygonHa, pointInPolygon, plotForGps, qrCells, normId } from '../src';
 
 describe('flood model', () => {
   it('matches the design numbers', () => {
@@ -47,6 +47,23 @@ describe('geo', () => {
     const d = 100 / 111320;
     const ha = polygonHa([{ lat: 0, lon: 0 }, { lat: 0, lon: d }, { lat: d, lon: d }, { lat: d, lon: 0 }]);
     expect(ha).toBeCloseTo(1, 1);
+  });
+  it('detects point inside polygon', () => {
+    const square = [{ lat: 0, lon: 0 }, { lat: 0, lon: 1 }, { lat: 1, lon: 1 }, { lat: 1, lon: 0 }];
+    expect(pointInPolygon({ lat: 0.5, lon: 0.5 }, square)).toBe(true);
+    expect(pointInPolygon({ lat: 2, lon: 2 }, square)).toBe(false);
+    expect(pointInPolygon({ lat: 0.5, lon: 0.5 }, [])).toBe(false);
+  });
+  it('finds the right plot for a GPS point', () => {
+    const plots = [
+      { id: 'p1', code: 'A-01', boundary: [{ lat: 7.73, lon: 31.40 }, { lat: 7.73, lon: 31.41 }, { lat: 7.74, lon: 31.41 }, { lat: 7.74, lon: 31.40 }] },
+      { id: 'p2', code: 'A-02', boundary: [{ lat: 7.75, lon: 31.40 }, { lat: 7.75, lon: 31.41 }, { lat: 7.76, lon: 31.41 }, { lat: 7.76, lon: 31.40 }] },
+    ];
+    const m1 = plotForGps({ lat: 7.735, lon: 31.405 }, plots);
+    expect(m1).toMatchObject({ id: 'p1', code: 'A-01', inside: true });
+    const m2 = plotForGps({ lat: 7.755, lon: 31.405 }, plots);
+    expect(m2).toMatchObject({ id: 'p2', code: 'A-02', inside: true });
+    expect(plotForGps({ lat: 0, lon: 0 }, plots)).toBeNull();
   });
   it('draws QR finder squares', () => {
     expect(qrCells('BAL‑26‑03').some(c => c.x === 0 && c.y === 0)).toBe(true);

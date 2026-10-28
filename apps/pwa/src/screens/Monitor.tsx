@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { savePhoto } from '../photos';
-import { ACTIVITIES, CRACK_WIDTH, MIN_PHOTOS, pestOptions, SOIL_MOISTURE, SURFACE, WATER_AROUND, WATER_STATE, WATER_TREND, conditionSummary, plotLabel, type PlotCondition, type Term, SKIES, STAGES, EW_ID, monitorError, normId, whereIs } from '@abuk/core';
+import { ACTIVITIES, CRACK_WIDTH, MIN_PHOTOS, pestOptions, SOIL_MOISTURE, SURFACE, WATER_AROUND, WATER_STATE, WATER_TREND, conditionSummary, plotLabel, plotForGps, pointInPolygon, type PlotCondition, type Term, SKIES, STAGES, EW_ID, monitorError, normId, whereIs } from '@abuk/core';
 import { record, setState, today, useApp } from '../store';
 import { oneFix, useOnline, type Fix } from '../net';
 import { Field, Seg } from '../ui';
@@ -20,6 +20,7 @@ export function Monitor() {
   const [photos, setPhotos] = useState<Blob[]>([]);
   const [fix, setFix] = useState<Fix | null>(null);
   const [fixErr, setFixErr] = useState('');
+  const [gpsWarn, setGpsWarn] = useState('');
   const [now, setNow] = useState(new Date());
   const [wx, setWx] = useState<{ w: Weather | null; live: boolean; err: string }>({ w: lw, live: false, err: '' });
   const edited = useRef(new Set<string>());
@@ -31,6 +32,14 @@ export function Monitor() {
   useEffect(() => {
     oneFix().then(f => {
       setFix(f);
+      const match = plotForGps(f, s.farm.plots);
+      if (match && !edited.current.has('plot')) {
+        const label = plotOpts.find(o => o.startsWith(match.code));
+        if (label) setM(x => ({ ...x, plot: label }));
+        if (!match.inside) setGpsWarn(`GPS is near ${match.code} (${Math.round(match.distKm * 1000)} m from centre) but outside its boundary`);
+      } else if (!match && s.farm.plots.some(p => p.boundary.length > 2)) {
+        setGpsWarn('GPS position does not fall inside any mapped plot');
+      }
       fetchWeather(f.lat, f.lon).then(w => {
         setWx({ w, live: true, err: '' });
         setM(x => ({ ...x, ...(edited.current.has('temp') ? {} : { temp: String(w.temp) }), ...(edited.current.has('rain') ? {} : { rain: String(w.rain24) }), ...(edited.current.has('sky') ? {} : { sky: w.sky }) }));
@@ -38,9 +47,21 @@ export function Monitor() {
     }, e => setFixErr((e as Error).message));
     const iv = setInterval(() => setNow(new Date()), 15_000);
     return () => clearInterval(iv);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const upd = <K extends keyof typeof m>(k: K, v: (typeof m)[K]) => { edited.current.add(k); setM(x => ({ ...x, [k]: v })); setErr(''); setSaved(false); };
+  const upd = <K extends keyof typeof m>(k: K, v: (typeof m)[K]) => {
+    edited.current.add(k);
+    setM(x => ({ ...x, [k]: v }));
+    setErr(''); setSaved(false);
+    if (k === 'plot' && fix) {
+      const code = (v as string).split(' · ')[0];
+      const plot = s.farm.plots.find(p => p.code === code);
+      if (plot && plot.boundary.length > 2) {
+        if (!pointInPolygon(fix, plot.boundary)) setGpsWarn(`GPS is outside ${code}'s boundary — are you at the right plot?`);
+        else setGpsWarn('');
+      } else setGpsWarn('');
+    }
+  };
   const setCond = (c: Partial<PlotCondition>) => { setM(x => ({ ...x, condition: { ...x.condition, ...c } })); setErr(''); setSaved(false); };
   const tog = (k: 'acts' | 'pests', v: string) => upd(k, m[k].includes(v) ? m[k].filter(x => x !== v) : [...m[k], v]);
 
@@ -71,6 +92,7 @@ export function Monitor() {
           <span><span className="lbl" style={{ display: 'block' }}>Payam · auto</span>{fix ? (whereIs(fix.lat, fix.lon)?.payam ?? 'outside South Sudan') : '—'}</span>
           <span><span className="lbl" style={{ display: 'block' }}>Temperature · auto</span>{m.temp ? `${m.temp} °C` : '—'}</span>
         </div>
+        {gpsWarn && <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-md)', background: '#fef3cd', color: '#856404', fontSize: 12.5, lineHeight: 1.45 }}>⚠ {gpsWarn}</div>}
         <Field label="Farm / plot"><select className="input" value={m.plot} onChange={e => upd('plot', e.target.value)}>{plotOpts.map(o => <option key={o}>{o}</option>)}</select></Field>
         <div className="grid2">
           <Field label="Extension worker ID"><input className={'input num' + (err && !EW_ID.test(m.ew) ? ' bad' : '')} value={m.ew} placeholder="EW‑000" onChange={e => upd('ew', e.target.value.toUpperCase())} style={{ textTransform: 'uppercase' }} /></Field>
