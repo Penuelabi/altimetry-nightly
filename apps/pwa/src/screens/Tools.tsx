@@ -3,7 +3,7 @@ import { get as idbGet, set as idbSet } from 'idb-keyval';
 import { BATCHES, MEMBERS, P2P_PEERS, PICTO, STORE, TOOLS, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
 import { go, record, setState, useApp, type Lead } from '../store';
 import { api, explain } from '../api';
-import { useOnline } from '../net';
+import { useOnline, usePlace } from '../net';
 import { Check, Chevron, Icon, Seg, Toggle } from '../ui';
 
 export function Tools() {
@@ -202,6 +202,7 @@ export function Voice() {
 
 // ---- iv Pest photo check ----
 export function Pest() {
+  const place = usePlace();
   const [st, setSt] = useState<'idle' | 'busy' | 'done'>('idle');
   const [answered, setAnswered] = useState('');
   const me = useApp().session?.user.id ?? 'EW‑014';
@@ -214,7 +215,7 @@ export function Pest() {
     <div className="pad g14" style={{ paddingTop: 14 }}>
       <div className="photo" style={{ height: 170 }}>Crop‑check photo · sorghum leaf, B‑12</div>
       {st === 'idle' && <button className="btn lg" onClick={() => setSt('busy')}>Compare with local library</button>}
-      {st === 'busy' && <div className="it" style={{ fontSize: 13.5, color: 'var(--color-accent-800)' }}>Comparing with 46 reference photos from Jonglei…</div>}
+      {st === 'busy' && <div className="it" style={{ fontSize: 13.5, color: 'var(--color-accent-800)' }}>Comparing with 46 reference photos from {place.state || 'South Sudan'}…</div>}
       {st === 'done' && (
         <div className="col g12">
           <div>
@@ -239,7 +240,7 @@ export function Pest() {
           ) : <div className="it" style={{ fontSize: 13, color: 'var(--color-accent-800)', borderTop: '1px solid var(--color-divider)', paddingTop: 8 }}>{answered}</div>}
         </div>
       )}
-      <div className="sub" style={{ lineHeight: 1.5 }}>Preview: the matcher shows example results until the Jonglei reference library is loaded. The app only suggests; an extension worker confirms before any treatment is advised.</div>
+      <div className="sub" style={{ lineHeight: 1.5 }}>Preview: the matcher shows example results until the reference library for {place.state || 'South Sudan'} is loaded. The app only suggests; an extension worker confirms before any treatment is advised.</div>
     </div>
   );
 }

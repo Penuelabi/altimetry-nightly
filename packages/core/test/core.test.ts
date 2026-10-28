@@ -26,6 +26,8 @@ describe('validation', () => {
   it('checks forms', () => {
     expect(monitorError({ ew: '', acts: [], date: '' })).toBe('Add extension worker ID like EW‑014, at least one activity, a date.');
     expect(monitorError({ ew: 'EW-014', acts: ['Weeding'], date: '2026-10-28' })).toBe('');
+    expect(monitorError({ ew: 'EW-014', acts: ['Weeding'], date: '2026-10-28', photos: 1 })).toBe('Add at least 3 photos (1 so far).');
+    expect(monitorError({ ew: 'EW-014', acts: ['Weeding'], date: '2026-10-28', photos: 3 })).toBe('');
     expect(harvestError(0)).toMatch(/weight/);
     expect(harvestError(6000)).toMatch(/truck/);
     expect(signinError('EW-014', 'abk_123456')).toBe('');
@@ -47,5 +49,19 @@ describe('geo', () => {
   });
   it('draws QR finder squares', () => {
     expect(qrCells('BAL‑26‑03').some(c => c.x === 0 && c.y === 0)).toBe(true);
+  });
+});
+
+import { whereIs } from '../src';
+describe('payam lookup', () => {
+  it('places the farm point in Duk county, Jonglei', () => {
+    const p = whereIs(7.731, 31.402);
+    expect(p).toMatchObject({ county: 'Duk', state: 'Jonglei' });
+  });
+  it('places Juba in Central Equatoria', () => {
+    expect(whereIs(4.85, 31.58)?.state).toBe('Central Equatoria');
+  });
+  it('returns null outside South Sudan', () => {
+    expect(whereIs(0, 0)).toBeNull();
   });
 });

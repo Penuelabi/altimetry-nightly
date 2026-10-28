@@ -2,6 +2,7 @@ import { recessDays, ZONES, type Task } from '@abuk/core';
 import { go, setState, tab, useApp } from '../store';
 import { Check, Stat } from '../ui';
 import { basinOpacity, moundLines, toggleTask, useGreet, useL } from './common';
+import { usePlace } from '../net';
 
 const MONTHS = 'JFMAMJJASOND'.split('');
 const monthColor = (i: number) => (i === new Date().getMonth() ? 'var(--color-accent-700)' : 'var(--color-neutral-700)');
@@ -113,7 +114,7 @@ const ZONE_TASK = { basin: 'Basin', ridge: 'Ridge', slope: 'Slope' } as const;
 
 function Field() {
   const s = useApp(), L = useL();
-  const z = ZINFO[s.zone];
+  const z = ZINFO[s.zone], place = usePlace();
   const lbl = { fontFamily: 'Lora', fontSize: 10, letterSpacing: 1.2 };
   return (
     <div className="col">
@@ -132,7 +133,7 @@ function Field() {
           <circle cx="300" cy="190" r="5" fill="none" stroke="var(--color-accent)" strokeWidth="2" />
           <circle cx="300" cy="190" r="12" fill="none" stroke="var(--color-accent)" strokeOpacity=".4" />
         </svg>
-        <div className="num" style={{ position: 'absolute', right: 12, top: 10, fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '3px 6px' }}>7.731° N · 31.402° E</div>
+        <div className="num" style={{ position: 'absolute', right: 12, top: 10, fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '3px 6px' }}>{place.lat.toFixed(3)}° N · {place.lon.toFixed(3)}° E</div>
       </div>
       <div className="pad g14" style={{ paddingTop: 14 }}>
         <div style={{ display: 'flex', gap: 6 }}>

@@ -1,10 +1,9 @@
 import readXlsxFile from 'read-excel-file/node';
-import * as shapefile from 'shapefile';
 import type { BulletinRow, PullResult, Station } from '@abuk/core';
-import { withinRadius } from '@abuk/core';
+import { whereIs, withinRadius } from '@abuk/core';
 import { cfg, need } from './config';
 import { csvObjects, findCol, num } from './csv';
-import { c, driveDownload, driveFind, driveList, eeCompute, fn, loadImage, meanAround, terrainExpr } from './adapters/google';
+import { c, driveDownload, driveFind, eeCompute, fn, loadImage, meanAround, terrainExpr } from './adapters/google';
 
 const text = async (parent: string, name: string) => {
   const f = await driveFind(parent, name);
@@ -50,80 +49,69 @@ export function ifsFrom(csv: string, stationUids: string[]) {
   });
 }
 
-// Ray casting over GeoJSON rings.
-export function inPolygon(lon: number, lat: number, coords: number[][][]) {
-  let inside = false;
-  for (const ring of coords) for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const [xi, yi] = ring[i], [xj, yj] = ring[j];
-    if ((yi > lat) !== (yj > lat) && lon < (xj - xi) * (lat - yi) / (yj - yi) + xi) inside = !inside;
-  }
-  return inside;
-}
+export { inPolygon } from '@abuk/core';
 
-let payamCache: { shp: string; feats: { name: string; county: string; polys: number[][][][] }[] } | null = null;
-async function payamAt(lat: number, lon: number) {
-  const folder = await driveFind(cfg.driveFolder, 'ssd_payam');
-  if (!folder) throw new Error('ssd_payam folder not found');
-  const files = await driveList(folder.id);
-  const shp = files.find(f => f.name.toLowerCase().endsWith('.shp')), dbf = files.find(f => f.name.toLowerCase().endsWith('.dbf'));
-  if (!shp || !dbf) throw new Error('ssd_payam has no .shp/.dbf');
-  if (payamCache?.shp !== shp.modifiedTime) {
-    const src = await shapefile.open(await driveDownload(shp), await driveDownload(dbf));
-    const feats: NonNullable<typeof payamCache>['feats'] = [];
-    for (let r = await src.read(); !r.done; r = await src.read()) {
-      const g = r.value.geometry as { type: string; coordinates: number[][][] | number[][][][] };
-      const p = r.value.properties as Record<string, unknown>;
-      const keys = Object.keys(p);
-      const nk = keys.find(k => /payam|adm3_?en|adm3_?name|^adm3$/i.test(k)) ?? keys[0];
-      const ck = keys.find(k => /county|adm2_?en|adm2_?name/i.test(k));
-      feats.push({ name: String(p[nk] ?? ''), county: ck ? String(p[ck] ?? '') : '', polys: g.type === 'MultiPolygon' ? g.coordinates as number[][][][] : [g.coordinates as number[][][]] });
-    }
-    payamCache = { shp: shp.modifiedTime, feats };
-  }
-  return payamCache.feats.find(f => f.polys.some(poly => inPolygon(lon, lat, poly))) ?? null;
-}
-
-export async function pull(lat: number, lon: number, radiusKm: number, county = 'Duk'): Promise<PullResult> {
+// Drive pieces run in parallel; Earth Engine is a separate call (geeSummary) so a slow
+// raster reduction never holds up the station, bulletin and forecast rows.
+export async function pull(lat: number, lon: number, radiusKm: number): Promise<PullResult> {
   need('google');
   const errors: string[] = [];
   const guard = async <T>(label: string, f: () => Promise<T>, fallback: T): Promise<T> => {
     try { return await f(); } catch (e) { errors.push(`${label}: ${(e as Error).message}`); return fallback; }
   };
   const root = cfg.driveFolder;
-  const stations = await guard('station_status.csv', async () => stationsFrom(await text(root, 'station_status.csv'), lat, lon, radiusKm), { rows: [], fallback: true });
-  const bulletin = await guard('county bulletin', async () => {
-    const folder = await driveFind(root, 'county_bulletin');
-    const f = folder && await driveFind(folder.id, 'county_bulletin_latest.xlsx');
-    if (!f) throw new Error('county_bulletin_latest.xlsx not found');
-    const [sheet] = await readXlsxFile(await driveDownload(f));
-    return bulletinFrom(sheet.data as unknown[][], county);
-  }, null);
-  const ifs = await guard('cache_ecmwf_ifs_daily.csv', async () => ifsFrom(await text(root, 'cache_ecmwf_ifs_daily.csv'), stations.rows.map(s => s.uid)), []);
-  const payam = await guard('ssd_payam', () => payamAt(lat, lon), null);
-  const gee = await geeSummary(lat, lon, radiusKm);
-  return { at: new Date().toISOString(), radiusKm, location: { lat, lon, county: payam?.county || county, payam: payam?.name ?? null }, stations, bulletin, ifs, gee, errors };
+  const place = whereIs(lat, lon);
+  const county = place?.county ?? 'Duk';
+  const [stations, bulletin, ifsCsv] = await Promise.all([
+    guard('station_status.csv', async () => stationsFrom(await text(root, 'station_status.csv'), lat, lon, radiusKm), { rows: [], fallback: true }),
+    guard('county bulletin', async () => {
+      const folder = await driveFind(root, 'county_bulletin');
+      const f = folder && await driveFind(folder.id, 'county_bulletin_latest.xlsx');
+      if (!f) throw new Error('county_bulletin_latest.xlsx not found');
+      const [sheet] = await readXlsxFile(await driveDownload(f));
+      return bulletinFrom(sheet.data as unknown[][], county);
+    }, null),
+    guard('cache_ecmwf_ifs_daily.csv', () => text(root, 'cache_ecmwf_ifs_daily.csv'), '')
+  ]);
+  const ifs = ifsCsv ? ifsFrom(ifsCsv, stations.rows.map(s => s.uid)) : [];
+  return {
+    at: new Date().toISOString(), radiusKm,
+    location: { lat, lon, county, payam: place?.payam ?? null, state: place?.state ?? null },
+    stations, bulletin, ifs, gee: { soilMoisture: null, floodExtentPct: null, errors: [] }, errors
+  };
 }
 
+// Results are cached for 6 h per ~100 m cell and radius: the rasters change at most daily.
+const geeCache = new Map<string, { at: number; v: Awaited<ReturnType<typeof computeGee>> }>();
 export async function geeSummary(lat: number, lon: number, radiusKm: number) {
+  const key = `${lat.toFixed(3)},${lon.toFixed(3)},${radiusKm}`;
+  const hit = geeCache.get(key);
+  if (hit && Date.now() - hit.at < 6 * 3600_000) return hit.v;
+  const v = await computeGee(lat, lon, radiusKm);
+  if (!v.errors.length) geeCache.set(key, { at: Date.now(), v });
+  return v;
+}
+
+async function computeGee(lat: number, lon: number, radiusKm: number) {
   const errors: string[] = [];
-  let soilMoisture: number | null = null, floodExtentPct: number | null = null;
-  try {
-    need('gee');
-    if (!cfg.soilAsset) errors.push('GEE_SOIL_MOISTURE_ASSET is not set');
-    else {
+  const run = async (label: string, f: () => Promise<number | null>) => {
+    try { return await f(); } catch (e) { errors.push(`${label}: ${(e as Error).message}`); return null; }
+  };
+  try { need('gee'); } catch (e) { return { soilMoisture: null, floodExtentPct: null, errors: [(e as Error).message] }; }
+  const [soilMoisture, floodExtentPct] = await Promise.all([
+    cfg.soilAsset ? run('soil moisture', async () => {
       const r = await eeCompute(meanAround(loadImage(cfg.soilAsset), lat, lon, radiusKm * 1000, 9000));
       const v = cfg.soilBand ? r[cfg.soilBand] : Object.values(r).find(x => typeof x === 'number');
-      soilMoisture = typeof v === 'number' ? v : null;
-    }
-    if (!cfg.floodAsset) errors.push('GEE_FLOOD_EXTENT_ASSET is not set');
-    else {
-      // 1 = flooded, 0 = not; unmask so pixels left blank count as dry instead of being dropped from the mean.
+      return typeof v === 'number' ? Math.round(v * 1000) / 1000 : null;
+    }) : (errors.push('GEE_SOIL_MOISTURE_ASSET is not set'), null),
+    cfg.floodAsset ? run('flood extent', async () => {
+      // 1 = flooded, 0 = not; unmask so blanks count as dry. 90 m is plenty for a % over km² and ~9× faster than 30 m.
       const img = fn('Image.unmask', { input: loadImage(cfg.floodAsset), value: c(0) });
-      const r = await eeCompute(meanAround(img, lat, lon, radiusKm * 1000, 30));
+      const r = await eeCompute(meanAround(img, lat, lon, radiusKm * 1000, 90));
       const v = Object.values(r).find(x => typeof x === 'number');
-      floodExtentPct = typeof v === 'number' ? Math.round(v * 1000) / 10 : null;
-    }
-  } catch (e) { errors.push((e as Error).message); }
+      return typeof v === 'number' ? Math.round(v * 1000) / 10 : null;
+    }) : (errors.push('GEE_FLOOD_EXTENT_ASSET is not set'), null)
+  ]);
   return { soilMoisture, floodExtentPct, errors };
 }
 

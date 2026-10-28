@@ -1,22 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import { basinDepth, FARM, haversineKm, polygonHa, type Terrain } from '@abuk/core';
+import { basinDepth, haversineKm, polygonHa, whereIs, type Terrain } from '@abuk/core';
 import { go, record, setState, useApp, type Plot } from '../store';
 import { api, explain } from '../api';
-import { useOnline } from '../net';
+import { useOnline, usePlace } from '../net';
+import { LiveMap } from '../LiveMap';
 import { Icon } from '../ui';
-import { basinOpacity, moundLines } from './common';
 
 interface Pt { lat: number; lon: number; acc: number; alt: number | null }
 interface Capture { mode: 'walk' | 'pin'; pts: Pt[]; done: boolean; err: string }
 
-// Schematic map: 1 px ≈ 2.2 m around the farm centroid, so the 40 ha block fits the 360 px diagram.
-const toSvg = (p: { lat: number; lon: number }) => {
-  const dx = (p.lon - FARM.lon) * 111320 * Math.cos(FARM.lat * Math.PI / 180), dy = (p.lat - FARM.lat) * 110540;
-  return { x: Math.round(Math.max(4, Math.min(356, 180 + dx / 2.2))), y: Math.round(Math.max(4, Math.min(326, 250 - dy / 2.2))) };
-};
-
 export function MapScreen() {
-  const s = useApp(), online = useOnline();
+  const s = useApp(), online = useOnline(), place = usePlace();
   const [cap, setCap] = useState<Capture | null>(null);
   const [terrain, setTerrain] = useState<Terrain | null>(null);
   const [terrErr, setTerrErr] = useState('');
@@ -25,6 +19,16 @@ export function MapScreen() {
 
   const stop = () => { if (watch.current !== null) navigator.geolocation.clearWatch(watch.current); watch.current = null; };
   useEffect(() => stop, []);
+
+  // Follow the phone while the map is open (the app-wide check runs only every 2 minutes).
+  useEffect(() => {
+    if (!('geolocation' in navigator)) return;
+    const id = navigator.geolocation.watchPosition(p => {
+      const { latitude: lat, longitude: lon, accuracy } = p.coords, w = whereIs(lat, lon);
+      setState({ where: { lat, lon, acc: accuracy, payam: w?.payam ?? 'Outside South Sudan', county: w?.county ?? '', state: w?.state ?? '', at: new Date().toISOString() } });
+    }, () => {}, { enableHighAccuracy: true, maximumAge: 5000 });
+    return () => navigator.geolocation.clearWatch(id);
+  }, []);
 
   const start = (mode: 'walk' | 'pin') => {
     stop(); setTerrain(null); setTerrErr('');
@@ -67,8 +71,6 @@ export function MapScreen() {
     setCap(null);
   };
 
-  const svgPts = cap?.pts.map(toSvg) ?? [];
-  const lbl = { fontFamily: 'Lora', fontSize: 11 };
   const readouts = cap && centre ? [
     { k: 'Latitude', v: centre.lat.toFixed(5) + '° N', src: 'phone GPS' },
     { k: 'Longitude', v: centre.lon.toFixed(5) + '° E', src: 'phone GPS' },
@@ -81,36 +83,15 @@ export function MapScreen() {
   return (
     <div className="col">
       <div style={{ position: 'relative', borderBottom: '1px solid var(--color-divider)' }}>
-        <svg viewBox="0 0 360 330" width="100%" style={{ display: 'block' }}>
-          <rect x="0" y="0" width="360" height="90" fill="var(--color-accent-100)" />
-          <rect x="0" y="90" width="360" height="70" fill="var(--color-neutral-100)" />
-          <rect x="0" y="160" width="360" height="170" fill="var(--color-neutral-200)" />
-          <rect x="0" y="160" width="360" height="170" fill="var(--color-neutral-500)" fillOpacity={basinOpacity(depth)} />
-          <path d="M0 90 C90 82 180 98 360 88" fill="none" stroke="var(--color-neutral-500)" strokeDasharray="3 3" />
-          <path d="M0 160 C100 152 220 168 360 158" fill="none" stroke="var(--color-neutral-500)" strokeDasharray="3 3" />
-          <text x="300" y="86" fontFamily="Lora" fontSize="9" fill="var(--color-neutral-700)">412 m</text>
-          <text x="300" y="155" fontFamily="Lora" fontSize="9" fill="var(--color-neutral-700)">410 m</text>
-          {moundLines([190, 206, 222, 238, 254, 270, 286, 302], depth).map(l => <line key={l.y} x1="20" x2="340" y1={l.y} y2={l.y} stroke={l.c} strokeWidth="2" />)}
-          <text x="14" y="22" fontFamily="Lora" fontSize="10" letterSpacing="1.2" fill="var(--color-accent-800)">ZONE 1 · DRY RIDGE</text>
-          <text x="14" y="108" fontFamily="Lora" fontSize="10" letterSpacing="1.2" fill="var(--color-neutral-700)">ZONE 2 · SLOPE</text>
-          <text x="14" y="178" fontFamily="Lora" fontSize="10" letterSpacing="1.2" fill="var(--color-neutral-900)">ZONE 3 · BASIN · MOUNDS 7 m APART</text>
-          <rect x="40" y="34" width="110" height="40" fill="transparent" stroke="var(--color-accent)" strokeWidth="1.5" onClick={() => go('plot')} style={{ cursor: 'pointer' }} />
-          <text x="46" y="50" {...lbl} fill="var(--color-accent-900)">R‑02 Moringa</text>
-          <rect x="180" y="34" width="120" height="40" fill="none" stroke="var(--color-accent)" strokeDasharray="4 3" />
-          <text x="186" y="50" {...lbl} fill="var(--color-accent-900)">R‑05 Gum · Shea</text>
-          <rect x="160" y="112" width="140" height="36" fill="none" stroke="var(--color-accent)" strokeWidth="1.5" />
-          <text x="166" y="128" {...lbl} fill="var(--color-accent-900)">S‑04 Groundnut</text>
-          <rect x="40" y="226" width="130" height="64" fill="transparent" stroke="var(--color-accent-700)" strokeWidth="2" onClick={() => go('plot')} style={{ cursor: 'pointer' }} />
-          <text x="46" y="242" {...lbl} fill="var(--color-neutral-900)">B‑07 Balanites</text>
-          {s.plots.map(p => p.pts.length > 1
-            ? <polygon key={p.id} points={p.pts.map(toSvg).map(q => `${q.x},${q.y}`).join(' ')} fill="none" stroke="var(--color-accent-700)" strokeDasharray="2 2" />
-            : <circle key={p.id} {...(({ x, y }) => ({ cx: x, cy: y }))(toSvg(p.pts[0]))} r="3" fill="var(--color-accent-700)" />)}
-          {svgPts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--color-accent)" />)}
-          {cap?.mode === 'walk' && svgPts.length > 1 && <polyline points={[...svgPts, ...(cap.done ? [svgPts[0]] : [])].map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke="var(--color-accent)" strokeWidth="1.5" />}
-        </svg>
-        <div style={{ position: 'absolute', right: 10, top: 10 }}>
+        <LiveMap here={place} gps={place.gps} acc={place.acc} plots={s.plots.map(p => p.pts)} track={cap?.pts ?? []} closed={!!cap?.done} />
+        <div style={{ position: 'absolute', left: 10, bottom: 10, zIndex: 500, display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-start' }}>
+          <span className="num" style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '3px 6px' }}>{place.payam} · {place.county} · {place.state}</span>
+          <span className="num" style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '3px 6px' }}>{place.gps ? `${place.lat.toFixed(5)}° N, ${place.lon.toFixed(5)}° E${place.acc ? ` ±${Math.round(place.acc)} m` : ''}` : 'Waiting for GPS… showing the farm'} · 150 m buffer</span>
+        </div>
+        <div style={{ position: 'absolute', right: 10, top: 10, zIndex: 500 }}>
           <button onClick={() => go('flood')} style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '4px 7px' }}>Depth {depth.toFixed(2)} m</button>
         </div>
+        {!online && <div style={{ position: 'absolute', left: 0, right: 0, top: 0, zIndex: 500, fontSize: 11, padding: '4px 8px', background: 'color-mix(in srgb, var(--color-bg) 85%, transparent)' }}>No signal: satellite imagery appears when online. GPS and plots still work.</div>}
       </div>
       {!cap ? (
         <div className="pad g12">

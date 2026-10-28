@@ -1,7 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import type { SyncRecord } from '@abuk/core';
+import { FARM, whereIs, type SyncRecord } from '@abuk/core';
 import { api } from './api';
-import { getState, setState } from './store';
+import { getState, setState, useApp } from './store';
 
 const sub = (cb: () => void) => { addEventListener('online', cb); addEventListener('offline', cb); return () => { removeEventListener('online', cb); removeEventListener('offline', cb); }; };
 export const useOnline = () => useSyncExternalStore(sub, () => navigator.onLine);
@@ -44,4 +44,26 @@ export function oneFix(timeout = 15000): Promise<Fix> {
       e => rej(new Error(e.code === 1 ? 'Location permission is off. Allow it in the browser settings.' : 'No GPS fix yet. Step into the open and try again.')),
       { enableHighAccuracy: true, timeout, maximumAge: 10_000 });
   });
+}
+
+// Where the phone is: GPS every 2 minutes while the app is open, named offline from the bundled payam boundaries.
+export function useLocationWatch() {
+  useEffect(() => {
+    let live = true;
+    const tick = () => oneFix(20000).then(f => {
+      const p = whereIs(f.lat, f.lon);
+      if (live) setState({ where: { lat: f.lat, lon: f.lon, acc: f.acc, payam: p?.payam ?? 'Outside South Sudan', county: p?.county ?? '', state: p?.state ?? '', at: new Date().toISOString() } });
+    }, () => {});
+    tick();
+    const iv = setInterval(tick, 120_000);
+    return () => { live = false; clearInterval(iv); };
+  }, []);
+}
+
+// The current place, or the farm point until the first GPS fix.
+export function usePlace() {
+  const w = useApp().where;
+  if (w) return { ...w, gps: true };
+  const p = whereIs(FARM.lat, FARM.lon);
+  return { lat: FARM.lat, lon: FARM.lon, acc: null, payam: p?.payam ?? 'Duk Padiet', county: p?.county ?? 'Duk', state: p?.state ?? 'Jonglei', at: '', gps: false };
 }

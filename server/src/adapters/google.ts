@@ -92,7 +92,7 @@ export function loadImage(asset: string): Node {
 
 export function meanAround(image: Node, lat: number, lon: number, radiusM: number, scale: number): Node {
   const geometry = fn('Geometry.buffer', { geometry: fn('GeometryConstructors.Point', { coordinates: c([lon, lat]) }), distance: c(radiusM) });
-  return fn('Image.reduceRegion', { image, reducer: fn('Reducer.mean', {}), geometry, scale: c(scale), maxPixels: c(1e9) });
+  return fn('Image.reduceRegion', { image, reducer: fn('Reducer.mean', {}), geometry, scale: c(scale), maxPixels: c(1e9), bestEffort: c(true) });
 }
 
 export async function eeCompute(expr: Node): Promise<Record<string, number | null>> {

@@ -1,13 +1,13 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import type { GaugeReading, Role, SyncRecord } from '@abuk/core';
-import { parseGauge, signinError } from '@abuk/core';
+import { parseGauge, signinError, whereIs } from '@abuk/core';
 import { cfg, health, NotConfigured } from './config';
 import { EXPIRY_DAYS, changeUsers, checkKey, issueSession, loadUsers, makeUser, readSession, toPublic, type Session } from './auth';
 import { readJson, updateJson } from './adapters/github';
 import { sheetsAppend } from './adapters/google';
 import { parseInbound, sendSms } from './adapters/sms';
-import { pull, terrain } from './sources';
+import { geeSummary, pull, terrain } from './sources';
 
 type Env = { Variables: { me: Session } };
 export const app = new Hono<Env>();
@@ -92,6 +92,19 @@ app.get('/api/sources/pull', auth(), async c => {
   const p = coords(c), radius = Math.min(200, Math.max(1, Number(c.req.query('radius')) || 20));
   if (!p) return c.json({ error: 'invalid', message: 'lat and lon are required' }, 400);
   return c.json(await pull(p.lat, p.lon, radius));
+});
+
+app.get('/api/sources/gee', auth(), async c => {
+  const p = coords(c), radius = Math.min(200, Math.max(1, Number(c.req.query('radius')) || 20));
+  if (!p) return c.json({ error: 'invalid', message: 'lat and lon are required' }, 400);
+  return c.json(await geeSummary(p.lat, p.lon, radius));
+});
+
+// Payam / county / state for a point (also works offline in the app from the same boundaries).
+app.get('/api/where', async c => {
+  const p = coords(c);
+  if (!p) return c.json({ error: 'invalid', message: 'lat and lon are required' }, 400);
+  return c.json(whereIs(p.lat, p.lon));
 });
 
 app.get('/api/terrain', auth(), async c => {

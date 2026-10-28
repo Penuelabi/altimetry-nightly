@@ -1,16 +1,17 @@
 import { SEASON } from '@abuk/core';
 import { openSpecies } from '../store';
+import { usePlace } from '../net';
 
 const MONTHS = 'JFMAMJJASOND'.split('');
 const COLS = '92px repeat(12,1fr)';
 
 export function Season() {
-  const m = new Date().getMonth();
+  const m = new Date().getMonth(), place = usePlace();
   const hatch = 'repeating-linear-gradient(90deg,var(--color-accent-200) 0 1px,transparent 1px 4px)';
   const lab = { fontSize: 9.5, fontStyle: 'italic', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-neutral-700)' } as const;
   return (
     <div className="pad g12" style={{ padding: '16px 14px 24px' }}>
-      <p className="body" style={{ margin: '0 4px', fontSize: 13.5 }}>Duk County runs on the river. Plant by water, not by date: the bars below shift when the flood model updates.</p>
+      <p className="body" style={{ margin: '0 4px', fontSize: 13.5 }}>{place.payam} runs on the river. Plant by water, not by date: the bars below shift when the flood model updates.</p>
       <div className="num" style={{ display: 'grid', gridTemplateColumns: COLS, fontSize: 9.5, textAlign: 'center', borderBottom: '1px solid var(--color-divider)', paddingBottom: 4 }}>
         <span />{MONTHS.map((l, i) => <span key={i} style={{ color: i === m ? 'var(--color-accent-700)' : 'var(--color-neutral-700)' }}>{l}</span>)}
       </div>

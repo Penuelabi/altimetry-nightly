@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactElement } from 'react';
 import { ICONS, SPECIES, T, TITLES, type NavKey, type Screen } from '@abuk/core';
 import { back, setState, tab, useApp } from './store';
-import { syncNow, useAutoSync, useOnline } from './net';
+import { syncNow, useAutoSync, useLocationWatch, useOnline, usePlace } from './net';
+import { UpdateBanner } from './update';
 import { Icon } from './ui';
 import { Home } from './screens/Home';
 import { MapScreen } from './screens/Map';
@@ -39,6 +40,8 @@ export function App() {
   const [splash, setSplash] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
   useAutoSync();
+  useLocationWatch();
+  const place = usePlace();
   useEffect(() => { const t = setTimeout(() => setSplash(false), 1100); return () => clearTimeout(t); }, []);
 
   const lang = s.lang === 'ar' ? 'ar' : 'en', L = T[lang];
@@ -60,7 +63,7 @@ export function App() {
             <img src="/icon.png" alt="Hydro-Climate Watch" />
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="kick sm" style={{ letterSpacing: '.14em' }}>{scr === 'home' ? 'Duk County · Jonglei' : 'Abuk Project'}</div>
+            <div className="kick sm" style={{ letterSpacing: '.14em' }}>{scr === 'home' ? `${place.payam} · ${place.county}` : 'Abuk Project'}</div>
             <div className="hdr-title">{title}</div>
           </div>
           <div className="col" style={{ alignItems: 'flex-end', gap: 4, flex: 'none' }}>
@@ -71,6 +74,7 @@ export function App() {
           </div>
         </header>
         {s.lang === 'din' && <div className="banner">Thuɔŋjäŋ strings awaiting a community translator; showing English.</div>}
+        <UpdateBanner />
         {s.session?.demo && <div className="banner">Demo mode: sample data only, nothing is sent to the project server.</div>}
 
         <main className="scroll" key={scr + s.species}>
@@ -88,7 +92,7 @@ export function App() {
         {splash && (
           <div className="splash" onClick={() => setSplash(false)}>
             <img src="/lockup.png" alt="South Sudan Hydro-Climate Watch" />
-            <div className="kick">Duk County · Abuk Project</div>
+            <div className="kick">{place.payam} · Abuk Project</div>
           </div>
         )}
       </div>

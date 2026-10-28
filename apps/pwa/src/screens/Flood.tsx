@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { basinDepth, dayLabel, headline, moundRows, plantAlert, recessDays, slopeDepth, type PullResult } from '@abuk/core';
 import { go, useApp } from '../store';
-import { useOnline } from '../net';
+import { useOnline, usePlace } from '../net';
 
 const ago = (iso: string) => {
   const m = Math.round((Date.now() - Date.parse(iso)) / 60000);
@@ -28,7 +28,7 @@ function inputs(p: PullResult | null) {
 }
 
 export function Flood() {
-  const s = useApp(), online = useOnline();
+  const s = useApp(), online = useOnline(), place = usePlace();
   const [day, setDay] = useState(0);
   const bd = basinDepth(day), sd = slopeDepth(day), total = recessDays();
   const b = s.lastPull?.bulletin;
@@ -40,7 +40,7 @@ export function Flood() {
         <h1 className="h1" style={{ margin: '4px 0 0', fontSize: 30, lineHeight: 1.05 }}>{headline(bd)}</h1>
       </div>
       <div className="card accent" style={{ gap: 6 }}>
-        <div className="between"><span className="kick sm">Duk county bulletin · {b?.issued || '27 Oct'}</span><span style={{ fontSize: 11, padding: '1px 6px', border: '1px solid var(--color-accent)', borderRadius: 'var(--radius-sm)', color: 'var(--color-accent-800)' }}>{b?.alert || 'orange'}</span></div>
+        <div className="between"><span className="kick sm">{b?.county || place.county} county bulletin · {b?.issued || '27 Oct'}</span><span style={{ fontSize: 11, padding: '1px 6px', border: '1px solid var(--color-accent)', borderRadius: 'var(--radius-sm)', color: 'var(--color-accent-800)' }}>{b?.alert || 'orange'}</span></div>
         {b ? <div style={{ fontSize: 14, lineHeight: 1.4 }}>{b.headline || 'Bulletin row loaded; no headline column found.'}</div> : <>
           <div style={{ fontSize: 14, lineHeight: 1.4 }}><strong style={{ fontWeight: 600 }}>Dry spell possible (46%) on dry soils.</strong> Monitor crops and pasture.</div>
           <div style={{ fontSize: 12, lineHeight: 1.5, color: 'var(--color-neutral-800)' }}>28 Oct likely dry · 30–31 Oct likely wet · 2–3 Nov likely dry · 6 Nov likely dry</div>
@@ -92,7 +92,7 @@ export function Flood() {
             <span className="num" style={{ fontSize: 13.5, textAlign: 'right' }}>{i.v}</span>
           </div>
         ))}
-        <p className="body note" style={{ marginTop: 10 }}>Water balance: rainfall + catchment runoff + river inflow − evaporation − soil infiltration, calibrated against satellite flood extent. {s.lastPull ? `Data pulled ${ago(s.lastPull.at)}.` : 'Duk bulletin data to 24 Oct.'} {online ? 'Re-runs when you pull new data.' : 'Reruns automatically when online.'}</p>
+        <p className="body note" style={{ marginTop: 10 }}>Water balance: rainfall + catchment runoff + river inflow − evaporation − soil infiltration, calibrated against satellite flood extent. {s.lastPull ? `Data pulled ${ago(s.lastPull.at)}.` : `${place.county} bulletin data to 24 Oct.`} {online ? 'Re-runs when you pull new data.' : 'Reruns automatically when online.'}</p>
       </div>
     </div>
   );

@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { FARM, SOURCES, type PullResult } from '@abuk/core';
+import { SOURCES, type PullResult } from '@abuk/core';
 import { go, setState, useApp } from '../store';
 import { api, explain } from '../api';
-import { oneFix, useOnline } from '../net';
+import { useOnline, usePlace } from '../net';
 import { Field, Seg, Toggle } from '../ui';
 
 interface Extra { kind: 'GitHub' | 'Drive'; url: string; by: string; at: string }
-const RADIUS_NOTE: Record<number, string> = { 10: 'farm and home payam', 20: 'Duk county core', 50: 'Duk + edges of Twic East, Ayod' };
 const when = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 // Which pull section feeds which listed source, so each row can show its own status.
@@ -15,12 +14,12 @@ const SECTION: Record<string, (p: PullResult) => string | null> = {
   stat: p => (p.stations.rows.length ? `${p.stations.rows.length} station${p.stations.rows.length > 1 ? 's' : ''}${p.stations.fallback ? ', nearest outside radius' : ''}` : null),
   alt: p => (p.stations.rows.length ? 'nearby rows' : null), ifs: p => (p.ifs.length ? `${p.ifs.length} stations` : null),
   sm: p => (p.gee.soilMoisture != null ? 'mean in radius' : null), fx: p => (p.gee.floodExtentPct != null ? 'mean in radius' : null),
-  payam: p => (p.location.payam ? p.location.payam : null)
+  payam: () => 'built into the app'
 };
 
 export function Sources() {
-  const s = useApp(), online = useOnline();
-  const [at, setAt] = useState({ lat: FARM.lat, lon: FARM.lon, gps: false });
+  const s = useApp(), online = useOnline(), at = usePlace();
+  const [geeBusy, setGeeBusy] = useState(false);
   const [pulling, setPulling] = useState(false);
   const [msg, setMsg] = useState('');
   const [conn, setConn] = useState<'GitHub' | 'Drive' | null>(null);
@@ -30,7 +29,6 @@ export function Sources() {
   const isAdmin = s.session?.user.role === 'Admin';
 
   useEffect(() => {
-    oneFix().then(f => setAt({ lat: f.lat, lon: f.lon, gps: true }), () => {});
     if (online) api<Extra[]>('/api/sources/extra').then(setExtra, () => {});
   }, [online]);
 
@@ -38,11 +36,18 @@ export function Sources() {
     if (!online) return setMsg('No signal. Pull is queued and will run when the phone reconnects.');
     setPulling(true); setMsg('');
     try {
-      const r = await api<PullResult>(`/api/sources/pull?lat=${at.lat}&lon=${at.lon}&radius=${s.radius}`);
-      setState({ lastPull: r });
-      setMsg(r.errors.length ? `Pulled with ${r.errors.length} problem${r.errors.length > 1 ? 's' : ''}: ${r.errors.join('; ')}` : 'Pulled. Flood model inputs updated.');
-    } catch (e) { setMsg(explain(e)); }
-    finally { setPulling(false); }
+      const q = `lat=${at.lat}&lon=${at.lon}&radius=${s.radius}`;
+      // Earth Engine runs alongside; its numbers drop in when ready instead of holding up the rest.
+      setGeeBusy(true);
+      const gee = api<PullResult['gee']>(`/api/sources/gee?${q}`)
+        .then(g => setState(st => (st.lastPull ? { lastPull: { ...st.lastPull, gee: g } } : {})), () => {})
+        .finally(() => setGeeBusy(false));
+      const r = await api<PullResult>(`/api/sources/pull?${q}`);
+      setState(st => ({ lastPull: { ...r, gee: st.lastPull?.gee.soilMoisture != null || st.lastPull?.gee.floodExtentPct != null ? st.lastPull.gee : r.gee } }));
+      setMsg(r.errors.length ? `Pulled with ${r.errors.length} problem${r.errors.length > 1 ? 's' : ''}: ${r.errors.join('; ')}` : 'Pulled. Satellite soil moisture and flood extent follow in a moment.');
+      setPulling(false);
+      await gee;
+    } catch (e) { setMsg(explain(e)); setPulling(false); }
   };
 
   const connect = async () => {
@@ -60,10 +65,10 @@ export function Sources() {
       <div className="card accent">
         <div className="kick sm">Current location</div>
         <div className="num" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 10px', fontSize: 13 }}>
-          <span><span className="lbl" style={{ display: 'block', textTransform: 'none', letterSpacing: 0 }}>GPS</span>{at.lat.toFixed(3)}° N, {at.lon.toFixed(3)}° E{at.gps ? '' : ' (farm)'}</span>
-          <span><span className="lbl" style={{ display: 'block', textTransform: 'none', letterSpacing: 0 }}>County · State</span>{p?.location.county || FARM.county} · {FARM.state}</span>
-          <span><span className="lbl" style={{ display: 'block', textTransform: 'none', letterSpacing: 0 }}>Payam</span>{p?.location.payam ?? 'from ssd_payam on pull'}</span>
-          <span><span className="lbl" style={{ display: 'block', textTransform: 'none', letterSpacing: 0 }}>Covers</span>{RADIUS_NOTE[s.radius]}</span>
+          <span><span className="lbl" style={{ display: 'block', textTransform: 'none', letterSpacing: 0 }}>GPS</span>{at.lat.toFixed(4)}° N, {at.lon.toFixed(4)}° E{at.gps ? (at.acc ? ` ±${Math.round(at.acc)} m` : '') : ' (farm, no GPS yet)'}</span>
+          <span><span className="lbl" style={{ display: 'block', textTransform: 'none', letterSpacing: 0 }}>County · State</span>{at.county} · {at.state}</span>
+          <span><span className="lbl" style={{ display: 'block', textTransform: 'none', letterSpacing: 0 }}>Payam</span>{at.payam}</span>
+          <span><span className="lbl" style={{ display: 'block', textTransform: 'none', letterSpacing: 0 }}>Covers</span>{s.radius} km around you</span>
         </div>
         <Seg items={[[10, '10 km'], [20, '20 km'], [50, '50 km']]} value={s.radius} onPick={r => setState({ radius: r })} fontSize={12.5} />
       </div>
@@ -80,7 +85,7 @@ export function Sources() {
               <div style={{ minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}><span style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '1px 5px', color: 'var(--color-neutral-800)', flex: 'none' }}>{r.kind}</span><span style={{ fontSize: 14, lineHeight: 1.3 }}>{r.name}</span></div>
                 <div className="sub num" style={{ marginTop: 3, wordBreak: 'break-all' }}>{r.path}</div>
-                <div className="sub num">{r.size} · {pulling && on(r.id) ? 'pulling…' : p && SECTION[r.id] ? (st ? `${st} · ${when(p.at)}` : 'no data on last pull') : r.last} · feeds <em>{r.feeds}</em></div>
+                <div className="sub num">{r.size} · {(pulling || (geeBusy && r.kind === 'GEE')) && on(r.id) ? 'pulling…' : p && SECTION[r.id] ? (st ? `${st} · ${when(p.at)}` : 'no data on last pull') : r.last} · feeds <em>{r.feeds}</em></div>
               </div>
               <Toggle on={on(r.id)} label="Use in model" onClick={() => setState(x => ({ sourcesOn: { ...x.sourcesOn, [r.id]: !on(r.id) } }))} />
             </div>

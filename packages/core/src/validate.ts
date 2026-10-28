@@ -11,11 +11,13 @@ export function harvestError(kg: number): string {
   return '';
 }
 
-export function monitorError(m: { ew: string; acts: string[]; date: string }): string {
+export const MIN_PHOTOS = 3;
+export function monitorError(m: { ew: string; acts: string[]; date: string; photos?: number }): string {
   const errs: string[] = [];
   if (!EW_ID.test(m.ew)) errs.push('extension worker ID like EW‑014');
   if (!m.acts.length) errs.push('at least one activity');
   if (!m.date) errs.push('a date');
+  if (m.photos !== undefined && m.photos < MIN_PHOTOS) errs.push(`at least ${MIN_PHOTOS} photos (${m.photos} so far)`);
   return errs.length ? 'Add ' + errs.join(', ') + '.' : '';
 }
 

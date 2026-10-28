@@ -33,6 +33,7 @@ jobs:
       - run: npm run build -w apps/pwa
         env:
           VITE_DEMO: '1'
+          VITE_BUILD_SHA: ${{ github.sha }}
           VITE_API_URL: ${{ vars.ABUK_API_URL || 'https://abuk-server-26ltd3lrlq-ew.a.run.app' }}
       - run: npx cap sync android
         working-directory: apps/pwa

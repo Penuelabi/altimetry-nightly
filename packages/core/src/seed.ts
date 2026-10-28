@@ -73,14 +73,14 @@ export const SEASON: { zone: string; rows: [string, string, [number, number, 'g'
 
 export interface Source { id: string; kind: 'Drive' | 'GEE' | 'GitHub'; name: string; path: string; size: string; last: string; feeds: string; on: boolean }
 export const SOURCES: Source[] = [
-  { id: 'bull', kind: 'Drive', name: 'County bulletin, Duk row', path: 'county_bulletin › county_bulletin_latest.xlsx', size: '1 row of 79', last: 'not pulled yet', feeds: 'soil, rain, alert', on: true },
-  { id: 'ens', kind: 'Drive', name: 'Rain ensemble, 50 members, 15 days', path: 'county_bulletin › forecast_log_ens.csv', size: 'Duk only', last: 'not pulled yet', feeds: 'rainfall forecast', on: true },
+  { id: 'bull', kind: 'Drive', name: 'County bulletin, row for your county', path: 'county_bulletin › county_bulletin_latest.xlsx', size: '1 row of 79', last: 'not pulled yet', feeds: 'soil, rain, alert', on: true },
+  { id: 'ens', kind: 'Drive', name: 'Rain ensemble, 50 members, 15 days', path: 'county_bulletin › forecast_log_ens.csv', size: 'your county only', last: 'not pulled yet', feeds: 'rainfall forecast', on: true },
   { id: 'stat', kind: 'Drive', name: 'Altimetry station status', path: 'station_status.csv · stations within radius', size: 'filtered', last: 'not pulled yet', feeds: 'river level, flood status', on: true },
   { id: 'alt', kind: 'Drive', name: 'Water-level series (DAHITI + Hydroweb)', path: 'merged_altimetry_stations.csv · nearby rows only', size: '41.8 MB → ~60 KB', last: 'not pulled yet', feeds: 'river inflow trend', on: true },
   { id: 'ifs', kind: 'Drive', name: 'ECMWF IFS daily: temp, soil water, runoff', path: 'cache_ecmwf_ifs_daily.csv', size: 'nearby stations', last: 'not pulled yet', feeds: 'temperature, runoff', on: true },
   { id: 'sm', kind: 'GEE', name: 'Soil moisture (SMAP SPL4SMGP)', path: 'Earth Engine asset · clipped to radius', size: '9 km grid', last: 'not pulled yet', feeds: 'soil moisture', on: true },
   { id: 'fx', kind: 'GEE', name: 'Flood extent', path: 'Earth Engine asset · clipped to radius', size: 'raster tile', last: 'not pulled yet', feeds: 'flood extent', on: true },
-  { id: 'payam', kind: 'Drive', name: 'Payam boundaries', path: 'ssd_payam (shapefile)', size: '1.2 MB, once', last: 'not pulled yet', feeds: 'county / payam lookup', on: true }
+  { id: 'payam', kind: 'GitHub', name: 'Payam, county and state boundaries', path: 'South-Sudan-Admin-Geojson › ssd_A3.json (517 payams)', size: '340 KB, in the app', last: 'works offline', feeds: 'payam / county / state from GPS', on: true }
 ];
 
 export interface MonRecord { plot: string; crop: string; acts: string; ew: string; date: string; cond: number; synced: boolean; rid?: string }

@@ -4,3 +4,4 @@ export * from './validate';
 export * from './qr';
 export * from './geo';
 export * from './api';
+export * from './admin';

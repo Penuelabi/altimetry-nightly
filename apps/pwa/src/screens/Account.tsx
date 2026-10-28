@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { signinError, type SigninResponse } from '@abuk/core';
 import { go, setState, useApp } from '../store';
 import { api, explain } from '../api';
-import { useOnline } from '../net';
+import { useOnline, usePlace } from '../net';
 import { Field, Seg } from '../ui';
+import { BUILD, checkForUpdate, installUpdate, useUpdate } from '../update';
 
 async function sha(text: string) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -25,7 +26,7 @@ function PinBoxes({ value, onChange, label }: { value: string; onChange: (v: str
 const Lockup = () => <img src="/lockup.png" alt="South Sudan Hydro-Climate Watch" style={{ width: '100%', maxWidth: 300, display: 'block', margin: '0 auto 4px' }} />;
 
 export function SignIn() {
-  const online = useOnline();
+  const online = useOnline(), place = usePlace();
   const [id, setId] = useState('');
   const [key, setKey] = useState('');
   const [err, setErr] = useState('');
@@ -46,7 +47,7 @@ export function SignIn() {
     <div className="pad" style={{ padding: '22px 18px 24px' }}>
       <Lockup />
       <div>
-        <div className="kick">Duk County · Abuk Project</div>
+        <div className="kick">{place.payam} · Abuk Project</div>
         <h1 className="h1" style={{ margin: '4px 0 6px', fontSize: 34, lineHeight: 1.02 }}>Sign in with your access key.</h1>
         <p className="body" style={{ fontSize: 13.5 }}>Your project admin gives you a worker ID and a one‑time access key. Ask them for a new one if it is lost.</p>
       </div>
@@ -88,7 +89,7 @@ export function PinLock({ onUnlock }: { onUnlock: () => void }) {
 }
 
 export function Account() {
-  const s = useApp();
+  const s = useApp(), place = usePlace();
   const [pin, setPin] = useState('');
   const [pinMsg, setPinMsg] = useState('');
   const u = s.session!.user;
@@ -105,7 +106,7 @@ export function Account() {
       <div className="kick">Signed in</div>
       <h1 className="h1" style={{ margin: 0, fontSize: 34, lineHeight: 1.02 }}>Welcome, {u.name.split(' ')[0]}.</h1>
       <div className="grid2" style={{ gap: 0, borderTop: '1px solid var(--color-divider)' }}>
-        {[['Worker ID', u.id], ['Role', u.role], ['Data scope', `Duk · ${s.radius} km`], ['Session until', exp]].map(([k, v]) => (
+        {[['Worker ID', u.id], ['Role', u.role], ['Data scope', `${place.payam} · ${s.radius} km`], ['Session until', exp]].map(([k, v]) => (
           <div key={k} style={{ padding: '9px 0', borderBottom: '1px solid var(--color-divider)' }}><div className="lbl">{k}</div><div style={{ fontSize: 14 }}>{v}</div></div>
         ))}
       </div>
@@ -117,8 +118,23 @@ export function Account() {
         <Seg items={[['ledger', 'Ledger'], ['almanac', 'Almanac'], ['field', 'Field map']]} value={s.homeLayout} onPick={v => setState({ homeLayout: v })} />
       </div>
       {u.role === 'Admin' && <button className="btn plain" onClick={() => go('admin')}>Manage users & access keys</button>}
+      <AppVersion />
       <button className="btn lg" onClick={() => setState({ screen: 'home', hist: [] })}>Continue</button>
       <button className="link" style={{ color: 'var(--color-neutral-700)', fontSize: 13 }} onClick={() => setState({ session: null, pin: null })}>Sign out{s.outbox.length ? ` (${s.outbox.length} records still waiting to sync stay on this phone)` : ''}</button>
+    </div>
+  );
+}
+
+function AppVersion() {
+  const u = useUpdate();
+  const line = u.state === 'checking' ? 'Checking…' : u.state === 'available' ? `New version ${u.latest} from ${u.date} is ready.` : u.state === 'current' ? `You have the latest version (${u.date}).` : u.state === 'error' ? u.msg : '';
+  return (
+    <div className="col g6" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>
+      <div className="between"><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>App version</span><span className="mono" style={{ fontSize: 12 }}>{BUILD}</span></div>
+      {line && <div className="msg">{line}</div>}
+      {u.state === 'available'
+        ? <button className="btn" onClick={installUpdate}>Download & install update</button>
+        : <button className="btn plain" onClick={checkForUpdate}>Check for updates</button>}
     </div>
   );
 }

@@ -8,7 +8,7 @@ export interface NewKeyResponse { user: PublicUser; key: string; commit: string 
 export interface Station { uid: string; name: string; type: string; lat: number; lon: number; km: number; lastDate: string; lastLevel: number | null; vs2yr: number | null; floodStatus: string; levelClass: string; ratePerDay: number | null }
 export interface BulletinRow { county: string; issued: string; alert: string; headline: string; values: Record<string, string | number> }
 export interface PullResult {
-  at: string; radiusKm: number; location: { lat: number; lon: number; county: string; payam: string | null };
+  at: string; radiusKm: number; location: { lat: number; lon: number; county: string; payam: string | null; state?: string | null };
   stations: { rows: Station[]; fallback: boolean };
   bulletin: BulletinRow | null;
   ifs: { station: string; date: string; values: Record<string, number> }[];
