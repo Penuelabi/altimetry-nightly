@@ -47,14 +47,13 @@ jobs:
         with:
           name: abuk-apk
           path: out/*.apk
-      - uses: softprops/action-gh-release@v2
-        with:
-          tag_name: abuk-apk-latest
-          name: Abuk APK (latest test build)
-          prerelease: true
-          target_commitish: ${{ github.sha }}
-          body: |
-            Test build of the Duk County · Abuk Project app from branch abuk-app (${{ github.sha }}).
-            On the phone: download abuk-project-latest.apk, open it, and allow "install unknown apps" for your browser when Android asks.
-            Sign-in needs the project server; tap "Open demo with sample data" to try the app without it.
-          files: out/*.apk
+      - name: Publish to the abuk-apk-latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete abuk-apk-latest --yes --cleanup-tag || true
+          gh release create abuk-apk-latest out/*.apk --prerelease --target "$GITHUB_SHA" \
+            --title "Abuk APK (latest test build)" \
+            --notes "Test build of the Duk County · Abuk Project app from branch abuk-app ($GITHUB_SHA).
+          On the phone: download abuk-project-latest.apk, open it, and allow \"install unknown apps\" for your browser when Android asks.
+          Sign in with your worker ID and access key, or tap \"Open demo with sample data\" to try it without the server."

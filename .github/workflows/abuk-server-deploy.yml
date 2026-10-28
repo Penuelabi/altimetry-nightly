@@ -1,6 +1,7 @@
 name: Abuk server deploy (Cloud Run)
 
-# Run from Actions → "Abuk server deploy" → Run workflow (branch abuk-app).
+# Runs when a tag abuk-server-* is pushed (manual "Run workflow" needs the file on main,
+# which this branch leaves untouched): git tag abuk-server-2 && git push origin abuk-server-2
 # Secrets never leave GitHub/Google: GitHub secrets are copied into Secret Manager
 # and mounted into the Cloud Run service.
 #
@@ -11,6 +12,8 @@ name: Abuk server deploy (Cloud Run)
 # Repository secrets:    GCP_DEPLOY_KEY (falls back to GEE_SERVICE_ACCOUNT_KEY), GEE_SERVICE_ACCOUNT_KEY,
 #   DRIVE_FOLDER_ID, ABUK_GITHUB_TOKEN, SMS_GATE_USER, SMS_GATE_PASSWORD
 on:
+  push:
+    tags: ['abuk-server-*']
   workflow_dispatch:
 
 permissions:
