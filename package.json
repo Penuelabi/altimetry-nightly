@@ -1,0 +1,16 @@
+{
+  "name": "abuk-project",
+  "private": true,
+  "workspaces": ["packages/*", "apps/pwa", "server"],
+  "scripts": {
+    "dev:pwa": "npm run dev -w apps/pwa",
+    "dev:server": "npm run dev -w server",
+    "build": "npm run build -w apps/pwa",
+    "test": "vitest run",
+    "typecheck": "tsc -p packages/core && tsc -p server && tsc -p apps/pwa"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.0"
+  }
+}

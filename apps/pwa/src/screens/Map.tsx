@@ -1,0 +1,151 @@
+import { useEffect, useRef, useState } from 'react';
+import { basinDepth, FARM, haversineKm, polygonHa, type Terrain } from '@abuk/core';
+import { go, record, setState, useApp, type Plot } from '../store';
+import { api, explain } from '../api';
+import { useOnline } from '../net';
+import { Icon } from '../ui';
+import { basinOpacity, moundLines } from './common';
+
+interface Pt { lat: number; lon: number; acc: number; alt: number | null }
+interface Capture { mode: 'walk' | 'pin'; pts: Pt[]; done: boolean; err: string }
+
+// Schematic map: 1 px ≈ 2.2 m around the farm centroid, so the 40 ha block fits the 360 px diagram.
+const toSvg = (p: { lat: number; lon: number }) => {
+  const dx = (p.lon - FARM.lon) * 111320 * Math.cos(FARM.lat * Math.PI / 180), dy = (p.lat - FARM.lat) * 110540;
+  return { x: Math.round(Math.max(4, Math.min(356, 180 + dx / 2.2))), y: Math.round(Math.max(4, Math.min(326, 250 - dy / 2.2))) };
+};
+
+export function MapScreen() {
+  const s = useApp(), online = useOnline();
+  const [cap, setCap] = useState<Capture | null>(null);
+  const [terrain, setTerrain] = useState<Terrain | null>(null);
+  const [terrErr, setTerrErr] = useState('');
+  const watch = useRef<number | null>(null);
+  const depth = basinDepth(0);
+
+  const stop = () => { if (watch.current !== null) navigator.geolocation.clearWatch(watch.current); watch.current = null; };
+  useEffect(() => stop, []);
+
+  const start = (mode: 'walk' | 'pin') => {
+    stop(); setTerrain(null); setTerrErr('');
+    if (!('geolocation' in navigator)) return setCap({ mode, pts: [], done: false, err: 'This phone has no GPS access in the browser.' });
+    setCap({ mode, pts: [], done: false, err: '' });
+    const t0 = Date.now();
+    watch.current = navigator.geolocation.watchPosition(p => {
+      const pt: Pt = { lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy, alt: p.coords.altitude };
+      setCap(c => {
+        if (!c || c.done) return c;
+        // Walking: keep a vertex every 3 m. Pin: average fixes for 8 s.
+        if (c.mode === 'walk') {
+          const last = c.pts[c.pts.length - 1];
+          return !last || haversineKm(last, pt) * 1000 >= 3 ? { ...c, pts: [...c.pts, pt] } : c;
+        }
+        const pts = [...c.pts, pt];
+        if (Date.now() - t0 > 8000 && pts.length >= 3) { stop(); return { ...c, pts, done: true }; }
+        return { ...c, pts };
+      });
+    }, e => setCap(c => c && { ...c, err: e.code === 1 ? 'Location permission is off. Allow it in the browser settings.' : 'Waiting for a GPS fix…' }),
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+  };
+
+  const finish = () => { stop(); setCap(c => c && { ...c, done: c.pts.length >= 3 || c.mode === 'pin', err: c.pts.length < 3 && c.mode === 'walk' ? 'Walk at least three corners first.' : '' }); };
+
+  const centre = cap?.pts.length ? { lat: cap.pts.reduce((a, p) => a + p.lat, 0) / cap.pts.length, lon: cap.pts.reduce((a, p) => a + p.lon, 0) / cap.pts.length } : null;
+  const acc = cap?.pts.length ? Math.min(...cap.pts.map(p => p.acc)) : null;
+  const gpsAlt = cap?.pts.find(p => p.alt !== null)?.alt ?? null;
+
+  useEffect(() => {
+    if (!cap?.done || !centre || !online || terrain) return;
+    api<Terrain>(`/api/terrain?lat=${centre.lat}&lon=${centre.lon}`).then(setTerrain, e => setTerrErr(explain(e)));
+  }, [cap?.done, online]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const save = () => {
+    if (!cap || !centre) return;
+    const plot: Plot = { id: `P‑${s.plots.length + 39}`, mode: cap.mode, pts: cap.mode === 'walk' ? cap.pts.map(({ lat, lon }) => ({ lat, lon })) : [centre], ha: cap.mode === 'walk' ? polygonHa(cap.pts) : 0, elevation: terrain?.elevation ?? gpsAlt, slopePct: terrain?.slopePct ?? null, at: new Date().toISOString() };
+    setState(st => ({ plots: [...st.plots, plot] }));
+    record('plot', { ...plot });
+    setCap(null);
+  };
+
+  const svgPts = cap?.pts.map(toSvg) ?? [];
+  const lbl = { fontFamily: 'Lora', fontSize: 11 };
+  const readouts = cap && centre ? [
+    { k: 'Latitude', v: centre.lat.toFixed(5) + '° N', src: 'phone GPS' },
+    { k: 'Longitude', v: centre.lon.toFixed(5) + '° E', src: 'phone GPS' },
+    { k: 'Elevation', v: terrain?.elevation != null ? `${terrain.elevation} m` : gpsAlt != null ? `${Math.round(gpsAlt)} m (GPS)` : '—', src: terrain ? 'terrain model' : terrErr ? 'terrain model unavailable' : 'refines when online' },
+    { k: 'Slope', v: terrain?.slopePct != null ? `${terrain.slopePct} %` : '—', src: terrain ? 'terrain model' : 'needs connection' },
+    cap.mode === 'walk' ? { k: 'Area', v: polygonHa(cap.pts).toFixed(2) + ' ha', src: cap.done ? 'closed boundary' : 'closes on finish' } : { k: 'Fixes', v: String(cap.pts.length), src: 'averaged' },
+    { k: 'Flood risk', v: `Basin · ${depth.toFixed(2)} m`, src: 'from flood model' }
+  ] : [];
+
+  return (
+    <div className="col">
+      <div style={{ position: 'relative', borderBottom: '1px solid var(--color-divider)' }}>
+        <svg viewBox="0 0 360 330" width="100%" style={{ display: 'block' }}>
+          <rect x="0" y="0" width="360" height="90" fill="var(--color-accent-100)" />
+          <rect x="0" y="90" width="360" height="70" fill="var(--color-neutral-100)" />
+          <rect x="0" y="160" width="360" height="170" fill="var(--color-neutral-200)" />
+          <rect x="0" y="160" width="360" height="170" fill="var(--color-neutral-500)" fillOpacity={basinOpacity(depth)} />
+          <path d="M0 90 C90 82 180 98 360 88" fill="none" stroke="var(--color-neutral-500)" strokeDasharray="3 3" />
+          <path d="M0 160 C100 152 220 168 360 158" fill="none" stroke="var(--color-neutral-500)" strokeDasharray="3 3" />
+          <text x="300" y="86" fontFamily="Lora" fontSize="9" fill="var(--color-neutral-700)">412 m</text>
+          <text x="300" y="155" fontFamily="Lora" fontSize="9" fill="var(--color-neutral-700)">410 m</text>
+          {moundLines([190, 206, 222, 238, 254, 270, 286, 302], depth).map(l => <line key={l.y} x1="20" x2="340" y1={l.y} y2={l.y} stroke={l.c} strokeWidth="2" />)}
+          <text x="14" y="22" fontFamily="Lora" fontSize="10" letterSpacing="1.2" fill="var(--color-accent-800)">ZONE 1 · DRY RIDGE</text>
+          <text x="14" y="108" fontFamily="Lora" fontSize="10" letterSpacing="1.2" fill="var(--color-neutral-700)">ZONE 2 · SLOPE</text>
+          <text x="14" y="178" fontFamily="Lora" fontSize="10" letterSpacing="1.2" fill="var(--color-neutral-900)">ZONE 3 · BASIN · MOUNDS 7 m APART</text>
+          <rect x="40" y="34" width="110" height="40" fill="transparent" stroke="var(--color-accent)" strokeWidth="1.5" onClick={() => go('plot')} style={{ cursor: 'pointer' }} />
+          <text x="46" y="50" {...lbl} fill="var(--color-accent-900)">R‑02 Moringa</text>
+          <rect x="180" y="34" width="120" height="40" fill="none" stroke="var(--color-accent)" strokeDasharray="4 3" />
+          <text x="186" y="50" {...lbl} fill="var(--color-accent-900)">R‑05 Gum · Shea</text>
+          <rect x="160" y="112" width="140" height="36" fill="none" stroke="var(--color-accent)" strokeWidth="1.5" />
+          <text x="166" y="128" {...lbl} fill="var(--color-accent-900)">S‑04 Groundnut</text>
+          <rect x="40" y="226" width="130" height="64" fill="transparent" stroke="var(--color-accent-700)" strokeWidth="2" onClick={() => go('plot')} style={{ cursor: 'pointer' }} />
+          <text x="46" y="242" {...lbl} fill="var(--color-neutral-900)">B‑07 Balanites</text>
+          {s.plots.map(p => p.pts.length > 1
+            ? <polygon key={p.id} points={p.pts.map(toSvg).map(q => `${q.x},${q.y}`).join(' ')} fill="none" stroke="var(--color-accent-700)" strokeDasharray="2 2" />
+            : <circle key={p.id} {...(({ x, y }) => ({ cx: x, cy: y }))(toSvg(p.pts[0]))} r="3" fill="var(--color-accent-700)" />)}
+          {svgPts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--color-accent)" />)}
+          {cap?.mode === 'walk' && svgPts.length > 1 && <polyline points={[...svgPts, ...(cap.done ? [svgPts[0]] : [])].map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke="var(--color-accent)" strokeWidth="1.5" />}
+        </svg>
+        <div style={{ position: 'absolute', right: 10, top: 10 }}>
+          <button onClick={() => go('flood')} style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '4px 7px' }}>Depth {depth.toFixed(2)} m</button>
+        </div>
+      </div>
+      {!cap ? (
+        <div className="pad g12">
+          <h2 className="h2">Map a new plot</h2>
+          <p className="body" style={{ fontSize: 13.5, color: 'var(--color-neutral-800)' }}>GPS works offline. Elevation and slope are read from the terrain model as soon as the phone reconnects.</p>
+          <div className="grid2">
+            <button className="btn col" style={{ minHeight: 64, alignItems: 'center', justifyContent: 'center', gap: 4 }} onClick={() => start('walk')}>
+              <Icon d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z M16 17h4 M4 13h4" size={20} sw={1.6} />Walk boundary
+            </button>
+            <button className="btn col" style={{ minHeight: 64, alignItems: 'center', justifyContent: 'center', gap: 4 }} onClick={() => start('pin')}>
+              <Icon d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0 M12 7a3 3 0 1 0 0 6a3 3 0 1 0 0-6" size={20} sw={1.6} />Drop a pin
+            </button>
+          </div>
+          <div className="note" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>{38 + s.plots.length} plots mapped · 2,640 trees pinned · 112 individual, 48 group plots</div>
+        </div>
+      ) : (
+        <div className="pad g12" style={{ paddingTop: 14 }}>
+          <div className="between">
+            <h2 className="h2">{cap.mode === 'walk' ? 'Walking boundary' : 'Dropping pin'}</h2>
+            <span className="it" style={{ fontSize: 12, color: 'var(--color-accent-700)' }}>{cap.done ? `Fix locked ±${acc?.toFixed(1)} m` : cap.mode === 'walk' ? `${cap.pts.length} points…` : 'Averaging GPS…'}</span>
+          </div>
+          {cap.err && <div className="msg">{cap.err}</div>}
+          {readouts.length > 0 && (
+            <div className="grid2" style={{ gap: 0, borderTop: '1px solid var(--color-divider)' }}>
+              {readouts.map(r => <div key={r.k} style={{ padding: '8px 0', borderBottom: '1px solid var(--color-divider)' }}><div className="lbl">{r.k}</div><div className="head num" style={{ fontSize: 19 }}>{r.v}</div><div style={{ fontSize: 10.5, color: 'var(--color-neutral-600)' }}>{r.src}</div></div>)}
+            </div>
+          )}
+          <div className="grid2">
+            <button className="btn plain" onClick={() => { stop(); setCap(null); }}>Cancel</button>
+            {cap.mode === 'walk' && !cap.done
+              ? <button className="btn" onClick={finish}>Finish boundary</button>
+              : <button className="btn" disabled={!cap.done} onClick={save}>Save plot</button>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

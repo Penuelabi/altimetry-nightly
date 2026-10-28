@@ -1,0 +1,47 @@
+import { useEffect, useSyncExternalStore } from 'react';
+import type { SyncRecord } from '@abuk/core';
+import { api } from './api';
+import { getState, setState } from './store';
+
+const sub = (cb: () => void) => { addEventListener('online', cb); addEventListener('offline', cb); return () => { removeEventListener('online', cb); removeEventListener('offline', cb); }; };
+export const useOnline = () => useSyncExternalStore(sub, () => navigator.onLine);
+
+let busy = false;
+export async function syncNow() {
+  const s = getState();
+  if (busy || !navigator.onLine || !s.session || s.session.demo || !s.outbox.length) return;
+  busy = true;
+  try {
+    const batch: SyncRecord[] = s.outbox.slice(0, 200);
+    const { accepted } = await api<{ accepted: string[] }>('/api/sync', { body: { records: batch } });
+    const ok = new Set(accepted);
+    setState(st => ({
+      outbox: st.outbox.filter(r => !ok.has(r.id)), lastSync: new Date().toISOString(),
+      harvests: st.harvests.map(h => (h.rid && ok.has(h.rid) ? { ...h, synced: true } : h)),
+      monLog: st.monLog.map(m => (m.rid && ok.has(m.rid) ? { ...m, synced: true } : m))
+    }));
+  } catch { /* stays queued; retried on the next tick */ }
+  finally { busy = false; }
+}
+
+// Flush the outbox when signal returns and every minute while online.
+export function useAutoSync() {
+  const online = useOnline();
+  useEffect(() => {
+    if (!online) return;
+    syncNow();
+    const iv = setInterval(syncNow, 60_000);
+    return () => clearInterval(iv);
+  }, [online]);
+}
+
+export interface Fix { lat: number; lon: number; acc: number; alt: number | null }
+export function oneFix(timeout = 15000): Promise<Fix> {
+  return new Promise((res, rej) => {
+    if (!('geolocation' in navigator)) return rej(new Error('This phone has no GPS access in the browser.'));
+    navigator.geolocation.getCurrentPosition(
+      p => res({ lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy, alt: p.coords.altitude }),
+      e => rej(new Error(e.code === 1 ? 'Location permission is off. Allow it in the browser settings.' : 'No GPS fix yet. Step into the open and try again.')),
+      { enableHighAccuracy: true, timeout, maximumAge: 10_000 });
+  });
+}
