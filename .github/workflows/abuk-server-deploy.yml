@@ -135,4 +135,5 @@ jobs:
           fi
           URL="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')"
           echo "### Abuk server: $URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::Abuk server deployed at $URL"
           curl -fsS "$URL/api/health" | tee -a "$GITHUB_STEP_SUMMARY"

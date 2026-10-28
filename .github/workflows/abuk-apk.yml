@@ -33,7 +33,7 @@ jobs:
       - run: npm run build -w apps/pwa
         env:
           VITE_DEMO: '1'
-          VITE_API_URL: ${{ vars.ABUK_API_URL }}
+          VITE_API_URL: ${{ vars.ABUK_API_URL || 'https://abuk-server-457219283943.europe-west1.run.app' }}
       - run: npx cap sync android
         working-directory: apps/pwa
       - run: ./gradlew assembleDebug --no-daemon
