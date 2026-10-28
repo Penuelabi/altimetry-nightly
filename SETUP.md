@@ -80,6 +80,6 @@ Phone numbers never ship in the app. Add them to `config/leads.json` in the acce
 
 ## Deploying
 
-- **Server, on Cloud Run:** run the workflow `.github/workflows/abuk-server-deploy.yml` by hand. It copies GitHub secrets into Secret Manager, generates the session and webhook secrets once, and deploys `Dockerfile`. The service URL and `/api/health` appear in the run summary. Any other Node 22 host works too: `npm start -w server`.
+- **Server, on Cloud Run:** run the workflow `.github/workflows/abuk-server-deploy.yml` by hand. Push to the `abuk-deploy` branch to run it. It copies GitHub secrets into Secret Manager, generates the session and webhook secrets once, and deploys `Dockerfile`. The service URL and `/api/health` appear in the run summary. Any other Node 22 host works too: `npm start -w server`.
 - **Android APK:** `.github/workflows/abuk-apk.yml` builds on every push to `abuk-app` and attaches the APK to the `abuk-apk-latest` release. To point it at the server, set the repository variable `ABUK_API_URL`.
 - **PWA:** `npm run build -w apps/pwa` produces static files in `apps/pwa/dist`. Serve them over HTTPS so the service worker and GPS work.
