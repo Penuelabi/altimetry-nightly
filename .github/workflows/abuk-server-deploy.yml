@@ -71,9 +71,11 @@ jobs:
           SMS_PASS: ${{ secrets.SMS_GATE_PASSWORD }}
         run: |
           set -euo pipefail
-          trap 'echo "::error::Secret Manager step failed at line $LINENO (see the log above); the account needs Secret Manager Admin."' ERR
+          trap 'echo "::error::Secret Manager step failed running: $BASH_COMMAND"' ERR
           G="gcloud --project=$PROJECT"
-          RUNTIME_SA="$($G projects describe "$PROJECT" --format='value(projectNumber)')-compute@developer.gserviceaccount.com"
+          # The service runs as the same account that deploys it (it already reads the Drive folder).
+          RUNTIME_SA="$(gcloud config get-value account 2>/dev/null)"
+          echo "RUNTIME_SA=$RUNTIME_SA" >> "$GITHUB_ENV"
           MOUNTS=""
           put() {  # put NAME ENV_VAR VALUE  (empty VALUE keeps any existing version)
             if ! $G secrets describe "$1" >/dev/null 2>&1; then
@@ -120,7 +122,7 @@ jobs:
           ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER"
           [ -n "$DRIVE_FOLDER_ID" ] && ENVS="$ENVS|DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID"
           if ! gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --source . \
-            --allow-unauthenticated --memory 512Mi --max-instances 3 \
+            --allow-unauthenticated --memory 512Mi --max-instances 3 --service-account "$RUNTIME_SA" \
             --set-env-vars "$ENVS" --set-secrets "$MOUNTS" 2> deploy.err; then
             cat deploy.err
             echo "::error::$(grep -E 'ERROR|PERMISSION|denied' deploy.err | head -3 | tr '\n' ' ')"
