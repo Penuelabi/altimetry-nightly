@@ -7,8 +7,9 @@ android {
         applicationId "org.dukabuk.field"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // CI passes the run number so every build is a newer version Android will install over the last.
+        versionCode((System.getenv("ABUK_VERSION_CODE") ?: "1").toInteger())
+        versionName(System.getenv("ABUK_VERSION_NAME") ?: "1.0")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +17,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // One permanent key for every build (kept in the private access repo by CI), so updates
+    // install over the previous version instead of failing with "App not installed".
+    signingConfigs {
+        release {
+            if (System.getenv("ABUK_KEYSTORE")) {
+                storeFile file(System.getenv("ABUK_KEYSTORE"))
+                storePassword System.getenv("ABUK_KEYSTORE_PASSWORD")
+                keyAlias "abuk"
+                keyPassword System.getenv("ABUK_KEYSTORE_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
+            if (System.getenv("ABUK_KEYSTORE")) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -37,13 +37,41 @@ jobs:
           VITE_API_URL: ${{ vars.ABUK_API_URL || 'https://abuk-server-26ltd3lrlq-ew.a.run.app' }}
       - run: npx cap sync android
         working-directory: apps/pwa
-      - run: ./gradlew assembleDebug --no-daemon
+      - name: Signing key (kept in the private access repo; created once)
+        env:
+          GH_ACCESS_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN }}
+          ACCESS_REPO: ${{ vars.ABUK_ACCESS_REPO || 'Penuelabi/abuk-access' }}
+        run: |
+          set -euo pipefail
+          [ -n "$GH_ACCESS_TOKEN" ] || { echo "::error::Secret ABUK_GITHUB_TOKEN is needed to keep the signing key"; exit 1; }
+          API="https://api.github.com/repos/$ACCESS_REPO/contents/signing"
+          H=(-H "authorization: Bearer $GH_ACCESS_TOKEN" -H "accept: application/vnd.github.raw+json" -H "x-github-api-version: 2022-11-28")
+          KS="$RUNNER_TEMP/abuk-release.jks"
+          if curl -fsS "${H[@]}" "$API/abuk-release.jks.b64" -o "$RUNNER_TEMP/ks.b64"; then
+            base64 -d "$RUNNER_TEMP/ks.b64" > "$KS"
+            PW="$(curl -fsS "${H[@]}" "$API/password.txt")"
+          else
+            echo "No signing key yet: creating one and saving it to $ACCESS_REPO/signing (private)."
+            PW="$(openssl rand -hex 24)"
+            keytool -genkeypair -keystore "$KS" -storetype PKCS12 -alias abuk -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$PW" -keypass "$PW" -dname "CN=Abuk Project, O=Duk County Abuk Project, C=SS"
+            put() { curl -fsS -X PUT -H "authorization: Bearer $GH_ACCESS_TOKEN" -H "accept: application/vnd.github+json" "$API/$1" \
+              -d "{\"message\":\"Android signing key ($1)\",\"content\":\"$2\"}" > /dev/null; }
+            put abuk-release.jks.b64 "$(base64 -w0 "$KS" | base64 -w0)"
+            put password.txt "$(printf '%s' "$PW" | base64 -w0)"
+          fi
+          echo "::add-mask::$PW"
+          { echo "ABUK_KEYSTORE=$KS"; echo "ABUK_KEYSTORE_PASSWORD=$PW"; } >> "$GITHUB_ENV"
+      - name: Build signed APK
         working-directory: apps/pwa/android
+        run: |
+          export ABUK_VERSION_CODE=$((100 + GITHUB_RUN_NUMBER)) ABUK_VERSION_NAME="1.$GITHUB_RUN_NUMBER (${GITHUB_SHA::7})"
+          ./gradlew assembleRelease --no-daemon
       - name: Name the APK
         run: |
           mkdir -p out
-          cp apps/pwa/android/app/build/outputs/apk/debug/app-debug.apk "out/abuk-project-$(date -u +%Y%m%d)-${GITHUB_SHA::7}.apk"
-          cp apps/pwa/android/app/build/outputs/apk/debug/app-debug.apk out/abuk-project-latest.apk
+          cp apps/pwa/android/app/build/outputs/apk/release/app-release.apk "out/abuk-project-$(date -u +%Y%m%d)-${GITHUB_SHA::7}.apk"
+          cp apps/pwa/android/app/build/outputs/apk/release/app-release.apk out/abuk-project-latest.apk
       - uses: actions/upload-artifact@v4
         with:
           name: abuk-apk
