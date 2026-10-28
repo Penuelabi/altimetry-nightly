@@ -6,7 +6,8 @@ export type Lang = 'en' | 'ar' | 'din';
 export type Screen =
   | 'home' | 'tools' | 'alerts' | 'gauge' | 'voice' | 'pest' | 'payout' | 'store' | 'trace' | 'p2p'
   | 'signin' | 'admin' | 'map' | 'flood' | 'season' | 'tasks' | 'plot' | 'harvest' | 'monitor'
-  | 'sources' | 'process' | 'market' | 'guide' | 'species' | 'register' | 'herd';
+  | 'sources' | 'process' | 'market' | 'guide' | 'species' | 'register' | 'herd'
+  | 'vsla' | 'degradation' | 'container';
 export type NavKey = 'home' | 'map' | 'season' | 'guide' | 'market';
 export type HomeLayout = 'ledger' | 'almanac' | 'field';
 
@@ -24,8 +25,8 @@ export const T = {
 };
 
 export const TITLES: Record<'en' | 'ar', Record<Exclude<Screen, 'species'>, string>> = {
-  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'River gauge', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable batches', p2p: 'Phone‑to‑phone sync', register: 'Farm register', herd: 'Livestock, forest & fish' },
-  ar: { home: 'مشروع أبوك', map: 'خريطة المزرعة', flood: 'نموذج الفيضان', season: 'تقويم المحاصيل', tasks: 'المهام', plot: 'القطعة B‑07', harvest: 'سجل الحصاد', process: 'المعالجة', market: 'السوق', guide: 'دليل الأنواع', monitor: 'فحص المحصول', sources: 'مصادر البيانات', signin: 'تسجيل الدخول', admin: 'الوصول والمفاتيح', tools: 'أدوات الحقل', alerts: 'تنبيهات الفيضان', gauge: 'قراءة المقياس', voice: 'صور وصوت', pest: 'فحص الآفات', payout: 'أيام العمل والأجور', store: 'مخزن البذور', trace: 'تتبع الزجاجات', p2p: 'مزامنة الهواتف', register: 'سجل المزرعة', herd: 'الثروة الحيوانية والغابات والأسماك' }
+  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'River gauge', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable batches', p2p: 'Phone‑to‑phone sync', register: 'Farm register', herd: 'Livestock, forest & fish', vsla: 'VSLA savings & loans', degradation: 'Land assessment', container: 'Container farming' },
+  ar: { home: 'مشروع أبوك', map: 'خريطة المزرعة', flood: 'نموذج الفيضان', season: 'تقويم المحاصيل', tasks: 'المهام', plot: 'القطعة B‑07', harvest: 'سجل الحصاد', process: 'المعالجة', market: 'السوق', guide: 'دليل الأنواع', monitor: 'فحص المحصول', sources: 'مصادر البيانات', signin: 'تسجيل الدخول', admin: 'الوصول والمفاتيح', tools: 'أدوات الحقل', alerts: 'تنبيهات الفيضان', gauge: 'قراءة المقياس', voice: 'صور وصوت', pest: 'فحص الآفات', payout: 'أيام العمل والأجور', store: 'مخزن البذور', trace: 'تتبع الزجاجات', p2p: 'مزامنة الهواتف', register: 'سجل المزرعة', herd: 'الثروة الحيوانية والغابات والأسماك', vsla: 'الادخار والقروض', degradation: 'تقييم الأرض', container: 'الزراعة في الحاويات' }
 };
 
 export interface Task { id: number; t: string; zone: string; who: string; due: 'today' | 'week'; done: boolean }

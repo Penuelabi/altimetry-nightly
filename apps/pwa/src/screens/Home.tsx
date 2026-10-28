@@ -40,6 +40,8 @@ function Ledger() {
   const BTN: [string, () => void, boolean, string?][] = [
     ['Log harvest', () => go('harvest'), true], ['Map a plot', () => tab('map'), true], ['Processing', () => go('process'), false],
     ['Flood model', () => go('flood'), false], ['Crop check', () => go('monitor'), true], ['Data sources', () => go('sources'), false],
+    ['VSLA savings & loans', () => go('vsla'), true], ['Land assessment', () => go('degradation'), true],
+    ['Container farming', () => go('container'), true], ['Livestock & fish', () => go('herd'), false],
     ['Farm register · plots, crops, groups', () => openRegister('plots'), false, 'span2'],
     ['Field tools · SMS alerts, voice, payout, store…', () => go('tools'), true, 'span2']
   ];

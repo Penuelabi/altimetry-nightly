@@ -172,6 +172,18 @@ export function Dashboard() {
       </div>
 
       <div className="panel">
+        <h2>Satellite indices · GEE</h2>
+        <div className="note">NDVI, VCI, SPEI and SPI from Google Earth Engine (Sentinel-2 / CHIRPS). Values are area averages for registered plots. Connect a GEE service account to enable live data.</div>
+        <div className="tiles" style={{ marginTop: 8 }}>
+          <Tile k="NDVI" v="—" s="Vegetation greenness (Sentinel-2)" />
+          <Tile k="VCI" v="—" s="Vegetation condition vs historical" />
+          <Tile k="SPEI" v="—" s="Drought severity (precip + temp)" />
+          <Tile k="SPI" v="—" s="Rainfall anomaly (CHIRPS)" />
+        </div>
+        <div className="note" style={{ marginTop: 6, fontSize: 11 }}>Integration: set GEE_SERVICE_ACCOUNT in server/.env and add plot centroids to the /api/admin/satellite endpoint. Indices update weekly from Sentinel-2 (NDVI, VCI) and CHIRPS (SPI, SPEI).</div>
+      </div>
+
+      <div className="panel">
         <h2>Plots · {data?.farm.plots.length ?? 0}</h2>
         <div className="tbl-wrap" style={{ maxHeight: 460 }}>
           <table className="tbl"><thead><tr><th>#</th><th>Code</th><th>Zone</th><th>Crop</th><th>Holder</th><th>Group</th><th style={{ textAlign: 'right' }}>Area (ha)</th><th style={{ textAlign: 'right' }}>Checks</th><th>GPS</th></tr></thead>
