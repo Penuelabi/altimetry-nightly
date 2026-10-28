@@ -1,4 +1,4 @@
-// Bootstraps the first admin: `npm run add-admin -w server -- "Garang Mabior"`.
+// Bootstraps the first admin: `npm run add-admin -w server -- "Garang Mabior"` (one name is fine).
 // Prints the key once; only its hash is committed to GitHub. With ADMIN_KEY_FILE set
 // (used by the deploy workflow) the key goes to that file instead of stdout, and
 // nothing is added if an admin already exists.
@@ -8,7 +8,7 @@ import { changeUsers, loadUsers, makeUser } from '../auth';
 const name = process.argv.slice(2).join(' ').trim();
 const keyFile = process.env.ADMIN_KEY_FILE;
 try {
-  if (name.split(/\s+/).length < 2) { console.error('Usage: add-admin "First Last"'); process.exit(1); }
+  if (!name) { console.error('Usage: add-admin "Full Name"'); process.exit(1); }
   if (keyFile && (await loadUsers(true)).users.some(u => u.role === 'Admin' && u.on)) { console.log('An admin already exists; nothing to do.'); process.exit(0); }
   let key = '', id = '';
   const r = await changeUsers(`add admin (hash only)`, f => {
