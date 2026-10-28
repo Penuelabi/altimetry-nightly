@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { CROP_OPTIONS, PLOT_OPTIONS, harvestError } from '@abuk/core';
+import { harvestError } from '@abuk/core';
 import { record, setState, today, useApp } from '../store';
 import { useOnline } from '../net';
 import { Field } from '../ui';
 
 export function Harvest() {
   const s = useApp(), online = useOnline();
-  const [form, setForm] = useState({ crop: CROP_OPTIONS[0], plot: PLOT_OPTIONS[0], kg: '' });
+  const crops = s.farm.crops.map(c => c.name), plots = s.farm.plots.map(p => p.code);
+  const [form, setForm] = useState({ crop: crops[0] ?? '', plot: plots[0] ?? '', kg: '' });
   const [err, setErr] = useState('');
   const [saved, setSaved] = useState(false);
   const who = s.session?.user.meta.match(/Group \d+/)?.[0] ?? s.session?.user.name ?? 'Group 4';
@@ -22,9 +23,9 @@ export function Harvest() {
     <div className="pad g14">
       <div className="box col g10" style={{ padding: 14 }}>
         <h2 className="h2 h20">New entry</h2>
-        <Field label="Crop"><select className="input" value={form.crop} onChange={upd('crop')}>{CROP_OPTIONS.map(o => <option key={o}>{o}</option>)}</select></Field>
+        <Field label="Crop"><select className="input" value={form.crop} onChange={upd('crop')}>{crops.map(o => <option key={o}>{o}</option>)}</select></Field>
         <div className="grid2">
-          <Field label="Plot"><select className="input" value={form.plot} onChange={upd('plot')}>{PLOT_OPTIONS.map(o => <option key={o}>{o}</option>)}</select></Field>
+          <Field label="Plot"><select className="input" value={form.plot} onChange={upd('plot')}>{plots.map(o => <option key={o}>{o}</option>)}</select></Field>
           <Field label="Weight (kg)"><input className={'input num' + (err ? ' bad' : '')} type="number" inputMode="decimal" placeholder="0" value={form.kg} onChange={upd('kg')} style={{ fontSize: 16 }} /></Field>
         </div>
         {err && <div className="msg" style={{ fontSize: 12 }}>{err}</div>}

@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { get, set } from 'idb-keyval';
 import type { GaugeReading, HomeLayout, Lang, PublicUser, PullResult, Screen, SyncKind, SyncRecord } from '@abuk/core';
-import { HARV, LEADS, MEMBERS, MON, SOURCES, STORE, TASKS, type Harvest, type MonRecord, type Task } from '@abuk/core';
+import { HARV, LEADS, MEMBERS, MON, SOURCES, STORE, TASKS, applyOps, seedRegister, type FarmOp, type Harvest, type MonRecord, type Register, type Task } from '@abuk/core';
 
 export interface Session { token: string; user: PublicUser; expires: string; demo?: boolean }
 export interface Plot { id: string; mode: 'walk' | 'pin'; pts: { lat: number; lon: number }[]; ha: number; elevation: number | null; slopePct: number | null; at: string }
@@ -20,6 +20,7 @@ export interface State {
   offer: 'open' | 'accepted' | 'countered';
   leads: Lead[]; alertLog: string[]; gauge: GaugeReading[] | null;
   where: Where | null;
+  farm: Register; farmOps: FarmOp[]; regTab: 'plots' | 'crops' | 'groups' | 'batches' | 'runs';
 }
 
 const initial: State = {
@@ -31,11 +32,12 @@ const initial: State = {
   present: MEMBERS.map((_, i) => i !== 4 && i !== 8), stock: STORE.map(s => s[2]), doneP: [],
   offer: 'open',
   leads: LEADS.map(([name, g, rows]) => ({ id: name, name: `${name} · ${g}`, rows, phone: 'number on server', on: true })),
-  alertLog: [], gauge: null, where: null
+  alertLog: [], gauge: null, where: null,
+  farm: seedRegister(), farmOps: [], regTab: 'plots'
 };
 
 // Navigation is per session; the rest survives restarts.
-const TRANSIENT: (keyof State)[] = ['screen', 'hist'];
+const TRANSIENT: (keyof State)[] = ['screen', 'hist', 'regTab'];
 const KEY = 'abuk-state-v1';
 
 let state: State = initial;
@@ -74,6 +76,7 @@ export function useApp(): State {
 export const go = (s: Screen) => setState(st => ({ screen: s, hist: [...st.hist, st.screen] }));
 export const tab = (s: Screen) => setState({ screen: s, hist: [] });
 export const back = () => setState(st => st.hist.length ? { screen: st.hist[st.hist.length - 1], hist: st.hist.slice(0, -1) } : {});
+export const openRegister = (t: State['regTab']) => { setState({ regTab: t }); go('register'); };
 export const openSpecies = (key: string) => { setState({ species: key }); go('species'); };
 
 // ---- outbox ----
@@ -86,3 +89,8 @@ export function record(kind: SyncKind, data: Record<string, unknown>) {
 }
 
 export const today = () => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+// Farm register edits apply on the phone at once and queue for the server (see net.ts syncNow).
+export function farmChange(...ops: FarmOp[]) {
+  setState(st => ({ farm: applyOps(st.farm, ops), farmOps: [...st.farmOps, ...ops] }));
+}

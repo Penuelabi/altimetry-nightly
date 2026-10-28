@@ -40,3 +40,14 @@ export async function updateJson<T>(path: string, fallback: T, message: string, 
   }
   throw new Error('unreachable');
 }
+
+// Recent commits touching a path: who changed the farm register or users, and when.
+export async function commitsFor(path: string, perPage = 20): Promise<{ sha: string; message: string; date: string }[]> {
+  need('github');
+  const res = await fetch(`https://api.github.com/repos/${cfg.ghRepo}/commits?path=${encodeURIComponent(path)}&sha=${encodeURIComponent(cfg.ghBranch)}&per_page=${perPage}`, {
+    headers: { accept: 'application/vnd.github+json', authorization: `Bearer ${cfg.ghToken}`, 'user-agent': 'abuk-server' }
+  });
+  if (!res.ok) throw new Error(`GitHub commits ${path} → ${res.status}`);
+  const j = await res.json() as { sha: string; commit: { message: string; author: { date: string } } }[];
+  return j.map(c => ({ sha: c.sha.slice(0, 7), message: c.commit.message.split('\n')[0], date: c.commit.author.date }));
+}

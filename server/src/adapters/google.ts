@@ -76,6 +76,16 @@ export async function sheetsAppend(tab: string, rows: (string | number)[][]) {
   });
 }
 
+// Reads a whole record tab back (rows after the header); missing tabs are simply empty.
+export async function sheetsRead(tab: string): Promise<string[][]> {
+  need('sheets');
+  const range = encodeURIComponent(`${tab}!A2:D`);
+  const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}`, { headers: { authorization: `Bearer ${await googleToken()}` } });
+  if (res.status === 400) return [];
+  if (!res.ok) throw new Error(`Sheets read ${tab} → ${res.status}`);
+  return ((await res.json()) as { values?: string[][] }).values ?? [];
+}
+
 // ---- Earth Engine REST: expressions are built as plain JSON graphs ----
 type Node = { constantValue: unknown } | { functionInvocationValue: { functionName: string; arguments: Record<string, Node> } };
 export const c = (v: unknown): Node => ({ constantValue: v });

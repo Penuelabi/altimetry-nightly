@@ -6,7 +6,7 @@ export type Lang = 'en' | 'ar' | 'din';
 export type Screen =
   | 'home' | 'tools' | 'alerts' | 'gauge' | 'voice' | 'pest' | 'payout' | 'store' | 'trace' | 'p2p'
   | 'signin' | 'admin' | 'map' | 'flood' | 'season' | 'tasks' | 'plot' | 'harvest' | 'monitor'
-  | 'sources' | 'process' | 'market' | 'guide' | 'species';
+  | 'sources' | 'process' | 'market' | 'guide' | 'species' | 'register';
 export type NavKey = 'home' | 'map' | 'season' | 'guide' | 'market';
 export type HomeLayout = 'ledger' | 'almanac' | 'field';
 
@@ -24,8 +24,8 @@ export const T = {
 };
 
 export const TITLES: Record<'en' | 'ar', Record<Exclude<Screen, 'species'>, string>> = {
-  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'Gauge by SMS', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable bottles', p2p: 'Phone‑to‑phone sync' },
-  ar: { home: 'مشروع أبوك', map: 'خريطة المزرعة', flood: 'نموذج الفيضان', season: 'تقويم المحاصيل', tasks: 'المهام', plot: 'القطعة B‑07', harvest: 'سجل الحصاد', process: 'المعالجة', market: 'السوق', guide: 'دليل الأنواع', monitor: 'فحص المحصول', sources: 'مصادر البيانات', signin: 'تسجيل الدخول', admin: 'الوصول والمفاتيح', tools: 'أدوات الحقل', alerts: 'تنبيهات الفيضان', gauge: 'قراءة المقياس', voice: 'صور وصوت', pest: 'فحص الآفات', payout: 'أيام العمل والأجور', store: 'مخزن البذور', trace: 'تتبع الزجاجات', p2p: 'مزامنة الهواتف' }
+  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'Gauge by SMS', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable bottles', p2p: 'Phone‑to‑phone sync', register: 'Farm register' },
+  ar: { home: 'مشروع أبوك', map: 'خريطة المزرعة', flood: 'نموذج الفيضان', season: 'تقويم المحاصيل', tasks: 'المهام', plot: 'القطعة B‑07', harvest: 'سجل الحصاد', process: 'المعالجة', market: 'السوق', guide: 'دليل الأنواع', monitor: 'فحص المحصول', sources: 'مصادر البيانات', signin: 'تسجيل الدخول', admin: 'الوصول والمفاتيح', tools: 'أدوات الحقل', alerts: 'تنبيهات الفيضان', gauge: 'قراءة المقياس', voice: 'صور وصوت', pest: 'فحص الآفات', payout: 'أيام العمل والأجور', store: 'مخزن البذور', trace: 'تتبع الزجاجات', p2p: 'مزامنة الهواتف', register: 'سجل المزرعة' }
 };
 
 export interface Task { id: number; t: string; zone: string; who: string; due: 'today' | 'week'; done: boolean }
@@ -83,7 +83,7 @@ export const SOURCES: Source[] = [
   { id: 'payam', kind: 'GitHub', name: 'Payam, county and state boundaries', path: 'South-Sudan-Admin-Geojson › ssd_A3.json (517 payams)', size: '340 KB, in the app', last: 'works offline', feeds: 'payam / county / state from GPS', on: true }
 ];
 
-export interface MonRecord { plot: string; crop: string; acts: string; ew: string; date: string; cond: number; synced: boolean; rid?: string }
+export interface MonRecord { plot: string; crop: string; acts: string; ew: string; date: string; cond: number; synced: boolean; rid?: string; field?: string }
 export const MON: MonRecord[] = [
   { plot: 'B‑03', crop: 'Jute mallow', acts: 'Weeding', ew: 'EW‑014', date: '27 Oct', cond: 4, synced: true },
   { plot: 'S‑04', crop: 'Groundnut', acts: 'Harvest, Pest scouting', ew: 'EW‑014', date: '25 Oct', cond: 3, synced: true },

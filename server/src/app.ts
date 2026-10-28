@@ -1,13 +1,15 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
+import { serveStatic } from '@hono/node-server/serve-static';
 import type { GaugeReading, Role, SyncRecord } from '@abuk/core';
-import { parseGauge, signinError, whereIs } from '@abuk/core';
+import { applyOps, editAllowed, opError, parseGauge, removeAllowed, seedRegister, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
 import { cfg, health, NotConfigured } from './config';
 import { EXPIRY_DAYS, changeUsers, checkKey, issueSession, loadUsers, makeUser, readSession, toPublic, type Session } from './auth';
 import { readJson, updateJson } from './adapters/github';
 import { sheetsAppend } from './adapters/google';
 import { parseInbound, sendSms } from './adapters/sms';
 import { geeSummary, pull, terrain } from './sources';
+import { overview } from './dashboard';
 
 type Env = { Variables: { me: Session } };
 export const app = new Hono<Env>();
@@ -123,6 +125,28 @@ app.post('/api/sources/extra', auth(['Admin']), async c => {
   return c.json(r.data);
 });
 
+// ---- admin dashboard ----
+app.get('/api/admin/overview', auth(['Admin']), async c => c.json(await overview(c.req.query('fresh') === '1')));
+
+// ---- farm register (plots, crops, groups, batches, processing runs) ----
+const FARM_PATH = 'config/farm.json';
+app.get('/api/farm', auth(), async c => c.json((await readJson<Register>(FARM_PATH, seedRegister())).data));
+
+// Ops arrive in the order they were made on the phone (possibly offline); all of a batch commit together.
+app.post('/api/farm/ops', auth(), async c => {
+  const me = c.get('me');
+  const { ops = [] } = await c.req.json<{ ops?: FarmOp[] }>();
+  if (!editAllowed(me.role)) return c.json({ error: 'forbidden', message: 'Only admins and group leads can change the farm register.' }, 403);
+  for (const o of ops) {
+    if (o.op === 'remove' && !removeAllowed(me.role)) return c.json({ error: 'forbidden', message: 'Only admins can delete from the farm register.' }, 403);
+    const bad = opError(o);
+    if (bad) return c.json({ error: 'invalid', message: `Farm change rejected: ${bad}.` }, 400);
+  }
+  if (!ops.length) return c.json((await readJson<Register>(FARM_PATH, seedRegister())).data);
+  const r = await updateJson<Register>(FARM_PATH, seedRegister(), `farm: ${ops.length} change${ops.length > 1 ? 's' : ''} by ${me.id}`, reg => applyOps(reg, ops.slice(0, 200)));
+  return c.json(r.data);
+});
+
 // ---- offline records ----
 app.post('/api/sync', auth(), async c => {
   const { records = [] } = await c.req.json<{ records?: SyncRecord[] }>();
@@ -187,3 +211,9 @@ app.get('/api/gauge', auth(), async c => {
   const list = (await readJson<GaugeReading[]>(GAUGE_PATH, [])).data;
   return c.json(list.slice(0, 50).map(r => ({ ...r, from: /^\+?\d{6,}$/.test(r.from) ? mask(r.from) : r.from })));
 });
+
+// ---- admin dashboard web page (built from apps/dashboard) ----
+const DASH = process.env.DASHBOARD_DIR || 'apps/dashboard/dist';
+app.get('/admin', c => c.redirect('/admin/'));
+app.use('/admin/*', serveStatic({ root: DASH, rewriteRequestPath: p => p.replace(/^\/admin/, '') }));
+app.get('/admin/*', serveStatic({ path: `${DASH}/index.html` }));

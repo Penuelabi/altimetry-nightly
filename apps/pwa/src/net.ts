@@ -1,17 +1,32 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { FARM, whereIs, type SyncRecord } from '@abuk/core';
-import { api } from './api';
+import { FARM, applyOps, whereIs, type Register, type SyncRecord } from '@abuk/core';
+import { api, ApiFail } from './api';
 import { getState, setState, useApp } from './store';
 
 const sub = (cb: () => void) => { addEventListener('online', cb); addEventListener('offline', cb); return () => { removeEventListener('online', cb); removeEventListener('offline', cb); }; };
 export const useOnline = () => useSyncExternalStore(sub, () => navigator.onLine);
 
 let busy = false;
+export let farmRejected = '';
 export async function syncNow() {
   const s = getState();
-  if (busy || !navigator.onLine || !s.session || s.session.demo || !s.outbox.length) return;
+  if (busy || !navigator.onLine || !s.session || s.session.demo) return;
   busy = true;
   try {
+    // Farm register: send queued edits (server applies them in order), then take the shared copy.
+    const ops = s.farmOps;
+    let farm: Register;
+    try { farm = ops.length ? await api<Register>('/api/farm/ops', { body: { ops } }) : await api<Register>('/api/farm'); }
+    catch (e) {
+      // Refused (no permission / invalid): drop those edits and take the server's copy instead of retrying forever.
+      if (!(e instanceof ApiFail) || (e.status !== 400 && e.status !== 403)) throw e;
+      farmRejected = e.message;
+      farm = await api<Register>('/api/farm');
+    }
+    setState(st => ({ farm: applyOps(farm, st.farmOps.slice(ops.length)), farmOps: st.farmOps.slice(ops.length) }));
+  } catch { /* stays queued; retried on the next tick */ }
+  try {
+    if (!getState().outbox.length) return;
     const batch: SyncRecord[] = s.outbox.slice(0, 200);
     const { accepted } = await api<{ accepted: string[] }>('/api/sync', { body: { records: batch } });
     const ok = new Set(accepted);

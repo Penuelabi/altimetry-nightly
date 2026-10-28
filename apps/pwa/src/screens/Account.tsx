@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { signinError, type SigninResponse } from '@abuk/core';
-import { go, setState, useApp } from '../store';
+import { go, openRegister, setState, useApp } from '../store';
 import { api, explain } from '../api';
 import { useOnline, usePlace } from '../net';
 import { Field, Seg } from '../ui';
@@ -117,6 +117,7 @@ export function Account() {
         <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Home screen</div>
         <Seg items={[['ledger', 'Ledger'], ['almanac', 'Almanac'], ['field', 'Field map']]} value={s.homeLayout} onPick={v => setState({ homeLayout: v })} />
       </div>
+      <button className="btn plain" onClick={() => openRegister('plots')}>Farm register · plots, crops, groups, batches</button>
       {u.role === 'Admin' && <button className="btn plain" onClick={() => go('admin')}>Manage users & access keys</button>}
       <AppVersion />
       <button className="btn lg" onClick={() => setState({ screen: 'home', hist: [] })}>Continue</button>

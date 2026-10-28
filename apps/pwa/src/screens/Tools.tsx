@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
-import { BATCHES, MEMBERS, P2P_PEERS, PICTO, STORE, TOOLS, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
-import { go, record, setState, useApp, type Lead } from '../store';
+import { P2P_PEERS, PICTO, STORE, TOOLS, editAllowed, newId, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
+import { farmChange, go, openRegister, record, setState, useApp, type Lead } from '../store';
 import { api, explain } from '../api';
 import { useOnline, usePlace } from '../net';
-import { Check, Chevron, Icon, Seg, Toggle } from '../ui';
+import { Check, Chevron, Field, Icon, Seg, Toggle } from '../ui';
 
 export function Tools() {
   return (
@@ -146,6 +146,23 @@ export function Voice() {
   const [have, setHave] = useState<Record<string, boolean>>({});
   const rec = useRef<MediaRecorder | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
+  const cam = useRef<HTMLInputElement>(null);
+  const [pics, setPics] = useState<Record<string, string>>({});
+  // A lead can replace any tile's drawing with a photo of the real task on this farm.
+  useEffect(() => {
+    let urls: string[] = [];
+    Promise.all(PICTO.map(async ([k]) => [k, await idbGet<Blob>(`picto-photo-${k}`).catch(() => undefined)] as const)).then(r => {
+      const m: Record<string, string> = {};
+      for (const [k, b] of r) if (b) { const u = URL.createObjectURL(b); urls.push(u); m[k] = u; }
+      setPics(m);
+    });
+    return () => urls.forEach(URL.revokeObjectURL);
+  }, []);
+  const setPhoto = async (f: File) => {
+    if (!playing) return;
+    await idbSet(`picto-photo-${playing}`, f).catch(() => {});
+    setPics(p => ({ ...p, [playing]: URL.createObjectURL(f) }));
+  };
   const canLead = s.session?.user.role !== 'Extension worker';
 
   useEffect(() => { Promise.all(PICTO.map(async ([k]) => [k, !!(await idbGet(`prompt-${k}`).catch(() => null))] as const)).then(r => setHave(Object.fromEntries(r))); }, []);
@@ -184,7 +201,7 @@ export function Voice() {
       <div className="grid2">
         {PICTO.map(([k, l, d]) => (
           <button key={k} onClick={() => tap(k)} style={{ height: 128, border: `1.5px solid ${playing === k ? 'var(--color-accent)' : 'var(--color-divider)'}`, borderRadius: 'var(--radius-lg)', background: s.doneP.includes(k) ? 'var(--color-accent-100)' : 'transparent', color: 'var(--color-accent-900)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, position: 'relative' }}>
-            <Icon d={d} size={52} sw={1.3} />
+            {pics[k] ? <img src={pics[k]} alt={l} style={{ width: 84, height: 70, objectFit: 'cover', borderRadius: 'var(--radius-md)' }} /> : <Icon d={d} size={52} sw={1.3} />}
             <span style={{ fontSize: 12, color: 'var(--color-neutral-800)' }}>{l}</span>
             <span style={{ position: 'absolute', top: 8, right: 10, fontSize: 13, color: 'var(--color-accent-800)' }}>{s.doneP.includes(k) ? '✓' : ''}</span>
           </button>
@@ -193,9 +210,13 @@ export function Voice() {
       <div style={{ minHeight: 44, display: 'flex', alignItems: 'center', gap: 10, borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)', padding: '8px 0' }}>
         <span style={{ display: 'flex', gap: 3, alignItems: 'flex-end', height: 20 }}>{[bar('18px'), bar('10px'), bar('20px'), bar('10px')].map((h, i) => <span key={i} style={{ width: 3, height: recording ? '14px' : h, background: 'var(--color-accent)' }} />)}</span>
         <span style={{ fontSize: 13, color: 'var(--color-neutral-800)', flex: 1 }}>{status}</span>
-        {canLead && playing && <button className="btn plain sm" onClick={toggleRec}>{recording ? 'Stop' : have[playing] ? 'Re‑record' : 'Record'}</button>}
+        {canLead && playing && <>
+          <button className="btn plain sm" onClick={toggleRec}>{recording ? 'Stop' : have[playing] ? 'Re‑record' : 'Record'}</button>
+          {!recording && <button className="btn plain sm" onClick={() => cam.current?.click()}>{pics[playing] ? 'New photo' : 'Photo'}</button>}
+        </>}
+        <input ref={cam} type="file" accept="image/*" capture="environment" hidden onChange={e => { const f = e.target.files?.[0]; if (f) setPhoto(f); e.target.value = ''; }} />
       </div>
-      <div className="sub" style={{ lineHeight: 1.5 }}>Prompts are recorded once by a group lead in the local dialect and stored on the phone (about 40 KB each). Leads and admins can re-record any prompt.</div>
+      <div className="sub" style={{ lineHeight: 1.5 }}>Prompts are recorded once by a group lead in the local dialect and stored on the phone (about 40 KB each). Leads and admins can tap a tile, then Record or Photo, to replace its voice prompt or picture.</div>
     </div>
   );
 }
@@ -203,23 +224,39 @@ export function Voice() {
 // ---- iv Pest photo check ----
 export function Pest() {
   const place = usePlace();
+  const s = useApp();
+  const [photo, setPhoto] = useState<Blob | null>(null);
+  const [plot, setPlot] = useState(s.farm.plots[0]?.code ?? '');
   const [st, setSt] = useState<'idle' | 'busy' | 'done'>('idle');
   const [answered, setAnswered] = useState('');
-  const me = useApp().session?.user.id ?? 'EW‑014';
+  const file = useRef<HTMLInputElement>(null);
+  const url = photo ? URL.createObjectURL(photo) : '';
+  useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);
+  const me = s.session?.user.id ?? 'EW‑014';
   useEffect(() => { if (st !== 'busy') return; const t = setTimeout(() => setSt('done'), 1400); return () => clearTimeout(t); }, [st]);
-  const answer = (ok: boolean) => {
-    record('pest', { plot: 'B‑12', suggestion: 'Fall armyworm', confirmed: ok, by: me });
-    setAnswered(ok ? `Confirmed by ${me}. Task added for Group 6: treat B‑12 within 3 days. Neighbouring plots flagged for scouting.` : 'Sent to the county extension office with the photo for a second opinion.');
+  const answer = async (ok: boolean) => {
+    const key = photo ? `pest-${Date.now()}` : null;
+    if (key && photo) await idbSet(key, photo).catch(() => {});
+    record('pest', { plot, photo: key, suggestion: 'Fall armyworm', confirmed: ok, by: me, place });
+    setAnswered(ok ? `Confirmed by ${me}. Recorded for plot ${plot}; treat within 3 days and scout neighbouring plots.` : 'Sent to the county extension office with the photo for a second opinion.');
   };
+  const reset = () => { setPhoto(null); setSt('idle'); setAnswered(''); };
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <div className="photo" style={{ height: 170 }}>Crop‑check photo · sorghum leaf, B‑12</div>
-      {st === 'idle' && <button className="btn lg" onClick={() => setSt('busy')}>Compare with local library</button>}
-      {st === 'busy' && <div className="it" style={{ fontSize: 13.5, color: 'var(--color-accent-800)' }}>Comparing with 46 reference photos from {place.state || 'South Sudan'}…</div>}
+      <button onClick={() => file.current?.click()} className="photo" style={{ height: 190, padding: 0, overflow: 'hidden', cursor: 'pointer', width: '100%' }}>
+        {url ? <img src={url} alt="Crop photo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span>Tap to take a photo of the damaged leaf or plant</span>}
+      </button>
+      <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={e => { const f = e.target.files?.[0]; if (f) { setPhoto(f); setSt('idle'); setAnswered(''); } e.target.value = ''; }} />
+      <div className="grid2">
+        <Field label="Plot"><select className="input" value={plot} onChange={e => setPlot(e.target.value)}>{s.farm.plots.map(p => <option key={p.id}>{p.code}</option>)}</select></Field>
+        <button className="btn plain" style={{ alignSelf: 'end' }} onClick={() => file.current?.click()}>{photo ? 'Retake photo' : 'Take photo'}</button>
+      </div>
+      {photo && st === 'idle' && <button className="btn lg" onClick={() => setSt('busy')}>Compare with local library</button>}
+      {st === 'busy' && <div className="it" style={{ fontSize: 13.5, color: 'var(--color-accent-800)' }}>Comparing with reference photos from {place.state || 'South Sudan'}…</div>}
       {st === 'done' && (
         <div className="col g12">
           <div>
-            <div className="section">Closest matches</div>
+            <div className="section">Closest matches · example results</div>
             {([['Fall armyworm', 78], ['Stem borer', 12], ['Leaf blight', 6]] as const).map(([n, p]) => (
               <div key={n} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 40px', gap: 8, alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--color-divider)' }}>
                 <span style={{ fontSize: 14 }}>{n}</span>
@@ -237,10 +274,13 @@ export function Pest() {
               <button className="btn plain" style={{ minHeight: 44, fontSize: 13.5 }} onClick={() => answer(false)}>Not this</button>
               <button className="btn" style={{ minHeight: 44, fontSize: 13.5 }} onClick={() => answer(true)}>Confirm ({me})</button>
             </div>
-          ) : <div className="it" style={{ fontSize: 13, color: 'var(--color-accent-800)', borderTop: '1px solid var(--color-divider)', paddingTop: 8 }}>{answered}</div>}
+          ) : <>
+            <div className="it" style={{ fontSize: 13, color: 'var(--color-accent-800)', borderTop: '1px solid var(--color-divider)', paddingTop: 8 }}>{answered}</div>
+            <button className="btn plain" onClick={reset}>Check another photo</button>
+          </>}
         </div>
       )}
-      <div className="sub" style={{ lineHeight: 1.5 }}>Preview: the matcher shows example results until the reference library for {place.state || 'South Sudan'} is loaded. The app only suggests; an extension worker confirms before any treatment is advised.</div>
+      <div className="sub" style={{ lineHeight: 1.5 }}>Your photo and decision are saved and synced. The matches shown are examples until a reference photo library for {place.state || 'the area'} is loaded; an extension worker always confirms before any treatment is advised.</div>
     </div>
   );
 }
@@ -248,32 +288,68 @@ export function Pest() {
 // ---- v Work days & payout ----
 export function Payout() {
   const s = useApp();
+  const can = editAllowed(s.session?.user.role ?? '');
+  const groups = s.farm.groups.filter(g => g.members.length || can);
+  const [gid, setGid] = useState(groups.find(g => g.id === 'g4')?.id ?? groups[0]?.id ?? '');
+  const g = s.farm.groups.find(x => x.id === gid);
+  const [absent, setAbsent] = useState<string[]>([]);
+  const [sale, setSale] = useState({ buyer: 'Nile Botanicals (40 L oil)', amount: '540', fund: '15' });
+  const [who, setWho] = useState('');
   const [msg, setMsg] = useState('');
-  const days = MEMBERS.map((m, i) => m[1] + (s.present[i] ? 1 : 0)), tot = days.reduce((a, b) => a + b, 0);
-  const share = (i: number) => 459 * days[i] / tot;
+  const members = g?.members ?? [];
+  const present = (id: string) => !absent.includes(id);
+  const days = members.map(m => m.workDays + (present(m.id) ? 1 : 0)), tot = days.reduce((a, b) => a + b, 0) || 1;
+  const amount = Number(sale.amount) || 0, fund = Math.round(amount * (Number(sale.fund) || 0)) / 100, pool = amount - fund;
+  const share = (i: number) => pool * days[i] / tot;
+  const addMember = () => {
+    if (!g || !who.trim()) return;
+    farmChange({ op: 'upsert', kind: 'group', item: { ...g, members: [...g.members, { id: newId('m'), name: who.trim(), workDays: 0 }] } });
+    setWho('');
+  };
   const approve = () => {
-    record('payout', { sale: 'Nile Botanicals 40 L', pool: 459, shares: MEMBERS.map((m, i) => ({ name: m[0], days: days[i], usd: Math.round(share(i) * 100) / 100 })) });
-    setMsg('Approved. The mobile‑money list goes to the project office at the next sync for payment.');
+    if (!g) return;
+    if (!(amount > 0)) return setMsg('Enter the sale amount.');
+    const here = members.filter(m => present(m.id)).map(m => m.id);
+    if (can) farmChange({ op: 'workdays', groupId: g.id, memberIds: here });
+    record('payout', { group: g.name, sale: sale.buyer, amount, fundPct: Number(sale.fund) || 0, pool, shares: members.map((m, i) => ({ id: m.id, name: m.name, days: days[i], usd: Math.round(share(i) * 100) / 100 })) });
+    setMsg(`Approved. Today's roll-call is added to work days, and the mobile‑money list goes to the project office at the next sync.`);
+    setAbsent([]);
   };
   const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <div className="between"><div><div className="kick">Group 4 · roll‑call {date}</div><div className="head" style={{ fontSize: 24 }}>{s.present.filter(Boolean).length} of 12 present</div></div><button className="btn plain sm" onClick={() => setState({ present: MEMBERS.map(() => true) })}>All present</button></div>
+      <Field label="Group"><select className="input" value={gid} onChange={e => { setGid(e.target.value); setAbsent([]); setMsg(''); }}>{s.farm.groups.map(x => <option key={x.id} value={x.id}>{x.name} · {x.members.length} members</option>)}</select></Field>
+      <div className="between"><div><div className="kick">{g?.name ?? '—'} · roll‑call {date}</div><div className="head" style={{ fontSize: 24 }}>{members.length - absent.filter(a => members.some(m => m.id === a)).length} of {members.length} present</div></div><button className="btn plain sm" onClick={() => setAbsent([])}>All present</button></div>
       <div>
         <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 52px 64px', gap: 8 }} className="lbl rule-b"><span /><span>Member</span><span style={{ textAlign: 'right' }}>Days</span><span style={{ textAlign: 'right' }}>Share</span></div>
-        {MEMBERS.map((m, i) => (
-          <button key={m[0]} className="row" onClick={() => setState(st => ({ present: st.present.map((p, j) => (j === i ? !p : p)) }))} style={{ display: 'grid', gridTemplateColumns: '28px 1fr 52px 64px', gap: 8, alignItems: 'center', padding: '8px 0', fontSize: 13.5, minHeight: 40 }}>
-            <Check on={s.present[i]} /><span>{m[0]}</span><span className="num" style={{ textAlign: 'right' }}>{days[i]}</span><span className="head num" style={{ textAlign: 'right', fontSize: 17 }}>${share(i).toFixed(2)}</span>
+        {members.map((m, i) => (
+          <button key={m.id} className="row" onClick={() => setAbsent(a => (a.includes(m.id) ? a.filter(x => x !== m.id) : [...a, m.id]))} style={{ display: 'grid', gridTemplateColumns: '28px 1fr 52px 64px', gap: 8, alignItems: 'center', padding: '8px 0', fontSize: 13.5, minHeight: 40 }}>
+            <Check on={present(m.id)} /><span>{m.name}</span><span className="num" style={{ textAlign: 'right' }}>{days[i]}</span><span className="head num" style={{ textAlign: 'right', fontSize: 17 }}>${share(i).toFixed(2)}</span>
           </button>
         ))}
+        {!members.length && <div className="note" style={{ padding: '8px 0' }}>No members in this group yet.</div>}
+        {can && g && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, marginTop: 8 }}>
+            <input className="input" style={{ minHeight: 40 }} value={who} placeholder="Add a member to this group" onChange={e => setWho(e.target.value)} onKeyDown={e => e.key === 'Enter' && addMember()} />
+            <button className="btn md" style={{ padding: '0 12px' }} onClick={addMember}>Add</button>
+          </div>
+        )}
       </div>
-      <div className="num rule-b" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '4px 10px', fontSize: 13, paddingBottom: 10 }}>
-        <span>Oil sale, Nile Botanicals (40 L)</span><span style={{ textAlign: 'right' }}>$540.00</span>
-        <span style={{ color: 'var(--color-neutral-700)' }}>Cooperative fund 15%</span><span style={{ textAlign: 'right', color: 'var(--color-neutral-700)' }}>− $81.00</span>
-        <span style={{ fontWeight: 600 }}>Shared by work days</span><span style={{ textAlign: 'right', fontWeight: 600 }}>$459.00</span>
+      <div className="box col g8" style={{ padding: 12 }}>
+        <div className="section">Sale to share</div>
+        <Field label="Buyer / what was sold"><input className="input" value={sale.buyer} onChange={e => setSale({ ...sale, buyer: e.target.value })} /></Field>
+        <div className="grid2">
+          <Field label="Amount ($)"><input className="input num" type="number" inputMode="decimal" value={sale.amount} onChange={e => { setSale({ ...sale, amount: e.target.value }); setMsg(''); }} /></Field>
+          <Field label="Cooperative fund %"><input className="input num" type="number" inputMode="decimal" value={sale.fund} onChange={e => setSale({ ...sale, fund: e.target.value })} /></Field>
+        </div>
+        <div className="num" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '4px 10px', fontSize: 13 }}>
+          <span>{sale.buyer || 'Sale'}</span><span style={{ textAlign: 'right' }}>${amount.toFixed(2)}</span>
+          <span style={{ color: 'var(--color-neutral-700)' }}>Cooperative fund {Number(sale.fund) || 0}%</span><span style={{ textAlign: 'right', color: 'var(--color-neutral-700)' }}>− ${fund.toFixed(2)}</span>
+          <span style={{ fontWeight: 600 }}>Shared by work days</span><span style={{ textAlign: 'right', fontWeight: 600 }}>${pool.toFixed(2)}</span>
+        </div>
       </div>
       {msg && <div className="msg">{msg}</div>}
-      <button className="btn" onClick={approve}>Approve & send mobile‑money list</button>
+      <button className="btn" onClick={approve} disabled={!members.length}>Approve & send mobile‑money list</button>
     </div>
   );
 }
@@ -313,18 +389,27 @@ export function Store() {
 
 // ---- vii Traceable bottles ----
 export function Trace() {
+  const s = useApp();
+  const batches = [...s.farm.batches].sort((x, y) => y.pressed.localeCompare(x.pressed)); // newest first
   const [i, setI] = useState(0);
-  const b = BATCHES[i];
-  const rows: [string, string][] = [['Plot', b.plot], ['Fruit collected', b.fruit], ['Pressed', b.pressed], ['Batch size', b.bottles], ['Origin', b.place], ['Cooperative', 'Abuk Project, 160 farmers']];
+  const b = batches[Math.min(i, batches.length - 1)];
+  const can = editAllowed(s.session?.user.role ?? '');
+  if (!b) return (
+    <div className="pad"><p className="body">No bottle batches yet.</p>{can && <button className="btn" onClick={() => openRegister('batches')}>+ Add a bottle batch</button>}</div>
+  );
+  const plot = s.farm.plots.find(p => p.id === b.plotId);
+  const group = plot && s.farm.groups.find(g => g.id === plot.groupId);
+  const origin = plot?.boundary[0] ? `${plot.boundary[0].lat.toFixed(2)}° N ${plot.boundary[0].lon.toFixed(2)}° E` : b.place;
+  const rows: [string, string][] = [['Plot', `${plot?.code ?? '—'} · ${group ? `${group.name} (${group.members.length} farmers)` : plot?.holder || 'individual'}`], ['Fruit collected', b.fruit || '—'], ['Pressed', b.pressed], ['Batch size', `${b.bottles} × 1 L`], ['Origin', origin || '—'], ['Cooperative', 'Abuk Project, 160 farmers']];
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <Seg items={BATCHES.map((x, j) => [j, x.id] as [number, string])} value={i} onPick={setI} fontSize={12} />
+      <Field label="Batch"><select className="input mono" value={Math.min(i, batches.length - 1)} onChange={e => setI(Number(e.target.value))}>{batches.map((x, j) => <option key={x.id} value={j}>{x.code} · {x.bottles} bottles</option>)}</select></Field>
       <div className="box" style={{ display: 'grid', gridTemplateColumns: '128px 1fr', gap: 14, alignItems: 'center', padding: 12 }}>
-        <svg viewBox="0 0 25 25" width="128" height="128" style={{ display: 'block', background: 'var(--color-neutral-100)' }}>{qrCells(b.id).map(c => <rect key={`${c.x}-${c.y}`} x={c.x} y={c.y} width="1" height="1" fill="var(--color-text)" />)}</svg>
+        <svg viewBox="0 0 25 25" width="128" height="128" style={{ display: 'block', background: 'var(--color-neutral-100)' }}>{qrCells(b.code).map(c => <rect key={`${c.x}-${c.y}`} x={c.x} y={c.y} width="1" height="1" fill="var(--color-text)" />)}</svg>
         <div className="col" style={{ gap: 3 }}>
           <div className="kick sm">Bottle label</div>
           <div className="head" style={{ fontSize: 20, lineHeight: 1.1 }}>Desert date oil, 1 L</div>
-          <div className="num" style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Batch {b.id}</div>
+          <div className="num" style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Batch {b.code}</div>
           <div className="it" style={{ fontSize: 10.5, color: 'var(--color-neutral-600)' }}>placeholder QR pattern</div>
         </div>
       </div>
@@ -333,6 +418,7 @@ export function Trace() {
         {rows.map(([k, v]) => <div key={k} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 8, padding: '8px 0', borderBottom: '1px solid var(--color-divider)', fontSize: 13.5 }}><span style={{ color: 'var(--color-neutral-700)' }}>{k}</span><span>{v}</span></div>)}
       </div>
       <button className="btn" onClick={() => window.print()}>Print labels for this batch</button>
+      {can && <button className="btn plain" onClick={() => openRegister('batches')}>+ Add or edit bottle batches</button>}
     </div>
   );
 }

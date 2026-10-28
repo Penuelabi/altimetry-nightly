@@ -1,5 +1,5 @@
 import { recessDays, ZONES, type Task } from '@abuk/core';
-import { go, setState, tab, useApp } from '../store';
+import { go, openRegister, setState, tab, useApp } from '../store';
 import { Check, Stat } from '../ui';
 import { basinOpacity, moundLines, toggleTask, useGreet, useL } from './common';
 import { usePlace } from '../net';
@@ -30,6 +30,7 @@ function Ledger() {
   const BTN: [string, () => void, boolean, string?][] = [
     ['Log harvest', () => go('harvest'), true], ['Map a plot', () => tab('map'), true], ['Processing', () => go('process'), false],
     ['Flood model', () => go('flood'), false], ['Crop check', () => go('monitor'), true], ['Data sources', () => go('sources'), false],
+    ['Farm register · plots, crops, groups', () => openRegister('plots'), false, 'span2'],
     ['Field tools · SMS alerts, voice, payout, store…', () => go('tools'), true, 'span2']
   ];
   return (

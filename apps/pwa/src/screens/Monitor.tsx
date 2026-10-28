@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { set as idbSet } from 'idb-keyval';
-import { ACTIVITIES, MIN_PHOTOS, MON_CROPS, MON_PLOTS, PESTS, SKIES, STAGES, EW_ID, monitorError, normId, whereIs } from '@abuk/core';
+import { ACTIVITIES, CRACK_WIDTH, MIN_PHOTOS, PESTS, SOIL_MOISTURE, SURFACE, WATER_AROUND, WATER_STATE, WATER_TREND, conditionSummary, plotLabel, type PlotCondition, type Term, SKIES, STAGES, EW_ID, monitorError, normId, whereIs } from '@abuk/core';
 import { record, setState, today, useApp } from '../store';
 import { oneFix, useOnline, type Fix } from '../net';
 import { Field, Seg } from '../ui';
@@ -12,7 +12,8 @@ export function Monitor() {
   const s = useApp(), online = useOnline();
   const myId = s.session?.user.id.startsWith('EW') ? s.session.user.id : '';
   const lw = lastWeather();
-  const blank = { plot: MON_PLOTS[0], ew: myId, date: isoToday(), acts: ['Weeding'], crop: 'Cowpea', stage: 'Seedbed', cond: 4, pests: [] as string[], sky: (lw?.sky ?? 'Sunny') as string, temp: lw ? String(lw.temp) : '', rain: lw ? String(lw.rain24) : '', notes: '' };
+  const plotOpts = s.farm.plots.map(p => plotLabel(p, s.farm)), cropOpts = s.farm.crops.map(c => c.name);
+  const blank = { plot: plotOpts[0] ?? '', ew: myId, date: isoToday(), acts: ['Weeding'], crop: cropOpts.includes('Cowpea') ? 'Cowpea' : cropOpts[0] ?? '', stage: 'Seedbed', cond: 4, pests: [] as string[], sky: (lw?.sky ?? 'Sunny') as string, temp: lw ? String(lw.temp) : '', rain: lw ? String(lw.rain24) : '', notes: '', condition: { moisture: '', water: '', floodDepthCm: '', around: '', aroundDepthCm: '', aroundDistanceM: '', trend: '', surface: [], crackWidth: '' } as PlotCondition };
   const [m, setM] = useState(blank);
   const [err, setErr] = useState('');
   const [saved, setSaved] = useState(false);
@@ -40,6 +41,7 @@ export function Monitor() {
   }, []);
 
   const upd = <K extends keyof typeof m>(k: K, v: (typeof m)[K]) => { edited.current.add(k); setM(x => ({ ...x, [k]: v })); setErr(''); setSaved(false); };
+  const setCond = (c: Partial<PlotCondition>) => { setM(x => ({ ...x, condition: { ...x.condition, ...c } })); setErr(''); setSaved(false); };
   const tog = (k: 'acts' | 'pests', v: string) => upd(k, m[k].includes(v) ? m[k].filter(x => x !== v) : [...m[k], v]);
 
   const save = async () => {
@@ -49,8 +51,8 @@ export function Monitor() {
     const photoKeys = await Promise.all(photos.map(async (b, i) => { const k = `photo-${Date.now()}-${i}`; await idbSet(k, b).catch(() => {}); return k; }));
     const at = new Date(), place = fix ? whereIs(fix.lat, fix.lon) : null;
     const rid = record('monitor', { ...m, ew, gps: fix && { lat: fix.lat, lon: fix.lon, acc: fix.acc }, place, stampedAt: at.toISOString(), weather: { source: wx.live ? 'open-meteo' : wx.w ? 'last reading' : 'entered', edited: [...edited.current].filter(k => ['temp', 'rain', 'sky'].includes(k)) }, photos: photoKeys });
-    setState(st => ({ monLog: [{ plot: m.plot.split(' · ')[0], crop: m.crop, acts: m.acts.join(', '), ew, date: today(), cond: m.cond, synced: false, rid }, ...st.monLog] }));
-    setM({ ...m, notes: '', pests: [] }); setPhotos([]); setSaved(true);
+    setState(st => ({ monLog: [{ plot: m.plot.split(' · ')[0], crop: m.crop, acts: m.acts.join(', '), ew, date: today(), cond: m.cond, synced: false, rid, field: conditionSummary(m.condition) }, ...st.monLog] }));
+    setM({ ...m, notes: '', pests: [], condition: { ...m.condition, surface: [], crackWidth: '', floodDepthCm: '', aroundDepthCm: '', aroundDistanceM: '' } }); setPhotos([]); setSaved(true);
     edited.current.clear();
   };
 
@@ -69,21 +71,46 @@ export function Monitor() {
           <span><span className="lbl" style={{ display: 'block' }}>Payam · auto</span>{fix ? (whereIs(fix.lat, fix.lon)?.payam ?? 'outside South Sudan') : '—'}</span>
           <span><span className="lbl" style={{ display: 'block' }}>Temperature · auto</span>{m.temp ? `${m.temp} °C` : '—'}</span>
         </div>
-        <Field label="Farm / plot"><select className="input" value={m.plot} onChange={e => upd('plot', e.target.value)}>{MON_PLOTS.map(o => <option key={o}>{o}</option>)}</select></Field>
+        <Field label="Farm / plot"><select className="input" value={m.plot} onChange={e => upd('plot', e.target.value)}>{plotOpts.map(o => <option key={o}>{o}</option>)}</select></Field>
         <div className="grid2">
           <Field label="Extension worker ID"><input className={'input num' + (err && !EW_ID.test(m.ew) ? ' bad' : '')} value={m.ew} placeholder="EW‑000" onChange={e => upd('ew', e.target.value.toUpperCase())} style={{ textTransform: 'uppercase' }} /></Field>
           <Field label="Date"><input className="input" type="date" value={m.date} onChange={e => upd('date', e.target.value)} style={{ fontSize: 14, padding: '0 8px' }} /></Field>
         </div>
       </div>
+      <div className="col g10">
+        {sec('2 · Plot condition today', 'FAO soil description terms')}
+        <TermPick label="Soil moisture (squeeze a handful from 10 cm down)" terms={SOIL_MOISTURE} value={m.condition.moisture} onPick={v => setCond({ moisture: v })} />
+        <TermPick label="Water on the plot" terms={WATER_STATE} value={m.condition.water} onPick={v => setCond({ water: v })} />
+        {['ponding', 'flooded', 'receding'].includes(m.condition.water) && <Field label="Water depth on the plot, deepest point (cm)"><input className="input num" type="number" inputMode="numeric" value={m.condition.floodDepthCm} onChange={e => setCond({ floodDepthCm: e.target.value })} /></Field>}
+        <TermPick label="Water around the plot" terms={WATER_AROUND} value={m.condition.around} onPick={v => setCond({ around: v })} />
+        {m.condition.around && m.condition.around !== 'dry' && (
+          <div className="grid2">
+            <Field label="Depth of that water (cm)"><input className="input num" type="number" inputMode="numeric" value={m.condition.aroundDepthCm} onChange={e => setCond({ aroundDepthCm: e.target.value })} /></Field>
+            {m.condition.around === 'nearby' && <Field label="Distance from plot (m)"><input className="input num" type="number" inputMode="numeric" value={m.condition.aroundDistanceM} onChange={e => setCond({ aroundDistanceM: e.target.value })} /></Field>}
+          </div>
+        )}
+        {(m.condition.water && m.condition.water !== 'none') || (m.condition.around && m.condition.around !== 'dry')
+          ? <TermPick label="Water level since the last visit" terms={WATER_TREND} value={m.condition.trend} onPick={v => setCond({ trend: v })} /> : null}
+        <div className="sub">Measure depth with a stick marked every 10 cm, at the deepest point you can reach safely.</div>
+        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Surface and damage seen (tap all that apply)</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {SURFACE.map(t => { const on = m.condition.surface.includes(t.id); return (
+            <button key={t.id} className={'chip' + (on ? ' on' : '')} style={{ minHeight: 36, padding: '0 10px', fontSize: 12.5 }} title={t.desc}
+              onClick={() => setCond({ surface: on ? m.condition.surface.filter(x => x !== t.id) : [...m.condition.surface, t.id] })}>{on ? '✓ ' : ''}{t.label}</button>
+          ); })}
+        </div>
+        {m.condition.surface.length > 0 && <div className="sub">{m.condition.surface.map(id => SURFACE.find(t => t.id === id)!).map(t => `${t.label}: ${t.desc}`).join(' · ')}</div>}
+        {m.condition.surface.includes('cracking') && <TermPick label="Widest cracks (FAO width class)" terms={CRACK_WIDTH} value={m.condition.crackWidth} onPick={v => setCond({ crackWidth: v })} showDesc />}
+      </div>
       <div className="col g8">
-        {sec('2 · Activity done')}
+        {sec('3 · Activity done')}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {ACTIVITIES.map(a => <button key={a} className={'chip' + (m.acts.includes(a) ? ' on' : '')} onClick={() => tog('acts', a)}>{m.acts.includes(a) ? '✓ ' : ''}{a}</button>)}
         </div>
       </div>
       <div className="col g10">
-        {sec('3 · Crop')}
-        <Field label="Crop"><select className="input" value={m.crop} onChange={e => upd('crop', e.target.value)}>{MON_CROPS.map(o => <option key={o}>{o}</option>)}</select></Field>
+        {sec('4 · Crop')}
+        <Field label="Crop"><select className="input" value={m.crop} onChange={e => upd('crop', e.target.value)}>{cropOpts.map(o => <option key={o}>{o}</option>)}</select></Field>
         <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Growth stage</div>
         <Seg items={STAGES.map(x => [x, x] as [string, string])} value={m.stage} onPick={v => upd('stage', v)} fontSize={12} />
         <div className="between"><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Condition</span><span className="it" style={{ fontSize: 12.5, color: 'var(--color-accent-800)' }}>{['', 'failing', 'poor', 'fair', 'good', 'excellent'][m.cond]}</span></div>
@@ -96,7 +123,7 @@ export function Monitor() {
         </div>
       </div>
       <div className="col g10">
-        {sec('4 · Local weather', wx.live ? `auto from Open‑Meteo ${new Date(wx.w!.at).toTimeString().slice(0, 5)}, editable` : wx.w ? `offline: last reading ${new Date(wx.w.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : fix ? (wx.err ? 'no weather data: enter by hand' : 'fetching weather…') : 'waiting for GPS')}
+        {sec('5 · Local weather', wx.live ? `auto from Open‑Meteo ${new Date(wx.w!.at).toTimeString().slice(0, 5)}, editable` : wx.w ? `offline: last reading ${new Date(wx.w.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : fix ? (wx.err ? 'no weather data: enter by hand' : 'fetching weather…') : 'waiting for GPS')}
         <Seg items={SKIES.map(x => [x, x] as [string, string])} value={m.sky} onPick={v => upd('sky', v)} fontSize={12.5} />
         <div className="grid2">
           <Field label="Temperature °C"><input className="input num" type="number" value={m.temp} onChange={e => upd('temp', e.target.value)} /></Field>
@@ -104,7 +131,7 @@ export function Monitor() {
         </div>
       </div>
       <div className="col g10">
-        {sec('5 · Evidence')}
+        {sec('6 · Evidence')}
         <div className="between"><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Photos: whole plot, close-up of leaves, any damage</span><span className="num" style={{ fontSize: 12.5, color: photos.length >= MIN_PHOTOS ? 'var(--color-accent-800)' : 'var(--color-text)' }}>{photos.length} / {MIN_PHOTOS}{photos.length >= MIN_PHOTOS ? ' ✓' : ''}</span></div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
           {urls.map((u, i) => (
@@ -127,11 +154,25 @@ export function Monitor() {
         <h2 className="h2 h20 rule" style={{ marginBottom: 2 }}>Recent checks</h2>
         {s.monLog.map((r, i) => (
           <div key={i} className="rowg">
-            <span><span style={{ display: 'block', fontSize: 14 }}>{r.plot} · {r.crop}</span><span className="sub">{r.acts} · {r.ew} · {r.date}</span></span>
+            <span><span style={{ display: 'block', fontSize: 14 }}>{r.plot} · {r.crop}</span><span className="sub">{r.acts} · {r.ew} · {r.date}</span>{r.field && <span className="sub" style={{ display: 'block' }}>{r.field}</span>}</span>
             <span style={{ textAlign: 'right' }}><span className="head" style={{ display: 'block', fontSize: 19 }}>{r.cond}/5</span><span className="it" style={{ fontSize: 11, color: 'var(--color-accent-700)' }}>{r.synced ? 'synced' : 'on phone'}</span></span>
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// One-of picker for a list of standard terms; the chosen term's description shows underneath.
+function TermPick({ label, terms, value, onPick, showDesc }: { label: string; terms: Term[]; value: string; onPick: (id: string) => void; showDesc?: boolean }) {
+  const cur = terms.find(t => t.id === value);
+  return (
+    <div className="col g6">
+      <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>{label}</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {terms.map(t => <button key={t.id} className={'chip' + (value === t.id ? ' on' : '')} style={{ minHeight: 36, padding: '0 10px', fontSize: 12.5 }} onClick={() => onPick(t.id)}>{t.label}{showDesc ? ` ${t.desc}` : ''}</button>)}
+      </div>
+      {cur && !showDesc && <div className="sub it">{cur.desc}</div>}
     </div>
   );
 }

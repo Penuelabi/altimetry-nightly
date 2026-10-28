@@ -105,3 +105,32 @@ describe('http', () => {
     expect(parseInbound({ event: 'sms:received', payload: { phoneNumber: '+211', message: 'G 4.1' } })).toEqual({ from: '+211', text: 'G 4.1' });
   });
 });
+
+describe('farm register http', () => {
+  it('requires sign-in', async () => {
+    process.env.SESSION_SECRET = 'x'.repeat(40);
+    expect((await app.request('/api/farm')).status).toBe(401);
+  });
+  it('lets only admins and leads change it', async () => {
+    process.env.SESSION_SECRET = 'x'.repeat(40);
+    const { user } = makeUser([], 'Nyandeng Ajak', 'Extension worker', 30);
+    const { token } = await issueSession(user);
+    const r = await app.request('/api/farm/ops', { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ ops: [] }) });
+    expect(r.status).toBe(403);
+  });
+});
+
+import { parseRow } from '../src/dashboard';
+describe('dashboard', () => {
+  it('parses synced sheet rows', () => {
+    expect(parseRow('monitor', ['r1', '2026-10-28T09:00:00Z', 'EW‑014', '{"plot":"B‑07"}'])).toMatchObject({ kind: 'monitor', by: 'EW‑014', data: { plot: 'B‑07' } });
+    expect(parseRow('monitor', ['', '', '', ''])).toBeNull();
+    expect(parseRow('harvest', ['r2', '2026-10-28', 'x', 'not json'])!.data).toEqual({ raw: 'not json' });
+  });
+  it('is admin only', async () => {
+    process.env.SESSION_SECRET = 'x'.repeat(40);
+    const { user } = makeUser([], 'Deng Bol', 'Group lead', 30);
+    const { token } = await issueSession(user);
+    expect((await app.request('/api/admin/overview', { headers: { authorization: `Bearer ${token}` } })).status).toBe(403);
+  });
+});

@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { LISTINGS, PROC } from '@abuk/core';
-import { go, record, setState, tab, useApp } from '../store';
+import { LISTINGS, PROC, editAllowed } from '@abuk/core';
+import { go, openRegister, record, setState, tab, useApp } from '../store';
 import { Seg } from '../ui';
 
 export function Process() {
+  const s = useApp();
   const [k, setK] = useState<keyof typeof PROC>('balanites');
-  const p = PROC[k];
+  // Latest recorded run for this product; the design's sample figures until one exists.
+  const run = s.farm.runs.filter(r => r.chain === k).sort((a, b) => b.date.localeCompare(a.date))[0];
+  const p = run ? { intro: `Latest run, ${new Date(run.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}. ${s.farm.runs.filter(r => r.chain === k).length} run(s) recorded.`, steps: run.steps.filter(x => x.out).map(x => ({ name: x.name, out: x.out, note: '' })), foot: run.note } : PROC[k];
+  const can = editAllowed(s.session?.user.role ?? '');
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
       <Seg items={[['balanites', PROC.balanites.label], ['moringa', PROC.moringa.label]]} value={k} onPick={setK} />
@@ -21,7 +25,8 @@ export function Process() {
         ))}
       </div>
       <div style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10, fontSize: 12.5, color: 'var(--color-neutral-800)' }}>{p.foot}</div>
-      <button className="btn" onClick={() => tab('market')}>List stock in the market</button>
+      {can && <button className="btn" onClick={() => openRegister('runs')}>+ Record a processing run</button>}
+      <button className="btn plain" onClick={() => tab('market')}>List stock in the market</button>
     </div>
   );
 }

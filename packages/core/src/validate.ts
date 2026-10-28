@@ -1,3 +1,5 @@
+import { conditionError, type PlotCondition } from './condition';
+
 export const EW_ID = /^EW[‑-]?\d{3}$/;
 export const WORKER_ID = /^(EW|AD)[‑-]\d{3}$/;
 export const ACCESS_KEY = /^abk_[A-Za-z0-9]{6,}$/;
@@ -12,11 +14,12 @@ export function harvestError(kg: number): string {
 }
 
 export const MIN_PHOTOS = 3;
-export function monitorError(m: { ew: string; acts: string[]; date: string; photos?: number }): string {
+export function monitorError(m: { ew: string; acts: string[]; date: string; photos?: number; condition?: PlotCondition }): string {
   const errs: string[] = [];
   if (!EW_ID.test(m.ew)) errs.push('extension worker ID like EW‑014');
   if (!m.acts.length) errs.push('at least one activity');
   if (!m.date) errs.push('a date');
+  if (m.condition) { const c = conditionError(m.condition); if (c) errs.push(c); }
   if (m.photos !== undefined && m.photos < MIN_PHOTOS) errs.push(`at least ${MIN_PHOTOS} photos (${m.photos} so far)`);
   return errs.length ? 'Add ' + errs.join(', ') + '.' : '';
 }

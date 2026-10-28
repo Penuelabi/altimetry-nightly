@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { basinDepth, haversineKm, polygonHa, whereIs, type Terrain } from '@abuk/core';
-import { go, record, setState, useApp, type Plot } from '../store';
+import { basinDepth, editAllowed, haversineKm, newId, polygonHa, whereIs, type Plot as FarmPlot, type Terrain, type Zone } from '@abuk/core';
+import { farmChange, go, record, setState, useApp, type Plot } from '../store';
 import { api, explain } from '../api';
 import { useOnline, usePlace } from '../net';
 import { LiveMap } from '../LiveMap';
-import { Icon } from '../ui';
+import { Field, Icon, Seg } from '../ui';
 
 interface Pt { lat: number; lon: number; acc: number; alt: number | null }
 interface Capture { mode: 'walk' | 'pin'; pts: Pt[]; done: boolean; err: string }
@@ -63,12 +63,35 @@ export function MapScreen() {
     api<Terrain>(`/api/terrain?lat=${centre.lat}&lon=${centre.lon}`).then(setTerrain, e => setTerrErr(explain(e)));
   }, [cap?.done, online]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Where the capture goes: an existing plot in the farm register, or a new one.
+  const canEdit = editAllowed(s.session?.user.role ?? '');
+  const [target, setTarget] = useState('new');
+  const [np, setNp] = useState({ code: '', zone: 'basin' as Zone, crop: s.farm.crops[0]?.name ?? '', groupId: '' });
+  const [saveErr, setSaveErr] = useState('');
+  const [savedMsg, setSavedMsg] = useState('');
+
   const save = () => {
     if (!cap || !centre) return;
-    const plot: Plot = { id: `P‑${s.plots.length + 39}`, mode: cap.mode, pts: cap.mode === 'walk' ? cap.pts.map(({ lat, lon }) => ({ lat, lon })) : [centre], ha: cap.mode === 'walk' ? polygonHa(cap.pts) : 0, elevation: terrain?.elevation ?? gpsAlt, slopePct: terrain?.slopePct ?? null, at: new Date().toISOString() };
-    setState(st => ({ plots: [...st.plots, plot] }));
-    record('plot', { ...plot });
-    setCap(null);
+    const pts = cap.mode === 'walk' ? cap.pts.map(({ lat, lon }) => ({ lat, lon })) : [centre];
+    const ha = cap.mode === 'walk' ? Math.round(polygonHa(cap.pts) * 100) / 100 : null;
+    const capture: Plot = { id: `P‑${Date.now().toString(36)}`, mode: cap.mode, pts, ha: ha ?? 0, elevation: terrain?.elevation ?? gpsAlt, slopePct: terrain?.slopePct ?? null, at: new Date().toISOString() };
+    let code = '';
+    if (canEdit) {
+      if (target === 'new') {
+        if (!np.code.trim()) return setSaveErr('Give the new plot a code, e.g. B‑13.');
+        if (s.farm.plots.some(p => p.code.toLowerCase() === np.code.trim().toLowerCase())) return setSaveErr('A plot with that code exists; pick it under "Save to".');
+        const plot: FarmPlot = { id: newId('plot'), code: np.code.trim(), zone: np.zone, crop: np.crop, groupId: np.groupId, holder: '', areaHa: ha, boundary: pts, notes: '' };
+        farmChange({ op: 'upsert', kind: 'plot', item: plot }); code = plot.code;
+      } else {
+        const old = s.farm.plots.find(p => p.id === target)!;
+        farmChange({ op: 'upsert', kind: 'plot', item: { ...old, boundary: pts, areaHa: ha ?? old.areaHa } }); code = old.code;
+      }
+    }
+    // The raw capture is also recorded, so extension workers' mapping reaches the office too.
+    setState(st => ({ plots: [...st.plots, capture] }));
+    record('plot', { ...capture, plot: code || null });
+    setSavedMsg(code ? `Saved to plot ${code}.` : 'Saved. An admin or group lead will attach it to a plot.');
+    setCap(null); setSaveErr(''); setNp({ ...np, code: '' }); setTarget('new');
   };
 
   const readouts = cap && centre ? [
@@ -83,7 +106,7 @@ export function MapScreen() {
   return (
     <div className="col">
       <div style={{ position: 'relative', borderBottom: '1px solid var(--color-divider)' }}>
-        <LiveMap here={place} gps={place.gps} acc={place.acc} plots={s.plots.map(p => p.pts)} track={cap?.pts ?? []} closed={!!cap?.done} />
+        <LiveMap here={place} gps={place.gps} acc={place.acc} plots={[...s.farm.plots.filter(p => p.boundary.length).map(p => p.boundary), ...s.plots.map(p => p.pts)]} track={cap?.pts ?? []} closed={!!cap?.done} />
         <div style={{ position: 'absolute', left: 10, bottom: 10, zIndex: 500, display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-start' }}>
           <span className="num" style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '3px 6px' }}>{place.payam} · {place.county} · {place.state}</span>
           <span className="num" style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '3px 6px' }}>{place.gps ? `${place.lat.toFixed(5)}° N, ${place.lon.toFixed(5)}° E${place.acc ? ` ±${Math.round(place.acc)} m` : ''}` : 'Waiting for GPS… showing the farm'} · 150 m buffer</span>
@@ -105,7 +128,8 @@ export function MapScreen() {
               <Icon d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0 M12 7a3 3 0 1 0 0 6a3 3 0 1 0 0-6" size={20} sw={1.6} />Drop a pin
             </button>
           </div>
-          <div className="note" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>{38 + s.plots.length} plots mapped · 2,640 trees pinned · 112 individual, 48 group plots</div>
+          {savedMsg && <div className="msg">{savedMsg}</div>}
+          <div className="note" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>{s.farm.plots.length} plots in the farm register · {s.farm.plots.filter(p => p.boundary.length > 2).length} with a mapped boundary</div>
         </div>
       ) : (
         <div className="pad g12" style={{ paddingTop: 14 }}>
@@ -117,6 +141,23 @@ export function MapScreen() {
           {readouts.length > 0 && (
             <div className="grid2" style={{ gap: 0, borderTop: '1px solid var(--color-divider)' }}>
               {readouts.map(r => <div key={r.k} style={{ padding: '8px 0', borderBottom: '1px solid var(--color-divider)' }}><div className="lbl">{r.k}</div><div className="head num" style={{ fontSize: 19 }}>{r.v}</div><div style={{ fontSize: 10.5, color: 'var(--color-neutral-600)' }}>{r.src}</div></div>)}
+            </div>
+          )}
+          {cap.done && canEdit && (
+            <div className="box col g10" style={{ padding: 12 }}>
+              <Field label="Save to"><select className="input" value={target} onChange={e => { setTarget(e.target.value); setSaveErr(''); }}>
+                <option value="new">New plot…</option>
+                {s.farm.plots.map(p => <option key={p.id} value={p.id}>{p.code} · {p.crop}{p.boundary.length > 2 ? ' (replace boundary)' : ''}</option>)}
+              </select></Field>
+              {target === 'new' && <>
+                <div className="grid2">
+                  <Field label="Plot code"><input className="input" value={np.code} placeholder="B‑13" onChange={e => { setNp({ ...np, code: e.target.value.toUpperCase() }); setSaveErr(''); }} /></Field>
+                  <Field label="Main crop"><select className="input" value={np.crop} onChange={e => setNp({ ...np, crop: e.target.value })}>{s.farm.crops.map(c => <option key={c.id}>{c.name}</option>)}</select></Field>
+                </div>
+                <Seg items={[['ridge', 'Ridge'], ['slope', 'Slope'], ['basin', 'Basin']]} value={np.zone} onPick={z => setNp({ ...np, zone: z })} />
+                <Field label="Group"><select className="input" value={np.groupId} onChange={e => setNp({ ...np, groupId: e.target.value })}><option value="">Individual</option>{s.farm.groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
+              </>}
+              {saveErr && <div className="msg">{saveErr}</div>}
             </div>
           )}
           <div className="grid2">

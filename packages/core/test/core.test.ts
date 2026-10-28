@@ -65,3 +65,47 @@ describe('payam lookup', () => {
     expect(whereIs(0, 0)).toBeNull();
   });
 });
+
+import { applyOps, seedRegister, opError, plotLabel } from '../src';
+describe('farm register', () => {
+  it('seeds the design farm', () => {
+    const r = seedRegister();
+    expect(r.plots.map(p => p.code)).toContain('B‑07');
+    expect(r.groups.find(g => g.id === 'g4')!.members).toHaveLength(12);
+  });
+  it('applies upserts, removes and work days in order', () => {
+    let r = seedRegister();
+    r = applyOps(r, [
+      { op: 'upsert', kind: 'crop', item: { id: 'shea-nuts', name: 'Shea nuts' } },
+      { op: 'upsert', kind: 'plot', item: { ...r.plots[0], code: 'R‑02a' } },
+      { op: 'remove', kind: 'plot', id: 'S‑01' },
+      { op: 'workdays', groupId: 'g4', memberIds: ['g4m1'] }
+    ]);
+    expect(r.crops.at(-1)!.name).toBe('Shea nuts');
+    expect(r.plots[0].code).toBe('R‑02a');
+    expect(r.plots.some(p => p.id === 'S‑01')).toBe(false);
+    expect(r.groups.find(g => g.id === 'g4')!.members[0].workDays).toBe(42);
+    expect(r.version).toBe(5);
+    expect(plotLabel(r.plots.find(p => p.id === 'B‑07')!, r)).toBe('B‑07 · Group 4');
+  });
+  it('validates ops', () => {
+    expect(opError({ op: 'upsert', kind: 'crop', item: { id: 'x', name: ' ' } })).toMatch(/name/);
+    expect(opError({ op: 'remove', kind: 'plot', id: '' })).toMatch(/id/);
+  });
+});
+
+import { conditionSummary } from '../src';
+describe('plot condition', () => {
+  const base = { moisture: 'wet', water: 'none', floodDepthCm: '', around: 'dry', aroundDepthCm: '', aroundDistanceM: '', trend: '', surface: [] as string[], crackWidth: '' };
+  it('asks for what is missing', () => {
+    expect(monitorError({ ew: 'EW-014', acts: ['Weeding'], date: 'x', condition: { ...base, moisture: '' } })).toBe('Add soil moisture.');
+    expect(monitorError({ ew: 'EW-014', acts: ['Weeding'], date: 'x', condition: { ...base, water: 'flooded' } })).toBe('Add the water depth on the plot in cm.');
+    expect(monitorError({ ew: 'EW-014', acts: ['Weeding'], date: 'x', condition: { ...base, around: 'nearby', aroundDepthCm: '40' } })).toBe('Add how far away the nearest water is in metres.');
+    expect(monitorError({ ew: 'EW-014', acts: ['Weeding'], date: 'x', condition: { ...base, around: 'edge', aroundDepthCm: '40' } })).toBe('Add whether the water is rising or falling.');
+    expect(monitorError({ ew: 'EW-014', acts: ['Weeding'], date: 'x', condition: { ...base, surface: ['cracking'] } })).toBe('Add the crack width.');
+  });
+  it('summarises in plain words', () => {
+    expect(conditionSummary({ ...base, moisture: 'dry', surface: ['cracking', 'silt'], crackWidth: 'wide' })).toBe('Dry, wide cracks, silt deposited');
+    expect(conditionSummary({ ...base, water: 'flooded', floodDepthCm: '30', around: 'surrounding', aroundDepthCm: '60', trend: 'falling' })).toBe('Wet, flooded 30 cm, water surrounding 60 cm, falling');
+  });
+});

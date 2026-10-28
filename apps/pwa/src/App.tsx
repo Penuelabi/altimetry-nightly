@@ -18,16 +18,17 @@ import { Sources } from './screens/Sources';
 import { Account, PinLock, SignIn } from './screens/Account';
 import { Admin } from './screens/Admin';
 import { Tools, Alerts, Gauge, Voice, Pest, Payout, Store, Trace, P2p } from './screens/Tools';
+import { RegisterScreen } from './screens/Register';
 
 const SCREENS: Record<Screen, () => ReactElement> = {
   home: Home, map: MapScreen, flood: Flood, season: Season, tasks: Tasks, plot: Plot, harvest: Harvest, process: Process, market: Market,
   guide: Guide, species: Species, monitor: Monitor, sources: Sources, signin: Account, admin: Admin, tools: Tools, alerts: Alerts,
-  gauge: Gauge, voice: Voice, pest: Pest, payout: Payout, store: Store, trace: Trace, p2p: P2p
+  gauge: Gauge, voice: Voice, pest: Pest, payout: Payout, store: Store, trace: Trace, p2p: P2p, register: RegisterScreen
 };
 
 // Which bottom tab lights up for screens reached from inside another tab (as in the design).
 const navKeyFor = (s: Screen): NavKey => {
-  if (['monitor', 'signin', 'admin', 'tools', 'alerts', 'gauge', 'voice', 'pest', 'payout', 'store', 'p2p', 'tasks', 'harvest'].includes(s)) return 'home';
+  if (['monitor', 'signin', 'admin', 'register', 'tools', 'alerts', 'gauge', 'voice', 'pest', 'payout', 'store', 'p2p', 'tasks', 'harvest'].includes(s)) return 'home';
   if (['flood', 'plot', 'sources'].includes(s)) return 'map';
   if (['trace', 'process'].includes(s)) return 'market';
   if (s === 'species') return 'guide';
@@ -50,7 +51,7 @@ export function App() {
   const title = gated === 'pin' ? 'Unlock' : scr === 'species' ? (SPECIES.find(x => x.key === s.species)?.name ?? 'Abuk') : TITLES[lang][scr];
   const Body = SCREENS[scr];
   const navKey = navKeyFor(scr);
-  const net = online ? (s.outbox.length === 0 ? L.synced : L.online) : `${L.offline} · ${s.outbox.length} ${L.queued}`;
+  const net = online ? (s.outbox.length + s.farmOps.length === 0 ? L.synced : L.online) : `${L.offline} · ${s.outbox.length + s.farmOps.length} ${L.queued}`;
 
   return (
     <div className="stage">

@@ -2,6 +2,7 @@ node_modules
 **/node_modules
 apps/pwa/android
 apps/pwa/dist
+apps/dashboard/dist
 project
 chats
 .git
