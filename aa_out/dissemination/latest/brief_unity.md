@@ -1,6 +1,6 @@
 # Unity - anticipatory action situation brief
 
-Prepared 2026-10-27 15:44 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-24; ECMWF run 2026-10-27 00 UTC.
+Prepared 2026-10-28 00:47 UTC for the Unity state TWG-AA. Rain and soil data to 2026-10-24; ECMWF run 2026-10-27 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -14,13 +14,13 @@ Prepared 2026-10-27 15:44 UTC for the Unity state TWG-AA. Rain and soil data to 
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
 | Mayom | Unity | **ORANGE** | drought / dry spell | 7 | 0% | 22,600 |
-| Pariang | Unity | **ORANGE** | drought / dry spell | 4 | 0% | 4,128 |
-| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 3 | 0% | 165 |
-| Guit | Unity | **YELLOW** | flood / waterlogging | 7 | 0% | 3,497 |
-| Koch | Unity | **YELLOW** | flood / waterlogging | 10 | 0% | 513 |
-| Leer | Unity | **YELLOW** | flood / waterlogging | 13 | 0% | 985 |
-| Mayendit | Unity | **YELLOW** | flood / waterlogging | 11 | 0% | 2,032 |
-| Panyijiar | Unity | **YELLOW** | flood / waterlogging | 15 | 0% | 4,064 |
+| Pariang | Unity | **ORANGE** | drought / dry spell | 3 | 0% | 4,128 |
+| Abiemnhom | Unity | **YELLOW** | drought / dry spell | 4 | 0% | 165 |
+| Guit | Unity | **YELLOW** | flood / waterlogging | 8 | 0% | 3,497 |
+| Koch | Unity | **YELLOW** | flood / waterlogging | 11 | 0% | 513 |
+| Leer | Unity | **YELLOW** | flood / waterlogging | 12 | 0% | 985 |
+| Mayendit | Unity | **YELLOW** | flood / waterlogging | 12 | 0% | 2,032 |
+| Panyijiar | Unity | **YELLOW** | drought / dry spell | 11 | 0% | 4,064 |
 | Rubkona | Unity | **YELLOW** | flood / waterlogging | 6 | 0% | 16,480 |
 
 ## Anticipatory action plans

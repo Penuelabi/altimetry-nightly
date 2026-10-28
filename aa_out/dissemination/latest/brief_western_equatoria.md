@@ -1,20 +1,20 @@
 # Western Equatoria - anticipatory action situation brief
 
-Prepared 2026-10-27 15:44 UTC for the Western Equatoria state TWG-AA. Rain and soil data to 2026-10-24; ECMWF run 2026-10-27 00 UTC.
+Prepared 2026-10-28 00:47 UTC for the Western Equatoria state TWG-AA. Rain and soil data to 2026-10-24; ECMWF run 2026-10-27 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
-- Counties by alert level: red 1, orange 0, yellow 3, green 6.
+- Counties by alert level: red 1, orange 1, yellow 2, green 6.
 - No anticipatory action plan is in readiness or activated.
 - River gauges at a proposed trigger level: 0 counties (0 at activation level).
 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Mvolo | Western Equatoria | **RED** | drought / dry spell | 17 | 0% | 135 |
-| Mundri East | Western Equatoria | **YELLOW** | flood / waterlogging | 20 | 0% | 59 |
-| Mundri West | Western Equatoria | **YELLOW** | flood / waterlogging | 21 | 0% | 42 |
+| Mvolo | Western Equatoria | **RED** | drought / dry spell | 9 | 0% | 135 |
+| Mundri East | Western Equatoria | **ORANGE** | drought / dry spell | 9 | 0% | 59 |
+| Mundri West | Western Equatoria | **YELLOW** | drought / dry spell | 10 | 0% | 42 |
 | Nagero | Western Equatoria | **YELLOW** | drought / dry spell | 17 | 0% | 34 |
 
 ## Decisions for the group
