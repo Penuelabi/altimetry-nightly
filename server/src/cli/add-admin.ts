@@ -7,13 +7,18 @@ import { changeUsers, loadUsers, makeUser } from '../auth';
 
 const name = process.argv.slice(2).join(' ').trim();
 const keyFile = process.env.ADMIN_KEY_FILE;
-if (name.split(/\s+/).length < 2) { console.error('Usage: add-admin "First Last"'); process.exit(1); }
-if (keyFile && (await loadUsers(true)).users.some(u => u.role === 'Admin' && u.on)) { console.log('An admin already exists; nothing to do.'); process.exit(0); }
-let key = '', id = '';
-const r = await changeUsers(`add admin (hash only)`, f => {
-  const m = makeUser(f.users, name, 'Admin', 365);
-  key = m.key; id = m.user.id;
-  return { users: [m.user, ...f.users] };
-});
-if (keyFile) { writeFileSync(keyFile, key, { mode: 0o600 }); console.log(`Admin ${id} added (commit ${r.commit.slice(0, 7)}); key stored, not printed.`); }
-else console.log(`Admin ${id} added (commit ${r.commit.slice(0, 7)}).\nAccess key, shown once:\n\n  ${key}\n`);
+try {
+  if (name.split(/\s+/).length < 2) { console.error('Usage: add-admin "First Last"'); process.exit(1); }
+  if (keyFile && (await loadUsers(true)).users.some(u => u.role === 'Admin' && u.on)) { console.log('An admin already exists; nothing to do.'); process.exit(0); }
+  let key = '', id = '';
+  const r = await changeUsers(`add admin (hash only)`, f => {
+    const m = makeUser(f.users, name, 'Admin', 365);
+    key = m.key; id = m.user.id;
+    return { users: [m.user, ...f.users] };
+  });
+  if (keyFile) { writeFileSync(keyFile, key, { mode: 0o600 }); console.log(`Admin ${id} added (commit ${r.commit.slice(0, 7)}); key stored, not printed.`); }
+  else console.log(`Admin ${id} added (commit ${r.commit.slice(0, 7)}).\nAccess key, shown once:\n\n  ${key}\n`);
+} catch (e) {
+  console.error(`add-admin failed: ${(e as Error).message}`);
+  process.exit(1);
+}

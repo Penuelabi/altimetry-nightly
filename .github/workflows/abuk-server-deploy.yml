@@ -105,7 +105,7 @@ jobs:
           npm ci --omit=dev -w server -w packages/core --include-workspace-root=false > npm.log 2>&1 || { tail -20 npm.log; echo "::error::npm ci failed: $(grep -m2 'ERR' npm.log | tr '\n' ' ')"; exit 1; }
           if ! npm run add-admin -w server -- "$ADMIN_NAME" > admin.log 2>&1; then
             cat admin.log
-            echo "::error::Creating the first admin failed: $(grep -m3 -E 'Error|GitHub|denied|not configured' admin.log | tr '\n' ' ')"
+            echo "::error::Creating the first admin failed: $(grep -v -E '^npm (error|ERR)|^ +at |^>|^$' admin.log | tail -5 | tr '\n' ' ')"
             exit 1
           fi
           cat admin.log
