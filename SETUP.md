@@ -1,97 +1,86 @@
-# Nightly altimetry update on GitHub Actions (00:00 Cairo time)
+# Abuk Project app: setup
 
-Every night GitHub starts a small Linux machine, copies your working files from
-the `colab_waterlevel` Drive folder, runs the four steps (check merged → download
-new DAHITI/Hydroweb → GEE climate for new rows → upload new rows to GEE), and
-saves the updated files back to the same Drive folder. Nothing needs to be open
-on your laptop.
+This repo implements the Claude Design handoff in `project/AbukApp.dc.html`, the Duk County · Abuk Project field app. The handoff notes are in `README.md` and `chats/`.
 
+| Path | What it is |
+| --- | --- |
+| `packages/core` | Shared by every client: seed data from the design, the flood recession model, form validation, geo helpers, API types. |
+| `server` | Node API (Hono). It holds every secret and talks to GitHub, Google Drive / Sheets / Earth Engine, and the SMS gateway. |
+| `apps/dashboard` | Admin dashboard, served by the server at `/admin`: updates per day, items needing attention (floods, damage, pests, poor crop health), a map of plots and crop checks, latest updates with CSV download, workers and farm-register history. Admins sign in with their access key. |
+| `apps/pwa` | Installable, offline-first web app (React + Vite). It covers all 24 screens and the three home layouts (pick one under the header logo → Home screen). |
+
+React Native and Kotlin/Compose ports come next. They will reuse `packages/core` (RN) and the same server API.
+
+## Run locally
+
+```sh
+npm install
+cp server/.env.example server/.env      # fill in what you have
+npm run dev:server                      # :8787; logs which integrations are missing
+npm run dev:pwa                         # :5173; proxies /api to the server
+npm test
 ```
-.github/workflows/nightly-altimetry.yml   schedule + steps
-cairo_midnight_check.py                   picks the trigger that is 00:00 in Cairo
-drive_sync.py                             Drive folder <-> runner (service account)
-merge_dahiti_hydroweb.py                  the pipeline (keys come from GitHub secrets)
-requirements.txt
+
+The development build has an "Open demo with sample data" link on the sign-in screen. Production builds don't include it.
+
+## Configuration (server environment)
+
+Missing values don't crash the server. The affected endpoint returns `503 not_configured` with the missing variable names, and the app shows that message. `GET /api/health` lists what is set.
+
+| Variable | Used for |
+| --- | --- |
+| `SESSION_SECRET` | Signs 30-day session tokens. Any long random string. |
+| `GITHUB_ACCESS_REPO`, `GITHUB_TOKEN`, `GITHUB_BRANCH` | Private repo with `users.json` (scrypt hashes of access keys only), `data/gauge.json` and `config/*.json`. Use a fine-grained token with *Contents: read & write* on that one repo. |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | One service account for Drive, Sheets and Earth Engine. Share the Drive folder and the records sheet with its email, and register it for Earth Engine. |
+| `DRIVE_FOLDER_ID` | Defaults to the colab_waterlevel folder `1EyYopiOghPmHyJyBuH8DCp9PJv1zvCzV`. |
+| `SHEET_ID` | Google Sheet that receives synced records ("Abuk Project records" in the colab_waterlevel folder). The server adds one tab per record kind the first time it is used. |
+| `GEE_PROJECT`, `GEE_SOIL_MOISTURE_ASSET`, `GEE_SOIL_MOISTURE_BAND`, `GEE_FLOOD_EXTENT_ASSET` | Earth Engine assets. Prefix an ImageCollection with `ic:` to use its newest image. The flood asset should be a 0/1 water mask. |
+| `SMS_PROVIDER` (`smsgate`, `africastalking` or `twilio`), `SMS_API_URL`, `SMS_API_KEY`, `SMS_USERNAME`, `SMS_SENDER_ID` | Flood alerts and gauge replies. For SMSGate (as in altimetry-nightly), use the username and password from the gateway app. For Twilio, `SMS_USERNAME` is the account SID. |
+| `SMS_WEBHOOK_SECRET` | Point the provider's inbound-SMS webhook at `/api/sms/inbound?secret=…`. |
+| `ALLOWED_ORIGIN` | The PWA's origin, for CORS. |
+
+The PWA reads `VITE_API_URL` at build time when the API runs on a different origin.
+
+### First admin
+
+```sh
+npm run add-admin -w server -- "Garang Mabior"
 ```
 
----
+This commits the hash to `users.json` and prints the key once. Admins then create other users in the app (Access & keys). Each key is shown once.
 
-## 1. Service account in Google Cloud (project `ee-penuelabi`)
+### Group-lead phone numbers
 
-1. Open <https://console.cloud.google.com/iam-admin/serviceaccounts?project=ee-penuelabi>
-   → **Create service account**. Name: `altimetry-nightly` → **Create and continue**.
-2. Add two roles, then **Done**:
-   - **Earth Engine Resource Writer** (read data, write your `altimetry` assets)
-   - **Service Usage Consumer**
-3. Click the new account → **Keys** → **Add key** → **Create new key** → **JSON**.
-   A `.json` file downloads. Treat it like a password: never email it or commit it.
-4. Enable the Drive API for the project:
-   <https://console.cloud.google.com/apis/library/drive.googleapis.com?project=ee-penuelabi> → **Enable**.
-   (The Earth Engine API is already enabled - your Colab runs use it.)
+Phone numbers never ship in the app. Add them to `config/leads.json` in the access repo:
 
-Copy the service account's email; it looks like
-`altimetry-nightly@ee-penuelabi.iam.gserviceaccount.com`.
+```json
+[{ "id": "achol", "name": "Achol Deng", "group": "Group 4", "rows": "B‑01–B‑08", "phone": "+211920000214", "lang": "en" }]
+```
 
-## 2. Share the Drive folder with it
+## What is live vs. sample
 
-1. In Google Drive, open `My Drive / colab_waterlevel` → **Share** → paste the
-   service account email → role **Editor** → untick "Notify" → **Share**.
-2. Copy the folder ID from the address bar:
-   `https://drive.google.com/drive/folders/`**`1AbCdEf...`** ← that part.
-3. Make sure these files already exist in the folder (a service account can update
-   files you own, but can't create new ones in a personal Drive):
+**Live once configured:**
+- sign-in, users and keys
+- data pull: `station_status.csv` filtered by radius, the county bulletin row, ECMWF IFS, payam lookup from `ssd_payam`, Earth Engine soil moisture and flood extent
+- terrain elevation and slope (SRTM) for mapped plots
+- record sync to Sheets
+- SMS alerts and inbound gauge readings
+- real phone GPS for plot mapping and crop checks
+- the offline outbox
 
-   | File | Created by |
-   |---|---|
-   | `merged_altimetry_stations.csv` / `.xlsx` | a Colab run of the latest script |
-   | `gee_uploaded_keys.csv` | a Colab run that reaches Step 4 |
-   | `dahiti_water_levels_raw.xlsx`, `hydroweb_water_levels_raw.xlsx` | a Colab run |
-   | `HYDROWEB_RIVERS_OPE.zip`, `HYDROWEB_LAKES_OPE.zip` | a Colab run |
-   | `cache_climate_15d.csv`, `cache_elevation.csv` | a Colab run |
-   | `nightly_run_log.txt` | the Colab midnight cell - or upload an empty text file with this name |
+**Still sample or preview:**
+- the basin-depth recession model: a linear 0.92 m at 2.5 cm/day, as in the design; not yet fitted to gauge data
+- the bulletin text and model inputs until the first pull
+- zone, plot, processing, market and payout figures
+- the pest matcher (no reference library yet)
+- the QR pattern (placeholder)
+- Bluetooth phone-to-phone swap: browsers can't do it, so it's left for the Android builds
+- Dinka strings: these need a community translator
 
-   If one is missing, the workflow's last step lists it. Uploading an empty file
-   with that exact name is enough; the next run fills it in.
+**Data finding:** `station_status.csv` has no altimetry station within 20 km, or even 50 km, of the farm point (7.731° N, 31.402° E). The nearest is White Nile km 4500 at about 91 km. The server falls back to the three nearest stations and the app says so.
 
-## 3. GitHub repository
+## Deploying
 
-1. Create a **private** repository (e.g. `altimetry-nightly`) at <https://github.com/new>.
-2. Upload the files from this folder. The workflow file must end up at
-   `.github/workflows/nightly-altimetry.yml`. If drag-and-drop skips the hidden
-   `.github` folder, use **Add file → Create new file**, type that path as the
-   name, and paste the file's contents.
-3. **Settings → Secrets and variables → Actions → New repository secret**, add four:
-
-   | Name | Value |
-   |---|---|
-   | `GEE_SERVICE_ACCOUNT_KEY` | the whole contents of the `.json` key file |
-   | `DRIVE_FOLDER_ID` | the folder ID from step 2 |
-   | `DAHITI_API_KEY` | your DAHITI key |
-   | `HYDROWEB_API_KEY` | your Hydroweb key |
-
-## 4. Test it now
-
-**Actions** tab → **Nightly altimetry update (00:00 Cairo)** → **Run workflow**.
-A manual run skips the midnight check. Open the run to follow each step's log.
-Afterwards, check that the files in your Drive folder have a new "modified" time
-and that `altimetry/merged_observations` in the GEE Code Editor has the new rows.
-
-From then on it runs by itself every night.
-
----
-
-## Good to know
-
-- **Timing.** GitHub schedules use UTC, so the workflow fires at 21:00 and 22:00 UTC
-  and continues only on the one that is midnight in Cairo (21:00 in summer, 22:00
-  in winter). On the night summer time starts, clocks jump from 23:59 to 01:00, so
-  that night it runs at 01:00. GitHub often starts scheduled runs 5-30 minutes late.
-- **Free minutes.** Private repositories get 2,000 free Actions minutes a month.
-  A run with new data mostly waits for GEE exports; roughly 10-40 minutes, so a
-  month of nightly runs should fit. Usage: Settings → Billing and plans.
-- **Don't run both.** Stop the Colab midnight cell once this is working, so the two
-  never write the same files at the same time.
-- **Keys.** The copy of the script in this repository has no keys written in it;
-  they come from the secrets. Your API keys have appeared in notebook outputs and
-  chat, so consider issuing new ones and storing them only as secrets.
-- **Stopping it.** Actions tab → the workflow → **⋯** → **Disable workflow**.
+- **Server, on Cloud Run:** run the workflow `.github/workflows/abuk-server-deploy.yml` by hand. Push to the `abuk-deploy` branch to run it. It copies GitHub secrets into Secret Manager, generates the session and webhook secrets once, and deploys `Dockerfile`. The service URL and `/api/health` appear in the run summary. Any other Node 22 host works too: `npm start -w server`.
+- **Android APK:** `.github/workflows/abuk-apk.yml` builds on every push to `abuk-app` and attaches the APK to the `abuk-apk-latest` release. To point it at the server, set the repository variable `ABUK_API_URL`.
+- **PWA:** `npm run build -w apps/pwa` produces static files in `apps/pwa/dist`. Serve them over HTTPS so the service worker and GPS work.

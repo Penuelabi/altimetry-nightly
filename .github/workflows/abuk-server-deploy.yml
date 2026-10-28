@@ -1,0 +1,170 @@
+name: Abuk server deploy (Cloud Run)
+
+# Runs on every push to the abuk-deploy branch (manual "Run workflow" needs the file on main,
+# which this setup leaves untouched): git push origin abuk-app:abuk-deploy
+# Secrets never leave GitHub/Google: GitHub secrets are copied into Secret Manager
+# and mounted into the Cloud Run service.
+#
+# Repository variables:  GCP_PROJECT (required), GCP_REGION (default europe-west1),
+#   ABUK_ACCESS_REPO (owner/repo holding users.json), ABUK_SHEET_ID,
+#   ABUK_GEE_SOIL_ASSET, ABUK_GEE_FLOOD_ASSET, ABUK_ALLOWED_ORIGIN,
+#   ABUK_ADMIN_NAME (first admin; their key is put in Secret Manager as abuk-first-admin-key)
+# Repository secrets:    GCP_DEPLOY_KEY (falls back to GEE_SERVICE_ACCOUNT_KEY), GEE_SERVICE_ACCOUNT_KEY,
+#   DRIVE_FOLDER_ID, ABUK_GITHUB_TOKEN, SMS_GATE_USER, SMS_GATE_PASSWORD
+on:
+  push:
+    branches: [abuk-deploy]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    env:
+      # Each setting may be a repository variable or a secret; known values are the defaults.
+      PROJECT: ${{ vars.GCP_PROJECT || secrets.GCP_PROJECT || 'ee-penuelabi' }}
+      REGION: ${{ vars.GCP_REGION || secrets.GCP_REGION || 'europe-west1' }}
+      ACCESS_REPO: ${{ vars.ABUK_ACCESS_REPO || secrets.ABUK_ACCESS_REPO || 'Penuelabi/abuk-access' }}
+      SHEET_ID: ${{ vars.ABUK_SHEET_ID || secrets.ABUK_SHEET_ID || '1AhGd-4GbTZTQrJv4tgFSuIyWgjrjxyUbKbA5czFzsX0' }}
+      ADMIN_NAME: ${{ vars.ABUK_ADMIN_NAME || secrets.ABUK_ADMIN_NAME }}
+      SERVICE: abuk-server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check settings
+        env:
+          HAS_DEPLOY_KEY: ${{ secrets.GCP_DEPLOY_KEY != '' || secrets.GEE_SERVICE_ACCOUNT_KEY != '' }}
+          HAS_GH_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN != '' }}
+        run: |
+          echo "project=$PROJECT region=$REGION access_repo=$ACCESS_REPO sheet=$SHEET_ID admin_name_set=$([ -n "$ADMIN_NAME" ] && echo yes || echo no)"
+          fail=0
+          [ "$HAS_DEPLOY_KEY" = true ] || { echo "::error::Missing secret GEE_SERVICE_ACCOUNT_KEY (or GCP_DEPLOY_KEY)"; fail=1; }
+          [ "$HAS_GH_TOKEN" = true ] || { echo "::error::Missing secret ABUK_GITHUB_TOKEN (Settings → Secrets and variables → Actions → Secrets)"; fail=1; }
+          [ -n "$ADMIN_NAME" ] || echo "::warning::ABUK_ADMIN_NAME is not set, so no first admin will be created"
+          exit $fail
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_DEPLOY_KEY || secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Enable services
+        run: |
+          # Each API separately, so one missing permission names itself; errors go to the run annotations.
+          need=0
+          for api in run cloudbuild artifactregistry secretmanager sheets drive earthengine storage; do
+            if out=$(gcloud services enable "$api.googleapis.com" --project "$PROJECT" 2>&1); then echo "enabled $api"
+            else
+              msg=$(echo "$out" | grep -E "ERROR|PERMISSION|denied|disabled|billing" | head -2 | tr '\n' ' ')
+              echo "::warning::Could not enable $api.googleapis.com: ${msg:-$out}"
+              case $api in run|cloudbuild|artifactregistry|secretmanager) need=1;; esac
+            fi
+          done
+          # Not fatal on its own: the APIs may already be on. Later steps fail clearly if not.
+          [ $need = 0 ] || echo "::warning::Core APIs could not be enabled by this account. If later steps fail, grant it Service Usage Admin or enable the APIs in the console."
+      - name: Store secrets in Secret Manager
+        env:
+          GOOGLE_SA: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+          GH_ACCESS_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN }}
+          SMS_PASS: ${{ secrets.SMS_GATE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          trap 'echo "::error::Secret Manager step failed running: $BASH_COMMAND"' ERR
+          G="gcloud --project=$PROJECT"
+          # The service runs as the same account that deploys it (it already reads the Drive folder).
+          RUNTIME_SA="$(gcloud config get-value account 2>/dev/null)"
+          echo "RUNTIME_SA=$RUNTIME_SA" >> "$GITHUB_ENV"
+          MOUNTS=""
+          put() {  # put NAME ENV_VAR VALUE  (empty VALUE keeps any existing version)
+            if ! $G secrets describe "$1" >/dev/null 2>&1; then
+              [ -n "$3" ] || return 0
+              $G secrets create "$1" --replication-policy=automatic >/dev/null
+            fi
+            [ -n "$3" ] && printf '%s' "$3" | $G secrets versions add "$1" --data-file=- >/dev/null
+            $G secrets add-iam-policy-binding "$1" --member="serviceAccount:$RUNTIME_SA" --role=roles/secretmanager.secretAccessor >/dev/null
+            MOUNTS="$MOUNTS,$2=$1:latest"
+          }
+          # Generated once, then kept: rotating SESSION_SECRET signs everyone out.
+          gen() { $G secrets describe "$1" >/dev/null 2>&1 && put "$1" "$2" "" || put "$1" "$2" "$(openssl rand -base64 48)"; }
+          put abuk-google-sa GOOGLE_SERVICE_ACCOUNT_JSON "$GOOGLE_SA"
+          put abuk-github-token GITHUB_TOKEN "$GH_ACCESS_TOKEN"
+          put abuk-sms-password SMS_API_KEY "$SMS_PASS"
+          gen abuk-session-secret SESSION_SECRET
+          gen abuk-sms-webhook SMS_WEBHOOK_SECRET
+          echo "MOUNTS=${MOUNTS#,}" >> "$GITHUB_ENV"
+      - name: Photo bucket (private; created once)
+        run: |
+          B="abuk-photos-$PROJECT"
+          if ! gcloud storage buckets describe "gs://$B" --project "$PROJECT" >/dev/null 2>&1; then
+            gcloud storage buckets create "gs://$B" --project "$PROJECT" --location "$REGION" --uniform-bucket-level-access --public-access-prevention \
+              || { echo "::warning::Could not create the photo bucket gs://$B. Photos stay on phones until it exists (grant the deploy account Storage Admin)."; exit 0; }
+          fi
+          gcloud storage buckets add-iam-policy-binding "gs://$B" --member="serviceAccount:$RUNTIME_SA" --role=roles/storage.objectAdmin >/dev/null \
+            || echo "::warning::Could not grant the service account access to gs://$B"
+          echo "PHOTO_BUCKET=$B" >> "$GITHUB_ENV"
+      - name: First admin (only if users.json has none)
+        if: env.ADMIN_NAME != ''
+        env:
+          GITHUB_ACCESS_REPO: ${{ env.ACCESS_REPO }}
+          GITHUB_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN }}
+          ADMIN_KEY_FILE: ${{ runner.temp }}/admin.key
+        run: |
+          set -euo pipefail
+          npm ci --omit=dev -w server -w packages/core --include-workspace-root=false > npm.log 2>&1 || { tail -20 npm.log; echo "::error::npm ci failed: $(grep -m2 'ERR' npm.log | tr '\n' ' ')"; exit 1; }
+          if ! npm run add-admin -w server -- "$ADMIN_NAME" > admin.log 2>&1; then
+            cat admin.log
+            echo "::error::Creating the first admin failed: $(grep -v -E '^npm (error|ERR)|^ +at |^>|^$' admin.log | tail -5 | tr '\n' ' ')"
+            exit 1
+          fi
+          cat admin.log
+          if [ -s "$ADMIN_KEY_FILE" ]; then
+            G="gcloud --project=$PROJECT"
+            $G secrets describe abuk-first-admin-key >/dev/null 2>&1 || $G secrets create abuk-first-admin-key --replication-policy=automatic >/dev/null
+            $G secrets versions add abuk-first-admin-key --data-file="$ADMIN_KEY_FILE" >/dev/null
+            rm -f "$ADMIN_KEY_FILE"
+            echo "First admin created. Read the key in Google Cloud: Secret Manager → abuk-first-admin-key." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Deploy
+        env:
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+          SMS_USER: ${{ secrets.SMS_GATE_USER }}
+          SMS_URL: ${{ vars.SMS_GATE_URL || 'https://api.sms-gate.app/3rdparty/v1' }}
+        run: |
+          set -euo pipefail
+          ENVS="^|^GITHUB_ACCESS_REPO=$ACCESS_REPO|SHEET_ID=$SHEET_ID|GEE_PROJECT=$PROJECT"
+          ENVS="$ENVS|GEE_SOIL_MOISTURE_ASSET=${{ vars.ABUK_GEE_SOIL_ASSET || 'ic:NASA/SMAP/SPL4SMGP/008' }}|GEE_SOIL_MOISTURE_BAND=${{ vars.ABUK_GEE_SOIL_BAND || 'sm_rootzone' }}"
+          ENVS="$ENVS|GEE_FLOOD_EXTENT_ASSET=${{ vars.ABUK_GEE_FLOOD_ASSET || 'projects/sudan-1575919084043/assets/maximum_flood_extent' }}"
+          ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER|SMS_API_URL=$SMS_URL"
+          [ -n "$DRIVE_FOLDER_ID" ] && ENVS="$ENVS|DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID"
+          [ -n "${PHOTO_BUCKET:-}" ] && ENVS="$ENVS|PHOTO_BUCKET=$PHOTO_BUCKET"
+          if ! gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --source . \
+            --allow-unauthenticated --memory 512Mi --max-instances 3 --service-account "$RUNTIME_SA" \
+            --set-env-vars "$ENVS" --set-secrets "$MOUNTS" 2> deploy.err; then
+            cat deploy.err
+            echo "::error::$(grep -E 'ERROR|PERMISSION|denied' deploy.err | head -3 | tr '\n' ' ')"
+            exit 1
+          fi
+          URL="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')"
+          echo "### Abuk server: $URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::Abuk server deployed at $URL"
+          curl -fsS "$URL/api/health" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Register the incoming-SMS webhook with SMSGate
+        env:
+          SMS_USER: ${{ secrets.SMS_GATE_USER }}
+          SMS_PASS: ${{ secrets.SMS_GATE_PASSWORD }}
+          SMS_URL: ${{ vars.SMS_GATE_URL || 'https://api.sms-gate.app/3rdparty/v1' }}
+        run: |
+          set -euo pipefail
+          [ -n "$SMS_USER" ] || { echo "SMS_GATE_USER not set; skipping."; exit 0; }
+          URL="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')"
+          HOOK="$(gcloud secrets versions access latest --secret abuk-sms-webhook --project "$PROJECT")"
+          echo "::add-mask::$HOOK"
+          # A fixed id makes this idempotent: re-running a deploy replaces the same webhook.
+          code=$(curl -sS -o resp.json -w '%{http_code}' -u "$SMS_USER:$SMS_PASS" -H 'content-type: application/json' \
+            -X POST "${SMS_URL%/}/webhooks" \
+            -d "{\"id\":\"abuk-gauge\",\"url\":\"$URL/api/sms/inbound?secret=$HOOK\",\"event\":\"sms:received\"}")
+          if [ "$code" -ge 300 ]; then echo "::error::SMSGate webhook registration returned HTTP $code (check SMS_GATE_USER / SMS_GATE_PASSWORD)"; exit 1; fi
+          echo "::notice::Incoming SMS from the gateway phone now go to the Abuk server (gauge readings)."
+

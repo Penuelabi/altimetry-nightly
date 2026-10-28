@@ -1,0 +1,23 @@
+{
+  "name": "@abuk/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc -p .",
+    "add-admin": "tsx src/cli/add-admin.ts"
+  },
+  "dependencies": {
+    "@abuk/core": "*",
+    "@hono/node-server": "^2.1.5",
+    "hono": "^4.13.14",
+    "jose": "^6.2.13",
+    "read-excel-file": "^9.3.13",
+    "tsx": "^4.23.15"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5"
+  }
+}

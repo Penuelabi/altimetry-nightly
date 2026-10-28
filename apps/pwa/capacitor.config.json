@@ -1,0 +1,18 @@
+{
+  "appId": "org.dukabuk.field",
+  "appName": "Abuk Project",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": false,
+      "statsUrl": "",
+      "appReadyTimeout": 15000,
+      "autoDeletePrevious": true,
+      "autoDeleteFailed": true,
+      "resetWhenUpdate": true
+    }
+  }
+}

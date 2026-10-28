@@ -1,0 +1,102 @@
+name: Abuk Android APK
+
+# Builds the Android test app from the abuk-app branch and attaches it to the
+# "Abuk APK (latest test build)" release, so it can be downloaded on a phone.
+on:
+  push:
+    branches: [abuk-app]
+    paths: ['apps/pwa/**', 'packages/core/**', 'package-lock.json', '.github/workflows/abuk-apk.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: abuk-apk
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      # Shell version: bump apps/pwa/native-version whenever the Android part changes (plugins, permissions,
+      # Capacitor). Screen packages that need a newer shell are only offered after the APK is installed.
+      - run: echo "VITE_NATIVE_VERSION=$(cat apps/pwa/native-version)" >> "$GITHUB_ENV"
+      # VITE_DEMO shows the sample-data demo on the sign-in screen; drop it once the server is deployed.
+      - run: npm run build -w apps/pwa
+        env:
+          VITE_DEMO: '1'
+          VITE_BUILD_SHA: ${{ github.sha }}
+          VITE_API_URL: ${{ vars.ABUK_API_URL || 'https://abuk-server-26ltd3lrlq-ew.a.run.app' }}
+      - run: npx cap sync android
+        working-directory: apps/pwa
+      - name: Signing key (kept in the private access repo; created once)
+        env:
+          GH_ACCESS_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN }}
+          ACCESS_REPO: ${{ vars.ABUK_ACCESS_REPO || 'Penuelabi/abuk-access' }}
+        run: |
+          set -euo pipefail
+          [ -n "$GH_ACCESS_TOKEN" ] || { echo "::error::Secret ABUK_GITHUB_TOKEN is needed to keep the signing key"; exit 1; }
+          API="https://api.github.com/repos/$ACCESS_REPO/contents/signing"
+          H=(-H "authorization: Bearer $GH_ACCESS_TOKEN" -H "accept: application/vnd.github.raw+json" -H "x-github-api-version: 2022-11-28")
+          KS="$RUNNER_TEMP/abuk-release.jks"
+          if curl -fsS "${H[@]}" "$API/abuk-release.jks.b64" -o "$RUNNER_TEMP/ks.b64"; then
+            base64 -d "$RUNNER_TEMP/ks.b64" > "$KS"
+            PW="$(curl -fsS "${H[@]}" "$API/password.txt")"
+          else
+            echo "No signing key yet: creating one and saving it to $ACCESS_REPO/signing (private)."
+            PW="$(openssl rand -hex 24)"
+            keytool -genkeypair -keystore "$KS" -storetype PKCS12 -alias abuk -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$PW" -keypass "$PW" -dname "CN=Abuk Project, O=Duk County Abuk Project, C=SS"
+            put() { curl -fsS -X PUT -H "authorization: Bearer $GH_ACCESS_TOKEN" -H "accept: application/vnd.github+json" "$API/$1" \
+              -d "{\"message\":\"Android signing key ($1)\",\"content\":\"$2\"}" > /dev/null; }
+            put abuk-release.jks.b64 "$(base64 -w0 "$KS" | base64 -w0)"
+            put password.txt "$(printf '%s' "$PW" | base64 -w0)"
+          fi
+          echo "::add-mask::$PW"
+          { echo "ABUK_KEYSTORE=$KS"; echo "ABUK_KEYSTORE_PASSWORD=$PW"; } >> "$GITHUB_ENV"
+      - name: Build signed APK
+        working-directory: apps/pwa/android
+        run: |
+          export ABUK_VERSION_CODE=$((100 + GITHUB_RUN_NUMBER)) ABUK_VERSION_NAME="1.$GITHUB_RUN_NUMBER (${GITHUB_SHA::7})"
+          ./gradlew assembleRelease --no-daemon
+      - name: Name the APK
+        run: |
+          mkdir -p out
+          cp apps/pwa/android/app/build/outputs/apk/release/app-release.apk "out/abuk-project-$(date -u +%Y%m%d)-${GITHUB_SHA::7}.apk"
+          cp apps/pwa/android/app/build/outputs/apk/release/app-release.apk out/abuk-project-latest.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abuk-apk
+          path: out/*.apk
+      - name: Publish to the abuk-apk-latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete abuk-apk-latest --yes --cleanup-tag || true
+          gh release create abuk-apk-latest out/*.apk --prerelease --target "$GITHUB_SHA" \
+            --title "Abuk APK (latest test build)" \
+            --notes "Test build of the Duk County · Abuk Project app from branch abuk-app ($GITHUB_SHA).
+          On the phone: download abuk-project-latest.apk, open it, and allow \"install unknown apps\" for your browser when Android asks.
+          Sign in with your worker ID and access key, or tap \"Open demo with sample data\" to try it without the server."
+      - name: Publish the screen update package (downloaded silently by the app)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ZIP="$RUNNER_TEMP/abuk-web-${GITHUB_SHA::7}-n$VITE_NATIVE_VERSION.zip"
+          (cd apps/pwa/dist && zip -qr "$ZIP" .)
+          gh release delete abuk-web-latest --yes --cleanup-tag || true
+          gh release create abuk-web-latest "$ZIP" --prerelease --target "$GITHUB_SHA" \
+            --title "Abuk screens (latest)" \
+            --notes "Screen update package for the Abuk Project Android app ($GITHUB_SHA, needs Android shell $VITE_NATIVE_VERSION). The app downloads it by itself; nothing to install."
