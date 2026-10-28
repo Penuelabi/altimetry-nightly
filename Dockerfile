@@ -10,7 +10,7 @@ RUN npm ci -w apps/dashboard -w packages/core --include-workspace-root=false
 COPY packages/core packages/core
 COPY apps/pwa/src/theme.css apps/pwa/src/theme.css
 COPY apps/dashboard apps/dashboard
-RUN npm run build -w apps/dashboard
+RUN cd apps/dashboard && npx vite build
 
 FROM node:22-slim
 WORKDIR /app
