@@ -32,7 +32,7 @@ Missing values don't crash the server. The affected endpoint returns `503 not_co
 | `GITHUB_ACCESS_REPO`, `GITHUB_TOKEN`, `GITHUB_BRANCH` | Private repo with `users.json` (scrypt hashes of access keys only), `data/gauge.json` and `config/*.json`. Use a fine-grained token with *Contents: read & write* on that one repo. |
 | `GOOGLE_SERVICE_ACCOUNT_JSON` | One service account for Drive, Sheets and Earth Engine. Share the Drive folder and the records sheet with its email, and register it for Earth Engine. |
 | `DRIVE_FOLDER_ID` | Defaults to the colab_waterlevel folder `1EyYopiOghPmHyJyBuH8DCp9PJv1zvCzV`. |
-| `SHEET_ID` | Google Sheet that receives synced records. It needs one tab per kind: `task`, `harvest`, `monitor`, `plot`, `offer`, `store`, `payout`, `voice`, `pest`. |
+| `SHEET_ID` | Google Sheet that receives synced records ("Abuk Project records" in the colab_waterlevel folder). The server adds one tab per record kind the first time it is used. |
 | `GEE_PROJECT`, `GEE_SOIL_MOISTURE_ASSET`, `GEE_SOIL_MOISTURE_BAND`, `GEE_FLOOD_EXTENT_ASSET` | Earth Engine assets. Prefix an ImageCollection with `ic:` to use its newest image. The flood asset should be a 0/1 water mask. |
 | `SMS_PROVIDER` (`smsgate`, `africastalking` or `twilio`), `SMS_API_URL`, `SMS_API_KEY`, `SMS_USERNAME`, `SMS_SENDER_ID` | Flood alerts and gauge replies. For SMSGate (as in altimetry-nightly), use the username and password from the gateway app. For Twilio, `SMS_USERNAME` is the account SID. |
 | `SMS_WEBHOOK_SECRET` | Point the provider's inbound-SMS webhook at `/api/sms/inbound?secret=…`. |

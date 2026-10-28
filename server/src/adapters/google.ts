@@ -51,8 +51,25 @@ export async function driveDownload(f: DriveFile): Promise<Buffer> {
   return buf;
 }
 
+const knownTabs = new Set<string>();
+async function ensureTab(tab: string) {
+  if (knownTabs.has(tab)) return;
+  const meta = await (await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}?fields=sheets.properties.title`)).json() as { sheets: { properties: { title: string } }[] };
+  meta.sheets.forEach(x => knownTabs.add(x.properties.title));
+  if (knownTabs.has(tab)) return;
+  // First record of this kind: add the tab with a header row.
+  await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}:batchUpdate`, {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ requests: [{ addSheet: { properties: { title: tab } } }] })
+  });
+  await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(`${tab}!A1`)}?valueInputOption=RAW`, {
+    method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ values: [['record_id', 'recorded_at', 'worker_id', 'data']] })
+  });
+  knownTabs.add(tab);
+}
+
 export async function sheetsAppend(tab: string, rows: (string | number)[][]) {
   need('sheets');
+  await ensureTab(tab);
   const range = encodeURIComponent(`${tab}!A1`);
   await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ values: rows })
