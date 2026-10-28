@@ -6,7 +6,8 @@ name: Abuk server deploy (Cloud Run)
 #
 # Repository variables:  GCP_PROJECT (required), GCP_REGION (default europe-west1),
 #   ABUK_ACCESS_REPO (owner/repo holding users.json), ABUK_SHEET_ID,
-#   ABUK_GEE_SOIL_ASSET, ABUK_GEE_FLOOD_ASSET, ABUK_ALLOWED_ORIGIN
+#   ABUK_GEE_SOIL_ASSET, ABUK_GEE_FLOOD_ASSET, ABUK_ALLOWED_ORIGIN,
+#   ABUK_ADMIN_NAME (first admin; their key is put in Secret Manager as abuk-first-admin-key)
 # Repository secrets:    GCP_DEPLOY_KEY (falls back to GEE_SERVICE_ACCOUNT_KEY), GEE_SERVICE_ACCOUNT_KEY,
 #   DRIVE_FOLDER_ID, ABUK_GITHUB_TOKEN, SMS_GATE_USER, SMS_GATE_PASSWORD
 on:
@@ -24,6 +25,9 @@ jobs:
       SERVICE: abuk-server
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Check settings
         run: |
           [ -n "$PROJECT" ] || { echo "::error::Set the repository variable GCP_PROJECT"; exit 1; }
@@ -60,6 +64,23 @@ jobs:
           gen abuk-session-secret SESSION_SECRET
           gen abuk-sms-webhook SMS_WEBHOOK_SECRET
           echo "MOUNTS=${MOUNTS#,}" >> "$GITHUB_ENV"
+      - name: First admin (only if users.json has none)
+        if: vars.ABUK_ADMIN_NAME != '' && vars.ABUK_ACCESS_REPO != ''
+        env:
+          GITHUB_ACCESS_REPO: ${{ vars.ABUK_ACCESS_REPO }}
+          GITHUB_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN }}
+          ADMIN_KEY_FILE: ${{ runner.temp }}/admin.key
+        run: |
+          set -euo pipefail
+          npm ci --omit=dev -w server -w packages/core --include-workspace-root=false
+          npm run add-admin -w server -- "${{ vars.ABUK_ADMIN_NAME }}"
+          if [ -s "$ADMIN_KEY_FILE" ]; then
+            G="gcloud --project=$PROJECT"
+            $G secrets describe abuk-first-admin-key >/dev/null 2>&1 || $G secrets create abuk-first-admin-key --replication-policy=automatic >/dev/null
+            $G secrets versions add abuk-first-admin-key --data-file="$ADMIN_KEY_FILE" >/dev/null
+            rm -f "$ADMIN_KEY_FILE"
+            echo "First admin created. Read the key in Google Cloud: Secret Manager → abuk-first-admin-key." >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Deploy
         env:
           DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
