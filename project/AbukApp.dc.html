@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="styles.css">
+<style>body{margin:0;background:var(--color-bg)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-800)}button{font-family:var(--font-body)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}.abk-scroll::-webkit-scrollbar{width:0}</style>
+</helmet>
+<div style="width:376px;height:792px;box-sizing:border-box;border:8px solid var(--color-neutral-900);border-radius:34px;background:var(--color-bg);overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:var(--shadow-lg);font-family:var(--font-body);color:var(--color-text)">
+  <div style="height:28px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--color-text)">
+    <span>06:42</span>
+    <div style="width:10px;height:10px;border-radius:50%;background:var(--color-neutral-900)"></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 20h.01 M7 20v-4 M12 20v-8 M17 20V8"></path></svg>
+      <svg width="18" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8h17a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H2z M22 11v2 M5 11v2 M9 11v2"></path></svg>
+    </div>
+  </div>
+
+  <div style="flex:none;padding:6px 16px 10px;display:flex;align-items:flex-start;gap:8px;border-bottom:1px solid var(--color-divider)">
+    <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ back }}" aria-label="Back" style="width:40px;height:44px;margin-left:-10px;border:none;background:transparent;color:var(--color-text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none" style-hover="color:var(--color-accent-700)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+      </button>
+    </sc-if>
+    <img src="assets/icon.png" alt="Hydro-Climate Watch" style="width:40px;height:40px;flex:none;margin-top:2px;border-radius:50%">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700)">{{ kicker }}</div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:25px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none">
+      <button onClick="{{ cycleLang }}" style="min-width:44px;height:26px;padding:0 8px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:12px;cursor:pointer" style-hover="border-color:var(--color-accent);background:var(--color-accent-100)">{{ langLabel }}</button>
+      <button onClick="{{ toggleNet }}" style="height:22px;padding:0 6px;border:none;background:transparent;color:var(--color-neutral-700);font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;font-variant-numeric:tabular-nums" style-hover="color:var(--color-accent-700)">
+        <span style="width:7px;height:7px;border-radius:50%;border:1.5px solid var(--color-accent);background:{{ netDot }}"></span>{{ netLabel }}
+      </button>
+    </div>
+  </div>
+  <sc-if value="{{ dinkaNote }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:none;padding:6px 16px;font-size:11.5px;color:var(--color-accent-800);background:var(--color-accent-100);border-bottom:1px solid var(--color-accent-200)">Thuɔŋjäŋ strings awaiting a community translator; showing English.</div>
+  </sc-if>
+
+  <div class="abk-scroll" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0">
+
+    <!-- HOME · LEDGER -->
+    <sc-if value="{{ isLedger }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:18px 18px 24px;display:flex;flex-direction:column;gap:18px">
+        <div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">Wed 28 Oct · Flood season, week 11</div>
+          <h1 style="margin:6px 0 8px;font-family:var(--font-heading);font-weight:400;font-size:34px;line-height:1.02;letter-spacing:-.01em">{{ greet }}. The basin is draining.</h1>
+          <p style="margin:0;font-size:14px;line-height:1.5;text-align:justify;hyphens:auto;text-wrap:pretty">The White Nile at Bor fell 3 cm overnight. Mound row B‑05 is still under water; the rest of the Balanites rows are clear. Recession sowing opens in about <strong style="font-weight:600">{{ recessDays }} days</strong>.</p>
+        </div>
+        <button onClick="{{ goFlood }}" style="display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;padding:0;cursor:pointer;text-align:left;color:var(--color-text)" style-hover="border-color:var(--color-accent)">
+          <div style="padding:10px 12px;border-right:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Bor gauge</div><div style="font-family:var(--font-heading);font-size:24px;font-variant-numeric:tabular-nums">4.12 m</div><div style="font-size:11.5px;color:var(--color-accent-700)">↓ 3 cm / day</div></div>
+          <div style="padding:10px 12px;border-right:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Basin depth</div><div style="font-family:var(--font-heading);font-size:24px;font-variant-numeric:tabular-nums">0.92 m</div><div style="font-size:11.5px;color:var(--color-neutral-700)">mounds 1.0 m</div></div>
+          <div style="padding:10px 12px"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Today</div><div style="font-family:var(--font-heading);font-size:24px;font-variant-numeric:tabular-nums">34°</div><div style="font-size:11.5px;color:var(--color-neutral-700)">no rain</div></div>
+        </button>
+        <div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--color-divider);padding-bottom:6px">
+            <h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:21px">{{ tTasks }}</h2>
+            <button onClick="{{ goTasks }}" style="border:none;background:transparent;color:var(--color-accent-700);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:6px 0">{{ tSeeAll }} · {{ openCount }} open</button>
+          </div>
+          <sc-for list="{{ homeTasks }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.toggle }}" style="width:100%;display:flex;gap:12px;align-items:flex-start;padding:11px 0;border:none;border-bottom:1px solid var(--color-divider);background:transparent;text-align:left;cursor:pointer;color:var(--color-text);min-height:44px">
+              <span style="flex:none;width:20px;height:20px;margin-top:1px;border:1px solid var(--color-accent);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--color-accent-800);font-size:13px">{{ t.mark }}</span>
+              <span style="flex:1"><span style="display:block;font-size:14px;line-height:1.35;text-decoration:{{ t.strike }}">{{ t.t }}</span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ t.zone }} · {{ t.who }}</span></span>
+            </button>
+          </sc-for>
+        </div>
+        <div>
+          <h2 style="margin:0 0 4px;font-family:var(--font-heading);font-weight:600;font-size:21px;border-bottom:1px solid var(--color-divider);padding-bottom:6px">{{ tZones }}</h2>
+          <sc-for list="{{ zones }}" as="z" hint-placeholder-count="3">
+            <button onClick="{{ goMap }}" style="width:100%;display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:baseline;padding:10px 0;border:none;border-bottom:1px solid var(--color-divider);background:transparent;text-align:left;cursor:pointer;color:var(--color-text)">
+              <span style="font-family:var(--font-heading);font-size:20px;color:var(--color-accent);font-variant-numeric:tabular-nums">{{ z.n }}</span>
+              <span><span style="display:block;font-size:14px">{{ z.name }} <span style="color:var(--color-neutral-700);font-size:12px">· {{ z.ha }}</span></span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ z.crops }}</span></span>
+              <span style="font-size:12px;color:var(--color-accent-800);font-style:italic">{{ z.status }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onClick="{{ goHarvest }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)" style-active="background:var(--color-accent-200)">Log harvest</button>
+          <button onClick="{{ goMap }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)" style-active="background:var(--color-accent-200)">Map a plot</button>
+          <button onClick="{{ goProcess }}" style="min-height:46px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;cursor:pointer" style-hover="border-color:var(--color-accent)">Processing</button>
+          <button onClick="{{ goFlood }}" style="min-height:46px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;cursor:pointer" style-hover="border-color:var(--color-accent)">Flood model</button>
+          <button onClick="{{ goMonitor }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Crop check</button>
+          <button onClick="{{ goSources }}" style="min-height:46px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;cursor:pointer" style-hover="border-color:var(--color-accent)">Data sources</button>
+          <button onClick="{{ goTools }}" style="grid-column:1 / 3;min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Field tools · SMS alerts, voice, payout, store…</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- HOME · ALMANAC -->
+    <sc-if value="{{ isAlmanac }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:18px 18px 24px;display:flex;flex-direction:column;gap:18px">
+        <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">{{ greet }} · Wed 28 Oct</div>
+        <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:14px 12px 12px">
+          <div style="display:grid;grid-template-columns:repeat(12,1fr);font-size:10px;color:var(--color-neutral-700);text-align:center;font-variant-numeric:tabular-nums">
+            <sc-for list="{{ months }}" as="m" hint-placeholder-count="12"><span style="color:{{ m.color }}">{{ m.l }}</span></sc-for>
+          </div>
+          <div style="position:relative;display:grid;grid-template-columns:repeat(12,1fr);height:58px;margin-top:6px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+            <div style="grid-column:1 / 2;background:repeating-linear-gradient(90deg,var(--color-accent-200) 0 1px,transparent 1px 5px)"></div>
+            <div style="grid-column:2 / 5;display:flex;align-items:center;justify-content:center;font-size:11px;font-style:italic;color:var(--color-neutral-700);border-left:1px solid var(--color-divider)">Dry</div>
+            <div style="grid-column:5 / 8;display:flex;align-items:center;justify-content:center;font-size:11px;font-style:italic;color:var(--color-neutral-700);border-left:1px solid var(--color-divider)">Rains</div>
+            <div style="grid-column:8 / 12;display:flex;align-items:center;justify-content:center;font-size:11px;font-style:italic;color:var(--color-neutral-900);border-left:1px solid var(--color-divider);background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 1.5px,transparent 1.5px 6px)">Flood</div>
+            <div style="grid-column:12 / 13;display:flex;align-items:center;justify-content:center;font-size:10px;font-style:italic;color:var(--color-accent-800);border-left:1px solid var(--color-divider);background:repeating-linear-gradient(90deg,var(--color-accent-200) 0 1px,transparent 1px 5px)">Rec.</div>
+            <div style="position:absolute;top:-6px;bottom:-6px;left:76.5%;width:0;border-left:2px solid var(--color-accent)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11.5px;color:var(--color-neutral-700)"><span>Today ▲ late flood</span><span>Recession opens ~4 Dec</span></div>
+        </div>
+        <div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Next window · in {{ recessDays }} days</div>
+          <h1 style="margin:4px 0 6px;font-family:var(--font-heading);font-weight:400;font-size:32px;line-height:1.04">Sow the recession silt.</h1>
+          <p style="margin:0;font-size:14px;line-height:1.5;text-align:justify;hyphens:auto">As water leaves the basin, broadcast cowpea, Feterita sorghum and jute mallow between the Balanites mounds. Seed stock check is on this week's list.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+          <div style="padding:10px 4px"><div style="font-family:var(--font-heading);font-size:22px">Cowpea</div><div style="font-size:11.5px;color:var(--color-neutral-700)">6 groups · 7 ha</div></div>
+          <div style="padding:10px 8px;border-left:1px solid var(--color-divider)"><div style="font-family:var(--font-heading);font-size:22px">Sorghum</div><div style="font-size:11.5px;color:var(--color-neutral-700)">Feterita · 9 ha</div></div>
+          <div style="padding:10px 8px;border-left:1px solid var(--color-divider)"><div style="font-family:var(--font-heading);font-size:22px">Kudra</div><div style="font-size:11.5px;color:var(--color-neutral-700)">jute · 2 ha</div></div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:6px;border-bottom:1px solid var(--color-divider)">
+            <h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:21px">{{ tTasks }}</h2>
+            <button onClick="{{ goTasks }}" style="border:none;background:transparent;color:var(--color-accent-700);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:6px 0">{{ tSeeAll }}</button>
+          </div>
+          <sc-for list="{{ homeTasks }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.toggle }}" style="width:100%;display:flex;gap:12px;align-items:flex-start;padding:11px 0;border:none;border-bottom:1px solid var(--color-divider);background:transparent;text-align:left;cursor:pointer;color:var(--color-text);min-height:44px">
+              <span style="flex:none;width:20px;height:20px;border:1px solid var(--color-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--color-accent-800);font-size:12px">{{ t.mark }}</span>
+              <span style="flex:1;font-size:14px;line-height:1.35;text-decoration:{{ t.strike }}">{{ t.t }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <button onClick="{{ goSeason }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Open full crop calendar</button>
+      </div>
+    </sc-if>
+
+    <!-- HOME · FIELD (map-first) -->
+    <sc-if value="{{ isField }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column">
+        <div style="position:relative;border-bottom:1px solid var(--color-divider)">
+          <svg viewBox="0 0 360 250" width="360" height="250" style="display:block">
+            <rect x="0" y="0" width="360" height="70" fill="var(--color-accent-100)"></rect>
+            <rect x="0" y="70" width="360" height="50" fill="var(--color-neutral-100)"></rect>
+            <rect x="0" y="120" width="360" height="130" fill="var(--color-neutral-200)"></rect>
+            <rect x="0" y="120" width="360" height="130" fill="var(--color-neutral-500)" fill-opacity="{{ basinOpacity }}"></rect>
+            <path d="M0 70 C90 62 180 78 360 68" fill="none" stroke="var(--color-neutral-500)" stroke-dasharray="3 3"></path>
+            <path d="M0 120 C100 112 220 128 360 118" fill="none" stroke="var(--color-neutral-500)" stroke-dasharray="3 3"></path>
+            <sc-for list="{{ moundLines }}" as="l" hint-placeholder-count="8"><line x1="20" x2="340" y1="{{ l.y }}" y2="{{ l.y }}" stroke="{{ l.c }}" stroke-width="{{ l.w }}"></line></sc-for>
+            <text x="14" y="22" font-family="Lora" font-size="10" letter-spacing="1.2" fill="var(--color-accent-800)">1 · DRY RIDGE · 10 HA</text>
+            <text x="14" y="88" font-family="Lora" font-size="10" letter-spacing="1.2" fill="var(--color-neutral-700)">2 · SLOPE · 8 HA</text>
+            <text x="14" y="138" font-family="Lora" font-size="10" letter-spacing="1.2" fill="var(--color-neutral-900)">3 · FLOODPLAIN BASIN · 22 HA</text>
+            <circle cx="300" cy="190" r="5" fill="none" stroke="var(--color-accent)" stroke-width="2"></circle>
+            <circle cx="300" cy="190" r="12" fill="none" stroke="var(--color-accent)" stroke-opacity=".4"></circle>
+          </svg>
+          <div style="position:absolute;right:12px;top:10px;font-size:11px;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:3px 6px;font-variant-numeric:tabular-nums">7.731° N · 31.402° E</div>
+        </div>
+        <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ zoneChips }}" as="c" hint-placeholder-count="3">
+              <button onClick="{{ c.pick }}" style="flex:1;min-height:40px;border:1px solid {{ c.border }};border-radius:var(--radius-md);background:{{ c.bg }};color:var(--color-text);font-size:13px;cursor:pointer">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <div>
+            <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">{{ zoneInfo.kicker }}</div>
+            <h1 style="margin:4px 0 6px;font-family:var(--font-heading);font-weight:400;font-size:30px;line-height:1.05">{{ zoneInfo.head }}</h1>
+            <p style="margin:0;font-size:14px;line-height:1.5;text-align:justify;hyphens:auto">{{ zoneInfo.body }}</p>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+            <sc-for list="{{ zoneInfo.stats }}" as="s" hint-placeholder-count="3">
+              <div style="padding:9px 8px 9px 0"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">{{ s.k }}</div><div style="font-family:var(--font-heading);font-size:21px;font-variant-numeric:tabular-nums">{{ s.v }}</div></div>
+            </sc-for>
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--color-neutral-700);margin-bottom:2px">{{ tTasks }} in this zone</div>
+            <sc-for list="{{ zoneTasks }}" as="t" hint-placeholder-count="2">
+              <button onClick="{{ t.toggle }}" style="width:100%;display:flex;gap:12px;align-items:flex-start;padding:10px 0;border:none;border-bottom:1px solid var(--color-divider);background:transparent;text-align:left;cursor:pointer;color:var(--color-text);min-height:44px">
+                <span style="flex:none;width:20px;height:20px;border:1px solid var(--color-accent);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--color-accent-800);font-size:13px">{{ t.mark }}</span>
+                <span style="flex:1;font-size:14px;line-height:1.35;text-decoration:{{ t.strike }}">{{ t.t }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button onClick="{{ goPlot }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Open plot B‑07</button>
+            <button onClick="{{ goFlood }}" style="min-height:46px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;cursor:pointer" style-hover="border-color:var(--color-accent)">Flood model</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- MAP -->
+    <sc-if value="{{ isMap }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column">
+        <div style="position:relative;border-bottom:1px solid var(--color-divider)">
+          <svg viewBox="0 0 360 330" width="360" height="330" style="display:block">
+            <rect x="0" y="0" width="360" height="90" fill="var(--color-accent-100)"></rect>
+            <rect x="0" y="90" width="360" height="70" fill="var(--color-neutral-100)"></rect>
+            <rect x="0" y="160" width="360" height="170" fill="var(--color-neutral-200)"></rect>
+            <rect x="0" y="160" width="360" height="170" fill="var(--color-neutral-500)" fill-opacity="{{ basinOpacity }}"></rect>
+            <path d="M0 90 C90 82 180 98 360 88" fill="none" stroke="var(--color-neutral-500)" stroke-dasharray="3 3"></path>
+            <path d="M0 160 C100 152 220 168 360 158" fill="none" stroke="var(--color-neutral-500)" stroke-dasharray="3 3"></path>
+            <text x="300" y="86" font-family="Lora" font-size="9" fill="var(--color-neutral-700)">412 m</text>
+            <text x="300" y="155" font-family="Lora" font-size="9" fill="var(--color-neutral-700)">410 m</text>
+            <sc-for list="{{ mapMounds }}" as="l" hint-placeholder-count="8"><line x1="20" x2="340" y1="{{ l.y }}" y2="{{ l.y }}" stroke="{{ l.c }}" stroke-width="{{ l.w }}"></line></sc-for>
+            <text x="14" y="22" font-family="Lora" font-size="10" letter-spacing="1.2" fill="var(--color-accent-800)">ZONE 1 · DRY RIDGE</text>
+            <text x="14" y="108" font-family="Lora" font-size="10" letter-spacing="1.2" fill="var(--color-neutral-700)">ZONE 2 · SLOPE</text>
+            <text x="14" y="178" font-family="Lora" font-size="10" letter-spacing="1.2" fill="var(--color-neutral-900)">ZONE 3 · BASIN · MOUNDS 7 m APART</text>
+            <rect x="40" y="34" width="110" height="40" fill="none" stroke="var(--color-accent)" stroke-width="1.5" onClick="{{ goPlot }}" style="cursor:pointer"></rect>
+            <text x="46" y="50" font-family="Lora" font-size="11" fill="var(--color-accent-900)">R‑02 Moringa</text>
+            <rect x="180" y="34" width="120" height="40" fill="none" stroke="var(--color-accent)" stroke-dasharray="4 3"></rect>
+            <text x="186" y="50" font-family="Lora" font-size="11" fill="var(--color-accent-900)">R‑05 Gum · Shea</text>
+            <rect x="160" y="112" width="140" height="36" fill="none" stroke="var(--color-accent)" stroke-width="1.5"></rect>
+            <text x="166" y="128" font-family="Lora" font-size="11" fill="var(--color-accent-900)">S‑04 Groundnut</text>
+            <rect x="40" y="226" width="130" height="64" fill="none" stroke="var(--color-accent-700)" stroke-width="2" onClick="{{ goPlot }}" style="cursor:pointer"></rect>
+            <text x="46" y="242" font-family="Lora" font-size="11" fill="var(--color-neutral-900)">B‑07 Balanites</text>
+            <sc-for list="{{ capPts }}" as="p" hint-placeholder-count="0"><circle cx="{{ p.x }}" cy="{{ p.y }}" r="3" fill="var(--color-accent)"></circle></sc-for>
+            <polyline points="{{ capLine }}" fill="none" stroke="var(--color-accent)" stroke-width="1.5"></polyline>
+          </svg>
+          <div style="position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px">
+            <button onClick="{{ goFlood }}" style="font-size:11px;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:4px 7px;cursor:pointer;color:var(--color-text)" style-hover="border-color:var(--color-accent)">Depth {{ basinDepthLabel }}</button>
+          </div>
+        </div>
+        <sc-if value="{{ noCapture }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:16px 18px 24px;display:flex;flex-direction:column;gap:12px">
+            <h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:21px">Map a new plot</h2>
+            <p style="margin:0;font-size:13.5px;line-height:1.5;color:var(--color-neutral-800);text-align:justify">GPS works offline. Elevation and slope are read from the terrain model as soon as the phone reconnects.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <button onClick="{{ startWalk }}" style="min-height:64px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" style-hover="background:var(--color-accent-100)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z M16 17h4 M4 13h4"></path></svg>
+                Walk boundary
+              </button>
+              <button onClick="{{ startPin }}" style="min-height:64px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" style-hover="background:var(--color-accent-100)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0 M12 7a3 3 0 1 0 0 6a3 3 0 1 0 0-6"></path></svg>
+                Drop a pin
+              </button>
+            </div>
+            <div style="font-size:12px;color:var(--color-neutral-700);border-top:1px solid var(--color-divider);padding-top:10px">38 plots mapped · 2,640 trees pinned · 112 individual, 48 group plots</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ hasCapture }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:21px">{{ capTitle }}</h2>
+              <span style="font-size:12px;color:var(--color-accent-700);font-style:italic">{{ capStatus }}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider)">
+              <sc-for list="{{ capReadouts }}" as="r" hint-placeholder-count="6">
+                <div style="padding:8px 0;border-bottom:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">{{ r.k }}</div><div style="font-family:var(--font-heading);font-size:19px;font-variant-numeric:tabular-nums">{{ r.v }}</div><div style="font-size:10.5px;color:var(--color-neutral-600)">{{ r.src }}</div></div>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <button onClick="{{ cancelCap }}" style="min-height:46px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;cursor:pointer" style-hover="border-color:var(--color-accent)">Cancel</button>
+              <button onClick="{{ saveCap }}" disabled="{{ capNotDone }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer;opacity:{{ capOpacity }}" style-hover="background:var(--color-accent-100)">Save plot</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- FLOOD SIMULATION -->
+    <sc-if value="{{ isFlood }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:16px 18px 24px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">Projected for {{ simDate }} · day +{{ simDay }}</div>
+          <h1 style="margin:4px 0 0;font-family:var(--font-heading);font-weight:400;font-size:30px;line-height:1.05">{{ simHeadline }}</h1>
+        </div>
+        <div style="border:1px solid var(--color-accent);border-radius:var(--radius-md);padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Duk county bulletin · 27 Oct</span><span style="font-size:11px;padding:1px 6px;border:1px solid var(--color-accent);border-radius:var(--radius-sm);color:var(--color-accent-800)">orange</span></div>
+          <div style="font-size:14px;line-height:1.4"><strong style="font-weight:600">Dry spell possible (46%) on dry soils.</strong> Monitor crops and pasture.</div>
+          <div style="font-size:12px;line-height:1.5;color:var(--color-neutral-800)">28 Oct likely dry · 30–31 Oct likely wet · 2–3 Nov likely dry · 6 Nov likely dry</div>
+          <div style="font-size:11px;color:var(--color-neutral-700)">5,015 people on flood‑prone ground of 206,545 in the county</div>
+        </div>
+        <div>
+          <input type="range" min="0" max="45" step="1" value="{{ simDay }}" onChange="{{ setSimDay }}" style="width:100%;accent-color:var(--color-accent);height:28px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums"><span>Today</span><span>+15</span><span>+30</span><span>+45 days</span></div>
+        </div>
+        <div>
+          <h2 style="margin:0 0 6px;font-family:var(--font-heading);font-weight:600;font-size:20px;border-bottom:1px solid var(--color-divider);padding-bottom:6px">Water depth by zone</h2>
+          <sc-for list="{{ depthBars }}" as="d" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:64px 1fr 56px;gap:10px;align-items:center;padding:7px 0">
+              <span style="font-size:13px">{{ d.name }}</span>
+              <div style="position:relative;height:16px;border:1px solid var(--color-divider);border-radius:var(--radius-sm)">
+                <div style="position:absolute;left:0;top:0;bottom:0;width:{{ d.pct }};background:repeating-linear-gradient(135deg,var(--color-neutral-500) 0 1.5px,transparent 1.5px 5px)"></div>
+                <div style="position:absolute;top:-3px;bottom:-3px;left:83.3%;border-left:1.5px solid var(--color-accent)"></div>
+              </div>
+              <span style="font-size:13px;text-align:right;font-variant-numeric:tabular-nums">{{ d.v }}</span>
+            </div>
+          </sc-for>
+          <div style="font-size:11px;color:var(--color-accent-800)">│ gold line = 1.0 m mound crest</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+          <div style="padding:10px 0"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Basin dry in</div><div style="font-family:var(--font-heading);font-size:28px;font-variant-numeric:tabular-nums">{{ recessDaysSim }}</div></div>
+          <div style="padding:10px 0 10px 12px;border-left:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Next flood rise</div><div style="font-family:var(--font-heading);font-size:28px">~Jul 2027</div></div>
+        </div>
+        <div style="border:1px solid var(--color-accent);border-radius:var(--radius-md);padding:12px 14px">
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Planting window</div>
+          <div style="font-size:14px;line-height:1.45;margin-top:4px">{{ plantAlert }}</div>
+        </div>
+        <div>
+          <h2 style="margin:0 0 2px;font-family:var(--font-heading);font-weight:600;font-size:20px;border-bottom:1px solid var(--color-divider);padding-bottom:6px">Balanites mound rows</h2>
+          <sc-for list="{{ moundRows }}" as="m" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:48px 1fr auto;gap:8px;padding:7px 0;border-bottom:1px solid var(--color-divider);font-size:13px;align-items:baseline">
+              <span style="font-variant-numeric:tabular-nums">{{ m.id }}</span>
+              <span style="color:var(--color-neutral-700);font-variant-numeric:tabular-nums">crest {{ m.h }} m</span>
+              <span style="font-style:italic;color:{{ m.color }}">{{ m.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--color-divider);padding-bottom:6px"><h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:20px">Model inputs</h2><button onClick="{{ goSources }}" style="border:none;background:transparent;color:var(--color-accent-700);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:6px 0">Data sources</button></div>
+          <sc-for list="{{ simInputs }}" as="i" hint-placeholder-count="7">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px 0;border-bottom:1px solid var(--color-divider)">
+              <span><span style="display:block;font-size:13.5px">{{ i.k }}</span><span style="font-size:11px;color:var(--color-neutral-600)">{{ i.src }}</span></span>
+              <span style="font-size:13.5px;text-align:right;font-variant-numeric:tabular-nums">{{ i.v }}</span>
+            </div>
+          </sc-for>
+          <p style="margin:10px 0 0;font-size:12px;line-height:1.5;color:var(--color-neutral-700);text-align:justify">Water balance: rainfall + catchment runoff + river inflow − evaporation − soil infiltration, calibrated against satellite flood extent. Duk bulletin data to 24 Oct. {{ simRunNote }}</p>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- SEASON -->
+    <sc-if value="{{ isSeason }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:12px">
+        <p style="margin:0 4px;font-size:13.5px;line-height:1.5;text-align:justify">Duk County runs on the river. Plant by water, not by date: the bars below shift when the flood model updates.</p>
+        <div style="display:grid;grid-template-columns:92px repeat(12,1fr);font-size:9.5px;color:var(--color-neutral-700);text-align:center;border-bottom:1px solid var(--color-divider);padding-bottom:4px">
+          <span></span>
+          <sc-for list="{{ months }}" as="m" hint-placeholder-count="12"><span style="color:{{ m.color }}">{{ m.l }}</span></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:92px repeat(12,1fr);height:22px;align-items:stretch">
+          <span style="font-size:11px;color:var(--color-neutral-700);align-self:center">Water</span>
+          <div style="grid-column:2 / 3;background:repeating-linear-gradient(90deg,var(--color-accent-200) 0 1px,transparent 1px 4px)"></div>
+          <div style="grid-column:3 / 6;font-size:9.5px;font-style:italic;display:flex;align-items:center;justify-content:center;color:var(--color-neutral-700)">dry</div>
+          <div style="grid-column:6 / 9;font-size:9.5px;font-style:italic;display:flex;align-items:center;justify-content:center;color:var(--color-neutral-700);border-left:1px solid var(--color-divider)">rains</div>
+          <div style="grid-column:9 / 13;font-size:9.5px;font-style:italic;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 1.5px,transparent 1.5px 5px)">flood</div>
+          <div style="grid-column:13 / 14;background:repeating-linear-gradient(90deg,var(--color-accent-200) 0 1px,transparent 1px 4px)"></div>
+        </div>
+        <sc-for list="{{ seasonGroups }}" as="g" hint-placeholder-count="3">
+          <div>
+            <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);padding:8px 0 4px;border-bottom:1px solid var(--color-divider)">{{ g.zone }}</div>
+            <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+              <button onClick="{{ r.open }}" style="width:100%;display:grid;grid-template-columns:92px repeat(12,1fr);align-items:center;min-height:30px;border:none;border-bottom:1px solid var(--color-divider);background:transparent;padding:0;cursor:pointer;text-align:left;color:var(--color-text);position:relative" style-hover="background:var(--color-accent-100)">
+                <span style="font-size:12px;grid-column:1 / 2;grid-row:1">{{ r.name }}</span>
+                <sc-for list="{{ r.bars }}" as="b" hint-placeholder-count="1">
+                  <span style="grid-row:1;grid-column:{{ b.col }};height:12px;border:1px solid var(--color-accent);border-radius:var(--radius-sm);background:{{ b.bg }}"></span>
+                </sc-for>
+                <span style="grid-row:1;grid-column:11 / 12;justify-self:center;width:0;height:100%;border-left:1px dashed var(--color-accent-700)"></span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="display:flex;gap:14px;font-size:11px;color:var(--color-neutral-700);padding:0 4px">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:9px;border:1px solid var(--color-accent);border-radius:2px"></span>growing</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:9px;border:1px solid var(--color-accent);background:var(--color-accent-300);border-radius:2px"></span>harvest</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:0;height:10px;border-left:1px dashed var(--color-accent-700)"></span>today</span>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- TASKS -->
+    <sc-if value="{{ isTasks }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+          <sc-for list="{{ taskTabs }}" as="f" hint-placeholder-count="3">
+            <button onClick="{{ f.pick }}" style="flex:1;min-height:40px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:13px;cursor:pointer;box-shadow:{{ f.line }}">{{ f.label }}</button>
+          </sc-for>
+        </div>
+        <div>
+          <sc-for list="{{ taskList }}" as="t" hint-placeholder-count="5">
+            <button onClick="{{ t.toggle }}" style="width:100%;display:flex;gap:12px;align-items:flex-start;padding:12px 0;border:none;border-bottom:1px solid var(--color-divider);background:transparent;text-align:left;cursor:pointer;color:var(--color-text);min-height:48px">
+              <span style="flex:none;width:22px;height:22px;border:1px solid var(--color-accent);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--color-accent-800);font-size:14px">{{ t.mark }}</span>
+              <span style="flex:1"><span style="display:block;font-size:14px;line-height:1.35;text-decoration:{{ t.strike }}">{{ t.t }}</span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ t.zone }} · {{ t.who }} · {{ t.dueLabel }}</span></span>
+            </button>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:12px;color:var(--color-neutral-700);line-height:1.5">Ticks are saved on the phone and sent to the cooperative office when signal returns. Group leads can tick on behalf of members without phones.</p>
+      </div>
+    </sc-if>
+
+    <!-- PLOT DETAIL -->
+    <sc-if value="{{ isPlot }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:16px 18px 24px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Zone 3 · Basin · Mixed plot</div>
+          <h1 style="margin:4px 0 6px;font-family:var(--font-heading);font-weight:400;font-size:32px;line-height:1.04">88 grafted Balanites on a one‑metre mound.</h1>
+          <p style="margin:0;font-size:14px;line-height:1.5;text-align:justify;hyphens:auto">Worked by Group 4 (12 farmers) with two individual strips held by Ayen Kuol and Deng Bol. Intercropped with cowpea and jute mallow after the water drops.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ plotStats }}" as="s" hint-placeholder-count="6">
+            <div style="padding:9px 6px 9px 0;border-bottom:1px solid var(--color-divider)"><div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">{{ s.k }}</div><div style="font-family:var(--font-heading);font-size:20px;font-variant-numeric:tabular-nums">{{ s.v }}</div></div>
+          </sc-for>
+        </div>
+        <div>
+          <h2 style="margin:0 0 2px;font-family:var(--font-heading);font-weight:600;font-size:20px;border-bottom:1px solid var(--color-divider);padding-bottom:6px">Trees</h2>
+          <sc-for list="{{ plotTrees }}" as="t" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:1fr auto;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px"><span>{{ t.k }}</span><span style="color:var(--color-neutral-700);font-variant-numeric:tabular-nums">{{ t.v }}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onClick="{{ goHarvest }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Log harvest</button>
+          <button onClick="{{ goSpeciesBal }}" style="min-height:46px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;cursor:pointer" style-hover="border-color:var(--color-accent)">Balanites guide</button>
+          <button onClick="{{ goMonitor }}" style="grid-column:1 / 3;min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Record a crop check for B‑07</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- HARVEST LOG -->
+    <sc-if value="{{ isHarvest }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:16px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:14px;display:flex;flex-direction:column;gap:10px">
+          <h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:20px">New entry</h2>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Crop
+            <select value="{{ form.crop }}" onChange="{{ setCrop }}" style="min-height:42px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:14px;color:var(--color-text);padding:0 8px">
+              <sc-for list="{{ cropOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+            </select>
+          </label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Plot
+              <select value="{{ form.plot }}" onChange="{{ setPlot }}" style="min-height:42px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:14px;color:var(--color-text);padding:0 8px">
+                <sc-for list="{{ plotOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o }}">{{ o }}</option></sc-for>
+              </select>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Weight (kg)
+              <input type="number" inputmode="decimal" value="{{ form.kg }}" onChange="{{ setKg }}" placeholder="0" style="min-height:40px;border:1px solid {{ kgBorder }};border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:16px;color:var(--color-text);padding:0 10px;font-variant-numeric:tabular-nums">
+            </label>
+          </div>
+          <sc-if value="{{ formErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:var(--color-accent-800);font-style:italic">{{ formErr }}</div></sc-if>
+          <button onClick="{{ saveHarvest }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)" style-active="background:var(--color-accent-200)">{{ saveLabel }}</button>
+        </div>
+        <div>
+          <h2 style="margin:0 0 2px;font-family:var(--font-heading);font-weight:600;font-size:20px;border-bottom:1px solid var(--color-divider);padding-bottom:6px">This month</h2>
+          <sc-for list="{{ harvestRows }}" as="h" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 0;border-bottom:1px solid var(--color-divider)">
+              <span><span style="display:block;font-size:14px">{{ h.crop }}</span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ h.plot }} · {{ h.who }} · {{ h.date }}</span></span>
+              <span style="text-align:right"><span style="display:block;font-family:var(--font-heading);font-size:20px;font-variant-numeric:tabular-nums">{{ h.kg }} kg</span><span style="font-size:11px;color:var(--color-accent-700);font-style:italic">{{ h.sync }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- PROCESSING -->
+    <sc-if value="{{ isProcess }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+          <sc-for list="{{ procTabs }}" as="f" hint-placeholder-count="2">
+            <button onClick="{{ f.pick }}" style="flex:1;min-height:40px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:13px;cursor:pointer;box-shadow:{{ f.line }}">{{ f.label }}</button>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:13.5px;line-height:1.5;text-align:justify">{{ proc.intro }}</p>
+        <div style="position:relative;padding-left:26px">
+          <div style="position:absolute;left:8px;top:10px;bottom:10px;border-left:1px solid var(--color-accent)"></div>
+          <sc-for list="{{ proc.steps }}" as="s" hint-placeholder-count="5">
+            <div style="position:relative;padding:8px 0 12px">
+              <span style="position:absolute;left:-24px;top:12px;width:13px;height:13px;border-radius:50%;border:1.5px solid var(--color-accent);background:var(--color-bg);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--color-accent-800)"></span>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+                <span style="font-size:14px">{{ s.name }}</span>
+                <span style="font-family:var(--font-heading);font-size:20px;font-variant-numeric:tabular-nums">{{ s.out }}</span>
+              </div>
+              <div style="font-size:11.5px;color:var(--color-neutral-700);line-height:1.4">{{ s.note }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="border-top:1px solid var(--color-divider);padding-top:10px;font-size:12.5px;color:var(--color-neutral-800)">{{ proc.foot }}</div>
+        <button onClick="{{ goMarket }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">List stock in the market</button>
+      </div>
+    </sc-if>
+
+    <!-- MARKET -->
+    <sc-if value="{{ isMarket }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:16px 18px 24px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Cooperative sales · 2026 season</div>
+          <div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-weight:400;font-size:42px;font-variant-numeric:tabular-nums">{{ revenue }}</span><span style="font-size:12.5px;color:var(--color-accent-700)">shared across 160 farmers</span></div>
+        </div>
+        <sc-if value="{{ hasOffer }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1px solid var(--color-accent);border-radius:var(--radius-md);padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">New offer · Juba</div>
+            <div style="font-size:14px;line-height:1.45">Nile Botanicals asks for <strong style="font-weight:600">40 L Balanites oil</strong> at $13.50 / L, collected at Bor.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <button onClick="{{ declineOffer }}" style="min-height:42px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:13.5px;cursor:pointer" style-hover="border-color:var(--color-accent)">Counter</button>
+              <button onClick="{{ acceptOffer }}" style="min-height:42px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:13.5px;cursor:pointer" style-hover="background:var(--color-accent-100)">Accept · $540</button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ offerMsg }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;font-style:italic;color:var(--color-accent-800);border-left:0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:8px 0">{{ offerMsg }}</div></sc-if>
+        <div>
+          <h2 style="margin:0 0 2px;font-family:var(--font-heading);font-weight:600;font-size:20px;border-bottom:1px solid var(--color-divider);padding-bottom:6px">Our listings</h2>
+          <sc-for list="{{ listings }}" as="l" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--color-divider)">
+              <span><span style="display:block;font-size:14px">{{ l.name }}</span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ l.stock }} in stock · {{ l.offers }}</span></span>
+              <span style="text-align:right"><span style="display:block;font-family:var(--font-heading);font-size:20px;font-variant-numeric:tabular-nums">{{ l.price }}</span><span style="font-size:11px;color:var(--color-neutral-700)">{{ l.unit }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onClick="{{ goProcess }}" style="min-height:46px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;cursor:pointer" style-hover="border-color:var(--color-accent)">Stock & processing</button>
+          <button style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">List produce</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- GUIDE -->
+    <sc-if value="{{ isGuide }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:4px">
+        <p style="margin:0 0 8px;font-size:13.5px;line-height:1.5;text-align:justify">Twelve species grown on the Abuk land, all native or long‑naturalised in South Sudan. Works without signal.</p>
+        <sc-for list="{{ guideGroups }}" as="g" hint-placeholder-count="3">
+          <div>
+            <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);padding:12px 0 4px;border-bottom:1px solid var(--color-divider)">{{ g.label }}</div>
+            <sc-for list="{{ g.items }}" as="s" hint-placeholder-count="4">
+              <button onClick="{{ s.open }}" style="width:100%;display:grid;grid-template-columns:1fr auto 16px;gap:8px;align-items:center;padding:10px 0;border:none;border-bottom:1px solid var(--color-divider);background:transparent;text-align:left;cursor:pointer;color:var(--color-text);min-height:48px" style-hover="background:var(--color-accent-100)">
+                <span><span style="display:block;font-family:var(--font-heading);font-size:19px;font-weight:600;line-height:1.1">{{ s.name }}</span><span style="font-size:12px;font-style:italic;color:var(--color-neutral-700)">{{ s.sci }}</span></span>
+                <span style="font-size:13px;color:var(--color-neutral-800)">{{ s.ar }}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- CROP CHECK (monitoring form) -->
+    <sc-if value="{{ isMonitor }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:16px">
+        <p style="margin:0;font-size:13px;line-height:1.5;color:var(--color-neutral-800);text-align:justify">One record per plot visit. GPS and time are stamped automatically; the form saves on the phone and syncs to the cooperative's Drive sheet.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">1 · Where & who</div>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Farm / plot
+            <select value="{{ mon.plot }}" onChange="{{ monSet.plot }}" style="min-height:42px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:14px;color:var(--color-text);padding:0 8px">
+              <sc-for list="{{ monPlots }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+            </select>
+          </label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Extension worker ID
+              <input value="{{ mon.ew }}" onChange="{{ monSet.ew }}" placeholder="EW‑000" style="min-height:40px;border:1px solid {{ ewBorder }};border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:15px;color:var(--color-text);padding:0 10px;text-transform:uppercase;font-variant-numeric:tabular-nums">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Date
+              <input type="date" value="{{ mon.date }}" onChange="{{ monSet.date }}" style="min-height:40px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:14px;color:var(--color-text);padding:0 8px">
+            </label>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">2 · Activity done</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ actChips }}" as="c" hint-placeholder-count="8">
+              <button onClick="{{ c.pick }}" style="min-height:38px;padding:0 12px;border:1px solid {{ c.border }};border-radius:var(--radius-md);background:{{ c.bg }};color:var(--color-text);font-size:13px;cursor:pointer">{{ c.mark }}{{ c.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">3 · Crop</div>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Crop
+            <select value="{{ mon.crop }}" onChange="{{ monSet.crop }}" style="min-height:42px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:14px;color:var(--color-text);padding:0 8px">
+              <sc-for list="{{ monCrops }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+            </select>
+          </label>
+          <div style="font-size:12px;color:var(--color-neutral-700)">Growth stage</div>
+          <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+            <sc-for list="{{ stageTabs }}" as="f" hint-placeholder-count="4">
+              <button onClick="{{ f.pick }}" style="flex:1;min-height:40px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:12px;cursor:pointer;box-shadow:{{ f.line }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;color:var(--color-neutral-700)">Condition</span><span style="font-size:12.5px;font-style:italic;color:var(--color-accent-800)">{{ condLabel }}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+            <sc-for list="{{ condBtns }}" as="b" hint-placeholder-count="5">
+              <button onClick="{{ b.pick }}" style="min-height:42px;border:1px solid {{ b.border }};border-radius:var(--radius-md);background:{{ b.bg }};color:var(--color-text);font-family:var(--font-heading);font-size:20px;cursor:pointer;font-variant-numeric:tabular-nums">{{ b.n }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">Pests or disease seen</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ pestChips }}" as="c" hint-placeholder-count="6">
+              <button onClick="{{ c.pick }}" style="min-height:36px;padding:0 10px;border:1px solid {{ c.border }};border-radius:var(--radius-md);background:{{ c.bg }};color:var(--color-text);font-size:12.5px;cursor:pointer">{{ c.mark }}{{ c.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--color-divider);padding-bottom:4px"><span style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">4 · Local weather</span><span style="font-size:11px;color:var(--color-neutral-600);font-style:italic">pre‑filled from forecast 06:10</span></div>
+          <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+            <sc-for list="{{ skyTabs }}" as="f" hint-placeholder-count="4">
+              <button onClick="{{ f.pick }}" style="flex:1;min-height:40px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:12.5px;cursor:pointer;box-shadow:{{ f.line }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Temperature °C
+              <input type="number" value="{{ mon.temp }}" onChange="{{ monSet.temp }}" style="min-height:40px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:15px;color:var(--color-text);padding:0 10px;font-variant-numeric:tabular-nums">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Rain last 24 h (mm)
+              <input type="number" value="{{ mon.rain }}" onChange="{{ monSet.rain }}" style="min-height:40px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:15px;color:var(--color-text);padding:0 10px;font-variant-numeric:tabular-nums">
+            </label>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">5 · Evidence</div>
+          <div style="display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center">
+            <button onClick="{{ addPhoto }}" style="height:80px;border:1px dashed var(--color-accent);border-radius:var(--radius-md);background:repeating-linear-gradient(135deg,var(--color-neutral-200) 0 1px,transparent 1px 8px);color:var(--color-accent-800);font-size:12px;cursor:pointer">{{ photoLabel }}</button>
+            <div style="font-size:12px;line-height:1.5;color:var(--color-neutral-800);font-variant-numeric:tabular-nums">GPS 7.73121° N, 31.40225° E<br>±3 m · stamped 06:51<br>Voice note: hold to record</div>
+          </div>
+          <textarea value="{{ mon.notes }}" onChange="{{ monSet.notes }}" placeholder="Notes (optional)" rows="2" style="border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:14px;color:var(--color-text);padding:8px 10px;resize:none"></textarea>
+        </div>
+        <sc-if value="{{ monErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:var(--color-accent-800);font-style:italic;border-top:1px solid var(--color-accent-300);padding-top:8px">{{ monErr }}</div></sc-if>
+        <button onClick="{{ saveMon }}" style="min-height:48px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:15px;cursor:pointer" style-hover="background:var(--color-accent-100)" style-active="background:var(--color-accent-200)">{{ monSaveLabel }}</button>
+        <div>
+          <h2 style="margin:0 0 2px;font-family:var(--font-heading);font-weight:600;font-size:20px;border-bottom:1px solid var(--color-divider);padding-bottom:6px">Recent checks</h2>
+          <sc-for list="{{ monRows }}" as="r" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 0;border-bottom:1px solid var(--color-divider)">
+              <span><span style="display:block;font-size:14px">{{ r.plot }} · {{ r.crop }}</span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ r.acts }} · {{ r.ew }} · {{ r.date }}</span></span>
+              <span style="text-align:right"><span style="display:block;font-family:var(--font-heading);font-size:19px">{{ r.cond }}/5</span><span style="font-size:11px;color:var(--color-accent-700);font-style:italic">{{ r.sync }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- DATA SOURCES -->
+    <sc-if value="{{ isSources }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <p style="margin:0;font-size:13.5px;line-height:1.5;text-align:justify">Pulled from the colab_waterlevel Drive folder and Earth Engine, filtered to where this phone is. Only rows inside the radius are downloaded and cached for offline use.</p>
+        <div style="border:1px solid var(--color-accent);border-radius:var(--radius-md);padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Current location</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:13px;font-variant-numeric:tabular-nums">
+            <span><span style="display:block;font-size:10.5px;color:var(--color-neutral-700)">GPS</span>7.731° N, 31.402° E</span>
+            <span><span style="display:block;font-size:10.5px;color:var(--color-neutral-700)">County · State</span>Duk · Jonglei</span>
+            <span><span style="display:block;font-size:10.5px;color:var(--color-neutral-700)">Payam</span>from ssd_payam</span>
+            <span><span style="display:block;font-size:10.5px;color:var(--color-neutral-700)">Covers</span>{{ radiusNote }}</span>
+          </div>
+          <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+            <sc-for list="{{ radiusTabs }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.pick }}" style="flex:1;min-height:38px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:12.5px;cursor:pointer;box-shadow:{{ f.line }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:8px 0">
+          <span style="font-size:12.5px;color:var(--color-neutral-800);font-variant-numeric:tabular-nums">{{ srcSummary }}</span>
+          <button onClick="{{ pullAll }}" style="min-height:38px;padding:0 12px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:13px;cursor:pointer" style-hover="background:var(--color-accent-100)">{{ pullLabel }}</button>
+        </div>
+        <sc-if value="{{ srcMsg }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;font-style:italic;color:var(--color-accent-800)">{{ srcMsg }}</div></sc-if>
+        <div>
+          <sc-for list="{{ srcRows }}" as="r" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--color-divider);align-items:start">
+              <div style="min-width:0">
+                <div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:1px 5px;color:var(--color-neutral-800);flex:none">{{ r.kind }}</span><span style="font-size:14px;line-height:1.3">{{ r.name }}</span></div>
+                <div style="font-size:11.5px;color:var(--color-neutral-700);margin-top:3px;word-break:break-all;font-variant-numeric:tabular-nums">{{ r.path }}</div>
+                <div style="font-size:11.5px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">{{ r.size }} · {{ r.last }} · feeds <em>{{ r.feeds }}</em></div>
+              </div>
+              <button onClick="{{ r.toggle }}" aria-label="Use in model" style="width:44px;height:26px;margin-top:2px;border:1px solid var(--color-accent);border-radius:13px;background:{{ r.trackBg }};position:relative;cursor:pointer;padding:0">
+                <span style="position:absolute;top:3px;left:{{ r.knob }};width:18px;height:18px;border-radius:50%;border:1px solid var(--color-accent);background:var(--color-bg)"></span>
+              </button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button onClick="{{ goAdmin }}" style="min-height:44px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:13.5px;cursor:pointer;margin-bottom:6px" style-hover="border-color:var(--color-accent)">Manage users & access keys (admin)</button>
+          <h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:20px">Connect a source</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button onClick="{{ connGit }}" style="min-height:46px;border:1px solid {{ gitBorder }};border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:13.5px;cursor:pointer" style-hover="background:var(--color-accent-100)">GitHub repository</button>
+            <button onClick="{{ connDrive }}" style="min-height:46px;border:1px solid {{ driveBorder }};border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:13.5px;cursor:pointer" style-hover="background:var(--color-accent-100)">Google Drive folder</button>
+          </div>
+          <sc-if value="{{ connOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:12px">
+              <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">{{ connLabel }}
+                <input value="{{ connUrl }}" onChange="{{ setConnUrl }}" placeholder="{{ connPh }}" style="min-height:40px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:13px;color:var(--color-text);padding:0 10px">
+              </label>
+              <div style="font-size:11.5px;color:var(--color-neutral-700);line-height:1.45">Accepted: CSV, GeoJSON, GeoTIFF (clipped to the farm), Google Sheets. Large rasters are downsampled to the 40 ha boundary before download.</div>
+              <button onClick="{{ doConnect }}" style="min-height:42px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:13.5px;cursor:pointer" style-hover="background:var(--color-accent-100)">Connect</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- SIGN IN -->
+    <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:22px 18px 24px;display:flex;flex-direction:column;gap:16px">
+        <sc-if value="{{ notSignedIn }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Duk County · Abuk Project</div>
+              <h1 style="margin:4px 0 6px;font-family:var(--font-heading);font-weight:400;font-size:34px;line-height:1.02">Sign in with your access key.</h1>
+              <p style="margin:0;font-size:13.5px;line-height:1.5;text-align:justify">Your project admin gives you a worker ID and a one‑time access key. Ask them for a new one if it is lost.</p>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Worker ID
+              <input value="{{ si.id }}" onChange="{{ siSetId }}" placeholder="EW‑000" style="min-height:44px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:16px;color:var(--color-text);padding:0 12px;text-transform:uppercase">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Access key
+              <input type="password" value="{{ si.key }}" onChange="{{ siSetKey }}" placeholder="abk_…" style="min-height:44px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:ui-monospace,Menlo,monospace;font-size:15px;color:var(--color-text);padding:0 12px">
+            </label>
+            <sc-if value="{{ siErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;font-style:italic;color:var(--color-accent-800)">{{ siErr }}</div></sc-if>
+            <button onClick="{{ doSignin }}" style="min-height:48px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:15px;cursor:pointer" style-hover="background:var(--color-accent-100)" style-active="background:var(--color-accent-200)">{{ siLabel }}</button>
+            <div style="font-size:12px;line-height:1.5;color:var(--color-neutral-700);border-top:1px solid var(--color-divider);padding-top:10px">First sign‑in needs signal. After that, a 4‑digit PIN unlocks the app offline for 30 days. Try <span style="font-family:ui-monospace,Menlo,monospace">EW‑014</span> with any key starting <span style="font-family:ui-monospace,Menlo,monospace">abk_</span>.</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Signed in</div>
+            <h1 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:34px;line-height:1.02">Welcome, {{ meName }}.</h1>
+            <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider)">
+              <sc-for list="{{ meRows }}" as="r" hint-placeholder-count="4">
+                <div style="padding:9px 0;border-bottom:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">{{ r.k }}</div><div style="font-size:14px">{{ r.v }}</div></div>
+              </sc-for>
+            </div>
+            <div style="font-size:12.5px;line-height:1.5;color:var(--color-neutral-800)">Set a 4‑digit PIN for offline unlock.</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <div style="height:48px;border:1px solid var(--color-accent);border-radius:var(--radius-md)"></div><div style="height:48px;border:1px solid var(--color-divider);border-radius:var(--radius-md)"></div><div style="height:48px;border:1px solid var(--color-divider);border-radius:var(--radius-md)"></div><div style="height:48px;border:1px solid var(--color-divider);border-radius:var(--radius-md)"></div>
+            </div>
+            <button onClick="{{ goHomeTab }}" style="min-height:48px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:15px;cursor:pointer" style-hover="background:var(--color-accent-100)">Continue</button>
+            <button onClick="{{ signOut }}" style="min-height:40px;border:none;background:transparent;color:var(--color-neutral-700);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Sign out</button>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ADMIN: users & keys -->
+    <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:16px">
+        <p style="margin:0;font-size:13.5px;line-height:1.5;text-align:justify">Only admins see this. A new key is shown once. GitHub stores a salted hash of it, never the key itself, in the private repository <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px">abuk-access/users.json</span>.</p>
+        <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:14px;display:flex;flex-direction:column;gap:10px">
+          <h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:20px">New user</h2>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-neutral-700)">Full name
+            <input value="{{ nu.name }}" onChange="{{ nuSetName }}" placeholder="e.g. Nyibol Garang" style="min-height:42px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:var(--font-body);font-size:15px;color:var(--color-text);padding:0 10px">
+          </label>
+          <div style="font-size:12px;color:var(--color-neutral-700)">Role</div>
+          <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+            <sc-for list="{{ roleTabs }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.pick }}" style="flex:1;min-height:40px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:12.5px;cursor:pointer;box-shadow:{{ f.line }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">Key expires after</div>
+          <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+            <sc-for list="{{ expTabs }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.pick }}" style="flex:1;min-height:40px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:12.5px;cursor:pointer;box-shadow:{{ f.line }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ nuErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;font-style:italic;color:var(--color-accent-800)">{{ nuErr }}</div></sc-if>
+          <button onClick="{{ genKey }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)" style-active="background:var(--color-accent-200)">Generate access key</button>
+        </div>
+        <sc-if value="{{ hasNewKey }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid var(--color-accent);border-radius:var(--radius-md);padding:14px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Key for {{ newKey.id }} · shown once</div>
+            <div style="font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all;padding:10px;border:1px dashed var(--color-accent);border-radius:var(--radius-sm);background:var(--color-accent-100)">{{ newKey.key }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <button onClick="{{ copyKey }}" style="min-height:42px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:13.5px;cursor:pointer" style-hover="background:var(--color-accent-100)">{{ copyLabel }}</button>
+              <button onClick="{{ hideKey }}" style="min-height:42px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:13.5px;cursor:pointer" style-hover="border-color:var(--color-accent)">Done, hide it</button>
+            </div>
+            <div style="font-size:11.5px;line-height:1.5;color:var(--color-neutral-800);font-variant-numeric:tabular-nums">{{ commitNote }}</div>
+          </div>
+        </sc-if>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--color-divider);padding-bottom:6px"><h2 style="margin:0;font-family:var(--font-heading);font-weight:600;font-size:20px">Users</h2><span style="font-size:12px;color:var(--color-neutral-700)">{{ userCount }}</span></div>
+          <sc-for list="{{ userRows }}" as="u" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--color-divider);align-items:center;opacity:{{ u.op }}">
+              <span><span style="display:block;font-size:14px">{{ u.name }} <span style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--color-neutral-700)">{{ u.id }}</span></span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ u.role }} · {{ u.meta }}</span></span>
+              <button onClick="{{ u.toggle }}" style="min-height:36px;padding:0 10px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:12px;cursor:pointer" style-hover="border-color:var(--color-accent)">{{ u.action }}</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;line-height:1.55;color:var(--color-neutral-700)">The admin's own GitHub token lives only on the admin phone's secure storage, never in the repository. The nightly workflow reads Drive and Earth Engine with its own service account, set as GitHub Actions secrets.</div>
+      </div>
+    </sc-if>
+
+    <!-- TOOLS HUB -->
+    <sc-if value="{{ isTools }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:10px 18px 24px">
+        <sc-for list="{{ toolRows }}" as="t" hint-placeholder-count="8">
+          <button onClick="{{ t.open }}" style="width:100%;display:grid;grid-template-columns:34px 1fr 16px;gap:10px;align-items:center;padding:12px 0;border:none;border-bottom:1px solid var(--color-divider);background:transparent;text-align:left;cursor:pointer;color:var(--color-text);min-height:56px" style-hover="background:var(--color-accent-100)">
+            <span style="font-family:var(--font-heading);font-size:20px;color:var(--color-accent)">{{ t.n }}</span>
+            <span><span style="display:block;font-family:var(--font-heading);font-weight:600;font-size:18px;line-height:1.15">{{ t.name }}</span><span style="font-size:12px;color:var(--color-neutral-700);line-height:1.35">{{ t.sub }}</span></span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- i FLOOD SMS ALERTS -->
+    <sc-if value="{{ isAlerts }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:13.5px;line-height:1.5;text-align:justify">Text group leads when the flood model forecasts a mound crest will be overtopped. Works on any phone, no app or data needed.</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12px;color:var(--color-neutral-700)">Warn when overtopping is forecast within</div>
+          <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+            <sc-for list="{{ alertDayTabs }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="flex:1;min-height:40px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:13px;cursor:pointer;box-shadow:{{ f.line }}">{{ f.label }}</button></sc-for>
+          </div>
+        </div>
+        <button onClick="{{ toggleRise }}" style="display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:0 12px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:13px;cursor:pointer" style-hover="border-color:var(--color-accent)"><span>Scenario: river rises 8 cm</span><span style="font-style:italic;color:var(--color-accent-800)">{{ riseLabel }}</span></button>
+        <div style="border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:10px 0;font-size:13.5px">{{ riskLine }}</div>
+        <div>
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:6px">SMS preview · 160 characters</div>
+          <div style="border:1px solid var(--color-neutral-800);border-radius:12px;padding:12px;background:var(--color-neutral-100);font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.5;color:var(--color-text)">{{ smsText }}</div>
+          <div style="font-size:11px;color:var(--color-neutral-700);margin-top:4px">Arabic copy is sent to leads who chose Arabic. Reply 1 to confirm receipt.</div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">Recipients</div>
+          <sc-for list="{{ leadRows }}" as="l" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 0;border-bottom:1px solid var(--color-divider);align-items:center">
+              <span><span style="display:block;font-size:14px">{{ l.name }}</span><span style="font-size:11.5px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">{{ l.rows }} · {{ l.phone }}</span></span>
+              <button onClick="{{ l.toggle }}" style="width:44px;height:26px;border:1px solid var(--color-accent);border-radius:13px;background:{{ l.track }};position:relative;cursor:pointer;padding:0"><span style="position:absolute;top:3px;left:{{ l.knob }};width:18px;height:18px;border-radius:50%;border:1px solid var(--color-accent);background:var(--color-bg)"></span></button>
+            </div>
+          </sc-for>
+        </div>
+        <button onClick="{{ sendTest }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Send test SMS to selected</button>
+        <sc-for list="{{ alertLog }}" as="a" hint-placeholder-count="2"><div style="font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">{{ a }}</div></sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ii GAUGE BY SMS / USSD -->
+    <sc-if value="{{ isGauge }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--color-divider);border-radius:var(--radius-md)">
+          <div style="padding:10px 12px;border-right:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">SMS</div><div style="font-family:ui-monospace,Menlo,monospace;font-size:14px">G 4.12</div><div style="font-size:11px;color:var(--color-neutral-700)">to 8022</div></div>
+          <div style="padding:10px 12px"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">USSD</div><div style="font-family:ui-monospace,Menlo,monospace;font-size:14px">*384*22#</div><div style="font-size:11px;color:var(--color-neutral-700)">1 Gauge · 2 Rain · 3 Flood</div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Bor gauge · last 10 readings</span><span style="font-family:var(--font-heading);font-size:22px;font-variant-numeric:tabular-nums">{{ gaugeLast }}</span></div>
+          <svg viewBox="0 0 320 70" width="100%" height="70" style="display:block;border-bottom:1px solid var(--color-divider)"><polyline points="{{ gaugeLine }}" fill="none" stroke="var(--color-accent)" stroke-width="1.6"></polyline><sc-for list="{{ gaugeDots }}" as="p" hint-placeholder-count="10"><circle cx="{{ p.x }}" cy="{{ p.y }}" r="2.5" fill="{{ p.fill }}" stroke="var(--color-accent)"></circle></sc-for></svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12px;color:var(--color-neutral-700)">Try it: send a reading as the Bor volunteer</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+            <input value="{{ gaugeInput }}" onChange="{{ setGaugeInput }}" placeholder="G 4.10" style="min-height:42px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-bg);font-family:ui-monospace,Menlo,monospace;font-size:15px;color:var(--color-text);padding:0 10px">
+            <button onClick="{{ sendGauge }}" style="min-height:42px;padding:0 14px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:13.5px;cursor:pointer" style-hover="background:var(--color-accent-100)">Send</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">Inbox → gauge sheet</div>
+          <sc-for list="{{ gaugeRows }}" as="m" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 0;border-bottom:1px solid var(--color-divider)">
+              <span><span style="display:block;font-family:ui-monospace,Menlo,monospace;font-size:13.5px">"{{ m.text }}"</span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ m.from }} · {{ m.at }}</span></span>
+              <span style="font-size:12px;font-style:italic;color:{{ m.color }};text-align:right">{{ m.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;line-height:1.5;color:var(--color-neutral-700)">Readings more than 30 cm from the last one are held for the admin to check before they feed the flood model. Satellite altimetry in station_status.csv is the cross-check.</div>
+      </div>
+    </sc-if>
+
+    <!-- iii PICTOGRAM + VOICE -->
+    <sc-if value="{{ isVoice }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 16px 24px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:13px;line-height:1.5;color:var(--color-neutral-800)">Tap a picture to hear it in Thuɔŋjäŋ. Tap again to record that you did it today.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <sc-for list="{{ pictos }}" as="p" hint-placeholder-count="6">
+            <button onClick="{{ p.tap }}" style="height:128px;border:1.5px solid {{ p.border }};border-radius:var(--radius-lg);background:{{ p.bg }};color:var(--color-accent-900);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative">
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.d }}"></path></svg>
+              <span style="font-size:12px;color:var(--color-neutral-800)">{{ p.label }}</span>
+              <span style="position:absolute;top:8px;right:10px;font-size:13px;color:var(--color-accent-800)">{{ p.mark }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="min-height:44px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:8px 0">
+          <span style="display:flex;gap:3px;align-items:flex-end;height:20px"><span style="width:3px;height:{{ vb1 }};background:var(--color-accent)"></span><span style="width:3px;height:{{ vb2 }};background:var(--color-accent)"></span><span style="width:3px;height:{{ vb3 }};background:var(--color-accent)"></span><span style="width:3px;height:{{ vb2 }};background:var(--color-accent)"></span></span>
+          <span style="font-size:13px;color:var(--color-neutral-800)">{{ voiceStatus }}</span>
+        </div>
+        <div style="font-size:11.5px;line-height:1.5;color:var(--color-neutral-700)">Prompts are recorded once by a group lead in the local dialect and stored on the phone (about 40 KB each). Admins can re-record any prompt.</div>
+      </div>
+    </sc-if>
+
+    <!-- iv PEST PHOTO CHECK -->
+    <sc-if value="{{ isPest }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="height:170px;border:6px solid var(--color-surface);outline:1px solid var(--color-divider);background:repeating-linear-gradient(135deg,var(--color-neutral-200) 0 1px,var(--color-neutral-100) 1px 9px);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-style:italic;color:var(--color-neutral-700)">Crop‑check photo · sorghum leaf, B‑12</div>
+        <sc-if value="{{ pestIdle }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ runPest }}" style="min-height:48px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:15px;cursor:pointer" style-hover="background:var(--color-accent-100)">Compare with local library</button>
+        </sc-if>
+        <sc-if value="{{ pestBusy }}" hint-placeholder-val="{{ false }}"><div style="font-size:13.5px;font-style:italic;color:var(--color-accent-800)">Comparing with 46 reference photos from Jonglei…</div></sc-if>
+        <sc-if value="{{ pestDone }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">Closest matches</div>
+              <sc-for list="{{ pestMatches }}" as="m" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:1fr 90px 40px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--color-divider)">
+                  <span style="font-size:14px">{{ m.name }}</span>
+                  <span style="height:8px;border:1px solid var(--color-accent);border-radius:2px;position:relative"><span style="position:absolute;left:0;top:0;bottom:0;width:{{ m.w }};background:var(--color-accent-300)"></span></span>
+                  <span style="font-size:13px;text-align:right;font-variant-numeric:tabular-nums">{{ m.p }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="border:1px solid var(--color-accent);border-radius:var(--radius-md);padding:12px 14px">
+              <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Suggested, needs confirmation</div>
+              <div style="font-size:14px;line-height:1.45;margin-top:4px">Fall armyworm. Hand‑pick egg masses and larvae at dawn; spray neem‑seed extract into leaf whorls within 3 days; check 20 plants per plot again in a week.</div>
+            </div>
+            <sc-if value="{{ pestOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button onClick="{{ pestReject }}" style="min-height:44px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:13.5px;cursor:pointer" style-hover="border-color:var(--color-accent)">Not this</button>
+                <button onClick="{{ pestConfirm }}" style="min-height:44px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:13.5px;cursor:pointer" style-hover="background:var(--color-accent-100)">Confirm (EW‑014)</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ pestMsg }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;font-style:italic;color:var(--color-accent-800);border-top:1px solid var(--color-divider);padding-top:8px">{{ pestMsg }}</div></sc-if>
+          </div>
+        </sc-if>
+        <div style="font-size:11.5px;line-height:1.5;color:var(--color-neutral-700)">Runs on the phone without signal. The app only suggests; an extension worker confirms before any treatment is advised.</div>
+      </div>
+    </sc-if>
+
+    <!-- v ROLL-CALL & PAYOUT -->
+    <sc-if value="{{ isPayout }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><div><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Group 4 · roll‑call 28 Oct</div><div style="font-family:var(--font-heading);font-size:24px">{{ presentCount }} of 12 present</div></div><button onClick="{{ allPresent }}" style="min-height:36px;padding:0 10px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:12px;cursor:pointer" style-hover="border-color:var(--color-accent)">All present</button></div>
+        <div>
+          <div style="display:grid;grid-template-columns:28px 1fr 52px 64px;gap:8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px"><span></span><span>Member</span><span style="text-align:right">Days</span><span style="text-align:right">Share</span></div>
+          <sc-for list="{{ rollRows }}" as="r" hint-placeholder-count="12">
+            <button onClick="{{ r.toggle }}" style="width:100%;display:grid;grid-template-columns:28px 1fr 52px 64px;gap:8px;align-items:center;padding:8px 0;border:none;border-bottom:1px solid var(--color-divider);background:transparent;text-align:left;cursor:pointer;color:var(--color-text);font-size:13.5px;min-height:40px">
+              <span style="width:20px;height:20px;border:1px solid var(--color-accent);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-accent-800)">{{ r.mark }}</span>
+              <span>{{ r.name }}</span>
+              <span style="text-align:right;font-variant-numeric:tabular-nums">{{ r.days }}</span>
+              <span style="text-align:right;font-variant-numeric:tabular-nums;font-family:var(--font-heading);font-size:17px">{{ r.share }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px;border-bottom:1px solid var(--color-divider);padding-bottom:10px;font-variant-numeric:tabular-nums">
+          <span>Oil sale, Nile Botanicals (40 L)</span><span style="text-align:right">$540.00</span>
+          <span style="color:var(--color-neutral-700)">Cooperative fund 15%</span><span style="text-align:right;color:var(--color-neutral-700)">− $81.00</span>
+          <span style="font-weight:600">Shared by work days</span><span style="text-align:right;font-weight:600">$459.00</span>
+        </div>
+        <button style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Approve & send mobile‑money list</button>
+      </div>
+    </sc-if>
+
+    <!-- vi SEED & INPUT STORE -->
+    <sc-if value="{{ isStore }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:13.5px;line-height:1.5;text-align:justify">Stock in the Abuk store, reserved against the next planting windows from the flood model.</div>
+        <div style="border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ storeRows }}" as="s" hint-placeholder-count="7">
+            <div style="padding:10px 0;border-bottom:1px solid var(--color-divider);display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-size:14px">{{ s.name }}</span><span style="font-family:var(--font-heading);font-size:19px;font-variant-numeric:tabular-nums">{{ s.haveLabel }}</span></div>
+              <div style="position:relative;height:7px;border:1px solid var(--color-divider);border-radius:2px"><span style="position:absolute;left:0;top:0;bottom:0;width:{{ s.w }};background:{{ s.fill }}"></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:11.5px;color:{{ s.noteColor }}">{{ s.note }}</span><button onClick="{{ s.issue }}" style="min-height:30px;padding:0 9px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:11.5px;cursor:pointer;flex:none" style-hover="border-color:var(--color-accent)">Issue {{ s.step }}</button></div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ storeMsg }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;font-style:italic;color:var(--color-accent-800)">{{ storeMsg }}</div></sc-if>
+        <button onClick="{{ orderShort }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">Request {{ shortCount }} short items</button>
+      </div>
+    </sc-if>
+
+    <!-- vii TRACEABLE BOTTLES -->
+    <sc-if value="{{ isTrace }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+          <sc-for list="{{ batchTabs }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="flex:1;min-height:40px;border:none;border-right:1px solid var(--color-divider);background:{{ f.bg }};color:var(--color-text);font-size:12px;cursor:pointer;box-shadow:{{ f.line }};font-variant-numeric:tabular-nums">{{ f.label }}</button></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:128px 1fr;gap:14px;align-items:center;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:12px">
+          <svg viewBox="0 0 25 25" width="128" height="128" style="display:block;background:var(--color-neutral-100)"><sc-for list="{{ qrCells }}" as="c" hint-placeholder-count="0"><rect x="{{ c.x }}" y="{{ c.y }}" width="1" height="1" fill="var(--color-text)"></rect></sc-for></svg>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Bottle label</div>
+            <div style="font-family:var(--font-heading);font-size:20px;line-height:1.1">Desert date oil, 1 L</div>
+            <div style="font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">Batch {{ batch.id }}</div>
+            <div style="font-size:10.5px;color:var(--color-neutral-600);font-style:italic">placeholder QR pattern</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">What the buyer sees on scan</div>
+          <sc-for list="{{ batchRows }}" as="r" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px"><span style="color:var(--color-neutral-700)">{{ r.k }}</span><span>{{ r.v }}</span></div>
+          </sc-for>
+        </div>
+        <button onClick="{{ printLabels }}" style="min-height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:14px;cursor:pointer" style-hover="background:var(--color-accent-100)">{{ printLabel }}</button>
+      </div>
+    </sc-if>
+
+    <!-- viii PHONE-TO-PHONE SYNC -->
+    <sc-if value="{{ isP2p }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:13.5px;line-height:1.5;text-align:justify">Swap records with nearby group‑lead phones over Bluetooth. Whoever reaches signal first uploads everyone's.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+          <div style="padding:10px 0"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">On this phone</div><div style="font-family:var(--font-heading);font-size:26px;font-variant-numeric:tabular-nums">{{ carrying }}</div><div style="font-size:11px;color:var(--color-neutral-700)">records to upload</div></div>
+          <div style="padding:10px 0 10px 12px;border-left:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">From phones</div><div style="font-family:var(--font-heading);font-size:26px;font-variant-numeric:tabular-nums">{{ fromPhones }}</div><div style="font-size:11px;color:var(--color-neutral-700)">swapped today</div></div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);border-bottom:1px solid var(--color-divider);padding-bottom:4px">Nearby · Bluetooth</div>
+          <sc-for list="{{ p2pRows }}" as="d" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--color-divider);align-items:center">
+              <span><span style="display:block;font-size:14px">{{ d.name }}</span><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ d.dist }} · {{ d.recs }} new records</span></span>
+              <button onClick="{{ d.swap }}" style="min-height:38px;min-width:84px;padding:0 10px;border:1px solid {{ d.border }};border-radius:var(--radius-md);background:transparent;color:var(--color-accent-800);font-size:12.5px;cursor:pointer" style-hover="background:var(--color-accent-100)">{{ d.label }}</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:11.5px;line-height:1.5;color:var(--color-neutral-700)">Records are signed with each worker's key and encrypted in transit, so a carrier phone can pass them on but not change them.</div>
+      </div>
+    </sc-if>
+
+    <!-- SPECIES -->
+    <sc-if value="{{ isSpecies }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:16px 18px 24px;display:flex;flex-direction:column;gap:14px">
+        <div>
+          <div style="font-size:12.5px;font-style:italic;color:var(--color-neutral-700)">{{ sp.sci }}</div>
+          <h1 style="margin:2px 0 4px;font-family:var(--font-heading);font-weight:400;font-size:36px;line-height:1">{{ sp.name }}</h1>
+          <div style="font-size:13px;color:var(--color-accent-800)">{{ sp.ar }} · {{ sp.local }}</div>
+        </div>
+        <div style="height:150px;border:6px solid var(--color-surface);outline:1px solid var(--color-divider);background:repeating-linear-gradient(135deg,var(--color-neutral-200) 0 1px,var(--color-neutral-100) 1px 9px);display:flex;align-items:center;justify-content:center;font-size:11.5px;color:var(--color-neutral-700);font-style:italic">Field photograph · {{ sp.name }}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider)">
+          <div style="padding:9px 0;border-bottom:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Zone</div><div style="font-size:14px">{{ sp.zone }}</div></div>
+          <div style="padding:9px 0 9px 10px;border-bottom:1px solid var(--color-divider);border-left:1px solid var(--color-divider)"><div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Season</div><div style="font-size:14px">{{ sp.season }}</div></div>
+        </div>
+        <div><h2 style="margin:0 0 4px;font-family:var(--font-heading);font-weight:600;font-size:20px">Growing it here</h2><p style="margin:0;font-size:14px;line-height:1.5;text-align:justify;hyphens:auto">{{ sp.notes }}</p></div>
+        <div><h2 style="margin:0 0 4px;font-family:var(--font-heading);font-weight:600;font-size:20px">Uses</h2><p style="margin:0;font-size:14px;line-height:1.5;text-align:justify;hyphens:auto">{{ sp.uses }}</p></div>
+        <div style="border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:10px 0">
+          <div style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:4px">Value chain</div>
+          <div style="font-size:13px;line-height:1.55">{{ sp.chain }}</div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="flex:none;height:62px;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);background:var(--color-bg)">
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+      <button onClick="{{ n.go }}" style="border:none;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:{{ n.color }};font-size:11px;box-shadow:{{ n.line }}" style-hover="color:var(--color-accent-700)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg>
+        {{ n.label }}
+      </button>
+    </sc-for>
+  </div>
+  <div style="flex:none;height:18px;display:flex;align-items:center;justify-content:center"><div style="width:110px;height:4px;border-radius:2px;background:var(--color-neutral-800)"></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:376,&quot;height&quot;:792},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;tools&quot;,&quot;alerts&quot;,&quot;gauge&quot;,&quot;voice&quot;,&quot;pest&quot;,&quot;payout&quot;,&quot;store&quot;,&quot;trace&quot;,&quot;p2p&quot;,&quot;signin&quot;,&quot;admin&quot;,&quot;map&quot;,&quot;flood&quot;,&quot;season&quot;,&quot;tasks&quot;,&quot;plot&quot;,&quot;harvest&quot;,&quot;monitor&quot;,&quot;sources&quot;,&quot;process&quot;,&quot;market&quot;,&quot;guide&quot;,&quot;species&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;homeLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ledger&quot;,&quot;almanac&quot;,&quot;field&quot;],&quot;default&quot;:&quot;ledger&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;en&quot;,&quot;ar&quot;,&quot;din&quot;],&quot;default&quot;:&quot;en&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const ICONS = {
+  home: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8 M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+  map: "M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z M15 5.764v15 M9 3.236v15",
+  season: "M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
+  guide: "M12 7v14 M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z",
+  market: "M2 7l4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7 M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8 M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4 M2 7h20 M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"
+};
+const T = {
+  en: { home: 'Home', map: 'Map', season: 'Season', guide: 'Guide', market: 'Market', greet: 'Good morning, Achol', tasks: "Today's work", zones: 'Zones', seeAll: 'All tasks', offline: 'Offline', online: 'Online', queued: 'to sync', synced: 'Synced' },
+  ar: { home: 'الرئيسية', map: 'الخريطة', season: 'الموسم', guide: 'الدليل', market: 'السوق', greet: 'صباح الخير يا أشول', tasks: 'أعمال اليوم', zones: 'المناطق', seeAll: 'كل المهام', offline: 'غير متصل', online: 'متصل', queued: 'للمزامنة', synced: 'تمت المزامنة' }
+};
+const TITLES = {
+  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'Gauge by SMS', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable bottles', p2p: 'Phone‑to‑phone sync' },
+  ar: { home: 'مشروع أبوك', map: 'خريطة المزرعة', flood: 'نموذج الفيضان', season: 'تقويم المحاصيل', tasks: 'المهام', plot: 'القطعة B‑07', harvest: 'سجل الحصاد', process: 'المعالجة', market: 'السوق', guide: 'دليل الأنواع', monitor: 'فحص المحصول', sources: 'مصادر البيانات', signin: 'تسجيل الدخول', admin: 'الوصول والمفاتيح', tools: 'أدوات الحقل', alerts: 'تنبيهات الفيضان', gauge: 'قراءة المقياس', voice: 'صور وصوت', pest: 'فحص الآفات', payout: 'أيام العمل والأجور', store: 'مخزن البذور', trace: 'تتبع الزجاجات', p2p: 'مزامنة الهواتف' }
+};
+const TASKS = [
+  { id: 1, t: 'Check mound B‑05 for erosion as water drops', zone: 'Basin', who: 'Group 4', due: 'today' },
+  { id: 2, t: 'Cut Moringa leaf block R‑02 (40‑day cycle)', zone: 'Ridge', who: 'Group 1', due: 'today' },
+  { id: 3, t: 'Send Bor river gauge reading by SMS', zone: 'All', who: 'Garang Mabior', due: 'today' },
+  { id: 4, t: 'Turn shade‑drying trays, leaf batch 27 Oct', zone: 'Shed', who: 'Nyandeng Ajak', due: 'today' },
+  { id: 5, t: 'Tap gum arabic trees, boundary row R‑05', zone: 'Ridge', who: 'Group 2', due: 'today' },
+  { id: 6, t: 'Count cowpea & Feterita seed for recession sowing', zone: 'Store', who: 'Group 4', due: 'week' },
+  { id: 7, t: 'Clear groundnut stubble, slope S‑04', zone: 'Slope', who: 'Group 3', due: 'week' },
+  { id: 8, t: 'Re-pin 6 Balanites trees missing GPS, row B‑07', zone: 'Basin', who: 'Group 4', due: 'week' }
+];
+const HARV = [
+  { crop: 'Moringa leaf (fresh)', plot: 'R‑02', kg: 186, who: 'Group 1', date: '27 Oct', synced: true },
+  { crop: 'Okra', plot: 'S‑04', kg: 42, who: 'Group 3', date: '26 Oct', synced: true },
+  { crop: 'Sesame', plot: 'S‑01', kg: 310, who: 'Group 5', date: '22 Oct', synced: true },
+  { crop: 'Jute mallow (kudra)', plot: 'B‑03', kg: 64, who: 'Ayen Kuol', date: '21 Oct', synced: true }
+];
+const SPECIES = [
+  { key: 'balanites', g: 'trees', name: 'Desert date', sci: 'Balanites aegyptiaca', ar: 'هجليج', local: 'Thou (Dinka) · lalob', zone: 'Basin, on 1 m mounds', season: 'Fruit Jan–Mar', notes: 'Grafted onto wild rootstock from elite mother trees, it fruits in 2–3 years. Plant on raised ridges 1 m high, 7 m apart, so the crown stays above the two‑month flood while deep taproots reach the water table through the dry season. Thin canopy lets recession crops grow beneath.', uses: 'Kernel oil for cosmetics and cooking; press cake is high‑protein livestock feed; pulp is eaten and sold; bark and fruit extracts are used against parasites; shells make good fuel.', chain: 'Collection & de‑pulping → cracking & kernel extraction → oil pressing → refining & packaging → retail / cosmetic buyers' },
+  { key: 'moringa', g: 'trees', name: 'Moringa', sci: 'Moringa oleifera', ar: 'مورينجا', local: 'Ridge only', zone: 'Dry ridge', season: 'Leaf cut every 35–45 days', notes: 'Needs sandy, well‑drained soil; never plant in the basin. On heavy clay, work river sand, compost and gypsum into the top 30 cm. Leaf blocks at 1 × 1 m; pod rows wider.', uses: 'Leaf powder for nutrition, pods as vegetable, seed oil, seed cake for water clarifying.', chain: 'Pruning / harvest → shade‑drying → milling → local market & household use, feed' },
+  { key: 'shea', g: 'trees', name: 'Shea', sci: 'Vitellaria paradoxa ssp. nilotica', ar: 'لولو', local: 'Lulu', zone: 'Ridge boundary', season: 'Fruit Apr–Jun', notes: 'The Nile subspecies gives a soft, liquid‑rich butter prized by buyers. Slow to bear from seed; protect existing wild trees and add grafted seedlings along the ridge edge.', uses: 'Shea butter and oil for cooking and cosmetics; fruit pulp eaten fresh.', chain: 'Fruit collection → de‑pulping → drying nuts → roasting & pounding → butter → market' },
+  { key: 'tamarind', g: 'trees', name: 'Tamarind', sci: 'Tamarindus indica', ar: 'عرديب', local: 'Aradeib', zone: 'Ridge & slope', season: 'Pods Jan–Mar', notes: 'Tolerates drought and occasional waterlogging at its edges. Good windbreak and shade tree for the processing area.', uses: 'Pulp for drinks and sauces, sold dried; leaves and bark in home remedies; timber.', chain: 'Pod harvest → de‑shelling → pressed pulp blocks → market' },
+  { key: 'gum', g: 'trees', name: 'Gum arabic', sci: 'Senegalia senegal', ar: 'هشاب', local: 'Hashab', zone: 'Dry ridge', season: 'Tap Nov–Feb', notes: 'Fixes nitrogen and holds sandy soil. Tap after the rains stop; collect nodules 4–6 weeks later.', uses: 'Gum for food and beverage industry export; pods as fodder; living fence.', chain: 'Tapping → collection → cleaning & grading → export traders' },
+  { key: 'sorghum', g: 'field', name: 'Sorghum', sci: 'Sorghum bicolor (Feterita)', ar: 'ذرة', local: 'Feterita / local', zone: 'Basin, post‑flood', season: 'Sow Dec · harvest Mar', notes: 'Choose tall local recession varieties that finish on stored soil moisture with no irrigation. Roots bind cracking vertisol clay.', uses: 'Staple grain, brewing, stalks for fodder and building.', chain: 'Harvest → threshing → household store & local market' },
+  { key: 'cowpea', g: 'field', name: 'Cowpea', sci: 'Vigna unguiculata', ar: 'لوبيا', local: '', zone: 'Basin, post‑flood', season: 'Dec–Feb', notes: 'Broadcast straight into the wet silt as the water drops. Fixes nitrogen for the Balanites rows.', uses: 'Grain and leaves for food; haulms for livestock.', chain: 'Harvest → drying → market' },
+  { key: 'jute', g: 'field', name: 'Jute mallow', sci: 'Corchorus olitorius', ar: 'ملوخية', local: 'Kudra', zone: 'Basin, post‑flood', season: 'Dec–Mar', notes: 'Cut tender tops every 2–3 weeks to keep plants bushy and delay seeding.', uses: 'Leaf vegetable, fresh or dried.', chain: 'Cutting → fresh market or sun‑drying' },
+  { key: 'groundnut', g: 'field', name: 'Groundnut', sci: 'Arachis hypogaea', ar: 'فول سوداني', local: '', zone: 'Slope', season: 'May–Aug', notes: 'Needs the lighter, better‑drained slope soils; lift before the flood reaches the slope.', uses: 'Nuts, paste and oil; haulms for fodder.', chain: 'Lifting → drying → shelling → paste / oil → market' },
+  { key: 'sesame', g: 'field', name: 'Sesame', sci: 'Sesamum indicum', ar: 'سمسم', local: '', zone: 'Slope', season: 'Jun–Sep', notes: 'Drought‑hardy; harvest stalks before pods shatter and dry them upright.', uses: 'Oil seed, paste; strong cash crop.', chain: 'Cutting → stooking → threshing → traders' },
+  { key: 'millet', g: 'field', name: 'Bulrush millet', sci: 'Pennisetum glaucum', ar: 'دخن', local: 'Dukhn', zone: 'Slope & ridge', season: 'Jun–Sep', notes: 'Earliest grain of the year; fills the hunger gap before sorghum.', uses: 'Porridge and flour; stalks for fencing.', chain: 'Harvest → threshing → household & market' },
+  { key: 'okra', g: 'field', name: 'Okra', sci: 'Abelmoschus esculentus', ar: 'بامية', local: '', zone: 'Slope, under Moringa', season: 'May–Aug', notes: 'Early rainfed or irrigated understory crop; pick every 2–3 days.', uses: 'Fresh and dried pods.', chain: 'Picking → fresh or sun‑dried → market' }
+];
+const SEASON = [
+  { zone: 'Zone 1 · Dry ridge', rows: [['Moringa', 'moringa', [[0, 11, 'g']]], ['Gum arabic', 'gum', [[10, 11, 'h'], [0, 1, 'h']]], ['Shea', 'shea', [[3, 5, 'h']]], ['Tamarind', 'tamarind', [[0, 2, 'h']]]] },
+  { zone: 'Zone 2 · Slope', rows: [['Groundnut', 'groundnut', [[4, 6, 'g'], [7, 7, 'h']]], ['Sesame', 'sesame', [[5, 7, 'g'], [8, 8, 'h']]], ['Bulrush millet', 'millet', [[5, 7, 'g'], [8, 8, 'h']]], ['Okra', 'okra', [[4, 7, 'h']]]] },
+  { zone: 'Zone 3 · Basin', rows: [['Balanites', 'balanites', [[0, 2, 'h']]], ['Sorghum', 'sorghum', [[11, 11, 'g'], [0, 1, 'g'], [2, 2, 'h']]], ['Cowpea', 'cowpea', [[11, 11, 'g'], [0, 1, 'h']]], ['Jute mallow', 'jute', [[11, 11, 'g'], [0, 2, 'h']]]] }
+];
+const SOURCES = [
+  { id: 'bull', kind: 'Drive', name: 'County bulletin, Duk row', path: 'county_bulletin › county_bulletin_latest.xlsx', size: '1 row of 79', last: 'run 27 Oct 12 UTC', feeds: 'soil, rain, alert', on: true },
+  { id: 'ens', kind: 'Drive', name: 'Rain ensemble, 50 members, 15 days', path: 'county_bulletin › forecast_log_ens.csv', size: 'Duk only', last: 'run 27 Oct 12 UTC', feeds: 'rainfall forecast', on: true },
+  { id: 'stat', kind: 'Drive', name: 'Altimetry station status', path: 'station_status.csv · stations within radius', size: 'filtered', last: 'updated 28 Oct 04:34', feeds: 'river level, flood status', on: true },
+  { id: 'alt', kind: 'Drive', name: 'Water-level series (DAHITI + Hydroweb)', path: 'merged_altimetry_stations.csv · nearby rows only', size: '41.8 MB → ~60 KB', last: 'updated 28 Oct 04:35', feeds: 'river inflow trend', on: true },
+  { id: 'ifs', kind: 'Drive', name: 'ECMWF IFS daily: temp, soil water, runoff', path: 'cache_ecmwf_ifs_daily.csv', size: 'nearby stations', last: 'fetched 28 Oct', feeds: 'temperature, runoff', on: true },
+  { id: 'sm', kind: 'GEE', name: 'Soil moisture (SMAP SPL4SMGP)', path: 'Earth Engine asset · clipped to radius', size: '9 km grid', last: 'to 24 Oct', feeds: 'soil moisture', on: true },
+  { id: 'fx', kind: 'GEE', name: 'Flood extent', path: 'Earth Engine asset · clipped to radius', size: 'raster tile', last: 'latest pass', feeds: 'flood extent', on: true },
+  { id: 'payam', kind: 'Drive', name: 'Payam boundaries', path: 'ssd_payam (shapefile)', size: '1.2 MB, once', last: 'cached', feeds: 'county / payam lookup', on: true }
+];
+const MON = [
+  { plot: 'B‑03', crop: 'Jute mallow', acts: 'Weeding', ew: 'EW‑014', date: '27 Oct', cond: 4, synced: true },
+  { plot: 'S‑04', crop: 'Groundnut', acts: 'Harvest, Pest scouting', ew: 'EW‑014', date: '25 Oct', cond: 3, synced: true },
+  { plot: 'R‑02', crop: 'Moringa', acts: 'Pruning', ew: 'EW‑022', date: '24 Oct', cond: 5, synced: true }
+];
+const USERS = [
+  { id: 'AD‑001', name: 'Garang Mabior', role: 'Admin', meta: 'Duk · all data · seen today', on: true },
+  { id: 'EW‑014', name: 'Achol Deng', role: 'Group lead', meta: 'Group 4 · key exp. 12 Jan', on: true },
+  { id: 'EW‑022', name: 'Nyandeng Ajak', role: 'Extension worker', meta: 'Duk · 20 km · seen 27 Oct', on: true },
+  { id: 'EW‑027', name: 'Deng Bol', role: 'Group lead', meta: 'Group 6 · seen 25 Oct', on: true },
+  { id: 'EW‑009', name: 'Ayen Kuol', role: 'Extension worker', meta: 'revoked 2 Oct', on: false }
+];
+const TOOLS = [['i','alerts','Flood SMS alerts','Text group leads before a mound crest is overtopped'],['ii','gauge','Gauge reading by SMS / USSD','"G 4.12" from Bor lands in the gauge sheet'],['iii','voice','Pictures & voice','Big icons and recorded Dinka prompts'],['iv','pest','Pest photo check','Match a photo to the local library; worker confirms'],['v','payout','Work days & payout','Roll‑call, then each member\'s share of sales'],['vi','store','Seed & input store','Stock reserved against planting windows'],['vii','trace','Traceable bottles','QR on each oil bottle: plot, harvest, co‑op'],['viii','p2p','Phone‑to‑phone sync','Swap records by Bluetooth in the field']];
+const PICTO = [
+  ['plant', 'Planting', 'M7 20h10 M10 20c5.5-2.5.8-6.4 3-10 M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z'],
+  ['weed', 'Weeding', 'M2 22v-5l5-5 5 5-5 5z M9.5 14.5 16 8 M17 2l5 5-.5.5a3.54 3.54 0 0 1-5 0a3.54 3.54 0 0 1 0-5L17 2'],
+  ['harvest', 'Harvest', 'M2 22 16 8 M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z'],
+  ['water', 'Water rising', 'M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1'],
+  ['pest', 'Pests seen', 'm8 2 1.88 1.88 M14.12 3.88 16 2 M9 7.13v-1a3.003 3.003 0 1 1 6 0v1 M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6 M12 20v-9 M6.53 9C4.6 8.8 3 7.1 3 5 M6 13H2 M3 21c0-2.1 1.7-3.9 3.8-4 M20.97 5c0 2.1-1.6 3.8-3.5 4 M22 13h-4 M17.2 17c2.1.1 3.8 1.9 3.8 4'],
+  ['help', 'Call the lead', 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z']
+];
+const MEMBERS = [['Achol Deng', 41], ['Nyibol Garang', 38], ['Majok Ater', 36], ['Akuol Chol', 40], ['Bol Mayen', 29], ['Adut Kuol', 33], ['Ajak Deng', 27], ['Nyankiir Malual', 39], ['Kuol Arok', 22], ['Achan Majak', 35], ['Thon Akec', 31], ['Abuk Ayuel', 37]];
+const STORE = [
+  ['Cowpea seed', 'kg', 180, 240, 'Recession sowing · ~4 Dec', 10], ['Feterita sorghum seed', 'kg', 260, 225, 'Recession sowing · ~4 Dec', 10], ['Jute mallow (kudra) seed', 'kg', 4, 6, 'Recession sowing · ~4 Dec', 1],
+  ['Balanites scions, elite trees', 'pcs', 320, 280, 'Grafting · Jan', 20], ['Gypsum', 'kg', 900, 1200, 'Ridge soil prep · Feb', 50], ['Sacks, 50 kg', 'pcs', 140, 120, 'Sorghum harvest · Mar', 10], ['Amber bottles, 1 L', 'pcs', 60, 150, 'Oil pressing · Mar', 10]];
+const BATCHES = [
+  { id: 'BAL‑26‑03', plot: 'B‑07 · Group 4 (12 farmers)', fruit: 'Jan–Feb 2026', pressed: '12 Mar 2026, cold‑pressed', bottles: '132 × 1 L', place: 'Duk County, Jonglei · 7.73° N 31.40° E' },
+  { id: 'BAL‑26‑02', plot: 'B‑03 · Ayen Kuol (individual)', fruit: 'Feb 2026', pressed: '28 Feb 2026, cold‑pressed', bottles: '41 × 1 L', place: 'Duk County, Jonglei · 7.73° N 31.40° E' },
+  { id: 'BAL‑26‑01', plot: 'B‑12 · Group 6 (14 farmers)', fruit: 'Jan 2026', pressed: '9 Feb 2026, cold‑pressed', bottles: '88 × 1 L', place: 'Duk County, Jonglei · 7.73° N 31.40° E' }];
+const qr = (seed) => { let h = 0; for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const out = [], fin = (x, y) => (x < 7 && y < 7) || (x > 17 && y < 7) || (x < 7 && y > 17);
+  for (let y = 0; y < 25; y++) for (let x = 0; x < 25; x++) { let on;
+    if (fin(x, y)) { const lx = x > 17 ? x - 18 : x, ly = y > 17 ? y - 18 : y; on = lx === 0 || ly === 0 || lx === 6 || ly === 6 || (lx > 1 && lx < 5 && ly > 1 && ly < 5); }
+    else { h = (h * 1103515245 + 12345) >>> 0; on = (h >>> 16) % 2 === 0; }
+    if (on) out.push({ x, y }); } return out; };
+const MOUNDS = [['B‑01', 1.00], ['B‑02', 1.00], ['B‑03', 0.98], ['B‑04', 0.95], ['B‑05', 0.82], ['B‑06', 1.00], ['B‑07', 1.00], ['B‑08', 0.94]];
+const D0 = 0.92, RATE = 0.025;
+const day = (n) => { const d = new Date(2026, 9, 28 + n); return d.getDate() + ' ' + d.toLocaleString('en', { month: 'short' }); };
+
+class Component extends DCLogic {
+  state = {
+    screen: this.props.startScreen || 'home', hist: [], lang: this.props.lang || 'en', online: false, queued: 14, justSynced: false,
+    simDay: 0, tasks: TASKS.map(t => ({ ...t, done: t.id === 3 })), harvests: HARV.slice(),
+    form: { crop: 'Moringa leaf (fresh)', plot: 'R‑02', kg: '' }, formErr: '', saved: false,
+    mon: { plot: 'B‑07 · Group 4', ew: '', date: '2026-10-28', acts: ['Weeding'], crop: 'Cowpea', stage: 'Seedbed', cond: 4, pests: [], sky: 'Sunny', temp: '34', rain: '0', notes: '' }, monErr: '', monSaved: false, monLog: MON.slice(), photos: 0,
+    sources: SOURCES.map(x => ({ ...x })), radius: 20,
+    users: USERS.map(u => ({ ...u })),
+    alertDays: 5, rise: false, leads: [['Achol Deng', 'Group 4', 'B‑01–B‑08', '+211 92• ••• 214'], ['Deng Bol', 'Group 6', 'B‑09–B‑16', '+211 91• ••• 077'], ['Kuol Arok', 'Group 2', 'B‑17–B‑24', '+211 98• ••• 530'], ['Nyandeng Ajak', 'EW‑022', 'all rows', '+211 92• ••• 901']].map(([name, g, rows, phone]) => ({ name: name + ' · ' + g, rows, phone, on: true })), alertLog: ['12 Sep 05:40 · B‑05, B‑08 · 4 sent, 4 replied'],
+    gauge: [{ from: 'Garang M.', text: 'G 4.12', at: '28 Oct 06:58', v: 4.12, ok: true }, { from: 'Garang M.', text: 'G 4.15', at: '27 Oct 07:02', v: 4.15, ok: true }, { from: 'Bol M.', text: 'g4.18', at: '26 Oct 18:10', v: 4.18, ok: true }, { from: 'unknown', text: 'G 41.2', at: '25 Oct 09:15', v: 41.2, ok: false }], gaugeHist: [4.36, 4.33, 4.31, 4.29, 4.27, 4.24, 4.22, 4.18, 4.15, 4.12], gaugeInput: '',
+    playing: null, doneP: [], pest: 'idle', pestMsg: '', pestOpen: true,
+    present: MEMBERS.map((m, i) => i !== 4 && i !== 8),
+    stock: STORE.map(s => s[2]), storeMsg: '', batch: 0, printed: false,
+    p2p: [['Deng Bol · Group 6', '12 m', 52], ['Nyandeng Ajak · EW‑022', '40 m', 71], ['Kuol Arok · Group 2', '85 m', 19], ['Akuol Chol · Group 4', '6 m', 8]].map(([name, dist, recs]) => ({ name, dist, recs, st: 'idle' })), carry: 38, nu: { name: '', role: 'Extension worker', exp: '90 days' }, nuErr: '', newKey: null, copied: false,
+    si: { id: '', key: '' }, siErr: '', signedIn: false, siBusy: false, srcMsg: '', pulling: false, conn: null, connUrl: '',
+    sp: 'balanites', procTab: 'balanites', taskFilter: 'today', capture: null, zone: 'basin', offer: true, offerMsg: ''
+  };
+  componentWillUnmount() { clearInterval(this.iv); clearTimeout(this.pt); }
+  setMon(k, v) { this.setState(st => ({ mon: { ...st.mon, [k]: v }, monErr: '', monSaved: false })); }
+  togMon(k, v) { const a = this.state.mon[k]; this.setMon(k, a.includes(v) ? a.filter(x => x !== v) : [...a, v]); }
+  go(s) { this.setState(st => ({ screen: s, hist: [...st.hist, st.screen] })); }
+  tab(s) { clearInterval(this.iv); this.setState({ screen: s, hist: [], capture: null }); }
+  bump() { this.setState(st => ({ queued: st.online ? 0 : st.queued + 1, justSynced: st.online })); }
+  toggleTask(id) { this.setState(st => ({ tasks: st.tasks.map(t => t.id === id ? { ...t, done: !t.done } : t) })); this.bump(); }
+  startCap(mode) {
+    clearInterval(this.iv);
+    const max = mode === 'walk' ? 16 : 1;
+    this.setState({ capture: { mode, pts: 0, done: false } });
+    this.iv = setInterval(() => this.setState(st => {
+      if (!st.capture) return null;
+      const pts = st.capture.pts + 1;
+      if (pts >= max) { clearInterval(this.iv); return { capture: { ...st.capture, pts, done: true } }; }
+      return { capture: { ...st.capture, pts } };
+    }), mode === 'walk' ? 420 : 1200);
+  }
+  capPoints(c) {
+    if (!c) return [];
+    if (c.mode === 'pin') return c.pts ? [{ x: 250, y: 260 }] : [];
+    const x0 = 200, y0 = 214, w = 120, h = 80, per = 2 * (w + h), out = [];
+    for (let i = 0; i < c.pts; i++) {
+      let d = (i / 16) * per, x, y;
+      if (d < w) { x = x0 + d; y = y0; } else if ((d -= w) < h) { x = x0 + w; y = y0 + d; } else if ((d -= h) < w) { x = x0 + w - d; y = y0 + h; } else { d -= w; x = x0; y = y0 + h - d; }
+      out.push({ x: Math.round(x + Math.sin(i * 2.1) * 2), y: Math.round(y + Math.cos(i * 1.7) * 2) });
+    }
+    return out;
+  }
+  renderVals() {
+    const s = this.state, lang = s.lang === 'ar' ? 'ar' : 'en', L = T[lang], TT = TITLES[lang];
+    const layout = this.props.homeLayout || 'ledger';
+    const scr = s.screen;
+    const depth = (d) => Math.max(0, D0 - RATE * d);
+    const bd = depth(s.simDay), sd = Math.max(0, 0.22 - 0.03 * s.simDay);
+    const recessTotal = Math.ceil(D0 / RATE);
+    const mk = (t) => ({ ...t, mark: t.done ? '✓' : '', strike: t.done ? 'line-through' : 'none', toggle: () => this.toggleTask(t.id), dueLabel: t.due === 'today' ? 'today' : 'this week' });
+    const tasks = s.tasks.map(mk);
+    const filt = s.taskFilter === 'today' ? tasks.filter(t => t.due === 'today') : s.taskFilter === 'mine' ? tasks.filter(t => t.who === 'Group 4') : tasks;
+    const zoneMap = { basin: 'Basin', ridge: 'Ridge', slope: 'Slope' };
+    const tabSel = (on) => ({ bg: on ? 'var(--color-accent-100)' : 'transparent', line: on ? 'inset 0 -2px 0 var(--color-accent)' : 'none' });
+    const spec = SPECIES.find(x => x.key === s.sp) || SPECIES[0];
+    const navKey = ['monitor', 'signin', 'admin', 'tools', 'alerts', 'gauge', 'voice', 'pest', 'payout', 'store', 'p2p'].includes(scr) ? 'home' : scr === 'trace' ? 'market' : scr === 'sources' ? 'map' : ['flood', 'tasks', 'plot', 'harvest', 'process'].includes(scr) ? (scr === 'flood' || scr === 'plot' ? 'map' : scr === 'process' ? 'market' : 'home') : scr === 'species' ? 'guide' : scr;
+    const zInfo = {
+      basin: { kicker: 'Zone 3 · 22 ha · 0.92 m water', head: 'Mounds clear except B‑05.', body: 'Balanites anchor. Water is falling 2–3 cm a day; recession sowing of cowpea, sorghum and kudra follows in about ' + recessTotal + ' days.', stats: [{ k: 'Trees', v: '1,936' }, { k: 'Mound rows', v: '24' }, { k: 'Groups', v: '7' }] },
+      slope: { kicker: 'Zone 2 · 8 ha · 0.22 m water', head: 'Groundnut lifted; sesame drying.', body: 'Transition soils between ridge and basin. Rainfed groundnut, sesame, millet and okra finish before the flood climbs the slope.', stats: [{ k: 'Plots', v: '11' }, { k: 'Slope', v: '0.6%' }, { k: 'Groups', v: '3' }] },
+      ridge: { kicker: 'Zone 1 · 10 ha · dry', head: 'Moringa cut due on R‑02.', body: 'Safe from flood. High‑density Moringa leaf blocks, gum arabic tapping rows, shea and tamarind on the boundary.', stats: [{ k: 'Moringa', v: '62k' }, { k: 'Gum trees', v: '410' }, { k: 'Groups', v: '2' }] }
+    }[s.zone];
+    const pts = this.capPoints(s.capture);
+    const c = s.capture;
+    const PROC = {
+      balanites: { intro: 'Last season’s desert‑date fruit, Jan–Mar 2026. This season’s collection starts once fruit drops in January.', steps: [
+        { name: 'Fruit collected', out: '2,400 kg', note: '7 groups, basin rows B‑01–B‑24' },
+        { name: 'De‑pulped & dried nuts', out: '1,460 kg', note: '940 kg pulp sold as food and feed' },
+        { name: 'Cracked → kernels', out: '390 kg', note: 'shells kept as fuel for the shed' },
+        { name: 'Pressed', out: '148 L', note: '+ 220 kg protein feed cake' },
+        { name: 'Refined & bottled', out: '132 × 1 L', note: '46 bottles still in store' }],
+        foot: 'Yield: 6.2 L oil per 100 kg fruit. Target for 2027: 9 L with the new screw press.' },
+      moringa: { intro: 'Rolling leaf harvest from ridge blocks every 35–45 days.', steps: [
+        { name: 'Fresh leaves cut', out: '1,120 kg', note: 'blocks R‑01–R‑04, last 3 cycles' },
+        { name: 'Shade‑dried', out: '245 kg', note: '5 days on mesh trays, out of sun' },
+        { name: 'Milled', out: '228 kg', note: 'hammer mill, sieved' },
+        { name: 'Packed', out: '456 × 500 g', note: '120 packs in stock' }],
+        foot: 'Drying ratio 4.6 : 1. Keep powder sealed: it loses colour in light.' }
+    }[s.procTab];
+    const kgBad = s.formErr && !(Number(s.form.kg) > 0);
+    return {
+      kicker: scr === 'home' ? 'Duk County · Jonglei' : 'Abuk Project', title: TT[scr] || (scr === 'species' ? spec.name : 'Abuk'),
+      canBack: s.hist.length > 0, back: () => this.setState(st => ({ screen: st.hist[st.hist.length - 1], hist: st.hist.slice(0, -1), capture: null })),
+      langLabel: { en: 'EN', ar: 'عربي', din: 'DIN' }[s.lang], cycleLang: () => this.setState(st => ({ lang: { en: 'ar', ar: 'din', din: 'en' }[st.lang] })),
+      dinkaNote: s.lang === 'din',
+      netDot: s.online ? 'var(--color-accent)' : 'transparent',
+      netLabel: s.online ? (s.justSynced || s.queued === 0 ? L.synced : L.online) : `${L.offline} · ${s.queued} ${L.queued}`,
+      toggleNet: () => this.setState(st => ({ online: !st.online, queued: !st.online ? 0 : st.queued, justSynced: !st.online })),
+      isLedger: scr === 'home' && layout === 'ledger', isAlmanac: scr === 'home' && layout === 'almanac', isField: scr === 'home' && layout === 'field',
+      isMap: scr === 'map', isFlood: scr === 'flood', isSeason: scr === 'season', isTasks: scr === 'tasks', isPlot: scr === 'plot', isHarvest: scr === 'harvest', isProcess: scr === 'process', isMarket: scr === 'market', isGuide: scr === 'guide', isSpecies: scr === 'species', isMonitor: scr === 'monitor', isSources: scr === 'sources', isSignin: scr === 'signin', isAdmin: scr === 'admin', isTools: scr === 'tools', isAlerts: scr === 'alerts', isGauge: scr === 'gauge', isVoice: scr === 'voice', isPest: scr === 'pest', isPayout: scr === 'payout', isStore: scr === 'store', isTrace: scr === 'trace', isP2p: scr === 'p2p', goTools: () => this.go('tools'), goAdmin: () => this.go('admin'), goHomeTab: () => this.tab('home'),
+      goMonitor: () => this.go('monitor'), goSources: () => this.go('sources'),
+      greet: L.greet, tTasks: L.tasks, tSeeAll: L.seeAll, tZones: L.zones,
+      goFlood: () => this.go('flood'), goTasks: () => this.go('tasks'), goMap: () => this.tab('map'), goHarvest: () => this.go('harvest'), goProcess: () => this.go('process'), goPlot: () => this.go('plot'), goSeason: () => this.tab('season'), goMarket: () => this.tab('market'),
+      goSpeciesBal: () => { this.setState({ sp: 'balanites' }); this.go('species'); },
+      recessDays: recessTotal, openCount: tasks.filter(t => !t.done).length,
+      homeTasks: tasks.filter(t => t.due === 'today').slice(0, 3),
+      zones: [{ n: '1', name: 'Dry ridge', ha: '10 ha', crops: 'Moringa, gum arabic, shea, tamarind', status: 'cut due' }, { n: '2', name: 'Slope', ha: '8 ha', crops: 'Groundnut, sesame, millet, okra', status: 'drying' }, { n: '3', name: 'Floodplain basin', ha: '22 ha', crops: 'Balanites on mounds · recession crops', status: '0.92 m water' }],
+      months: 'JFMAMJJASOND'.split('').map((l, i) => ({ l, color: i === 9 ? 'var(--color-accent-700)' : 'var(--color-neutral-700)' })),
+      zoneChips: [['ridge', 'Ridge'], ['slope', 'Slope'], ['basin', 'Basin']].map(([k, label]) => ({ label, pick: () => this.setState({ zone: k }), border: s.zone === k ? 'var(--color-accent)' : 'var(--color-divider)', bg: s.zone === k ? 'var(--color-accent-100)' : 'transparent' })),
+      zoneInfo: zInfo, zoneTasks: tasks.filter(t => t.zone === zoneMap[s.zone]).slice(0, 3),
+      basinOpacity: (bd / 1.2 * 0.6).toFixed(2), basinDepthLabel: bd.toFixed(2) + ' m',
+      moundLines: [150, 163, 176, 189, 202, 215, 228, 241].map((y, i) => ({ y, c: MOUNDS[i][1] < bd ? 'var(--color-neutral-600)' : 'var(--color-accent)', w: 2 })),
+      mapMounds: [190, 206, 222, 238, 254, 270, 286, 302].map((y, i) => ({ y, c: MOUNDS[i][1] < bd ? 'var(--color-neutral-600)' : 'var(--color-accent)', w: 2 })),
+      noCapture: !c, hasCapture: !!c, capPts: pts, capLine: c && c.mode === 'walk' ? pts.map(p => p.x + ',' + p.y).join(' ') + (c.done ? ' ' + pts[0].x + ',' + pts[0].y : '') : '',
+      capTitle: c ? (c.mode === 'walk' ? 'Walking boundary' : 'Dropping pin') : '',
+      capStatus: c ? (c.done ? 'Fix locked ±2.8 m' : c.mode === 'walk' ? `${c.pts} points…` : 'Averaging GPS…') : '',
+      capReadouts: c ? [
+        { k: 'Latitude', v: (7.73124 + (c.pts || 0) * 0.00003).toFixed(5) + '° N', src: 'phone GPS' },
+        { k: 'Longitude', v: (31.40218 + (c.pts || 0) * 0.00002).toFixed(5) + '° E', src: 'phone GPS' },
+        { k: 'Elevation', v: s.online ? '409.4 m' : '409 m (GPS)', src: s.online ? 'terrain model' : 'refines when online' },
+        { k: 'Slope', v: s.online ? '0.3 %' : '—', src: s.online ? 'terrain model' : 'needs connection' },
+        { k: c.mode === 'walk' ? 'Area' : 'Tree', v: c.mode === 'walk' ? (c.pts * 0.039).toFixed(2) + ' ha' : 'Balanites #89', src: c.mode === 'walk' ? 'closes on finish' : 'row B‑07' },
+        { k: 'Flood risk', v: 'Basin · 0.92 m', src: 'from flood model' }] : [],
+      capNotDone: !(c && c.done), capOpacity: c && c.done ? 1 : 0.45,
+      startWalk: () => this.startCap('walk'), startPin: () => this.startCap('pin'),
+      cancelCap: () => { clearInterval(this.iv); this.setState({ capture: null }); },
+      saveCap: () => { this.setState({ capture: null }); this.bump(); },
+      simDay: s.simDay, simDate: day(s.simDay), setSimDay: (e) => this.setState({ simDay: Number(e.target.value) }),
+      simHeadline: bd <= 0 ? 'Basin dry. Sow now.' : MOUNDS.some(m => m[1] < bd) ? 'One mound row still under water.' : bd < 0.25 ? 'Silt exposed at the basin edges.' : 'All mound crests clear.',
+      depthBars: [['Ridge', 0], ['Slope', sd], ['Basin', bd]].map(([name, v]) => ({ name, v: v.toFixed(2) + ' m', pct: Math.min(100, v / 1.2 * 100) + '%' })),
+      recessDaysSim: Math.max(0, recessTotal - s.simDay) + ' days',
+      plantAlert: bd > 0 ? `Sow cowpea, Feterita sorghum and kudra into the wet silt from about ${day(recessTotal - 3)}, as the basin edge dries. Slope plots can be sown from ${day(Math.ceil(0.22 / 0.03))}.` : 'Basin silt is exposed now: broadcast cowpea, sorghum and kudra seed within the next 10 days while moisture is high.',
+      moundRows: MOUNDS.map(([id, h]) => { const sub = h < bd, risk = !sub && h - bd < 0.08; return { id, h: h.toFixed(2), status: sub ? `submerged · clear ${day(Math.ceil((D0 - h) / RATE))}` : risk ? 'at risk · <8 cm freeboard' : 'clear', color: sub ? 'var(--color-text)' : risk ? 'var(--color-accent-800)' : 'var(--color-neutral-600)' }; }),
+      simInputs: [
+        { k: 'Rain forecast, week 1', v: '10.9 mm', src: '50‑member ensemble, 6–15 mm range' },
+        { k: 'Rain, last 30 days', v: '85 mm · 91%', src: 'GSMaP, of normal' },
+        { k: 'Soil moisture, root zone', v: 'dry · 27th pct', src: 'SMAP via Earth Engine · 52 mm deficit' },
+        { k: 'Runoff, 30 days', v: 'dry', src: 'SPL4SMGP' },
+        { k: 'Evapotranspiration, 30 d', v: '107 mm', src: 'water balance −26 mm' },
+        { k: 'Temperature', v: '34° / 22°', src: 'ECMWF IFS daily' },
+        { k: 'River level, nearest stations', v: 'status file', src: 'station_status.csv, DAHITI/Hydroweb' },
+        { k: 'Satellite flood extent', v: '61 % of basin', src: 'Earth Engine asset, clipped to radius' }],
+      simRunNote: s.online ? 'Re-run 2 min ago with fresh data.' : 'Last run 06:10 today; reruns automatically when online.',
+      seasonGroups: SEASON.map(g => ({ zone: g.zone, rows: g.rows.map(([name, key, bars]) => ({ name, open: () => { this.setState({ sp: key }); this.go('species'); }, bars: bars.map(([a, b, k]) => ({ col: `${a + 2} / ${b + 3}`, bg: k === 'h' ? 'var(--color-accent-300)' : 'transparent' })) })) })),
+      taskTabs: [['today', 'Today'], ['week', 'This week'], ['mine', 'Group 4']].map(([k, label]) => ({ label, pick: () => this.setState({ taskFilter: k }), ...tabSel(s.taskFilter === k) })),
+      taskList: filt,
+      plotStats: [{ k: 'Area', v: '0.62 ha' }, { k: 'Elevation', v: '409.6 m' }, { k: 'Slope', v: '0.3 %' }, { k: 'Mound', v: '1.00 m' }, { k: 'Soil', v: 'Vertisol' }, { k: 'Water', v: bd.toFixed(2) + ' m' }],
+      plotTrees: [{ k: 'Balanites, grafted 2024', v: '82' }, { k: 'Balanites, wild', v: '6 (GPS missing)' }, { k: 'First fruit expected', v: 'Jan 2027' }, { k: 'Centroid', v: '7.7312° N, 31.4022° E' }],
+      cropOptions: ['Moringa leaf (fresh)', 'Balanites fruit', 'Gum arabic', 'Shea fruit', 'Tamarind pods', 'Sorghum', 'Cowpea', 'Groundnut', 'Sesame', 'Bulrush millet', 'Okra', 'Jute mallow (kudra)'],
+      plotOptions: ['R‑02', 'R‑05', 'S‑01', 'S‑04', 'B‑03', 'B‑07'],
+      form: s.form, formErr: s.formErr, kgBorder: kgBad ? 'var(--color-accent)' : 'var(--color-divider)',
+      setCrop: (e) => this.setState({ form: { ...this.state.form, crop: e.target.value }, saved: false }),
+      setPlot: (e) => this.setState({ form: { ...this.state.form, plot: e.target.value }, saved: false }),
+      setKg: (e) => this.setState({ form: { ...this.state.form, kg: e.target.value }, formErr: '', saved: false }),
+      saveLabel: s.saved ? (s.online ? 'Saved & synced ✓' : 'Saved on phone ✓') : 'Save entry',
+      saveHarvest: () => {
+        const kg = Number(this.state.form.kg);
+        if (!(kg > 0)) return this.setState({ formErr: 'Enter the weight in kilograms.' });
+        if (kg > 5000) return this.setState({ formErr: 'That is more than a full truck. Check the number.' });
+        this.setState(st => ({ harvests: [{ crop: st.form.crop, plot: st.form.plot, kg, who: 'Group 4', date: '28 Oct', synced: st.online }, ...st.harvests], form: { ...st.form, kg: '' }, saved: true, formErr: '' }));
+        this.bump();
+      },
+      harvestRows: s.harvests.map(h => ({ ...h, kg: h.kg.toLocaleString('en'), sync: h.synced ? 'synced' : 'on phone' })),
+      procTabs: [['balanites', 'Balanites oil'], ['moringa', 'Moringa powder']].map(([k, label]) => ({ label, pick: () => this.setState({ procTab: k }), ...tabSel(s.procTab === k) })),
+      proc: PROC,
+      revenue: s.offerMsg.startsWith('Accepted') ? '$19,180' : '$18,640', hasOffer: s.offer, offerMsg: s.offerMsg,
+      acceptOffer: () => { this.setState({ offer: false, offerMsg: 'Accepted. Pickup booked for 3 Nov at Bor; Group 4 lead notified.' }); this.bump(); },
+      declineOffer: () => this.setState({ offer: false, offerMsg: 'Counter sent at $14.00 / L. Waiting for reply.' }),
+      listings: [
+        { name: 'Balanites oil, cold‑pressed', unit: 'per 1 L', price: '$14', stock: '46 bottles', offers: '3 offers' },
+        { name: 'Moringa leaf powder', unit: 'per 500 g', price: '$6', stock: '120 packs', offers: '5 offers' },
+        { name: 'Balanites feed cake', unit: 'per 50 kg', price: '$9', stock: '4 sacks', offers: '1 offer' },
+        { name: 'Gum arabic, grade 2', unit: 'per kg', price: '$3.20', stock: '85 kg', offers: 'none yet' },
+        { name: 'Sesame seed', unit: 'per 50 kg', price: '$38', stock: '6 sacks', offers: '2 offers' }],
+      guideGroups: [{ label: 'Trees', items: SPECIES.filter(x => x.g === 'trees') }, { label: 'Field & recession crops', items: SPECIES.filter(x => x.g === 'field') }].map(g => ({ label: g.label, items: g.items.map(x => ({ ...x, open: () => { this.setState({ sp: x.key }); this.go('species'); } })) })),
+      sp: spec,
+      mon: s.mon,
+      monSet: Object.fromEntries(['plot', 'ew', 'date', 'crop', 'temp', 'rain', 'notes'].map(k => [k, (e) => this.setMon(k, k === 'ew' ? e.target.value.toUpperCase() : e.target.value)])),
+      monPlots: ['B‑07 · Group 4', 'B‑03 · Ayen Kuol', 'B‑12 · Group 6', 'S‑04 · Group 3', 'S‑01 · Group 5', 'R‑02 · Group 1', 'R‑05 · Group 2'],
+      monCrops: ['Cowpea', 'Sorghum (Feterita)', 'Jute mallow', 'Groundnut', 'Sesame', 'Bulrush millet', 'Okra', 'Moringa', 'Balanites', 'Gum arabic', 'Shea', 'Tamarind'],
+      ewBorder: s.monErr && !/^EW[‑-]?\d{3}$/.test(s.mon.ew) ? 'var(--color-accent)' : 'var(--color-divider)',
+      actChips: ['Land prep', 'Planting', 'Weeding', 'Thinning', 'Fertilising', 'Pest scouting', 'Spraying', 'Pruning', 'Grafting', 'Harvest'].map(label => { const on = s.mon.acts.includes(label); return { label, mark: on ? '✓ ' : '', pick: () => this.togMon('acts', label), border: on ? 'var(--color-accent)' : 'var(--color-divider)', bg: on ? 'var(--color-accent-100)' : 'transparent' }; }),
+      stageTabs: ['Seedbed', 'Vegetative', 'Flowering', 'Mature'].map(label => ({ label, pick: () => this.setMon('stage', label), ...tabSel(s.mon.stage === label) })),
+      condBtns: [1, 2, 3, 4, 5].map(n => ({ n, pick: () => this.setMon('cond', n), border: s.mon.cond === n ? 'var(--color-accent)' : 'var(--color-divider)', bg: s.mon.cond === n ? 'var(--color-accent-100)' : 'transparent' })),
+      condLabel: ['', 'failing', 'poor', 'fair', 'good', 'excellent'][s.mon.cond],
+      pestChips: ['None', 'Aphids', 'Fall armyworm', 'Striga weed', 'Leaf blight', 'Termites', 'Birds', 'Livestock damage'].map(label => { const on = s.mon.pests.includes(label); return { label, mark: on ? '✓ ' : '', pick: () => this.togMon('pests', label), border: on ? 'var(--color-accent)' : 'var(--color-divider)', bg: on ? 'var(--color-accent-100)' : 'transparent' }; }),
+      skyTabs: ['Sunny', 'Cloudy', 'Rain', 'Windy'].map(label => ({ label, pick: () => this.setMon('sky', label), ...tabSel(s.mon.sky === label) })),
+      photoLabel: s.photos ? `${s.photos} photo${s.photos > 1 ? 's' : ''} ✓` : '+ Photo',
+      addPhoto: () => this.setState(st => ({ photos: st.photos + 1 })),
+      monErr: s.monErr,
+      monSaveLabel: s.monSaved ? (s.online ? 'Saved & synced ✓' : 'Saved on phone ✓') : 'Save crop check',
+      saveMon: () => {
+        const m = this.state.mon, errs = [];
+        if (!/^EW[‑-]?\d{3}$/.test(m.ew)) errs.push('extension worker ID like EW‑014');
+        if (!m.acts.length) errs.push('at least one activity');
+        if (!m.date) errs.push('a date');
+        if (errs.length) return this.setState({ monErr: 'Add ' + errs.join(', ') + '.' });
+        this.setState(st => ({ monLog: [{ plot: m.plot.split(' · ')[0], crop: m.crop, acts: m.acts.join(', '), ew: m.ew, date: '28 Oct', cond: m.cond, synced: st.online }, ...st.monLog], monSaved: true, photos: 0, mon: { ...m, notes: '', pests: [] } }));
+        this.bump();
+      },
+      monRows: s.monLog.map(r => ({ ...r, sync: r.synced ? 'synced' : 'on phone' })),
+      srcRows: s.sources.map(r => ({ ...r, last: s.pulling && r.on ? 'pulling…' : r.last, trackBg: r.on ? 'var(--color-accent-200)' : 'transparent', knob: r.on ? '22px' : '3px', toggle: () => this.setState(st => ({ sources: st.sources.map(x => x.id === r.id ? { ...x, on: !x.on } : x) })) })),
+      si: s.si, siErr: s.siErr, signedIn: s.signedIn, notSignedIn: !s.signedIn, siLabel: s.siBusy ? 'Checking…' : 'Sign in',
+      siSetId: (e) => this.setState({ si: { ...this.state.si, id: e.target.value.toUpperCase() }, siErr: '' }),
+      siSetKey: (e) => this.setState({ si: { ...this.state.si, key: e.target.value }, siErr: '' }),
+      doSignin: () => {
+        const { id, key } = this.state.si, nid = id.replace('-', '‑');
+        const u = this.state.users.find(x => x.id === nid);
+        if (!/^(EW|AD)[‑-]\d{3}$/.test(id)) return this.setState({ siErr: 'Worker ID looks like EW‑014.' });
+        if (!key.startsWith('abk_') || key.length < 10) return this.setState({ siErr: 'That key is not valid. Keys start with abk_.' });
+        if (!u) return this.setState({ siErr: 'No user with that ID. Ask your admin.' });
+        if (!u.on) return this.setState({ siErr: 'This key was revoked. Ask your admin for a new one.' });
+        this.setState({ siBusy: true });
+        this.pt = setTimeout(() => this.setState({ siBusy: false, signedIn: true, me: u }), 900);
+      },
+      signOut: () => this.setState({ signedIn: false, si: { id: '', key: '' } }),
+      meName: s.me ? s.me.name.split(' ')[0] : '',
+      meRows: s.me ? [{ k: 'Worker ID', v: s.me.id }, { k: 'Role', v: s.me.role }, { k: 'Data scope', v: 'Duk · 20 km' }, { k: 'Key expires', v: '12 Jan 2027' }] : [],
+      nu: s.nu, nuErr: s.nuErr,
+      nuSetName: (e) => this.setState({ nu: { ...this.state.nu, name: e.target.value }, nuErr: '' }),
+      roleTabs: ['Extension worker', 'Group lead', 'Admin'].map(r => ({ label: r === 'Extension worker' ? 'Ext. worker' : r, pick: () => this.setState({ nu: { ...this.state.nu, role: r } }), ...tabSel(s.nu.role === r) })),
+      expTabs: ['30 days', '90 days', '1 year'].map(r => ({ label: r, pick: () => this.setState({ nu: { ...this.state.nu, exp: r } }), ...tabSel(s.nu.exp === r) })),
+      genKey: () => {
+        const n = this.state.nu.name.trim();
+        if (n.split(' ').length < 2) return this.setState({ nuErr: 'Enter first and last name.' });
+        const cs = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; let k = 'abk_';
+        for (let i = 0; i < 24; i++) k += cs[Math.floor(Math.random() * cs.length)];
+        const pre = this.state.nu.role === 'Admin' ? 'AD' : 'EW', id = pre + '‑0' + (30 + this.state.users.length);
+        this.setState(st => ({ newKey: { id, key: k }, copied: false, nu: { ...st.nu, name: '' }, users: [{ id, name: n, role: st.nu.role, meta: 'key exp. in ' + st.nu.exp + ' · not signed in', on: true }, ...st.users] }));
+        this.bump();
+      },
+      hasNewKey: !!s.newKey, newKey: s.newKey || {}, copyLabel: s.copied ? 'Copied ✓' : 'Copy key',
+      copyKey: () => { try { navigator.clipboard.writeText(this.state.newKey.key); } catch (e) {} this.setState({ copied: true }); },
+      hideKey: () => this.setState({ newKey: null }),
+      commitNote: s.newKey ? (s.online ? `Committed to abuk-access: "add ${s.newKey.id} (sha256 hash)". Live on all phones at next sync.` : `Commit "add ${s.newKey.id} (hash only)" waits for signal. The key works once it is pushed.`) : '',
+      userCount: `${s.users.filter(u => u.on).length} active · ${s.users.filter(u => !u.on).length} revoked`,
+      userRows: s.users.map(u => ({ ...u, op: u.on ? 1 : 0.5, action: u.on ? 'Revoke' : 'Restore', toggle: () => { this.setState(st => ({ users: st.users.map(x => x.id === u.id ? { ...x, on: !x.on, meta: x.on ? 'revoked today' : 'restored today' } : x) })); this.bump(); } })),
+      toolRows: TOOLS.map(([n, k, name, sub]) => ({ n, name, sub, open: () => this.go(k) })),
+      alertDayTabs: [3, 5, 7].map(d => ({ label: d + ' days', pick: () => this.setState({ alertDays: d }), ...tabSel(s.alertDays === d) })),
+      toggleRise: () => this.setState(st => ({ rise: !st.rise })), riseLabel: s.rise ? 'on' : 'off',
+      riskLine: s.rise ? `Forecast: B‑03, B‑04, B‑05, B‑08 overtopped in ~${Math.min(s.alertDays, 4)} days. Alert will go to 2 leads.` : 'Water is falling. No crest at risk in the next ' + s.alertDays + ' days; no SMS will be sent.',
+      smsText: s.rise ? 'ABUK FLOOD: water to top rows B-03 B-04 B-05 B-08 in ~4 days. Lift seed & tools to ridge. Check mounds. Reply 1=OK. -Abuk Project' : 'ABUK: no flood risk to mound rows next ' + s.alertDays + ' days. Basin falling 2-3 cm/day. Sowing opens ~4 Dec. -Abuk Project',
+      leadRows: s.leads.map((l, i) => ({ ...l, track: l.on ? 'var(--color-accent-200)' : 'transparent', knob: l.on ? '22px' : '3px', toggle: () => this.setState(st => ({ leads: st.leads.map((x, j) => j === i ? { ...x, on: !x.on } : x) })) })),
+      sendTest: () => this.setState(st => ({ alertLog: [`28 Oct · test · ${st.leads.filter(l => l.on).length} sent${st.online ? '' : ' via SMS gateway when online'}`, ...st.alertLog] })),
+      alertLog: s.alertLog,
+      gaugeLast: s.gaugeHist[s.gaugeHist.length - 1].toFixed(2) + ' m',
+      ...(() => { const h = s.gaugeHist.slice(-10), mn = Math.min(...h) - 0.05, mx = Math.max(...h) + 0.05, pts = h.map((v, i) => ({ x: 10 + i * 33, y: Math.round(62 - (v - mn) / (mx - mn) * 54) })); return { gaugeLine: pts.map(p => p.x + ',' + p.y).join(' '), gaugeDots: pts.map((p, i) => ({ ...p, fill: i === pts.length - 1 ? 'var(--color-accent)' : 'var(--color-bg)' })) }; })(),
+      gaugeInput: s.gaugeInput, setGaugeInput: (e) => this.setState({ gaugeInput: e.target.value }),
+      sendGauge: () => { const t = this.state.gaugeInput.trim(), m = t.match(/^g\s*(\d+(?:\.\d+)?)$/i), last = this.state.gaugeHist[this.state.gaugeHist.length - 1];
+        if (!t) return; const v = m ? Number(m[1]) : null, ok = v !== null && Math.abs(v - last) <= 0.3;
+        this.setState(st => ({ gaugeInput: '', gauge: [{ from: 'you (test)', text: t, at: '28 Oct now', v, ok, bad: !m }, ...st.gauge], gaugeHist: ok ? [...st.gaugeHist, v] : st.gaugeHist })); },
+      gaugeRows: s.gauge.map(m => ({ ...m, status: m.bad ? 'not understood · reply sent' : m.ok ? 'accepted · ' + m.v.toFixed(2) + ' m' : 'held for admin', color: m.ok ? 'var(--color-neutral-700)' : 'var(--color-accent-800)' })),
+      pictos: PICTO.map(([k, label, d]) => ({ label, d, mark: s.doneP.includes(k) ? '✓' : '', border: s.playing === k ? 'var(--color-accent)' : 'var(--color-divider)', bg: s.doneP.includes(k) ? 'var(--color-accent-100)' : 'transparent',
+        tap: () => { if (this.state.playing === k) { this.setState(st => ({ playing: null, doneP: st.doneP.includes(k) ? st.doneP : [...st.doneP, k] })); this.bump(); } else { this.setState({ playing: k }); } } })),
+      voiceStatus: s.playing ? `Playing "${PICTO.find(p => p[0] === s.playing)[1]}" in Thuɔŋjäŋ · tap again to mark done` : s.doneP.length ? `${s.doneP.length} done today, saved for Group 4` : 'Nothing playing',
+      vb1: s.playing ? '18px' : '4px', vb2: s.playing ? '10px' : '4px', vb3: s.playing ? '20px' : '4px',
+      pestIdle: s.pest === 'idle', pestBusy: s.pest === 'busy', pestDone: s.pest === 'done', pestOpen: s.pestOpen, pestMsg: s.pestMsg,
+      runPest: () => { this.setState({ pest: 'busy' }); this.pt = setTimeout(() => this.setState({ pest: 'done' }), 1400); },
+      pestMatches: [['Fall armyworm', 78], ['Stem borer', 12], ['Leaf blight', 6]].map(([name, p]) => ({ name, p: p + '%', w: p + '%' })),
+      pestConfirm: () => { this.setState({ pestOpen: false, pestMsg: 'Confirmed by EW‑014. Task added for Group 6: treat B‑12 within 3 days. Neighbouring plots flagged for scouting.' }); this.bump(); },
+      pestReject: () => this.setState({ pestOpen: false, pestMsg: 'Sent to the county extension office with the photo for a second opinion.' }),
+      ...(() => { const days = MEMBERS.map((m, i) => m[1] + (s.present[i] ? 1 : 0)), tot = days.reduce((a, b) => a + b, 0);
+        return { presentCount: s.present.filter(Boolean).length, rollRows: MEMBERS.map((m, i) => ({ name: m[0], days: days[i], share: '$' + (459 * days[i] / tot).toFixed(2), mark: s.present[i] ? '✓' : '', toggle: () => this.setState(st => ({ present: st.present.map((p, j) => j === i ? !p : p) })) })) }; })(),
+      allPresent: () => this.setState({ present: MEMBERS.map(() => true) }),
+      storeRows: STORE.map(([name, unit, , need, use, step], i) => { const have = s.stock[i], short = have < need; return { name, step: step + ' ' + unit, haveLabel: have.toLocaleString('en') + ' ' + unit, w: Math.min(100, have / need * 100) + '%', fill: short ? 'var(--color-accent-300)' : 'var(--color-neutral-400)', note: short ? `short ${(need - have).toLocaleString('en')} ${unit} · ${use}` : `${need.toLocaleString('en')} ${unit} reserved · ${use}`, noteColor: short ? 'var(--color-accent-800)' : 'var(--color-neutral-700)',
+        issue: () => { this.setState(st => ({ stock: st.stock.map((q, j) => j === i ? Math.max(0, q - step) : q), storeMsg: `Issued ${step} ${unit} ${name.toLowerCase()} to Group 4.` })); this.bump(); } }; }),
+      shortCount: STORE.filter((x, i) => s.stock[i] < x[3]).length,
+      orderShort: () => this.setState({ storeMsg: 'Request sent to the project office: ' + STORE.filter((x, i) => this.state.stock[i] < x[3]).map(x => x[0].toLowerCase()).join(', ') + '.' }), storeMsg: s.storeMsg,
+      batchTabs: BATCHES.map((b, i) => ({ label: b.id, pick: () => this.setState({ batch: i, printed: false }), ...tabSel(s.batch === i) })),
+      batch: BATCHES[s.batch], qrCells: qr(BATCHES[s.batch].id),
+      batchRows: [{ k: 'Plot', v: BATCHES[s.batch].plot }, { k: 'Fruit collected', v: BATCHES[s.batch].fruit }, { k: 'Pressed', v: BATCHES[s.batch].pressed }, { k: 'Batch size', v: BATCHES[s.batch].bottles }, { k: 'Origin', v: BATCHES[s.batch].place }, { k: 'Cooperative', v: 'Abuk Project, 160 farmers' }],
+      printLabel: s.printed ? 'Sent to label printer ✓' : 'Print labels for this batch', printLabels: () => this.setState({ printed: true }),
+      carrying: s.carry + s.p2p.filter(d => d.st === 'done').reduce((a, d) => a + d.recs, 0), fromPhones: s.p2p.filter(d => d.st === 'done').reduce((a, d) => a + d.recs, 0),
+      p2pRows: s.p2p.map((d, i) => ({ ...d, label: d.st === 'busy' ? 'Swapping…' : d.st === 'done' ? 'Swapped ✓' : 'Swap', border: d.st === 'done' ? 'var(--color-divider)' : 'var(--color-accent)',
+        swap: () => { if (d.st !== 'idle') return; this.setState(st => ({ p2p: st.p2p.map((x, j) => j === i ? { ...x, st: 'busy' } : x) })); setTimeout(() => this.setState(st => ({ p2p: st.p2p.map((x, j) => j === i ? { ...x, st: 'done' } : x) })), 1200); } })),
+      radiusTabs: [10, 20, 50].map(r => ({ label: r + ' km', pick: () => this.setState({ radius: r }), ...tabSel(s.radius === r) })),
+      radiusNote: { 10: 'farm and home payam', 20: 'Duk county core', 50: 'Duk + edges of Twic East, Ayod' }[s.radius],
+      srcSummary: `${s.sources.filter(x => x.on).length} of ${s.sources.length} feeding the model · ${s.radius} km radius`,
+      pullLabel: s.pulling ? 'Pulling…' : s.online ? 'Pull now' : 'Pull when online',
+      srcMsg: s.srcMsg,
+      pullAll: () => {
+        if (!this.state.online) return this.setState({ srcMsg: 'No signal. Pull is queued and will run automatically when the phone reconnects.' });
+        this.setState({ pulling: true, srcMsg: '' });
+        this.pt = setTimeout(() => this.setState(st => ({ pulling: false, srcMsg: 'Pulled 3 changed files from colab_waterlevel. Flood model re-run: basin dry ~4 Dec (no change).', sources: st.sources.map(x => x.on ? { ...x, last: 'pulled just now' } : x) })), 1600);
+      },
+      connOpen: !!s.conn,
+      gitBorder: s.conn === 'git' ? 'var(--color-accent-800)' : 'var(--color-accent)', driveBorder: s.conn === 'drive' ? 'var(--color-accent-800)' : 'var(--color-accent)',
+      connGit: () => this.setState({ conn: 'git', connUrl: '' }), connDrive: () => this.setState({ conn: 'drive', connUrl: '' }),
+      connLabel: s.conn === 'drive' ? 'Shared Drive folder link' : 'Repository and folder',
+      connPh: s.conn === 'drive' ? 'drive.google.com/drive/folders/…' : 'github.com/owner/repo/tree/main/data',
+      connUrl: s.connUrl, setConnUrl: (e) => this.setState({ connUrl: e.target.value }),
+      doConnect: () => {
+        const u = this.state.connUrl.trim();
+        if (!u) return this.setState({ srcMsg: 'Paste a link first.' });
+        this.setState(st => ({ conn: null, connUrl: '', srcMsg: 'Connected. Files will be indexed on the next pull.', sources: [...st.sources, { id: 'n' + st.sources.length, kind: st.conn === 'drive' ? 'Drive' : 'GitHub', name: 'New source', path: u, size: '—', last: 'not pulled yet', feeds: 'choose input', on: false }] }));
+      },
+      nav: ['home', 'map', 'season', 'guide', 'market'].map(k => ({ label: L[k], d: ICONS[k], go: () => this.tab(k), color: navKey === k ? 'var(--color-accent-800)' : 'var(--color-neutral-700)', line: navKey === k ? 'inset 0 2px 0 var(--color-accent)' : 'none' }))
+    };
+  }
+}
+</script>
+</body>
+</html>
