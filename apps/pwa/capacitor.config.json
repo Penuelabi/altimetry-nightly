@@ -1,0 +1,6 @@
+{
+  "appId": "org.dukabuk.field",
+  "appName": "Abuk Project",
+  "webDir": "dist",
+  "android": { "allowMixedContent": false }
+}

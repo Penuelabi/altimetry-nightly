@@ -55,7 +55,7 @@ export function SignIn() {
       {err && <div className="msg">{err}</div>}
       <button className="btn lg" onClick={submit} disabled={busy}>{busy ? 'Checking…' : 'Sign in'}</button>
       <div className="note" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>First sign‑in needs signal. After that, a 4‑digit PIN unlocks the app offline for 30 days.</div>
-      {import.meta.env.DEV && <button className="link" onClick={demo}>Open demo with sample data (development build only)</button>}
+      {(import.meta.env.DEV || import.meta.env.VITE_DEMO === '1') && <button className="link" onClick={demo}>Open demo with sample data (test build)</button>}
     </div>
   );
 }

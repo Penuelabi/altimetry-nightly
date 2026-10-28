@@ -1,0 +1,60 @@
+name: Abuk Android APK
+
+# Builds the Android test app from the abuk-app branch and attaches it to the
+# "Abuk APK (latest test build)" release, so it can be downloaded on a phone.
+on:
+  push:
+    branches: [abuk-app]
+    paths: ['apps/pwa/**', 'packages/core/**', 'package-lock.json', '.github/workflows/abuk-apk.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: abuk-apk
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      # VITE_DEMO shows the sample-data demo on the sign-in screen; drop it once the server is deployed.
+      - run: npm run build -w apps/pwa
+        env:
+          VITE_DEMO: '1'
+          VITE_API_URL: ${{ vars.ABUK_API_URL }}
+      - run: npx cap sync android
+        working-directory: apps/pwa
+      - run: ./gradlew assembleDebug --no-daemon
+        working-directory: apps/pwa/android
+      - name: Name the APK
+        run: |
+          mkdir -p out
+          cp apps/pwa/android/app/build/outputs/apk/debug/app-debug.apk "out/abuk-project-$(date -u +%Y%m%d)-${GITHUB_SHA::7}.apk"
+          cp apps/pwa/android/app/build/outputs/apk/debug/app-debug.apk out/abuk-project-latest.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abuk-apk
+          path: out/*.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: abuk-apk-latest
+          name: Abuk APK (latest test build)
+          prerelease: true
+          target_commitish: ${{ github.sha }}
+          body: |
+            Test build of the Duk County · Abuk Project app from branch abuk-app (${{ github.sha }}).
+            On the phone: download abuk-project-latest.apk, open it, and allow "install unknown apps" for your browser when Android asks.
+            Sign-in needs the project server; tap "Open demo with sample data" to try the app without it.
+          files: out/*.apk

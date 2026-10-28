@@ -10,11 +10,16 @@
   },
   "dependencies": {
     "@abuk/core": "*",
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/lora": "^5.3.0",
     "idb-keyval": "^6.2.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.1.2",
