@@ -7,7 +7,7 @@ interface Rec { id: string; kind: SyncKind; at: string; by: string; data: Record
 interface Overview { generated: string; records: Rec[]; errors: string[]; users: (PublicUser & { lastSeen: string | null })[]; farm: Register; farmChanges: { sha: string; message: string; date: string }[]; gauge: GaugeReading[] }
 
 const KEY = 'abuk-admin-session';
-const KIND_LABEL: Record<string, string> = { monitor: 'Crop check', harvest: 'Harvest', plot: 'Plot mapped', task: 'Task', pest: 'Pest report', payout: 'Payout', store: 'Store', offer: 'Market offer', voice: 'Pictures & voice' };
+const KIND_LABEL: Record<string, string> = { monitor: 'Crop check', harvest: 'Harvest', plot: 'Plot mapped', task: 'Task', pest: 'Pest report', payout: 'Payout', store: 'Store', offer: 'Market offer', voice: 'Pictures & voice', alert: 'Flood alert sent' };
 const fmt = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 const day = (iso: string) => iso.slice(0, 10);
 
@@ -28,6 +28,7 @@ export function summary(r: Rec, farm: Register): string {
     case 'store': return d.request ? `Requested: ${(d.request as string[]).join(', ')}` : `Issued ${d.issued} ${d.unit} ${d.item} to ${d.to}`;
     case 'offer': return `${d.buyer}: ${d.answer} at $${d.price}/L`;
     case 'voice': return `Activity done: ${d.activity}`;
+    case 'alert': return `${d.lang === 'ar' ? 'Arabic' : 'English'} SMS to ${(d.to as string[] | undefined)?.length ?? 0} leads from the sender's phone: "${d.text}"`;
     default: return JSON.stringify(d).slice(0, 90);
   }
 }

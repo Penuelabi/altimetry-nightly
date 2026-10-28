@@ -17,7 +17,7 @@ export interface PullResult {
 }
 export interface Terrain { elevation: number | null; slopePct: number | null }
 
-export type SyncKind = 'task' | 'harvest' | 'monitor' | 'plot' | 'offer' | 'store' | 'payout' | 'voice' | 'pest';
+export type SyncKind = 'task' | 'harvest' | 'monitor' | 'plot' | 'offer' | 'store' | 'payout' | 'voice' | 'pest' | 'alert';
 export interface SyncRecord { id: string; kind: SyncKind; at: string; by: string; data: Record<string, unknown> }
 
 export interface GaugeReading { from: string; text: string; at: string; v: number | null; status: 'ok' | 'held' | 'bad' }

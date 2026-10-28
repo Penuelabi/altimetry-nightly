@@ -134,3 +134,17 @@ describe('dashboard', () => {
     expect((await app.request('/api/admin/overview', { headers: { authorization: `Bearer ${token}` } })).status).toBe(403);
   });
 });
+
+import { PHONE } from '../src/app';
+describe('alert recipients', () => {
+  it('accepts South Sudan numbers only', () => {
+    expect(PHONE.test('+211912345678')).toBe(true);
+    expect(PHONE.test('0912345678')).toBe(false);
+  });
+  it('only admins replace the list', async () => {
+    process.env.SESSION_SECRET = 'x'.repeat(40);
+    const { user } = makeUser([], 'Deng Bol', 'Group lead', 30);
+    const { token } = await issueSession(user);
+    expect((await app.request('/api/leads', { method: 'PUT', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: '{"leads":[]}' })).status).toBe(403);
+  });
+});

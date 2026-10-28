@@ -6,7 +6,7 @@ import { HARV, LEADS, MEMBERS, MON, SOURCES, STORE, TASKS, applyOps, seedRegiste
 export interface Session { token: string; user: PublicUser; expires: string; demo?: boolean }
 export interface Plot { id: string; mode: 'walk' | 'pin'; pts: { lat: number; lon: number }[]; ha: number; elevation: number | null; slopePct: number | null; at: string }
 export interface Where { lat: number; lon: number; acc: number | null; payam: string; county: string; state: string; at: string }
-export interface Lead { id: string; name: string; rows: string; phone: string; on: boolean }
+export interface Lead { id: string; name: string; group?: string; rows: string; phone: string; lang?: 'en' | 'ar'; on: boolean }
 
 // Everything a worker records lives here and on the phone (IndexedDB) until it syncs.
 export interface State {

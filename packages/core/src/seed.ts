@@ -24,7 +24,7 @@ export const T = {
 };
 
 export const TITLES: Record<'en' | 'ar', Record<Exclude<Screen, 'species'>, string>> = {
-  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'Gauge by SMS', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable bottles', p2p: 'Phone‑to‑phone sync', register: 'Farm register' },
+  en: { home: 'Abuk Project', map: 'Farm map', flood: 'Flood model', season: 'Crop calendar', tasks: 'Tasks', plot: 'Plot B‑07', harvest: 'Harvest log', process: 'Processing', market: 'Market', guide: 'Species guide', monitor: 'Crop check', sources: 'Data sources', signin: 'Sign in', admin: 'Access & keys', tools: 'Field tools', alerts: 'Flood SMS alerts', gauge: 'River gauge', voice: 'Pictures & voice', pest: 'Pest photo check', payout: 'Work days & payout', store: 'Seed & input store', trace: 'Traceable bottles', p2p: 'Phone‑to‑phone sync', register: 'Farm register' },
   ar: { home: 'مشروع أبوك', map: 'خريطة المزرعة', flood: 'نموذج الفيضان', season: 'تقويم المحاصيل', tasks: 'المهام', plot: 'القطعة B‑07', harvest: 'سجل الحصاد', process: 'المعالجة', market: 'السوق', guide: 'دليل الأنواع', monitor: 'فحص المحصول', sources: 'مصادر البيانات', signin: 'تسجيل الدخول', admin: 'الوصول والمفاتيح', tools: 'أدوات الحقل', alerts: 'تنبيهات الفيضان', gauge: 'قراءة المقياس', voice: 'صور وصوت', pest: 'فحص الآفات', payout: 'أيام العمل والأجور', store: 'مخزن البذور', trace: 'تتبع الزجاجات', p2p: 'مزامنة الهواتف', register: 'سجل المزرعة' }
 };
 
@@ -91,8 +91,8 @@ export const MON: MonRecord[] = [
 ];
 
 export const TOOLS: [string, Screen, string, string][] = [
-  ['i', 'alerts', 'Flood SMS alerts', 'Text group leads before a mound crest is overtopped'],
-  ['ii', 'gauge', 'Gauge reading by SMS / USSD', '"G 4.12" from Bor lands in the gauge sheet'],
+  ['i', 'alerts', 'Flood SMS alerts', 'Text group leads from this phone before a crest is overtopped'],
+  ['ii', 'gauge', 'River gauge reading', 'Type the Bor gauge level; it feeds the flood model'],
   ['iii', 'voice', 'Pictures & voice', 'Big icons and recorded Dinka prompts'],
   ['iv', 'pest', 'Pest photo check', 'Match a photo to the local library; worker confirms'],
   ['v', 'payout', 'Work days & payout', "Roll‑call, then each member's share of sales"],

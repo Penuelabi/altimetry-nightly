@@ -164,7 +164,22 @@ app.post('/api/sync', auth(), async c => {
 interface Lead { id: string; name: string; group: string; rows: string; phone: string; lang: 'en' | 'ar' }
 const mask = (p: string) => p.replace(/^(\+\d{3}\s?\d{2})\d(.*)(\d{3})$/, (_, a, _b, z) => `${a}• ••• ${z}`);
 
-app.get('/api/leads', auth(), async c => c.json((await readJson<Lead[]>('config/leads.json', [])).data.map(l => ({ ...l, phone: mask(l.phone) }))));
+// Full numbers only for the people who send alerts from their own phone's Messages app.
+app.get('/api/leads', auth(), async c => {
+  const leads = (await readJson<Lead[]>('config/leads.json', [])).data;
+  const full = c.req.query('full') === '1' && ['Admin', 'Group lead'].includes(c.get('me').role);
+  return c.json(full ? leads : leads.map(l => ({ ...l, phone: mask(l.phone) })));
+});
+
+export const PHONE = /^\+211\d{9}$/;
+app.put('/api/leads', auth(['Admin']), async c => {
+  const { leads = [] } = await c.req.json<{ leads?: Lead[] }>();
+  const clean = leads.map(l => ({ id: String(l.id || ''), name: String(l.name || '').trim(), group: String(l.group || '').trim(), rows: String(l.rows || '').trim(), phone: String(l.phone || '').replace(/[\s-]/g, ''), lang: l.lang === 'ar' ? 'ar' as const : 'en' as const }));
+  const bad = clean.find(l => !l.id || !l.name || !PHONE.test(l.phone));
+  if (bad) return c.json({ error: 'invalid', message: `Check ${bad.name || 'a recipient'}: name and a South Sudan number like +211 912 345 678 are needed.` }, 400);
+  const r = await updateJson<Lead[]>('config/leads.json', [], `alert recipients updated by ${c.get('me').id}`, () => clean);
+  return c.json(r.data);
+});
 
 app.post('/api/sms/alert', auth(['Admin', 'Group lead']), async c => {
   const { leadIds = [], text = '', textAr } = await c.req.json<{ leadIds?: string[]; text?: string; textAr?: string }>();
@@ -200,10 +215,10 @@ app.post('/api/sms/inbound', async c => {
   return c.json(r);
 });
 
-// Lets an admin test the parser end-to-end without a phone.
-app.post('/api/gauge/test', auth(['Admin', 'Group lead']), async c => {
+// Gauge readings typed into the app by any signed-in worker (no SMS gateway needed).
+app.post('/api/gauge/test', auth(), async c => {
   const { text = '' } = await c.req.json<{ text?: string }>();
-  const r = await recordGauge(`${c.get('me').name} (test)`, text);
+  const r = await recordGauge(c.get('me').name, text);
   return c.json({ reading: r, reply: replyFor(r) });
 });
 

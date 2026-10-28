@@ -21,53 +21,116 @@ export function Tools() {
 }
 
 // ---- i Flood SMS alerts ----
+// Sent from the phone's own Messages app: the app fills in the numbers and the text,
+// the person presses Send, and the SMS goes from their SIM like any other text.
+const ALERT_TEXT = {
+  en: (rise: boolean, days: number) => rise
+    ? 'ABUK FLOOD: water to top rows B-03 B-04 B-05 B-08 in ~4 days. Lift seed & tools to ridge. Check mounds. Reply 1=OK. -Abuk Project'
+    : `ABUK: no flood risk to mound rows next ${days} days. Basin falling 2-3 cm/day. Sowing opens ~4 Dec. -Abuk Project`,
+  ar: (rise: boolean, days: number) => rise
+    ? 'أبوك - فيضان: سيصل الماء إلى قمم صفوف B-03 B-04 B-05 B-08 خلال 4 أيام تقريباً. انقلوا البذور والأدوات إلى المرتفع وافحصوا التلال. ردّوا 1 للتأكيد. -مشروع أبوك'
+    : `أبوك: لا خطر فيضان على صفوف التلال خلال ${days} أيام. منسوب الحوض ينخفض 2-3 سم يومياً. تبدأ الزراعة نحو 4 ديسمبر. -مشروع أبوك`
+};
+
+// sms: link understood by Android Messages; recipients separated by commas.
+const smsLink = (numbers: string[], body: string) => `sms:${numbers.join(',')}?body=${encodeURIComponent(body)}`;
+const openMessages = (href: string) => { const a = document.createElement('a'); a.href = href; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); };
+
 export function Alerts() {
   const s = useApp(), online = useOnline();
+  const role = s.session?.user.role ?? '';
+  const canSend = role === 'Admin' || role === 'Group lead', isAdmin = role === 'Admin';
   const [days, setDays] = useState(5);
   const [rise, setRise] = useState(false);
   const [msg, setMsg] = useState('');
+  const [editing, setEditing] = useState(false);
   useEffect(() => {
-    if (online) api<{ id: string; name: string; group: string; rows: string; phone: string }[]>('/api/leads')
-      .then(ls => ls.length && setState(st => ({ leads: ls.map(l => ({ id: l.id, name: `${l.name} · ${l.group}`, rows: l.rows, phone: l.phone, on: st.leads.find(x => x.id === l.id)?.on ?? true })) })), () => {});
-  }, [online]);
-  const sms = rise ? 'ABUK FLOOD: water to top rows B-03 B-04 B-05 B-08 in ~4 days. Lift seed & tools to ridge. Check mounds. Reply 1=OK. -Abuk Project'
-    : `ABUK: no flood risk to mound rows next ${days} days. Basin falling 2-3 cm/day. Sowing opens ~4 Dec. -Abuk Project`;
-  const send = async () => {
-    const ids = s.leads.filter(l => l.on).map(l => l.id);
+    if (!online) return;
+    api<{ id: string; name: string; group: string; rows: string; phone: string; lang: 'en' | 'ar' }[]>(`/api/leads${canSend ? '?full=1' : ''}`)
+      .then(ls => setState(st => ({ leads: ls.map(l => ({ ...l, on: st.leads.find(x => x.id === l.id)?.on ?? true })) })), () => {});
+  }, [online, canSend]);
+  const leads = s.leads.filter(l => /^\+211\d{9}$/.test(l.phone));
+  const chosen = leads.filter(l => l.on);
+  const en = chosen.filter(l => l.lang !== 'ar'), ar = chosen.filter(l => l.lang === 'ar');
+  const textEn = ALERT_TEXT.en(rise, days), textAr = ALERT_TEXT.ar(rise, days);
+
+  const send = (lang: 'en' | 'ar') => {
+    const to = lang === 'ar' ? ar : en, text = lang === 'ar' ? textAr : textEn;
+    if (!to.length) return;
+    openMessages(smsLink(to.map(l => l.phone), text));
     const stamp = new Date().toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    try {
-      const r = await api<{ sent: number }>('/api/sms/alert', { body: { leadIds: ids, text: sms } });
-      setState(st => ({ alertLog: [`${stamp} · test · ${r.sent} of ${ids.length} sent`, ...st.alertLog] })); setMsg('');
-    } catch (e) { setMsg(explain(e)); }
+    setState(st => ({ alertLog: [`${stamp} · opened Messages for ${to.length} lead${to.length > 1 ? 's' : ''} (${lang === 'ar' ? 'Arabic' : 'English'})`, ...st.alertLog].slice(0, 20) }));
+    record('alert', { lang, to: to.map(l => l.id), text, scenario: rise ? 'rise' : 'falling', days });
+    setMsg('Messages opened. Check the recipients and press Send there; the text goes from this phone’s SIM.');
   };
+
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <div className="body" style={{ fontSize: 13.5 }}>Text group leads when the flood model forecasts a mound crest will be overtopped. Works on any phone, no app or data needed.</div>
+      <div className="body" style={{ fontSize: 13.5 }}>Text group leads when the flood model forecasts a mound crest will be overtopped. The message is sent from this phone through its Messages app, so it reaches any phone, no app or data needed.</div>
       <div className="col g6">
         <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Warn when overtopping is forecast within</div>
         <Seg items={[[3, '3 days'], [5, '5 days'], [7, '7 days']]} value={days} onPick={setDays} />
       </div>
       <button className="btn plain between" style={{ minHeight: 44, padding: '0 12px', fontSize: 13, alignItems: 'center', display: 'flex' }} onClick={() => setRise(!rise)}><span>Scenario: river rises 8 cm</span><span className="it" style={{ color: 'var(--color-accent-800)' }}>{rise ? 'on' : 'off'}</span></button>
       <div style={{ borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)', padding: '10px 0', fontSize: 13.5 }}>
-        {rise ? `Forecast: B‑03, B‑04, B‑05, B‑08 overtopped in ~${Math.min(days, 4)} days. Alert will go to 2 leads.` : `Water is falling. No crest at risk in the next ${days} days; no SMS will be sent.`}
+        {rise ? `Forecast: B‑03, B‑04, B‑05, B‑08 overtopped in ~${Math.min(days, 4)} days. Send the alert now.` : `Water is falling. No crest at risk in the next ${days} days; an all-clear message is optional.`}
       </div>
       <div>
-        <div className="kick sm" style={{ marginBottom: 6 }}>SMS preview · {sms.length} of 160 characters</div>
-        <div className="mono" style={{ border: '1px solid var(--color-neutral-800)', borderRadius: 12, padding: 12, background: 'var(--color-neutral-100)', fontSize: 12.5, lineHeight: 1.5 }}>{sms}</div>
-        <div style={{ fontSize: 11, color: 'var(--color-neutral-700)', marginTop: 4 }}>Arabic copy is sent to leads who chose Arabic. Reply 1 to confirm receipt.</div>
+        <div className="kick sm" style={{ marginBottom: 6 }}>SMS · English · {textEn.length} characters</div>
+        <div className="mono" style={{ border: '1px solid var(--color-neutral-800)', borderRadius: 12, padding: 12, background: 'var(--color-neutral-100)', fontSize: 12.5, lineHeight: 1.5 }}>{textEn}</div>
+        <div className="kick sm" style={{ margin: '10px 0 6px' }}>SMS · Arabic (for leads who chose Arabic)</div>
+        <div dir="rtl" style={{ border: '1px solid var(--color-neutral-800)', borderRadius: 12, padding: 12, background: 'var(--color-neutral-100)', fontSize: 13.5, lineHeight: 1.6 }}>{textAr}</div>
+        <div style={{ fontSize: 11, color: 'var(--color-neutral-700)', marginTop: 4 }}>Arabic texts are longer and may go as 2–3 SMS. Have a native speaker check the Arabic wording before the season.</div>
       </div>
       <div>
-        <div className="section">Recipients</div>
-        {s.leads.map((l: Lead) => (
-          <div key={l.id} className="rowg" style={{ alignItems: 'center' }}>
-            <span><span style={{ display: 'block', fontSize: 14 }}>{l.name}</span><span className="sub num">{l.rows} · {l.phone}</span></span>
-            <Toggle on={l.on} label={`Send to ${l.name}`} onClick={() => setState(st => ({ leads: st.leads.map(x => x.id === l.id ? { ...x, on: !x.on } : x) }))} />
-          </div>
-        ))}
+        <div className="between rule-b" style={{ paddingBottom: 4 }}><span className="kick sm">Recipients · {chosen.length} of {leads.length} selected</span>{isAdmin && <button className="link" style={{ padding: 0, fontSize: 12 }} onClick={() => setEditing(!editing)}>{editing ? 'Done' : 'Add or edit'}</button>}</div>
+        {editing ? <LeadEditor onSaved={() => setEditing(false)} /> : <>
+          {leads.map(l => (
+            <div key={l.id} className="rowg" style={{ alignItems: 'center' }}>
+              <span><span style={{ display: 'block', fontSize: 14 }}>{l.name}{l.group ? ` · ${l.group}` : ''}</span><span className="sub num">{l.rows ? `${l.rows} · ` : ''}{l.phone} · {l.lang === 'ar' ? 'Arabic' : 'English'}</span></span>
+              <Toggle on={l.on} label={`Send to ${l.name}`} onClick={() => setState(st => ({ leads: st.leads.map(x => x.id === l.id ? { ...x, on: !x.on } : x) }))} />
+            </div>
+          ))}
+          {!leads.length && <div className="note" style={{ padding: '8px 0' }}>{!online ? 'Recipients load when the phone has signal.' : isAdmin ? 'No recipients yet. Tap “Add or edit” to add group leads and their phone numbers.' : 'No recipients yet. Ask an admin to add group leads.'}</div>}
+        </>}
       </div>
       {msg && <div className="msg">{msg}</div>}
-      <button className="btn" onClick={send}>Send test SMS to selected</button>
+      {canSend ? <>
+        <button className="btn lg" disabled={!en.length} onClick={() => send('en')}>Send from this phone · English ({en.length})</button>
+        {ar.length > 0 && <button className="btn" onClick={() => send('ar')}>Send Arabic copy ({ar.length})</button>}
+      </> : <div className="note">Only admins and group leads send alerts.</div>}
       {s.alertLog.map((a, i) => <div key={i} className="num" style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>{a}</div>)}
+    </div>
+  );
+}
+
+function LeadEditor({ onSaved }: { onSaved: () => void }) {
+  const s = useApp();
+  const [rows, setRows] = useState(s.leads.filter(l => /^\+211/.test(l.phone)).map(l => ({ id: l.id, name: l.name, group: l.group ?? '', rows: l.rows, phone: l.phone, lang: l.lang ?? 'en' })));
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const set = (i: number, k: string, v: string) => setRows(r => r.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
+  const save = async () => {
+    setBusy(true); setErr('');
+    try {
+      const saved = await api<Lead[]>('/api/leads', { method: 'PUT', body: { leads: rows.map(r => ({ ...r, phone: r.phone.replace(/[\s-]/g, '').replace(/^0/, '+211') })) } });
+      setState(st => ({ leads: saved.map(l => ({ ...l, on: st.leads.find(x => x.id === l.id)?.on ?? true })) }));
+      onSaved();
+    } catch (e) { setErr(explain(e)); }
+    finally { setBusy(false); }
+  };
+  return (
+    <div className="col g10" style={{ paddingTop: 8 }}>
+      {rows.map((r, i) => (
+        <div key={r.id} className="box col g8" style={{ padding: 10 }}>
+          <div className="grid2"><Field label="Name"><input className="input" value={r.name} onChange={e => set(i, 'name', e.target.value)} /></Field><Field label="Group"><input className="input" value={r.group} onChange={e => set(i, 'group', e.target.value)} /></Field></div>
+          <div className="grid2"><Field label="Phone"><input className="input num" type="tel" inputMode="tel" value={r.phone} placeholder="+211 9…" onChange={e => set(i, 'phone', e.target.value)} /></Field><Field label="Mound rows"><input className="input" value={r.rows} placeholder="B‑01–B‑08" onChange={e => set(i, 'rows', e.target.value)} /></Field></div>
+          <div className="between" style={{ alignItems: 'center' }}><Seg items={[['en', 'English'], ['ar', 'Arabic']]} value={r.lang} onPick={v => set(i, 'lang', v)} fontSize={12} /><button className="btn plain sm" onClick={() => setRows(rs => rs.filter((_, j) => j !== i))}>Remove</button></div>
+        </div>
+      ))}
+      <button className="btn plain" onClick={() => setRows(r => [...r, { id: newId('lead'), name: '', group: '', rows: '', phone: '+211', lang: 'en' }])}>+ Add recipient</button>
+      {err && <div className="msg">{err}</div>}
+      <button className="btn" disabled={busy} onClick={save}>{busy ? 'Saving…' : 'Save recipients'}</button>
     </div>
   );
 }
@@ -95,7 +158,7 @@ export function Gauge() {
     setInput('');
     try {
       const r = await api<{ reading: GaugeReading; reply: string }>('/api/gauge/test', { body: { text: t } });
-      setState(st => ({ gauge: [r.reading, ...(st.gauge ?? [])] })); setMsg(`Reply sent: "${r.reply}"`);
+      setState(st => ({ gauge: [r.reading, ...(st.gauge ?? [])] })); setMsg(r.reading.status === 'ok' ? `Saved: ${r.reading.v?.toFixed(2)} m.` : r.reading.status === 'held' ? `Saved, but ${r.reading.v} m is far from the last reading, so an admin will check it.` : 'Not understood. Type G then the level, e.g. G 4.12');
     } catch (e) {
       // Offline: show what the server will decide, so volunteers can practise the format.
       const v = parseGauge(t, h[h.length - 1]);
@@ -105,10 +168,7 @@ export function Gauge() {
   const when = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <div className="box grid2" style={{ gap: 0 }}>
-        <div style={{ padding: '10px 12px', borderRight: '1px solid var(--color-divider)' }}><div className="lbl">SMS</div><div className="mono" style={{ fontSize: 14 }}>G 4.12</div><div style={{ fontSize: 11, color: 'var(--color-neutral-700)' }}>to the project short code</div></div>
-        <div style={{ padding: '10px 12px' }}><div className="lbl">USSD</div><div className="mono" style={{ fontSize: 14 }}>*384*22#</div><div style={{ fontSize: 11, color: 'var(--color-neutral-700)' }}>1 Gauge · 2 Rain · 3 Flood</div></div>
-      </div>
+      <div className="box" style={{ padding: '10px 12px', fontSize: 13, lineHeight: 1.5 }}>Read the staff gauge at Bor, then type <span className="mono">G</span> and the level in metres, e.g. <span className="mono">G 4.12</span>. Volunteers without the app can text the reading to their group lead, who enters it here.</div>
       <div>
         <div className="between"><span className="kick sm">Bor gauge · last {h.length} readings</span><span className="head num" style={{ fontSize: 22 }}>{h[h.length - 1].toFixed(2)} m</span></div>
         <svg viewBox="0 0 320 70" width="100%" height="70" style={{ display: 'block', borderBottom: '1px solid var(--color-divider)' }}>
@@ -117,7 +177,7 @@ export function Gauge() {
         </svg>
       </div>
       <div className="col g6">
-        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Try it: send a reading as the Bor volunteer</div>
+        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Today's reading</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
           <input className="input mono" style={{ minHeight: 42 }} placeholder="G 4.10" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} />
           <button className="btn md" style={{ padding: '0 14px' }} onClick={send}>Send</button>
@@ -125,11 +185,11 @@ export function Gauge() {
         {msg && <div className="msg">{msg}</div>}
       </div>
       <div>
-        <div className="section">Inbox → gauge sheet{s.gauge ? '' : ' · sample until first sync'}</div>
+        <div className="section">Readings{s.gauge ? '' : ' · sample until first sync'}</div>
         {rows.slice(0, 12).map((m, i) => (
           <div key={i} className="rowg">
             <span><span className="mono" style={{ display: 'block', fontSize: 13.5 }}>"{m.text}"</span><span className="sub">{m.from} · {when(m.at)}</span></span>
-            <span className="it" style={{ fontSize: 12, textAlign: 'right', color: m.status === 'ok' ? 'var(--color-neutral-700)' : 'var(--color-accent-800)' }}>{m.status === 'bad' ? 'not understood · reply sent' : m.status === 'ok' ? `accepted · ${m.v!.toFixed(2)} m` : 'held for admin'}</span>
+            <span className="it" style={{ fontSize: 12, textAlign: 'right', color: m.status === 'ok' ? 'var(--color-neutral-700)' : 'var(--color-accent-800)' }}>{m.status === 'bad' ? 'not understood' : m.status === 'ok' ? `accepted · ${m.v!.toFixed(2)} m` : 'held for admin'}</span>
           </div>
         ))}
       </div>

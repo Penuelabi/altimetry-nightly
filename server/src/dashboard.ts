@@ -5,7 +5,7 @@ import { commitsFor, readJson } from './adapters/github';
 import { loadUsers, toPublic } from './auth';
 
 export interface DashRecord { id: string; kind: SyncKind; at: string; by: string; data: Record<string, unknown> }
-export const KINDS: SyncKind[] = ['monitor', 'harvest', 'plot', 'task', 'pest', 'payout', 'store', 'offer', 'voice'];
+export const KINDS: SyncKind[] = ['monitor', 'harvest', 'plot', 'task', 'pest', 'payout', 'store', 'offer', 'voice', 'alert'];
 
 // Everything the admin dashboard shows, in one call. Sheet reads are cached for a minute
 // so several admins refreshing do not hammer the Sheets quota.
