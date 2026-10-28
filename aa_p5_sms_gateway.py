@@ -19,7 +19,11 @@ Inputs   aa_out/dissemination/latest/messages.csv  (channel == sms)
          recipients file, KEPT OUT OF THE PUBLIC REPOSITORY: SMS_RECIPIENTS_FILE (csv path) or SMS_RECIPIENTS_CSV
          (the csv text itself, e.g. a GitHub secret). Columns: phone, county, language, group_id
          (county blank = every county; language blank = every language; phone in international format, +211...)
-Env      SMS_GATE_URL       default https://api.sms-gate.app/3rdparty/v1  (Local mode: http://<phone-ip>:8080)
+Env      SMS_GATE_URL       default https://api.sms-gate.app/3rdparty/v1  (Local mode: http://<phone-ip>:8080;
+                            Private server: https://<your-domain>/api/3rdparty/v1)
+         SMS_INPUT_BASE_URL optional, e.g. https://raw.githubusercontent.com/Penuelabi/altimetry-nightly/main - read
+                            messages.csv and sms_release.csv from there (for a stateless cloud job)
+         SMS_STATE_DIR      optional folder for sms_send_log.csv (default aa_out); in Google Cloud a mounted bucket
          SMS_GATE_USER, SMS_GATE_PASSWORD   from the SMSGate app home screen
          SMS_GATE_SIM       optional SIM slot number (1, 2, ...)
          SMS_MAX_PER_RUN    safety cap on recipients per run, default 200
@@ -47,6 +51,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 AA_CONFIG = os.environ.get('AA_CONFIG_DIR', os.path.join(HERE, 'aa_config'))
 AA_OUT = os.environ.get('AA_OUT_DIR', os.path.join(HERE, 'aa_out'))
 API_URL = os.environ.get('SMS_GATE_URL', 'https://api.sms-gate.app/3rdparty/v1').rstrip('/')
+STATE_DIR = os.environ.get('SMS_STATE_DIR', AA_OUT)
+INPUT_BASE = os.environ.get('SMS_INPUT_BASE_URL', '').rstrip('/')
 MAX_PER_RUN = int(os.environ.get('SMS_MAX_PER_RUN', '200'))
 BATCH = 50                                   # phone numbers per API call
 SMS_MAX = 160
@@ -73,7 +79,20 @@ def read_csv(path_or_buf):
 # --------------------------------------------------------------------------- #
 # Inputs                                                                      #
 # --------------------------------------------------------------------------- #
+def fetch_csv(rel_path):
+    """Read a csv from SMS_INPUT_BASE_URL (public repository raw files). None when unavailable."""
+    try:
+        with urllib.request.urlopen(f'{INPUT_BASE}/{rel_path}', timeout=30) as r:
+            return read_csv(io.StringIO(r.read().decode('utf-8')))
+    except Exception as e:
+        print(f"WARNING: could not fetch {rel_path}: {type(e).__name__}")
+        return None
+
+
 def load_messages(path=None):
+    if INPUT_BASE and not path:
+        m = fetch_csv('aa_out/dissemination/latest/messages.csv')
+        return m[m['channel'] == 'sms'].copy() if m is not None and len(m) else pd.DataFrame()
     path = path or os.path.join(AA_OUT, 'dissemination', 'latest', 'messages.csv')
     if not os.path.exists(path):
         print(f"No messages file at {path}; run aa_p5_dissemination.py first.")
@@ -85,6 +104,9 @@ def load_messages(path=None):
 
 
 def load_release(path=None):
+    if INPUT_BASE and not path:
+        r = fetch_csv('aa_config/sms_release.csv')
+        return r if r is not None else pd.DataFrame(columns=RELEASE_COLS)     # no file = nothing released
     path = path or os.path.join(AA_CONFIG, 'sms_release.csv')
     if not os.path.exists(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -177,7 +199,7 @@ def run(send=False, messages=None, release=None, recipients=None):
     if send and not live:
         print('--send given but SMS_GATE_ENABLED is not "yes": running as a dry run.')
     mode = 'LIVE' if live else 'DRY RUN'
-    log_path = os.path.join(AA_OUT, 'sms_send_log.csv')
+    log_path = os.path.join(STATE_DIR, 'sms_send_log.csv')
     log = read_csv(log_path) if os.path.exists(log_path) else None
     rows, total = [], 0
     stamp = now_utc().strftime('%Y-%m-%d %H:%M')
@@ -218,7 +240,7 @@ def run(send=False, messages=None, release=None, recipients=None):
                      'key': key})
     out = pd.DataFrame(rows)
     if len(out):
-        os.makedirs(AA_OUT, exist_ok=True)
+        os.makedirs(STATE_DIR, exist_ok=True)
         out = out.reindex(columns=['run_utc', 'mode', 'county', 'situation', 'language', 'chars', 'text_hash',
                                    'recipients', 'status', 'key'])
         pd.concat([log, out], ignore_index=True).to_csv(log_path, index=False) if log is not None \
@@ -252,8 +274,9 @@ def log_indicator(n_msgs, n_people):
 # --------------------------------------------------------------------------- #
 def selftest():
     import tempfile
-    global AA_OUT, AA_CONFIG, post_messages
+    global AA_OUT, AA_CONFIG, STATE_DIR, post_messages
     AA_OUT, AA_CONFIG = tempfile.mkdtemp(), tempfile.mkdtemp()
+    STATE_DIR = AA_OUT
     sent = []
     post_messages = lambda text, phones: (sent.append((text, list(phones))) or (True, 'id1'))
     msgs = pd.DataFrame([
@@ -277,7 +300,7 @@ def selftest():
     assert len(sent) == 1 and sorted(sent[0][1]) == ['+211912345678', '+211922222222'], sent
     out2 = run(send=True, messages=msgs, release=rel, recipients=rec)         # same day again -> no duplicate
     assert len(sent) == 1 and 'skipped: already sent today' in set(out2['status'])
-    logtxt = open(os.path.join(AA_OUT, 'sms_send_log.csv'), encoding='utf-8').read()
+    logtxt = open(os.path.join(STATE_DIR, 'sms_send_log.csv'), encoding='utf-8').read()
     assert '+2119' not in logtxt, 'phone numbers must not be logged'
     print('selftest passed: dry run by default, release gate, 160-character limit, no duplicates, no numbers in log')
 

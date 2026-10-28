@@ -1,0 +1,15 @@
+# SMSGate private server configuration. deploy_gcp.sh fills the <> values and stores the result in Secret Manager
+# (it is mounted into the container at /config/config.yml; CONFIG_PATH points there). Never commit the filled file.
+# Check the current key names against config.example.yml in github.com/capcom6/sms-gateway before deploying.
+gateway:
+  mode: private
+  private_token: <PRIVATE_TOKEN>        # the same token you type into the Android app
+http:
+  listen: 0.0.0.0:3000
+database:
+  host: <CLOUD_SQL_PRIVATE_IP>
+  port: 3306
+  user: smsgate
+  password: <DB_PASSWORD>
+  database: smsgate
+  timezone: UTC

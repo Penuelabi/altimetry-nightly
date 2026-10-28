@@ -1,0 +1,6 @@
+# Cloud Run job image for aa_p5_sms_gateway.py (standard library + pandas only)
+FROM python:3.12-slim
+RUN pip install --no-cache-dir pandas numpy
+WORKDIR /app
+COPY aa_p5_sms_gateway.py /app/
+ENTRYPOINT ["python", "/app/aa_p5_sms_gateway.py"]
