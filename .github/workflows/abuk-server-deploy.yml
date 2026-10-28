@@ -102,8 +102,13 @@ jobs:
           ADMIN_KEY_FILE: ${{ runner.temp }}/admin.key
         run: |
           set -euo pipefail
-          npm ci --omit=dev -w server -w packages/core --include-workspace-root=false
-          npm run add-admin -w server -- "$ADMIN_NAME"
+          npm ci --omit=dev -w server -w packages/core --include-workspace-root=false > npm.log 2>&1 || { tail -20 npm.log; echo "::error::npm ci failed: $(grep -m2 'ERR' npm.log | tr '\n' ' ')"; exit 1; }
+          if ! npm run add-admin -w server -- "$ADMIN_NAME" > admin.log 2>&1; then
+            cat admin.log
+            echo "::error::Creating the first admin failed: $(grep -m3 -E 'Error|GitHub|denied|not configured' admin.log | tr '\n' ' ')"
+            exit 1
+          fi
+          cat admin.log
           if [ -s "$ADMIN_KEY_FILE" ]; then
             G="gcloud --project=$PROJECT"
             $G secrets describe abuk-first-admin-key >/dev/null 2>&1 || $G secrets create abuk-first-admin-key --replication-policy=automatic >/dev/null
