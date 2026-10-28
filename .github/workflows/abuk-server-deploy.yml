@@ -23,8 +23,12 @@ jobs:
   deploy:
     runs-on: ubuntu-24.04
     env:
-      PROJECT: ${{ vars.GCP_PROJECT }}
-      REGION: ${{ vars.GCP_REGION || 'europe-west1' }}
+      # Each setting may be a repository variable or a secret; known values are the defaults.
+      PROJECT: ${{ vars.GCP_PROJECT || secrets.GCP_PROJECT || 'ee-penuelabi' }}
+      REGION: ${{ vars.GCP_REGION || secrets.GCP_REGION || 'europe-west1' }}
+      ACCESS_REPO: ${{ vars.ABUK_ACCESS_REPO || secrets.ABUK_ACCESS_REPO || 'Penuelabi/abuk-access' }}
+      SHEET_ID: ${{ vars.ABUK_SHEET_ID || secrets.ABUK_SHEET_ID || '1AhGd-4GbTZTQrJv4tgFSuIyWgjrjxyUbKbA5czFzsX0' }}
+      ADMIN_NAME: ${{ vars.ABUK_ADMIN_NAME || secrets.ABUK_ADMIN_NAME }}
       SERVICE: abuk-server
     steps:
       - uses: actions/checkout@v4
@@ -32,8 +36,16 @@ jobs:
         with:
           node-version: 22
       - name: Check settings
+        env:
+          HAS_DEPLOY_KEY: ${{ secrets.GCP_DEPLOY_KEY != '' || secrets.GEE_SERVICE_ACCOUNT_KEY != '' }}
+          HAS_GH_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN != '' }}
         run: |
-          [ -n "$PROJECT" ] || { echo "::error::Set the repository variable GCP_PROJECT"; exit 1; }
+          echo "project=$PROJECT region=$REGION access_repo=$ACCESS_REPO sheet=$SHEET_ID admin_name_set=$([ -n "$ADMIN_NAME" ] && echo yes || echo no)"
+          fail=0
+          [ "$HAS_DEPLOY_KEY" = true ] || { echo "::error::Missing secret GEE_SERVICE_ACCOUNT_KEY (or GCP_DEPLOY_KEY)"; fail=1; }
+          [ "$HAS_GH_TOKEN" = true ] || { echo "::error::Missing secret ABUK_GITHUB_TOKEN (Settings → Secrets and variables → Actions → Secrets)"; fail=1; }
+          [ -n "$ADMIN_NAME" ] || echo "::warning::ABUK_ADMIN_NAME is not set, so no first admin will be created"
+          exit $fail
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_DEPLOY_KEY || secrets.GEE_SERVICE_ACCOUNT_KEY }}
@@ -68,15 +80,15 @@ jobs:
           gen abuk-sms-webhook SMS_WEBHOOK_SECRET
           echo "MOUNTS=${MOUNTS#,}" >> "$GITHUB_ENV"
       - name: First admin (only if users.json has none)
-        if: vars.ABUK_ADMIN_NAME != '' && vars.ABUK_ACCESS_REPO != ''
+        if: env.ADMIN_NAME != ''
         env:
-          GITHUB_ACCESS_REPO: ${{ vars.ABUK_ACCESS_REPO }}
+          GITHUB_ACCESS_REPO: ${{ env.ACCESS_REPO }}
           GITHUB_TOKEN: ${{ secrets.ABUK_GITHUB_TOKEN }}
           ADMIN_KEY_FILE: ${{ runner.temp }}/admin.key
         run: |
           set -euo pipefail
           npm ci --omit=dev -w server -w packages/core --include-workspace-root=false
-          npm run add-admin -w server -- "${{ vars.ABUK_ADMIN_NAME }}"
+          npm run add-admin -w server -- "$ADMIN_NAME"
           if [ -s "$ADMIN_KEY_FILE" ]; then
             G="gcloud --project=$PROJECT"
             $G secrets describe abuk-first-admin-key >/dev/null 2>&1 || $G secrets create abuk-first-admin-key --replication-policy=automatic >/dev/null
@@ -90,7 +102,7 @@ jobs:
           SMS_USER: ${{ secrets.SMS_GATE_USER }}
         run: |
           set -euo pipefail
-          ENVS="^|^GITHUB_ACCESS_REPO=${{ vars.ABUK_ACCESS_REPO }}|SHEET_ID=${{ vars.ABUK_SHEET_ID }}|GEE_PROJECT=$PROJECT"
+          ENVS="^|^GITHUB_ACCESS_REPO=$ACCESS_REPO|SHEET_ID=$SHEET_ID|GEE_PROJECT=$PROJECT"
           ENVS="$ENVS|GEE_SOIL_MOISTURE_ASSET=${{ vars.ABUK_GEE_SOIL_ASSET }}|GEE_FLOOD_EXTENT_ASSET=${{ vars.ABUK_GEE_FLOOD_ASSET }}"
           ENVS="$ENVS|ALLOWED_ORIGIN=${{ vars.ABUK_ALLOWED_ORIGIN || 'https://localhost' }}|SMS_PROVIDER=smsgate|SMS_USERNAME=$SMS_USER"
           [ -n "$DRIVE_FOLDER_ID" ] && ENVS="$ENVS|DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID"
