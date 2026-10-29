@@ -19,13 +19,31 @@ let index: { p: Place; polys: number[][][][]; box: [number, number, number, numb
 function build() {
   const t = topo as unknown as Topology<{ ssd_A3: GeometryCollection<Props> }>;
   const fc = feature(t, t.objects.ssd_A3);
+  // 138 of the 517 payams have no state or county in the boundary file. A payam code is SS + state (2) + county (2) + payam (2),
+  // so a blank is filled with the most common name among payams sharing the same code prefix.
+  const nameBy = (key: (p: Props) => string, name: (p: Props) => string) => {
+    const counts = new Map<string, Map<string, number>>();
+    for (const f of fc.features) {
+      const pr = f.properties as Props, n = name(pr);
+      if (!n) continue;
+      const m = counts.get(key(pr)) ?? new Map<string, number>();
+      m.set(n, (m.get(n) ?? 0) + 1);
+      counts.set(key(pr), m);
+    }
+    return (k: string) => [...(counts.get(k) ?? new Map<string, number>()).entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
+  };
+  const stateByCode = nameBy(p => p.Payam_MT_P.slice(0, 4), p => p.ADM1_EN);
+  const countyByCode = nameBy(p => p.Payam_MT_P.slice(0, 6), p => p.ADM2_EN);
   return fc.features.flatMap(f => {
     const g = f.geometry as { type: string; coordinates: unknown } | null;
     if (!g) return [];
     const polys = (g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates]) as number[][][][];
     const xs = polys.flat(2).map(c => c[0]), ys = polys.flat(2).map(c => c[1]);
     const pr = f.properties as Props;
-    return [{ p: { payam: pr.Payam_Name, county: pr.ADM2_EN, state: pr.ADM1_EN, pcode: pr.Payam_MT_P }, polys, box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] as [number, number, number, number] }];
+    const code = pr.Payam_MT_P;
+    const county = pr.ADM2_EN || countyByCode(code.slice(0, 6)) || `Unnamed county (${code.slice(0, 6)})`;
+    const state = pr.ADM1_EN || stateByCode(code.slice(0, 4)) || 'Unknown state';
+    return [{ p: { payam: pr.Payam_Name, county, state, pcode: code }, polys, box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] as [number, number, number, number] }];
   });
 }
 

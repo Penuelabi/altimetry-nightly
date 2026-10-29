@@ -8,6 +8,7 @@ interface Overview { generated: string; records: Rec[]; errors: string[]; users:
 
 interface SatState { v?: SatelliteIndices; error?: string; loading?: boolean }
 const PAYAMS = listPayams();
+const STATES = [...new Set(PAYAMS.map(p => p.state))];
 
 const KEY = 'abuk-admin-session';
 const KIND_LABEL: Record<string, string> = { monitor: 'Crop check', harvest: 'Harvest', plot: 'Plot mapped', task: 'Task', pest: 'Pest report', payout: 'Payout', store: 'Store', offer: 'Market offer', voice: 'Pictures & voice', alert: 'Flood alert sent' };
@@ -63,6 +64,8 @@ export function Dashboard() {
   const mapRef = useRef<DashMapHandle>(null);
   const [sat, setSat] = useState<Record<string, SatState>>({});
   const [extraPayams, setExtraPayams] = useState<string[]>([]);
+  const [pickState, setPickState] = useState('');
+  const [pickCounty, setPickCounty] = useState('');
 
   const loadPayam = async (pcode: string) => {
     if (!session) return;
@@ -233,9 +236,17 @@ export function Dashboard() {
           </table>
         </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          <select aria-label="Add a payam" value="" onChange={e => { const code = e.target.value; if (code) setExtraPayams(x => (x.includes(code) ? x : [...x, code])); }}>
-            <option value="">Add a payam…</option>
-            {PAYAMS.map(p => <option key={p.pcode} value={p.pcode}>{p.payam} · {p.county} · {p.state}</option>)}
+          <select aria-label="State" value={pickState} onChange={e => { setPickState(e.target.value); setPickCounty(''); }}>
+            <option value="">State…</option>
+            {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select aria-label="County" value={pickCounty} disabled={!pickState} onChange={e => setPickCounty(e.target.value)}>
+            <option value="">County…</option>
+            {[...new Set(PAYAMS.filter(p => p.state === pickState).map(p => p.county))].map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select aria-label="Add a payam" value="" disabled={!pickCounty} onChange={e => { const code = e.target.value; if (code) setExtraPayams(x => (x.includes(code) ? x : [...x, code])); }}>
+            <option value="">Add payam…</option>
+            {PAYAMS.filter(p => p.state === pickState && p.county === pickCounty).map(p => <option key={p.pcode} value={p.pcode}>{p.payam}{payamCodes.includes(p.pcode) ? ' ✓' : ''}</option>)}
           </select>
           <button className="link" onClick={() => void loadAllPayams(true)}>Refresh all</button>
         </div>

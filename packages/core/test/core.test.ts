@@ -98,9 +98,24 @@ describe('payam boundaries for satellite averaging', () => {
     expect(payamByCode(a.pcode)?.payam).toBe(a.payam);
     expect(payamByCode('nope')).toBeNull();
   });
-  it('lists every payam and the four in Duk county', () => {
+  it('lists every payam and the six in Duk county (Ageer and Dongchak have no county in the source file)', () => {
     expect(listPayams().length).toBe(517);
-    expect(payamsIn('Duk', 'Jonglei').map(p => p.payam).sort()).toEqual(['Duk Padiet', 'Duk Payuel', 'Pagak', 'Panyang']);
+    expect(payamsIn('Duk', 'Jonglei').map(p => p.payam).sort()).toEqual(['Ageer', 'Dongchak', 'Duk Padiet', 'Duk Payuel', 'Pagak', 'Panyang']);
+  });
+  it('fills a blank state and county from the payam code, so the pickers can group every payam', () => {
+    const all = listPayams();
+    expect(all.every(p => p.state && p.county)).toBe(true);
+    expect(all.every(p => p.state !== 'Unknown state')).toBe(true);
+    expect(payamByCode('SS070502')).toMatchObject({ payam: 'Buny', state: 'Upper Nile' });
+    expect(payamByCode('SS070502')!.county).not.toMatch(/^Unnamed/);
+    expect(payamByCode('SS060401')).toMatchObject({ payam: 'Adok', state: 'Unity' });
+    expect(payamByCode('SS060401')!.county).not.toMatch(/^Unnamed/);
+    expect(payamByCode('SS070802')).toMatchObject({ payam: 'Kaka', state: 'Upper Nile', county: 'Unnamed county (SS0708)' });
+  });
+  it('keeps payam codes unique, since the server looks payams up by code', () => {
+    const codes = listPayams().map(p => p.pcode);
+    expect(new Set(codes).size).toBe(codes.length);
+    expect(codes.every(c => /^SS\d{6}$/.test(c))).toBe(true);
   });
   it('measures area on the ground and subtracts holes', () => {
     const square = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]];
