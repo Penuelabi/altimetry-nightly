@@ -33,6 +33,8 @@ export interface State {
   // Crop checks from every phone (server, last 3 weeks), for the flood model and SMS alerts.
   checksAll: { id: string; at: string; by: string; plot: string; crop: string; lat: number | null; lon: number | null; water: string; depthCm: number | null; around: string; aroundDepthCm: number | null; trend: string }[];
   farm: Register; farmOps: FarmOp[]; regTab: 'plots' | 'crops' | 'groups' | 'people' | 'batches' | 'runs';
+  // Records received from another phone (ids, so the same file is not added twice) and a short log of transfers.
+  carried: string[]; p2pLog: { at: string; who: string; n: number; dir: 'in' | 'out' }[];
 }
 
 const initial: State = {
@@ -46,7 +48,7 @@ const initial: State = {
   leads: LEADS.map(([name, g, rows]) => ({ id: name, name: `${name} · ${g}`, rows, phone: 'number on server', on: true })),
   alertLog: [], gauge: null, where: null,
   accounts: [], roster: [], satHere: null, satIndices: null, autoPull: null, checksAll: [],
-  farm: seedRegister(), farmOps: [], regTab: 'plots'
+  farm: seedRegister(), farmOps: [], regTab: 'plots', carried: [], p2pLog: []
 };
 
 // Navigation is per session; the rest survives restarts.

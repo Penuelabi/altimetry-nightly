@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { basinDepth, recessDays, moundRows, headline, parseGauge, monitorError, harvestError, signinError, withinRadius, polygonHa, pointInPolygon, plotForGps, qrCells, normId } from '../src';
+import { blankPerson, normPhone, personError, productToStore, zoneDepths, basinDepth, recessDays, moundRows, headline, parseGauge, monitorError, harvestError, signinError, withinRadius, polygonHa, pointInPolygon, plotForGps, qrCells, normId } from '../src';
 
 describe('flood model', () => {
   it('matches the design numbers', () => {
@@ -278,5 +278,45 @@ describe('lead SMS alerts', () => {
     expect(a.en).toContain('County: ORANGE drought / dry spell');
     expect(a.en).toContain('Rain next 7d 11mm');
     expect(a.level).toBe('watch');
+  });
+});
+
+describe('people register, store and roll-call', () => {
+  const admin = { state: 'Jonglei', county: 'Duk', payam: 'Pagak', village: '' };
+  const kin = { name: 'Nyadak', name2: 'Deng', relation: 'wife', phone: '0912345678', village: '' };
+  const person = { ...blankPerson('p1', admin), name: 'Achol', name2: 'Deng', phone: '0912345678', kin: [kin, { ...kin, name: 'Kuol' }] };
+  it('normalises South Sudan phone numbers', () => {
+    expect(normPhone('0912 345 678')).toBe('+211912345678');
+    expect(normPhone('211912345678')).toBe('+211912345678');
+    expect(normPhone('+211 912-345-678')).toBe('+211912345678');
+    expect(normPhone('12345')).toBe('');
+  });
+  it('asks for two names, a phone, the admin level and two next of kin', () => {
+    expect(personError(person)).toBe('');
+    expect(personError({ ...person, name2: '' })).toContain('second name');
+    expect(personError({ ...person, admin: { ...admin, payam: '' } })).toContain('payam');
+    expect(personError({ ...person, kin: [kin, { ...kin, phone: '' }] })).toContain('next of kin 2');
+  });
+  it('puts a product in the store as an incoming movement, creating the item once', () => {
+    const reg = seedRegister();
+    const a = productToStore(reg, { storeId: 'ST-01', name: 'Goat (live)', unit: 'head', qty: 3, by: 'u1', note: '', date: '2026-10-29' });
+    expect(a.ops.map(o => (o as { kind: string }).kind)).toEqual(['item', 'move']);
+    const reg2 = applyOps(reg, a.ops);
+    const b = productToStore(reg2, { storeId: 'ST-01', name: 'Goat (live)', unit: 'head', qty: 2, by: 'u1', note: '', date: '2026-10-30' });
+    expect(b.ops.map(o => (o as { kind: string }).kind)).toEqual(['move']);
+  });
+  it('counts a roll-call day only once', () => {
+    const reg = seedRegister();
+    const g = reg.groups[3], m = g.members[0];
+    const op = { op: 'workdays' as const, groupId: g.id, memberIds: [m.id], date: '2026-10-29' };
+    const once = applyOps(reg, [op]), twice = applyOps(once, [op]);
+    expect(once.groups[3].members[0].workDays).toBe(m.workDays + 1);
+    expect(twice.groups[3].members[0].workDays).toBe(m.workDays + 1);
+  });
+  it('gives zone depths from the model: ridge dry, slope 0.70 m shallower than the basin', () => {
+    const z = zoneDepths({ d0: 0.92, rate: 0.025 });
+    expect(z.ridge).toBe(0);
+    expect(z.basin).toBeCloseTo(0.92);
+    expect(z.slope).toBeCloseTo(0.22);
   });
 });

@@ -100,7 +100,7 @@ export const TOOLS: [string, Screen, string, string][] = [
   ['v', 'payout', 'Work days & payout', "Roll‑call, then each member's share of sales"],
   ['vi', 'store', 'Seed & input store', 'Stock reserved against planting windows'],
   ['vii', 'trace', 'Traceable batches', 'QR label on each product: crop, plot GPS, harvest, co‑op'],
-  ['viii', 'p2p', 'Phone‑to‑phone sync', 'Swap records by Bluetooth in the field'],
+  ['viii', 'p2p', 'Phone‑to‑phone sync', 'Pass records between phones with no signal'],
   ['ix', 'herd', 'Livestock, forest & fish', 'Herd counts, forest collection and pond or catch records']
 ];
 

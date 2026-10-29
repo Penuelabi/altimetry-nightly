@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
-import { ICONS, P2P_PEERS, PARTS, PICTO, STORE, TOOLS, adminLabel, bulletinInputs, pestInfo, pestOptions, personName, plotLabel, removeAllowed, type AdminLoc, type Part, editAllowed, leadAlert, newId, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
+import { ICONS, PARTS, PICTO, STORE, TOOLS, adminLabel, bulletinInputs, pestInfo, pestOptions, personName, plotLabel, removeAllowed, type AdminLoc, type Part, editAllowed, leadAlert, newId, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
 import { farmChange, getState, go, openRegister, record, setState, useApp, type Lead } from '../store';
 import { AdminPicker, PersonSelect, nowLocal, useHereAdmin } from '../pickers';
-import { openLink, smsLink } from '../sms';
+import { copyText, openLink, smsLink } from '../sms';
+import { absorb, bundleText, downloadBundle, logSent, makeBundle, parseBundle, shareBundle } from '../carry';
 import { api, explain } from '../api';
 import { oneFix, useOnline, usePlace } from '../net';
 import { Check, Chevron, Field, Icon, Seg, Toggle } from '../ui';
@@ -564,27 +565,71 @@ export function Trace() {
 }
 
 // ---- viii Phone-to-phone sync ----
+// Not Bluetooth pairing: the records are put in a file (or a block of text) that any way of moving data between
+// phones can carry (Nearby Share, Bluetooth file send, WhatsApp, a memory stick). The other phone adds it to its
+// own queue and uploads it when it reaches signal.
 export function P2p() {
   const s = useApp();
   const [msg, setMsg] = useState('');
+  const [paste, setPaste] = useState('');
+  const [busy, setBusy] = useState(false);
+  const empty = !s.outbox.length && !s.farmOps.length;
+  const sent = async (how: string, n: number) => { logSent(n, how); setMsg(`${n} records ready. They stay on this phone until they upload; the other phone uploads its own copy.`); };
+  const sendFile = async () => {
+    const b = makeBundle();
+    setBusy(true);
+    const r = await shareBundle(b);
+    setBusy(false);
+    if (r === 'shared') return sent('file shared', b.records.length);
+    if (r === 'unsupported') { downloadBundle(b); setMsg('This phone cannot open the share sheet from the app, so the file was saved to Downloads. Send it from there by Nearby Share, Bluetooth or WhatsApp.'); logSent(b.records.length, 'file saved'); }
+  };
+  const sendText = async () => {
+    const b = makeBundle();
+    setBusy(true);
+    const t = await bundleText(b);
+    const ok = await copyText(t);
+    setBusy(false);
+    logSent(b.records.length, 'text copied');
+    setMsg(ok ? `Copied ${b.records.length} records as text (${Math.ceil(t.length / 1000)} KB). Paste it into a WhatsApp or SMS message to the other worker.` : 'The text could not be copied automatically.');
+  };
+  const take = async (text: string) => {
+    try {
+      const b = await parseBundle(text);
+      const r = absorb(b);
+      setMsg(`Received ${r.records} new records and ${r.ops} register edits from ${b.from.name || b.from.id}${r.skipped ? ` (${r.skipped} already here)` : ''}. They upload when this phone has signal.`);
+      setPaste('');
+    } catch (e) { setMsg((e as Error).message); }
+  };
+  const pick = async (f?: File | null) => { if (f) await take(await f.text()); };
+  const today = new Date().toISOString().slice(0, 10);
+  const gotToday = s.p2pLog.filter(l => l.dir === 'in' && l.at.slice(0, 10) === today).reduce((a, l) => a + l.n, 0);
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <div className="body" style={{ fontSize: 13.5 }}>Swap records with nearby group‑lead phones over Bluetooth. Whoever reaches signal first uploads everyone's.</div>
+      <div className="body" style={{ fontSize: 13.5 }}>Pass records to another worker's phone without any signal, then whoever reaches signal first uploads them. The app does not pair by Bluetooth by itself: it makes a file that Android's own Share, Nearby Share or Bluetooth can send.</div>
       <div className="grid2" style={{ gap: 0, borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
         <div style={{ padding: '10px 0' }}><div className="lbl">On this phone</div><div className="head num" style={{ fontSize: 26 }}>{s.outbox.length}</div><div style={{ fontSize: 11, color: 'var(--color-neutral-700)' }}>records to upload</div></div>
-        <div style={{ padding: '10px 0 10px 12px', borderLeft: '1px solid var(--color-divider)' }}><div className="lbl">From phones</div><div className="head num" style={{ fontSize: 26 }}>0</div><div style={{ fontSize: 11, color: 'var(--color-neutral-700)' }}>swapped today</div></div>
+        <div style={{ padding: '10px 0 10px 12px', borderLeft: '1px solid var(--color-divider)' }}><div className="lbl">From phones</div><div className="head num" style={{ fontSize: 26 }}>{gotToday}</div><div style={{ fontSize: 11, color: 'var(--color-neutral-700)' }}>received today</div></div>
       </div>
-      <div>
-        <div className="section">Nearby · Bluetooth · example list in the web version</div>
-        {P2P_PEERS.map(([name, dist, recs]) => (
-          <div key={name} className="rowg" style={{ padding: '10px 0', alignItems: 'center' }}>
-            <span><span style={{ display: 'block', fontSize: 14 }}>{name}</span><span className="sub">{dist} · {recs} new records</span></span>
-            <button className="btn" style={{ minHeight: 38, minWidth: 84, padding: '0 10px', fontSize: 12.5 }} onClick={() => setMsg('Bluetooth swaps need the Android app. This web version cannot reach nearby phones; it uploads its own records when it has signal.')}>Swap</button>
-          </div>
-        ))}
+      <div className="col g8">
+        <div className="section">Give records to another phone</div>
+        <button className="btn" disabled={busy || empty} onClick={sendFile}>Send as a file (Share, Nearby, Bluetooth)</button>
+        <button className="btn plain" disabled={busy || empty} onClick={sendText}>Copy as text for WhatsApp or SMS</button>
+        {empty && <div className="sub">Nothing is waiting to upload on this phone.</div>}
+      </div>
+      <div className="col g8">
+        <div className="section">Take records from another phone</div>
+        <label className="btn plain" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Open a records file
+          <input type="file" accept=".json,application/json,text/plain" style={{ display: 'none' }} onChange={e => { pick(e.target.files?.[0]); e.target.value = ''; }} />
+        </label>
+        <Field label="Or paste the text you were sent"><textarea className="input" rows={3} value={paste} onChange={e => setPaste(e.target.value)} style={{ padding: 10, fontSize: 12.5 }} /></Field>
+        <button className="btn plain" disabled={!paste.trim()} onClick={() => take(paste)}>Add pasted records</button>
       </div>
       {msg && <div className="msg">{msg}</div>}
-      <div className="sub" style={{ lineHeight: 1.5 }}>Records are signed with each worker's key and encrypted in transit, so a carrier phone can pass them on but not change them.</div>
+      {s.p2pLog.length > 0 && <div>
+        <div className="section">Recent</div>
+        {s.p2pLog.slice(0, 8).map((l, i) => <div key={i} className="rowg" style={{ padding: '6px 0' }}><span style={{ fontSize: 13 }}>{l.dir === 'in' ? 'Received from' : 'Sent'} {l.who}</span><span className="sub num">{l.n} · {new Date(l.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span></div>)}
+      </div>}
+      <div className="sub" style={{ lineHeight: 1.5 }}>A file is not encrypted: send it only to a worker you trust. Each record keeps the name of the worker who wrote it, and the server also notes which phone uploaded it. A file added twice is only counted once.</div>
     </div>
   );
 }

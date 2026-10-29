@@ -2,7 +2,7 @@ import { useRef, useState, type ReactNode } from 'react';
 import { BLANK_KIN, NO_ADMIN, adminLabel, blankPerson, normPhone, personError, type Person, chainFor, editAllowed, newId, personById, personName, plotLabel, polygonHa, removeAllowed, type Crop, type CropCategory, type CropSeason, type Group, type OilBatch, type Plot, type ProcessRun, type Register, type Zone } from '@abuk/core';
 import { farmChange, getState, useApp } from '../store';
 import { useOnline, usePlace } from '../net';
-import { AdminPicker, NewPerson, PersonFields, PersonSelect, useHereAdmin } from '../pickers';
+import { AdminPicker, MultiPick, NewPerson, PersonFields, PersonSelect, useHereAdmin } from '../pickers';
 import { LiveMap } from '../LiveMap';
 import { Photo, savePhoto } from '../photos';
 import { Chevron, Field, Seg } from '../ui';
@@ -310,8 +310,15 @@ function RunForm({ reg, item, onSave, onCancel, onRemove }: { reg: Register; ite
   const [r, setR] = useState<ProcessRun>(item ?? blank(reg.crops[0]?.name ?? ''));
   const [err, setErr] = useState('');
   const step = (i: number, patch: Partial<ProcessRun['steps'][number]>) => { setR({ ...r, steps: r.steps.map((x, j) => (j === i ? { ...x, ...patch } : x)) }); setErr(''); };
-  const save = () => (r.steps.some(s => s.out.trim()) ? onSave({ ...r, chain: r.product || r.chain, steps: r.steps.filter(s => s.name.trim()) }) : setErr('Fill in at least one step, e.g. "2,400 kg".'));
-  const plots = reg.plots.filter(p => !r.crop || p.crop === r.crop || (p.crops ?? []).includes(r.crop));
+  const save = () => {
+    if (!(r.plotIds ?? []).length) return setErr('Choose at least one plot the produce came from.');
+    if (!r.steps.some(s => s.out.trim())) return setErr('Fill in at least one step, e.g. "2,400 kg".');
+    onSave({ ...r, chain: r.product || r.chain, steps: r.steps.filter(s => s.name.trim()) });
+  };
+  // Every plot can be chosen; the ones growing this crop come first.
+  const matches = (p: Plot) => !r.crop || p.crop === r.crop || (p.crops ?? []).includes(r.crop);
+  const plots = [...reg.plots].sort((a, b) => Number(matches(b)) - Number(matches(a)));
+  const matching = plots.filter(matches).map(p => p.id);
   return (
     <Shell title={item ? 'Edit processing run' : 'New processing run'} onSave={save} onCancel={onCancel} onRemove={onRemove} err={err}>
       <div className="grid2">
@@ -319,9 +326,10 @@ function RunForm({ reg, item, onSave, onCancel, onRemove }: { reg: Register; ite
         <Field label="Product"><input className="input" value={runProduct(r)} onChange={e => setR({ ...r, product: e.target.value })} /></Field>
       </div>
       <Field label="Date"><input className="input" type="date" value={r.date} onChange={e => setR({ ...r, date: e.target.value })} style={{ fontSize: 14, padding: '0 8px' }} /></Field>
-      {plots.length > 0 && <div className="col g6">
-        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>From plots</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{plots.map(p => { const on = (r.plotIds ?? []).includes(p.id); return <button key={p.id} className={'chip' + (on ? ' on' : '')} style={{ minHeight: 34, padding: '0 10px', fontSize: 12.5 }} onClick={() => setR({ ...r, plotIds: on ? (r.plotIds ?? []).filter(x => x !== p.id) : [...(r.plotIds ?? []), p.id] })}>{on ? '✓ ' : ''}{p.code}</button>; })}</div>
+      <MultiPick label={`From plots (${(r.plotIds ?? []).length} chosen; ${r.crop || 'any crop'} plots first)`} items={plots.map(p => ({ id: p.id, label: p.code + (matches(p) ? '' : ' ·other crop') }))} value={r.plotIds ?? []} onChange={plotIds => { setR({ ...r, plotIds }); setErr(''); }} />
+      {matching.length > 0 && <div className="grid2">
+        <button className="btn plain sm" onClick={() => setR({ ...r, plotIds: [...new Set([...(r.plotIds ?? []), ...matching])] })}>Select all {r.crop || ''} plots</button>
+        <button className="btn plain sm" onClick={() => setR({ ...r, plotIds: [] })}>Clear</button>
       </div>}
       <div className="section">Steps</div>
       {r.steps.map((s, i) => (
