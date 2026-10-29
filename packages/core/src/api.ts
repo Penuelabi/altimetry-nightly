@@ -17,7 +17,9 @@ export interface PullResult {
 }
 export interface Terrain { elevation: number | null; slopePct: number | null }
 
+// Every value is the average over all pixels inside one payam's boundary.
 export interface SatelliteIndices {
+  payam: string; county: string; pcode: string; areaKm2: number;
   ndvi: number | null;
   vci: number | null;
   spi: number | null;

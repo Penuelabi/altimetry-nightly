@@ -87,8 +87,9 @@ export async function sheetsRead(tab: string): Promise<string[][]> {
 }
 
 // ---- Earth Engine REST: expressions are built as plain JSON graphs ----
-type Node = { constantValue: unknown } | { functionInvocationValue: { functionName: string; arguments: Record<string, Node> } };
+export type Node = { constantValue: unknown } | { arrayValue: { values: Node[] } } | { functionInvocationValue: { functionName: string; arguments: Record<string, Node> } };
 export const c = (v: unknown): Node => ({ constantValue: v });
+export const arr = (values: Node[]): Node => ({ arrayValue: { values } });
 export const fn = (functionName: string, args: Record<string, Node>): Node => ({ functionInvocationValue: { functionName, arguments: args } });
 
 // "ic:ID" → newest image of an ImageCollection; plain ID → an Image asset.
@@ -100,9 +101,20 @@ export function loadImage(asset: string): Node {
   return fn('Image.load', { id: c(asset) });
 }
 
+export function meanOver(image: Node, geometry: Node, scale: number): Node {
+  return fn('Image.reduceRegion', { image, reducer: fn('Reducer.mean', {}), geometry, scale: c(scale), maxPixels: c(1e9), bestEffort: c(true) });
+}
+
 export function meanAround(image: Node, lat: number, lon: number, radiusM: number, scale: number): Node {
   const geometry = fn('Geometry.buffer', { geometry: fn('GeometryConstructors.Point', { coordinates: c([lon, lat]) }), distance: c(radiusM) });
-  return fn('Image.reduceRegion', { image, reducer: fn('Reducer.mean', {}), geometry, scale: c(scale), maxPixels: c(1e9), bestEffort: c(true) });
+  return meanOver(image, geometry, scale);
+}
+
+// A payam boundary: polys[i] is a list of rings (outer first, then holes) of [lon, lat]. Straight edges, not geodesic.
+export function polygonGeometry(polys: number[][][][]): Node {
+  return polys.length === 1
+    ? fn('GeometryConstructors.Polygon', { coordinates: c(polys[0]), geodesic: c(false) })
+    : fn('GeometryConstructors.MultiPolygon', { coordinates: c(polys), geodesic: c(false) });
 }
 
 export async function eeCompute(expr: Node): Promise<Record<string, number | null>> {

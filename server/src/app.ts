@@ -8,7 +8,8 @@ import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, changeUsers, checkKey, c
 import { readJson, updateJson } from './adapters/github';
 import { photoGet, photoPut, sheetsAppend } from './adapters/google';
 import { parseInbound, sendSms } from './adapters/sms';
-import { geeSummary, pull, satelliteIndices, terrain } from './sources';
+import { geeSummary, pull, terrain } from './sources';
+import { resolvePayam, satelliteForPayam } from './satellite';
 import { overview, recentChecks } from './dashboard';
 
 type Env = { Variables: { me: Session } };
@@ -139,12 +140,15 @@ app.get('/api/sources/gee', auth(), async c => {
   return c.json(await geeSummary(p.lat, p.lon, radius));
 });
 
+// Satellite indices averaged over one payam: ?pcode=SS030504, or ?lat=&lon= for the payam that point is in.
 app.get('/api/sources/satellite', auth(), async c => {
-  const p = coords(c), radius = Math.min(200, Math.max(1, Number(c.req.query('radius')) || 20));
-  if (!p) return c.json({ error: 'invalid', message: 'lat and lon are required' }, 400);
-  return c.json(await satelliteIndices(p.lat, p.lon, radius));
+  const pcode = c.req.query('pcode');
+  const p = pcode ? null : coords(c);
+  if (!pcode && !p) return c.json({ error: 'invalid', message: 'pcode, or lat and lon, is required' }, 400);
+  const area = resolvePayam(pcode ? { pcode } : p!);
+  if (!area) return c.json({ error: 'not_found', message: pcode ? `unknown payam code ${pcode}` : 'that point is outside the payam boundaries' }, 404);
+  return c.json(await satelliteForPayam(area));
 });
-
 // Payam / county / state for a point (also works offline in the app from the same boundaries).
 app.get('/api/where', async c => {
   const p = coords(c);

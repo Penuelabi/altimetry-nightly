@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { conditionSummary, signinError, whereIs, type GaugeReading, type PlotCondition, type PublicUser, type Register, type SatelliteIndices, type SigninResponse, type SyncKind } from '@abuk/core';
+import { conditionSummary, listPayams, signinError, whereIs, type GaugeReading, type PlotCondition, type PublicUser, type Register, type SatelliteIndices, type SigninResponse, type SyncKind } from '@abuk/core';
 import { DayBars } from './DayBars';
 import { DashMap, type CheckPoint, type DashMapHandle } from './DashMap';
 
 interface Rec { id: string; kind: SyncKind; at: string; by: string; data: Record<string, unknown> }
 interface Overview { generated: string; records: Rec[]; errors: string[]; users: (PublicUser & { lastSeen: string | null })[]; farm: Register; farmChanges: { sha: string; message: string; date: string }[]; gauge: GaugeReading[] }
+
+interface SatState { v?: SatelliteIndices; error?: string; loading?: boolean }
+const PAYAMS = listPayams();
 
 const KEY = 'abuk-admin-session';
 const KIND_LABEL: Record<string, string> = { monitor: 'Crop check', harvest: 'Harvest', plot: 'Plot mapped', task: 'Task', pest: 'Pest report', payout: 'Payout', store: 'Store', offer: 'Market offer', voice: 'Pictures & voice', alert: 'Flood alert sent' };
@@ -58,14 +61,18 @@ export function Dashboard() {
   const [kind, setKind] = useState<string>('all');
   const [who, setWho] = useState<string>('all');
   const mapRef = useRef<DashMapHandle>(null);
-  const [sat, setSat] = useState<SatelliteIndices | null>(null);
+  const [sat, setSat] = useState<Record<string, SatState>>({});
+  const [extraPayams, setExtraPayams] = useState<string[]>([]);
 
-  const loadSat = async () => {
+  const loadPayam = async (pcode: string) => {
     if (!session) return;
+    setSat(s => ({ ...s, [pcode]: { ...s[pcode], loading: true } }));
     try {
-      const r = await fetch('/api/sources/satellite?lat=7.33&lon=31.65&radius=20', { headers: { authorization: `Bearer ${session.token}` } });
-      if (r.ok) setSat(await r.json());
-    } catch { /* silently fail */ }
+      const r = await fetch(`/api/sources/satellite?pcode=${pcode}`, { headers: { authorization: `Bearer ${session.token}` } });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.message || j.error);
+      setSat(s => ({ ...s, [pcode]: { v: j as SatelliteIndices } }));
+    } catch (e) { setSat(s => ({ ...s, [pcode]: { error: (e as Error).message } })); }
   };
 
   const load = async (fresh = false) => {
@@ -80,11 +87,33 @@ export function Dashboard() {
     } catch (e) { setErr((e as Error).message); }
     finally { setBusy(false); }
   };
-  useEffect(() => { load(); loadSat(); const iv = setInterval(() => load(), 120_000); return () => clearInterval(iv); }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); const iv = setInterval(() => load(), 120_000); return () => clearInterval(iv); }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const since = useMemo(() => new Date(Date.now() - range * 864e5).toISOString(), [range, data]);
   const inRange = useMemo(() => (data?.records ?? []).filter(r => r.at >= since), [data, since]);
   const shown = inRange.filter(r => (kind === 'all' || r.kind === kind) && (who === 'all' || r.by === who));
+
+  // Payams that workers' GPS records fall in (busiest first), then payams holding a mapped plot, then any the admin added.
+  const payamCodes = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of inRange) {
+      const g = r.data.gps as { lat?: number; lon?: number } | null | undefined;
+      const p = g && typeof g.lat === 'number' && typeof g.lon === 'number' ? whereIs(g.lat, g.lon) : null;
+      if (p) counts.set(p.pcode, (counts.get(p.pcode) ?? 0) + 1);
+    }
+    for (const plot of data?.farm.plots ?? []) {
+      const b = plot.boundary[0], p = b ? whereIs(b.lat, b.lon) : null;
+      if (p && !counts.has(p.pcode)) counts.set(p.pcode, 0);
+    }
+    const fromGps = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([k]) => k);
+    return [...new Set([...fromGps, ...extraPayams])].slice(0, 12);
+  }, [inRange, data, extraPayams]);
+
+  const loadAllPayams = async (force = false) => {
+    const todo = payamCodes.filter(p => force || !sat[p]);
+    for (let i = 0; i < todo.length; i += 2) await Promise.all(todo.slice(i, i + 2).map(loadPayam));
+  };
+  useEffect(() => { void loadAllPayams(); }, [session, payamCodes.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!session) return <Login onDone={setSession} />;
 
@@ -181,17 +210,35 @@ export function Dashboard() {
       </div>
 
       <div className="panel">
-        <h2>Satellite indices · GEE{sat?.asOf ? ` · ${sat.asOf}` : ''}</h2>
-        <div className="note">NDVI, VCI, SPEI and SPI from Google Earth Engine (Sentinel-2 / CHIRPS). Values are area averages around Duk project plots. Cached 6 h per location.</div>
-        <div className="tiles" style={{ marginTop: 8 }}>
-          <Tile k="NDVI" v={sat?.ndvi ?? '—'} s="Vegetation greenness (MODIS)" />
-          <Tile k="VCI" v={sat?.vci != null ? `${sat.vci}%` : '—'} s="Vegetation condition vs historical" />
-          <Tile k="SPEI" v={sat?.spei ?? '—'} s="Drought severity (TerraClimate PDSI)" />
-          <Tile k="SPI" v={sat?.spi ?? '—'} s="Rainfall anomaly (CHIRPS)" />
+        <h2>Satellite indices by payam · GEE</h2>
+        <div className="note">
+          NDVI, VCI, SPI and SPEI from Google Earth Engine, each averaged over the whole payam boundary. Shown for the payams where workers' GPS records fall in this period, plus payams with a mapped plot. SPI and SPEI are z-scores against 1991–2020 (−3 to +3). Kept 6 h per payam.
         </div>
-        {sat?.precipMm != null && <div className="note" style={{ marginTop: 6, fontSize: 12 }}>30-day rainfall: <strong>{sat.precipMm} mm</strong></div>}
-        {sat?.errors.length ? <div className="note" style={{ marginTop: 6, fontSize: 11, color: '#c03020' }}>{sat.errors.join('; ')}</div> : null}
-        {!sat && <div className="note" style={{ marginTop: 6, fontSize: 11 }}>Set GEE_PROJECT and GOOGLE_SERVICE_ACCOUNT_JSON in server/.env to enable. <button style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11 }} onClick={loadSat}>Retry</button></div>}
+        <div className="tbl-wrap" style={{ marginTop: 8 }}>
+          <table className="tbl"><thead><tr><th>Payam</th><th>County</th><th style={{ textAlign: 'right' }}>km²</th><th style={{ textAlign: 'right' }}>NDVI</th><th style={{ textAlign: 'right' }}>VCI</th><th style={{ textAlign: 'right' }}>SPI</th><th style={{ textAlign: 'right' }}>SPEI</th><th style={{ textAlign: 'right' }}>Rain 30 d</th><th /></tr></thead>
+            <tbody>{payamCodes.map(code => {
+              const st = sat[code], v = st?.v, place = PAYAMS.find(p => p.pcode === code);
+              const cell = (x: number | null | undefined, suffix = '') => <td className="num" style={{ textAlign: 'right' }}>{x == null ? '—' : `${x}${suffix}`}</td>;
+              return [
+                <tr key={code}>
+                  <td><strong>{place?.payam ?? code}</strong>{st?.loading && <span className="note"> · loading…</span>}</td>
+                  <td>{place ? `${place.county}, ${place.state}` : ''}</td>
+                  <td className="num" style={{ textAlign: 'right' }}>{v?.areaKm2.toLocaleString('en') ?? '—'}</td>
+                  {cell(v?.ndvi)}{cell(v?.vci, '%')}{cell(v?.spi)}{cell(v?.spei)}{cell(v?.precipMm, ' mm')}
+                  <td>{extraPayams.includes(code) && <button className="link" onClick={() => setExtraPayams(x => x.filter(c => c !== code))}>remove</button>}</td>
+                </tr>,
+                (st?.error || v?.errors.length) ? <tr key={`${code}-err`}><td colSpan={9} className="note" style={{ color: '#c03020', fontSize: 11 }}>{st?.error ?? v?.errors.join('; ')}</td></tr> : null
+              ];
+            })}{!payamCodes.length && <tr><td colSpan={9} className="note">No GPS records or mapped plots in this period yet. Add a payam below.</td></tr>}</tbody>
+          </table>
+        </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <select aria-label="Add a payam" value="" onChange={e => { const code = e.target.value; if (code) setExtraPayams(x => (x.includes(code) ? x : [...x, code])); }}>
+            <option value="">Add a payam…</option>
+            {PAYAMS.map(p => <option key={p.pcode} value={p.pcode}>{p.payam} · {p.county} · {p.state}</option>)}
+          </select>
+          <button className="link" onClick={() => void loadAllPayams(true)}>Refresh all</button>
+        </div>
       </div>
 
       <div className="panel">

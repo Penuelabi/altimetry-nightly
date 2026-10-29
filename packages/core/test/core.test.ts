@@ -84,6 +84,34 @@ describe('payam lookup', () => {
   });
 });
 
+import { listPayams, payamAt, payamByCode, payamsIn, polygonAreaKm2 } from '../src';
+describe('payam boundaries for satellite averaging', () => {
+  it('finds the payam a GPS point falls in, with its boundary and area', () => {
+    const a = payamAt(7.731, 31.402);
+    expect(a?.county).toBe('Duk');
+    expect(a?.polygons.length).toBeGreaterThan(0);
+    expect(a!.areaKm2).toBeGreaterThan(100);
+    expect(a!.areaKm2).toBeLessThan(1200);
+  });
+  it('looks the same payam up by its code', () => {
+    const a = payamAt(7.731, 31.402)!;
+    expect(payamByCode(a.pcode)?.payam).toBe(a.payam);
+    expect(payamByCode('nope')).toBeNull();
+  });
+  it('lists every payam and the four in Duk county', () => {
+    expect(listPayams().length).toBe(517);
+    expect(payamsIn('Duk', 'Jonglei').map(p => p.payam).sort()).toEqual(['Duk Padiet', 'Duk Payuel', 'Pagak', 'Panyang']);
+  });
+  it('measures area on the ground and subtracts holes', () => {
+    const square = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]];
+    const hole = [[0.25, 0.25], [0.75, 0.25], [0.75, 0.75], [0.25, 0.75], [0.25, 0.25]];
+    const full = polygonAreaKm2([[square]]);
+    expect(full).toBeGreaterThan(12000);
+    expect(full).toBeLessThan(12500);
+    expect(polygonAreaKm2([[square, hole]])).toBeCloseTo(full * 0.75, -2);
+  });
+});
+
 import { applyOps, seedRegister, opError, plotLabel } from '../src';
 describe('farm register', () => {
   it('seeds the design farm', () => {

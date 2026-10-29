@@ -29,12 +29,58 @@ function build() {
   });
 }
 
-export function whereIs(lat: number, lon: number): Place | null {
+function entryAt(lat: number, lon: number) {
   index ??= build();
   for (const e of index) {
     const [x0, y0, x1, y1] = e.box;
     if (lon < x0 || lon > x1 || lat < y0 || lat > y1) continue;
-    if (e.polys.some(poly => inPolygon(lon, lat, poly))) return e.p;
+    if (e.polys.some(poly => inPolygon(lon, lat, poly))) return e;
   }
   return null;
+}
+
+export function whereIs(lat: number, lon: number): Place | null {
+  return entryAt(lat, lon)?.p ?? null;
+}
+
+// A payam with its boundary: polygons[i] is a list of rings (outer ring first, then holes) of [lon, lat].
+export interface PayamArea extends Place { polygons: number[][][][]; areaKm2: number }
+
+// Planar approximation around the polygon's own latitude; good to a few percent at payam size.
+export function polygonAreaKm2(polys: number[][][][]): number {
+  let total = 0;
+  for (const poly of polys) {
+    poly.forEach((ring, i) => {
+      const lat0 = ring.reduce((n, p) => n + p[1], 0) / ring.length;
+      const kx = 111.32 * Math.cos(lat0 * Math.PI / 180), ky = 110.57;
+      let a = 0;
+      for (let k = 0, j = ring.length - 1; k < ring.length; j = k++) a += (ring[j][0] * ring[k][1] - ring[k][0] * ring[j][1]);
+      total += (i === 0 ? 1 : -1) * Math.abs(a) / 2 * kx * ky;
+    });
+  }
+  return Math.round(total);
+}
+
+const toArea = (e: NonNullable<typeof index>[number]): PayamArea => ({ ...e.p, polygons: e.polys, areaKm2: polygonAreaKm2(e.polys) });
+
+export function payamsIn(county: string, state?: string): PayamArea[] {
+  index ??= build();
+  return index.filter(e => e.p.county === county && (!state || e.p.state === state)).map(toArea);
+}
+
+// All payams, light (no boundaries), sorted by state, county, then name.
+export function listPayams(): Place[] {
+  index ??= build();
+  return index.map(e => e.p).sort((a, b) => a.state.localeCompare(b.state) || a.county.localeCompare(b.county) || a.payam.localeCompare(b.payam));
+}
+
+export function payamByCode(pcode: string): PayamArea | null {
+  index ??= build();
+  const e = index.find(x => x.p.pcode === pcode);
+  return e ? toArea(e) : null;
+}
+
+export function payamAt(lat: number, lon: number): PayamArea | null {
+  const e = entryAt(lat, lon);
+  return e ? toArea(e) : null;
 }
