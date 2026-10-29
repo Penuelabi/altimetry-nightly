@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ORDER_STATUS, balances, editAllowed, newId, seedStore, type Order, type OrderStatus, type StockItem, type StockMove, type Store as StoreT } from '@abuk/core';
+import { NO_ADMIN, ORDER_STATUS, STOCK_KINDS, adminLabel, balances, editAllowed, newId, personById, personName, plotLabel, seedStore, type AdminLoc, type Order, type OrderStatus, type StockItem, type StockMove, type Store as StoreT } from '@abuk/core';
 import { farmChange, useApp } from '../store';
 import { usePlace } from '../net';
+import { AdminPicker, PersonSelect, useHereAdmin } from '../pickers';
 import { Field, Seg } from '../ui';
 
 // Seed & input store: balance per store, every movement in or out, and orders with a status trail.
@@ -39,7 +40,7 @@ export function Store() {
         <Field label="Store"><select className="input" value={store?.id ?? ''} onChange={e => setStoreId(e.target.value)}>{stores.map(x => <option key={x.id} value={x.id}>{x.code} · {x.name}</option>)}</select></Field>
         {can && <button className="btn plain" onClick={() => setForm({ kind: 'store' })}>+ New store</button>}
       </div>
-      {store && (store.place || store.keeper) && <div className="sub">{[store.place, store.keeper && `keeper ${store.keeper}`].filter(Boolean).join(' · ')}</div>}
+      {store && <div className="sub">{[store.admin ? adminLabel(store.admin) : store.place, store.keeperId ? `keeper ${personName(personById(s.farm, store.keeperId))} ${personById(s.farm, store.keeperId)?.phone ?? ''}` : store.keeper && `keeper ${store.keeper}`, store.groupId && s.farm.groups.find(g => g.id === store.groupId)?.name, store.plotId && `near plot ${s.farm.plots.find(p => p.id === store.plotId)?.code ?? ''}`].filter(Boolean).join(' · ')}</div>}
       <Seg items={[['balance', 'Balance'], ['moves', 'In / out'], ['orders', `Orders${open.length ? ` (${open.length})` : ''}`]]} value={tab} onPick={v => setTab(v as typeof tab)} fontSize={12.5} />
       {msg && <div className="msg">{msg}</div>}
 
@@ -102,10 +103,10 @@ export function Store() {
   );
 }
 
-function newOrder(itemId: string, qty: number, storeId: string, supplier: string, by: string, where: string): Order {
+function newOrder(itemId: string, qty: number, storeId: string, supplier: string, by: string, where: string, admin?: AdminLoc): Order {
   const at = new Date().toISOString();
   const code = `ORD-${at.slice(2, 4)}${at.slice(5, 7)}${at.slice(8, 10)}-${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
-  return { id: newId('ord'), code, itemId, qty: Math.round(qty * 100) / 100, storeId, supplier, created: at, by, status: 'requested', where, history: [{ at, status: 'requested', where, by, note: '' }] };
+  return { id: newId('ord'), code, itemId, qty: Math.round(qty * 100) / 100, storeId, supplier, created: at, by, status: 'requested', where, history: [{ at, status: 'requested', where, by, note: '' }], ...(admin ? { admin } : {}) };
 }
 
 const Buttons = ({ onCancel, onSave, label }: { onCancel: () => void; onSave: () => void; label: string }) => (
@@ -149,26 +150,31 @@ function MoveForm({ store, stores, items, dir, itemId, have, onCancel, onSaved }
 }
 
 function OrderForm({ stores, items, storeId, itemId, qty, onCancel, onSaved }: { stores: StoreT[]; items: StockItem[]; storeId: string; itemId: string; qty: number; onCancel: () => void; onSaved: (m: string) => void }) {
-  const s = useApp(), place = usePlace();
-  const [f, setF] = useState({ itemId, qty: qty ? String(qty) : '', storeId, supplier: '', where: '' });
+  const s = useApp(), here = useHereAdmin();
+  const [f, setF] = useState({ itemId, qty: qty ? String(qty) : '', storeId, supplier: '', admin: here as AdminLoc });
   const [err, setErr] = useState('');
+  const [creating, setCreating] = useState(false);
   const item = items.find(i => i.id === f.itemId);
+  // An item that is not in the list yet is created here and chosen for this order.
+  if (creating) return <ItemForm onCancel={() => setCreating(false)} onSaved={(_m, id) => { if (id) setF(x => ({ ...x, itemId: id })); setCreating(false); }} />;
   const save = () => {
+    if (!f.itemId) return setErr('Choose the item, or create a new one.');
     if (!(Number(f.qty) > 0)) return setErr('Enter a quantity above 0.');
-    const o = newOrder(f.itemId, Number(f.qty), f.storeId, f.supplier.trim(), s.session?.user.id ?? '', f.where.trim() || place.payam);
+    if (!f.admin.state || !f.admin.county || !f.admin.payam) return setErr('Choose where the order is now: state, county and payam.');
+    const o = newOrder(f.itemId, Number(f.qty), f.storeId, f.supplier.trim(), s.session?.user.id ?? '', adminLabel(f.admin), f.admin);
     farmChange({ op: 'upsert', kind: 'order', item: o });
     onSaved(`Order ${o.code} requested: ${qtyOf(o.qty, item?.unit ?? '')} ${item?.name.toLowerCase() ?? ''}.`);
   };
   return (
     <div className="pad g12" style={{ paddingTop: 14 }}>
       <h2 className="h2 h20">New order</h2>
-      <Field label="Item"><select className="input" value={f.itemId} onChange={e => setF({ ...f, itemId: e.target.value })}>{items.map(i => <option key={i.id} value={i.id}>{i.code} · {i.name}</option>)}</select></Field>
+      <Field label="Item"><select className="input" value={f.itemId} onChange={e => (e.target.value === '+new' ? setCreating(true) : setF({ ...f, itemId: e.target.value }))}>{items.map(i => <option key={i.id} value={i.id}>{i.code} · {i.name}</option>)}<option value="+new">+ Create a new item…</option></select></Field>
       <div className="grid2">
         <Field label={`Quantity (${item?.unit ?? ''})`}><input className="input num" type="number" inputMode="decimal" value={f.qty} onChange={e => setF({ ...f, qty: e.target.value })} /></Field>
         <Field label="Deliver to"><select className="input" value={f.storeId} onChange={e => setF({ ...f, storeId: e.target.value })}>{stores.map(x => <option key={x.id} value={x.id}>{x.code}</option>)}</select></Field>
       </div>
       <Field label="Supplier (if known)"><input className="input" value={f.supplier} onChange={e => setF({ ...f, supplier: e.target.value })} /></Field>
-      <Field label="Where is it now"><input className="input" value={f.where} onChange={e => setF({ ...f, where: e.target.value })} placeholder={place.payam} /></Field>
+      <AdminPicker value={f.admin} onChange={admin => setF({ ...f, admin })} label="Where is it now" />
       {err && <div className="msg">{err}</div>}
       <Buttons onCancel={onCancel} onSave={save} label="Request" />
     </div>
@@ -178,18 +184,20 @@ function OrderForm({ stores, items, storeId, itemId, qty, onCancel, onSaved }: {
 function StatusForm({ order, item, onCancel, onSaved }: { order: Order; item?: StockItem; onCancel: () => void; onSaved: (m: string) => void }) {
   const s = useApp();
   const [status, setStatus] = useState<OrderStatus>(order.status);
-  const [where, setWhere] = useState(order.where);
+  const here = useHereAdmin();
+  const [admin, setAdmin] = useState<AdminLoc>(order.admin ?? here);
   const [note, setNote] = useState('');
   const [got, setGot] = useState(String(order.qty));
   const closed = order.status === 'received' || order.status === 'cancelled';
   const save = () => {
     const at = new Date().toISOString(), by = s.session?.user.id ?? '';
-    const next: Order = { ...order, status, where: where.trim(), history: [...order.history, { at, status, where: where.trim(), by, note: note.trim() }] };
+    const where = adminLabel(admin);
+    const next: Order = { ...order, status, where, admin, history: [...order.history, { at, status, where, by, note: note.trim() }] };
     const ops: Parameters<typeof farmChange> = [{ op: 'upsert', kind: 'order', item: next }];
     // Receiving an order puts the stock into its store.
     if (status === 'received' && Number(got) > 0) ops.push({ op: 'upsert', kind: 'move', item: { id: newId('mv'), storeId: order.storeId, itemId: order.itemId, date: at.slice(0, 10), dir: 'in', qty: Number(got), party: order.supplier || 'order', orderId: order.id, by, note: note.trim() } });
     farmChange(...ops);
-    onSaved(`Order ${order.code}: ${status}${where.trim() ? `, at ${where.trim()}` : ''}.${status === 'received' ? ` ${qtyOf(Number(got), item?.unit ?? '')} added to the store.` : ''}`);
+    onSaved(`Order ${order.code}: ${status}${where ? `, at ${where}` : ''}.${status === 'received' ? ` ${qtyOf(Number(got), item?.unit ?? '')} added to the store.` : ''}`);
   };
   return (
     <div className="pad g12" style={{ paddingTop: 14 }}>
@@ -205,7 +213,7 @@ function StatusForm({ order, item, onCancel, onSaved }: { order: Order; item?: S
       </div>
       {closed ? <div className="note">This order is {order.status}.</div> : <>
         <Field label="New status"><select className="input" value={status} onChange={e => setStatus(e.target.value as OrderStatus)}>{ORDER_STATUS.map(x => <option key={x}>{x}</option>)}</select></Field>
-        <Field label="Where is it now"><input className="input" value={where} onChange={e => setWhere(e.target.value)} placeholder="e.g. Bor, on the road, Juba warehouse" /></Field>
+        <AdminPicker value={admin} onChange={setAdmin} label="Where is it now" />
         {status === 'received' && <Field label={`Quantity received (${item?.unit ?? ''})`}><input className="input num" type="number" value={got} onChange={e => setGot(e.target.value)} /></Field>}
         <Field label="Note"><input className="input" value={note} onChange={e => setNote(e.target.value)} /></Field>
       </>}
@@ -215,14 +223,16 @@ function StatusForm({ order, item, onCancel, onSaved }: { order: Order; item?: S
 }
 
 function StoreForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: (m: string, id: string) => void }) {
-  const s = useApp(), place = usePlace();
+  const s = useApp(), here = useHereAdmin();
   const n = (s.farm.stores ?? []).length + 1;
-  const [f, setF] = useState({ code: `ST-${String(n).padStart(2, '0')}`, name: '', place: place.payam, keeper: '' });
+  const [f, setF] = useState({ code: `ST-${String(n).padStart(2, '0')}`, name: '', admin: here as AdminLoc, plotId: '', groupId: '', keeperId: '' });
   const [err, setErr] = useState('');
   const save = () => {
     if (!f.code.trim() || !f.name.trim()) return setErr('Store ID and name are required.');
     if ((s.farm.stores ?? []).some(x => x.code.toLowerCase() === f.code.trim().toLowerCase())) return setErr('That store ID is already used.');
-    const st: StoreT = { id: f.code.trim(), code: f.code.trim(), name: f.name.trim(), place: f.place.trim(), keeper: f.keeper.trim() };
+    if (!f.admin.state || !f.admin.county || !f.admin.payam) return setErr('Choose the state, county and payam of the store.');
+    if (!f.keeperId) return setErr('Choose the store keeper from the people list, or add them.');
+    const st: StoreT = { id: f.code.trim(), code: f.code.trim(), name: f.name.trim(), place: adminLabel(f.admin), keeper: personName(personById(s.farm, f.keeperId)), admin: f.admin, plotId: f.plotId, groupId: f.groupId, keeperId: f.keeperId };
     farmChange({ op: 'upsert', kind: 'store', item: st });
     onSaved(`Store ${st.code} added.`, st.id);
   };
@@ -230,15 +240,19 @@ function StoreForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: (m: s
     <div className="pad g12" style={{ paddingTop: 14 }}>
       <h2 className="h2 h20">New store</h2>
       <div className="grid2"><Field label="Store ID"><input className="input" value={f.code} onChange={e => setF({ ...f, code: e.target.value })} /></Field><Field label="Name"><input className="input" value={f.name} onChange={e => setF({ ...f, name: e.target.value })} /></Field></div>
-      <Field label="Place"><input className="input" value={f.place} onChange={e => setF({ ...f, place: e.target.value })} /></Field>
-      <Field label="Store keeper"><input className="input" value={f.keeper} onChange={e => setF({ ...f, keeper: e.target.value })} /></Field>
+      <AdminPicker value={f.admin} onChange={admin => setF({ ...f, admin })} label="Where is the store" />
+      <div className="grid2">
+        <Field label="Nearest plot"><select className="input" value={f.plotId} onChange={e => setF({ ...f, plotId: e.target.value })}><option value="">—</option>{s.farm.plots.map(p => <option key={p.id} value={p.id}>{plotLabel(p, s.farm)}</option>)}</select></Field>
+        <Field label="Group"><select className="input" value={f.groupId} onChange={e => setF({ ...f, groupId: e.target.value })}><option value="">—</option>{s.farm.groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
+      </div>
+      <PersonSelect label="Store keeper" value={f.keeperId} onChange={keeperId => setF({ ...f, keeperId })} />
       {err && <div className="msg">{err}</div>}
       <Buttons onCancel={onCancel} onSave={save} label="Add store" />
     </div>
   );
 }
 
-function ItemForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: (m: string) => void }) {
+function ItemForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: (m: string, id?: string) => void }) {
   const s = useApp();
   const [f, setF] = useState({ code: '', name: '', unit: 'kg', kind: 'seed' as StockItem['kind'], reorder: '' });
   const [err, setErr] = useState('');
@@ -247,7 +261,7 @@ function ItemForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: (m: st
     if ((s.farm.items ?? []).some(x => x.code.toLowerCase() === f.code.trim().toLowerCase())) return setErr('That item ID is already used.');
     const it: StockItem = { id: f.code.trim().toUpperCase(), code: f.code.trim().toUpperCase(), name: f.name.trim(), unit: f.unit.trim() || 'pcs', kind: f.kind, reorder: f.reorder ? Number(f.reorder) : null };
     farmChange({ op: 'upsert', kind: 'item', item: it });
-    onSaved(`Item ${it.code} added.`);
+    onSaved(`Item ${it.code} added.`, it.id);
   };
   return (
     <div className="pad g12" style={{ paddingTop: 14 }}>
@@ -255,7 +269,7 @@ function ItemForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: (m: st
       <div className="grid2"><Field label="Item ID"><input className="input" value={f.code} onChange={e => setF({ ...f, code: e.target.value })} placeholder="e.g. SEED-MAIZ" /></Field><Field label="Name"><input className="input" value={f.name} onChange={e => setF({ ...f, name: e.target.value })} /></Field></div>
       <div className="grid2">
         <Field label="Unit"><input className="input" value={f.unit} onChange={e => setF({ ...f, unit: e.target.value })} /></Field>
-        <Field label="Type"><select className="input" value={f.kind} onChange={e => setF({ ...f, kind: e.target.value as StockItem['kind'] })}>{['seed', 'input', 'tool', 'packaging', 'other'].map(k => <option key={k}>{k}</option>)}</select></Field>
+        <Field label="Type"><select className="input" value={f.kind} onChange={e => setF({ ...f, kind: e.target.value as StockItem['kind'] })}>{STOCK_KINDS.map(k => <option key={k}>{k}</option>)}</select></Field>
       </div>
       <Field label="Needed in store (warn below)"><input className="input num" type="number" value={f.reorder} onChange={e => setF({ ...f, reorder: e.target.value })} /></Field>
       {err && <div className="msg">{err}</div>}

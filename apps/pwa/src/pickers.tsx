@@ -1,7 +1,7 @@
 // Shared form pieces: cascading admin level (state > county > payam > village), the person form,
 // and pickers that choose from the registers instead of typing names again.
 import { useState } from 'react';
-import { adminLabel, blankPerson, countiesOf, newId, normPhone, payamsOf, personError, personName, statesList, type AdminLoc, type Person } from '@abuk/core';
+import { adminLabel, blankPerson, countiesOf, groupPeople, newId, normPhone, payamsOf, personError, personName, statesList, type AdminLoc, type Person } from '@abuk/core';
 import { farmChange, useApp } from './store';
 import { usePlace } from './net';
 import { Field } from './ui';
@@ -135,6 +135,39 @@ export function MultiPick({ items, value, onChange, label }: { items: { id: stri
         ); })}
         {!items.length && <span className="sub">Nothing to choose from yet.</span>}
       </div>
+    </div>
+  );
+}
+
+// "Put it in the store for sale": choose the store and an optional price; the form then calls productToStore on save.
+export interface SaleChoice { on: boolean; storeId: string; price: string }
+export const noSale = (): SaleChoice => ({ on: false, storeId: '', price: '' });
+export function StoreForSale({ value, onChange, what }: { value: SaleChoice; onChange: (v: SaleChoice) => void; what: string }) {
+  const s = useApp();
+  const stores = s.farm.stores ?? [];
+  return (
+    <div className="box col g8" style={{ padding: 10 }}>
+      <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13.5 }}>
+        <input type="checkbox" checked={value.on} onChange={e => onChange({ ...value, on: e.target.checked, storeId: value.storeId || stores[0]?.id || '' })} /> Put {what} in the store for sale
+      </label>
+      {value.on && (
+        <div className="grid2">
+          <Field label="Store"><select className="input" value={value.storeId} onChange={e => onChange({ ...value, storeId: e.target.value })}>{stores.map(x => <option key={x.id} value={x.id}>{x.code} · {x.name}</option>)}</select></Field>
+          <Field label="Price per unit (optional)"><input className="input num" type="number" inputMode="decimal" value={value.price} onChange={e => onChange({ ...value, price: e.target.value })} /></Field>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Group, then a member of that group (or the whole group), taken from the people register.
+export function GroupMember({ groupId, personId, onChange, required = true }: { groupId: string; personId: string; onChange: (groupId: string, personId: string) => void; required?: boolean }) {
+  const s = useApp();
+  const people = groupId ? groupPeople(s.farm, groupId) : [];
+  return (
+    <div className="col g8">
+      <Field label="Group"><select className="input" value={groupId} onChange={e => onChange(e.target.value, '')}><option value="">{required ? 'Choose…' : '—'}</option>{s.farm.groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
+      {groupId && <PersonSelect label="Member (leave empty for the whole group)" value={personId} only={people.length ? people.map(p => p.id) : undefined} empty="Whole group" onChange={id => onChange(groupId, id)} />}
     </div>
   );
 }
