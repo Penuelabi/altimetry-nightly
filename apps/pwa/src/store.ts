@@ -32,7 +32,7 @@ export interface State {
   autoPull: { state: 'running' | 'ok' | 'error'; at: string; msg?: string } | null;
   // Crop checks from every phone (server, last 3 weeks), for the flood model and SMS alerts.
   checksAll: { id: string; at: string; by: string; plot: string; crop: string; lat: number | null; lon: number | null; water: string; depthCm: number | null; around: string; aroundDepthCm: number | null; trend: string }[];
-  farm: Register; farmOps: FarmOp[]; regTab: 'plots' | 'crops' | 'groups' | 'batches' | 'runs';
+  farm: Register; farmOps: FarmOp[]; regTab: 'plots' | 'crops' | 'groups' | 'people' | 'batches' | 'runs';
 }
 
 const initial: State = {

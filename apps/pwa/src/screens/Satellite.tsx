@@ -106,6 +106,13 @@ export function Satellite() {
         })}
       </div>
 
+      {mine && (mine.floodPct != null || mine.waterPct != null) && (
+        <div className="box" style={{ padding: '10px 14px' }}>
+          <div className="between"><span style={{ fontSize: 13 }}>Flood extent in this payam</span><span className="head num" style={{ fontSize: 24, color: (mine.floodPct ?? 0) >= 20 ? '#2060a0' : 'var(--color-accent)' }}>{mine.floodPct ?? '—'}%</span></div>
+          <div className="sub">Water now covers {mine.waterPct ?? '—'}% of the payam; {mine.floodPct ?? '—'}% is flood (water that is not there all year). MODIS 8-day, 500 m pixels.</div>
+        </div>
+      )}
+
       {mine?.precipMm != null && (
         <div className="box" style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 13 }}>Rain, last 30 days available</span>

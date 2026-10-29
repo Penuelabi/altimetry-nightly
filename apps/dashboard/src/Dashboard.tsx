@@ -215,10 +215,10 @@ export function Dashboard() {
       <div className="panel">
         <h2>Satellite indices by payam · GEE</h2>
         <div className="note">
-          NDVI, VCI, SPI and SPEI from Google Earth Engine, each averaged over the whole payam boundary. Shown for the payams where workers' GPS records fall in this period, plus payams with a mapped plot. SPI and SPEI are z-scores against 1991–2020 (−3 to +3). Kept 6 h per payam.
+          NDVI, VCI, SPI, SPEI and flood extent (MODIS water minus permanent water, % of the payam) from Google Earth Engine, each averaged over the whole payam boundary. Shown for the payams where workers' GPS records fall in this period, plus payams with a mapped plot. SPI and SPEI are z-scores against 1991–2020 (−3 to +3). Kept 6 h per payam.
         </div>
         <div className="tbl-wrap" style={{ marginTop: 8 }}>
-          <table className="tbl"><thead><tr><th>Payam</th><th>County</th><th style={{ textAlign: 'right' }}>km²</th><th style={{ textAlign: 'right' }}>NDVI</th><th style={{ textAlign: 'right' }}>VCI</th><th style={{ textAlign: 'right' }}>SPI</th><th style={{ textAlign: 'right' }}>SPEI</th><th style={{ textAlign: 'right' }}>Rain 30 d</th><th /></tr></thead>
+          <table className="tbl"><thead><tr><th>Payam</th><th>County</th><th style={{ textAlign: 'right' }}>km²</th><th style={{ textAlign: 'right' }}>NDVI</th><th style={{ textAlign: 'right' }}>VCI</th><th style={{ textAlign: 'right' }}>SPI</th><th style={{ textAlign: 'right' }}>SPEI</th><th style={{ textAlign: 'right' }}>Rain 30 d</th><th style={{ textAlign: 'right' }}>Flood</th><th style={{ textAlign: 'right' }}>Water</th><th /></tr></thead>
             <tbody>{payamCodes.map(code => {
               const st = sat[code], v = st?.v, place = PAYAMS.find(p => p.pcode === code);
               const cell = (x: number | null | undefined, suffix = '') => <td className="num" style={{ textAlign: 'right' }}>{x == null ? '—' : `${x}${suffix}`}</td>;
@@ -227,12 +227,12 @@ export function Dashboard() {
                   <td><strong>{place?.payam ?? code}</strong>{st?.loading && <span className="note"> · loading…</span>}</td>
                   <td>{place ? `${place.county}, ${place.state}` : ''}</td>
                   <td className="num" style={{ textAlign: 'right' }}>{v?.areaKm2.toLocaleString('en') ?? '—'}</td>
-                  {cell(v?.ndvi)}{cell(v?.vci, '%')}{cell(v?.spi)}{cell(v?.spei)}{cell(v?.precipMm, ' mm')}
+                  {cell(v?.ndvi)}{cell(v?.vci, '%')}{cell(v?.spi)}{cell(v?.spei)}{cell(v?.precipMm, ' mm')}{cell(v?.floodPct, '%')}{cell(v?.waterPct, '%')}
                   <td>{extraPayams.includes(code) && <button className="link" onClick={() => setExtraPayams(x => x.filter(c => c !== code))}>remove</button>}</td>
                 </tr>,
-                (st?.error || v?.errors.length) ? <tr key={`${code}-err`}><td colSpan={9} className="note" style={{ color: '#c03020', fontSize: 11 }}>{st?.error ?? v?.errors.join('; ')}</td></tr> : null
+                (st?.error || v?.errors.length) ? <tr key={`${code}-err`}><td colSpan={11} className="note" style={{ color: '#c03020', fontSize: 11 }}>{st?.error ?? v?.errors.join('; ')}</td></tr> : null
               ];
-            })}{!payamCodes.length && <tr><td colSpan={9} className="note">No GPS records or mapped plots in this period yet. Add a payam below.</td></tr>}</tbody>
+            })}{!payamCodes.length && <tr><td colSpan={11} className="note">No GPS records or mapped plots in this period yet. Add a payam below.</td></tr>}</tbody>
           </table>
         </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>

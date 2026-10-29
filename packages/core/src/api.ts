@@ -25,6 +25,9 @@ export interface SatelliteIndices {
   spi: number | null;
   spei: number | null;
   precipMm: number | null;
+  // Share of the payam under flood water (seasonal) and under any water, from the newest MODIS 8-day composite.
+  floodPct: number | null;
+  waterPct: number | null;
   asOf: string;
   errors: string[];
 }

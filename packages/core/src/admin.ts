@@ -92,6 +92,12 @@ export function listPayams(): Place[] {
   return index.map(e => e.p).sort((a, b) => a.state.localeCompare(b.state) || a.county.localeCompare(b.county) || a.payam.localeCompare(b.payam));
 }
 
+// Cascading choices for forms: state → county → payam (names, sorted).
+const uniq = (xs: string[]) => [...new Set(xs)].sort((a, b) => a.localeCompare(b));
+export const statesList = () => uniq(listPayams().map(p => p.state));
+export const countiesOf = (state: string) => uniq(listPayams().filter(p => p.state === state).map(p => p.county));
+export const payamsOf = (state: string, county: string) => uniq(listPayams().filter(p => p.state === state && p.county === county).map(p => p.payam));
+
 export function payamByCode(pcode: string): PayamArea | null {
   index ??= build();
   const e = index.find(x => x.p.pcode === pcode);

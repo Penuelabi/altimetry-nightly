@@ -16,6 +16,8 @@ export const DEFAULT_MODEL: Model = { d0: D0, rate: RATE, d0Src: 'design example
 
 export const basinDepth = (day: number, m: Pick<Model, 'd0' | 'rate'> = DEFAULT_MODEL) => Math.min(2, Math.max(0, m.d0 - m.rate * day));
 export const slopeDepth = (day: number, m: Pick<Model, 'd0' | 'rate'> = DEFAULT_MODEL) => Math.max(0, basinDepth(day, m) - SLOPE_STEP);
+// Water depth in each zone today. The ridge stays dry in a normal year; the slope sits SLOPE_STEP above the basin floor.
+export const zoneDepths = (m: Pick<Model, 'd0' | 'rate'> = DEFAULT_MODEL, day = 0) => ({ ridge: 0, slope: slopeDepth(day, m), basin: basinDepth(day, m) });
 // Days until the basin is dry; null when the water is not falling.
 export const recessDays = (m: Pick<Model, 'd0' | 'rate'> = DEFAULT_MODEL) => (m.d0 <= 0 ? 0 : m.rate > 0 ? Math.ceil(m.d0 / m.rate) : null);
 

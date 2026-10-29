@@ -13,26 +13,62 @@ export interface Crop {
   localName?: string; scientific?: string; variety?: string; category?: CropCategory; season?: CropSeason;
   daysToHarvest?: number | null; spacing?: string; seedRate?: string; uses?: string; photos?: string[];
 }
-export interface Member { id: string; name: string; workDays: number }
-export interface Group { id: string; name: string; lead: string; members: Member[] }
+// Where something is, by admin level: State > County > Payam, then a village or town typed by the worker.
+export interface AdminLoc { state: string; county: string; payam: string; village?: string }
+export const NO_ADMIN: AdminLoc = { state: '', county: '', payam: '', village: '' };
+export const adminLabel = (a?: AdminLoc | null) => a ? [a.village, a.payam, a.county, a.state].filter(Boolean).join(', ') : '';
+// A person on the register: group members, store keepers, VSLA members, SMS recipients. Phones and
+// next of kin live here once and every form that picks the person reads them from here.
+export interface NextOfKin { name: string; name2: string; phone: string; relation: string; village: string }
+export const BLANK_KIN: NextOfKin = { name: '', name2: '', phone: '', relation: '', village: '' };
+export interface Person { id: string; name: string; name2: string; phone: string; phone2: string; admin: AdminLoc; kin: NextOfKin[]; note: string }
+export const personName = (p?: Pick<Person, 'name' | 'name2'> | null) => p ? [p.name, p.name2].filter(Boolean).join(' ') : '';
+export const blankPerson = (id: string, admin: AdminLoc = NO_ADMIN): Person => ({ id, name: '', name2: '', phone: '', phone2: '', admin, kin: [{ ...BLANK_KIN }, { ...BLANK_KIN }], note: '' });
+// A South Sudan mobile number: +211 then nine digits; spaces, dashes and a leading 0 are tolerated.
+export function normPhone(raw: string): string {
+  const d = raw.replace(/[^\d+]/g, '');
+  if (/^\+211\d{9}$/.test(d)) return d;
+  if (/^211\d{9}$/.test(d)) return `+${d}`;
+  if (/^0\d{9}$/.test(d)) return `+211${d.slice(1)}`;
+  if (/^\d{9}$/.test(d)) return `+211${d}`;
+  return '';
+}
+// What is missing from a person before saving; '' when complete.
+export function personError(p: Person): string {
+  const miss: string[] = [];
+  if (!p.name.trim()) miss.push('first name');
+  if (!p.name2.trim()) miss.push('second name');
+  if (!normPhone(p.phone)) miss.push('phone number (like +211 912 345 678)');
+  if (p.phone2.trim() && !normPhone(p.phone2)) miss.push('second phone in the same format, or leave it empty');
+  if (!p.admin.state || !p.admin.county || !p.admin.payam) miss.push('state, county and payam');
+  p.kin.forEach((k, i) => { if (!k.name.trim() || !normPhone(k.phone) || !k.relation.trim()) miss.push(`next of kin ${i + 1}: name, relation and phone`); });
+  return miss.length ? 'Add ' + miss.join(', ') + '.' : '';
+}
+
+export interface Member { id: string; name: string; workDays: number; personId?: string }
+export interface Group { id: string; name: string; lead: string; members: Member[]; admin?: AdminLoc }
 // crops: other crops grown on the plot besides the main one (intercrops, borders).
-export interface Plot { id: string; code: string; zone: Zone; crop: string; crops?: string[]; groupId: string; holder: string; areaHa: number | null; boundary: { lat: number; lon: number }[]; notes: string }
+export interface Plot { id: string; code: string; zone: Zone; crop: string; crops?: string[]; groupId: string; holder: string; areaHa: number | null; boundary: { lat: number; lon: number }[]; notes: string; admin?: AdminLoc }
 // A traceable batch of any processed product. `bottles` is the number of units (bottles, packs, sacks).
 export interface OilBatch {
   id: string; code: string; plotId: string; fruit: string; pressed: string; bottles: number; place: string;
   crop?: string; product?: string; unit?: string; lat?: number | null; lon?: number | null;
   runId?: string; storeId?: string; quality?: string; packedBy?: string; notes?: string;
+  admin?: AdminLoc; // `place` holds its text form
 }
 // chain: 'balanites' | 'moringa' in older runs; otherwise the product name (see chainFor).
 export interface ProcessRun { id: string; chain: string; crop?: string; product?: string; plotIds?: string[]; date: string; steps: { name: string; out: string }[]; note: string }
 // Seed & input store: stores, items, every movement in or out, and orders with their status trail.
-export interface Store { id: string; code: string; name: string; place: string; keeper: string }
-export interface StockItem { id: string; code: string; name: string; unit: string; kind: 'seed' | 'input' | 'tool' | 'packaging' | 'other'; reorder: number | null }
+// place and keeper stay as text for older records; admin, plotId, groupId and keeperId (a Person) are the structured form.
+export interface Store { id: string; code: string; name: string; place: string; keeper: string; admin?: AdminLoc; plotId?: string; groupId?: string; keeperId?: string }
+export const STOCK_KINDS = ['seed', 'input', 'tool', 'packaging', 'product', 'other'] as const;
+// 'product' is something the project sells (livestock, honey, fish, oil); price is per unit.
+export interface StockItem { id: string; code: string; name: string; unit: string; kind: typeof STOCK_KINDS[number]; reorder: number | null; price?: number | null }
 export interface StockMove { id: string; storeId: string; itemId: string; date: string; dir: 'in' | 'out'; qty: number; party: string; orderId: string; by: string; note: string }
 export const ORDER_STATUS = ['requested', 'approved', 'ordered', 'in transit', 'received', 'cancelled'] as const;
 export type OrderStatus = typeof ORDER_STATUS[number];
 export interface OrderStep { at: string; status: OrderStatus; where: string; by: string; note: string }
-export interface Order { id: string; code: string; itemId: string; qty: number; storeId: string; supplier: string; created: string; by: string; status: OrderStatus; where: string; history: OrderStep[] }
+export interface Order { id: string; code: string; itemId: string; qty: number; storeId: string; supplier: string; created: string; by: string; status: OrderStatus; where: string; history: OrderStep[]; admin?: AdminLoc }
 // Herd & pond register: livestock, forest products and fish. Each lives in the same shared
 // register and syncs the same way as the farm register and the seed & input store.
 export const LIVESTOCK_SPECIES = ['cow', 'goat', 'sheep', 'pig', 'chicken', 'rabbit'] as const;
@@ -45,14 +81,16 @@ const HERD_ADDS: readonly LivestockEventKind[] = ['opening', 'birth', 'purchase'
 const HERD_REMOVES: readonly LivestockEventKind[] = ['death', 'sale'];
 // One herd per species per owner or group; its head count is the running total of its events
 // (like the store balance), not a stored number, so it can never drift from the log.
-export interface Herd { id: string; species: LivestockSpecies; ownerType: 'member' | 'group'; ownerId: string; ownerName: string }
+// ownerId is a Person id for 'member'; groupId is the group the herd belongs to or the owner's group.
+export interface Herd { id: string; species: LivestockSpecies; ownerType: 'member' | 'group'; ownerId: string; ownerName: string; admin?: AdminLoc; groupId?: string }
 // qty is head count for opening/birth/purchase/death/sale/vaccination/treatment, litres for milk, count for eggs.
-export interface LivestockEvent { id: string; herdId: string; kind: LivestockEventKind; date: string; qty: number; note: string; by: string }
+// time is HH:MM. storeMoveId is set when the output was put into the store for sale (see productToStore).
+export interface LivestockEvent { id: string; herdId: string; kind: LivestockEventKind; date: string; qty: number; note: string; by: string; time?: string; storeMoveId?: string }
 
 export const FOREST_PRODUCTS = ['honey', 'resin', 'gum', 'firewood', 'charcoal', 'shea'] as const;
 export type ForestProduct = typeof FOREST_PRODUCTS[number];
 // What was collected, from where (GPS) and by whom.
-export interface ForestLog { id: string; product: ForestProduct; date: string; qty: number; unit: string; lat: number | null; lon: number | null; by: string; note: string }
+export interface ForestLog { id: string; product: ForestProduct; date: string; qty: number; unit: string; lat: number | null; lon: number | null; by: string; note: string; admin?: AdminLoc; groupId?: string; memberId?: string; time?: string; storeMoveId?: string }
 
 export const FISH_SPECIES = ['tilapia', 'nile perch', 'catfish', 'other'] as const;
 export type FishSpecies = typeof FISH_SPECIES[number];
@@ -61,12 +99,13 @@ export type FishEventKind = typeof FISH_EVENTS[number];
 export const FISH_PROCESSED = ['none', 'smoked', 'dried'] as const;
 export type FishProcessed = typeof FISH_PROCESSED[number];
 // Catch or pond stocking, harvest weight, and whether it was smoked or dried.
-export interface FishLog { id: string; species: FishSpecies; kind: FishEventKind; date: string; weightKg: number | null; qty: number | null; processed: FishProcessed; pond: string; by: string; note: string }
+export interface FishLog { id: string; species: FishSpecies; kind: FishEventKind; date: string; weightKg: number | null; qty: number | null; processed: FishProcessed; pond: string; by: string; note: string; admin?: AdminLoc; groupId?: string; memberId?: string; time?: string; storeMoveId?: string }
 
 // VSLA: Village Savings and Loan Associations — the evidence trail from savings to microfinance.
 export const VSLA_TX_TYPES = ['savings', 'loan', 'repayment', 'interest', 'fine', 'social-fund', 'share-out'] as const;
 export type VslaTxType = typeof VSLA_TX_TYPES[number];
-export interface VslaGroup { id: string; name: string; cycle: string; members: number; meetDay: string; shareValue: number; currency: string }
+// members is the head count; memberIds (Person ids) is the list when members were added from the person register.
+export interface VslaGroup { id: string; name: string; cycle: string; members: number; meetDay: string; shareValue: number; currency: string; admin?: AdminLoc; memberIds?: string[] }
 export interface VslaTx { id: string; vslaId: string; date: string; type: VslaTxType; memberId: string; memberName: string; amount: number; balance: number; by: string; note: string }
 
 // Micro-finance readiness tollgates — 5 gates from savings group to cooperative credit.
@@ -122,16 +161,24 @@ export const DEGRADATION_INDICATORS = [
   { id: 'drying', label: 'Drying of water sources in dry season' },
 ] as const;
 export type DegradationId = typeof DEGRADATION_INDICATORS[number]['id'];
-export interface DegradationAssessment { id: string; date: string; site: string; plotId: string; by: string; scores: Record<string, number>; photos: string[]; note: string }
+export interface DegradationAssessment { id: string; date: string; site: string; plotId: string; by: string; scores: Record<string, number>; photos: string[]; note: string; admin?: AdminLoc }
 
 // Container/bag farming — vegetable pilot for fishing communities.
 export const CONTAINER_TYPES = ['sack', 'bag', 'bucket', 'tire', 'raised-bed'] as const;
 export type ContainerType = typeof CONTAINER_TYPES[number];
-export interface ContainerUnit { id: string; code: string; type: ContainerType; crop: string; plantedDate: string; location: string; ownerId: string; ownerName: string; note: string }
+// ownerId is the Person id of the member who looks after the unit; groupId and plotId say which group and plot it belongs to.
+export interface ContainerUnit { id: string; code: string; type: ContainerType; crop: string; plantedDate: string; location: string; ownerId: string; ownerName: string; note: string; groupId?: string; plotId?: string; admin?: AdminLoc }
 export interface ContainerLog { id: string; unitId: string; date: string; action: 'water' | 'fertilize' | 'pest-check' | 'harvest' | 'note'; qty: number | null; unit: string; pest: string; photo: string; by: string; note: string }
+
+// A word for the pictures & voice screen in the three project languages (name = the English word, for lists).
+export interface Word { id: string; name: string; ar: string; din: string; icon: string; by: string }
+// Who gets flood alerts besides phones: an email list and WhatsApp groups (joined by invite link).
+export interface Subscriber { id: string; name: string; email: string; on: boolean }
+export interface WaGroup { id: string; name: string; link: string }
 
 export interface Register {
   version: number; updated: string; crops: Crop[]; groups: Group[]; plots: Plot[]; batches: OilBatch[]; runs: ProcessRun[];
+  people?: Person[]; words?: Word[]; subscribers?: Subscriber[]; waGroups?: WaGroup[];
   stores?: Store[]; items?: StockItem[]; moves?: StockMove[]; orders?: Order[];
   herds?: Herd[]; livestockEvents?: LivestockEvent[]; forestLogs?: ForestLog[]; fishLogs?: FishLog[];
   vslaGroups?: VslaGroup[]; vslaTxs?: VslaTx[];
@@ -140,7 +187,7 @@ export interface Register {
   tollgates?: TollgateRecord[];
 }
 
-export type Kind = 'crop' | 'group' | 'plot' | 'batch' | 'run' | 'store' | 'item' | 'move' | 'order' | 'herd' | 'livestockEvent' | 'forestLog' | 'fishLog' | 'vslaGroup' | 'vslaTx' | 'degradation' | 'container' | 'containerLog' | 'tollgate';
+export type Kind = 'crop' | 'group' | 'plot' | 'batch' | 'run' | 'store' | 'item' | 'move' | 'order' | 'herd' | 'livestockEvent' | 'forestLog' | 'fishLog' | 'vslaGroup' | 'vslaTx' | 'degradation' | 'container' | 'containerLog' | 'tollgate' | 'person' | 'word' | 'subscriber' | 'waGroup';
 export type FarmOp =
   | { op: 'upsert'; kind: 'crop'; item: Crop } | { op: 'upsert'; kind: 'group'; item: Group } | { op: 'upsert'; kind: 'plot'; item: Plot }
   | { op: 'upsert'; kind: 'batch'; item: OilBatch } | { op: 'upsert'; kind: 'run'; item: ProcessRun }
@@ -152,14 +199,17 @@ export type FarmOp =
   | { op: 'upsert'; kind: 'degradation'; item: DegradationAssessment }
   | { op: 'upsert'; kind: 'container'; item: ContainerUnit } | { op: 'upsert'; kind: 'containerLog'; item: ContainerLog }
   | { op: 'upsert'; kind: 'tollgate'; item: TollgateRecord }
+  | { op: 'upsert'; kind: 'person'; item: Person } | { op: 'upsert'; kind: 'word'; item: Word }
+  | { op: 'upsert'; kind: 'subscriber'; item: Subscriber } | { op: 'upsert'; kind: 'waGroup'; item: WaGroup }
   | { op: 'remove'; kind: Kind; id: string }
   | { op: 'workdays'; groupId: string; memberIds: string[] };
 
-type ListKey = 'crops' | 'groups' | 'plots' | 'batches' | 'runs' | 'stores' | 'items' | 'moves' | 'orders' | 'herds' | 'livestockEvents' | 'forestLogs' | 'fishLogs' | 'vslaGroups' | 'vslaTxs' | 'degradations' | 'containers' | 'containerLogs' | 'tollgates';
+type ListKey = 'crops' | 'groups' | 'plots' | 'batches' | 'runs' | 'stores' | 'items' | 'moves' | 'orders' | 'herds' | 'livestockEvents' | 'forestLogs' | 'fishLogs' | 'vslaGroups' | 'vslaTxs' | 'degradations' | 'containers' | 'containerLogs' | 'tollgates' | 'people' | 'words' | 'subscribers' | 'waGroups';
 const LIST: Record<Kind, ListKey> = {
   crop: 'crops', group: 'groups', plot: 'plots', batch: 'batches', run: 'runs', store: 'stores', item: 'items', move: 'moves', order: 'orders',
   herd: 'herds', livestockEvent: 'livestockEvents', forestLog: 'forestLogs', fishLog: 'fishLogs',
-  vslaGroup: 'vslaGroups', vslaTx: 'vslaTxs', degradation: 'degradations', container: 'containers', containerLog: 'containerLogs', tollgate: 'tollgates'
+  vslaGroup: 'vslaGroups', vslaTx: 'vslaTxs', degradation: 'degradations', container: 'containers', containerLog: 'containerLogs', tollgate: 'tollgates',
+  person: 'people', word: 'words', subscriber: 'subscribers', waGroup: 'waGroups'
 };
 
 export const newId = (prefix: string) => `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -189,7 +239,7 @@ export const editAllowed = (role: string) => role === 'Admin' || role === 'Group
 export function opAllowed(role: string, o: FarmOp, reg: Register): boolean {
   if (o.op === 'remove') return removeAllowed(role);
   if (editAllowed(role)) return true;
-  if (o.op === 'upsert' && (o.kind === 'move' || o.kind === 'order' || o.kind === 'livestockEvent' || o.kind === 'forestLog' || o.kind === 'fishLog' || o.kind === 'vslaTx' || o.kind === 'degradation' || o.kind === 'containerLog' || o.kind === 'tollgate')) return true;
+  if (o.op === 'upsert' && (o.kind === 'move' || o.kind === 'order' || o.kind === 'livestockEvent' || o.kind === 'forestLog' || o.kind === 'fishLog' || o.kind === 'vslaTx' || o.kind === 'degradation' || o.kind === 'containerLog' || o.kind === 'tollgate' || o.kind === 'person' || o.kind === 'word')) return true;
   if (o.op === 'upsert' && o.kind === 'crop') { const cur = reg.crops.find(c => c.id === o.item.id); return !!cur && cur.name === o.item.name; }
   return false;
 }
@@ -211,6 +261,9 @@ export function opError(o: FarmOp): string {
   if (o.op === 'upsert' && o.kind === 'container') return (o.item as ContainerUnit).code?.trim() && (o.item as ContainerUnit).crop?.trim() ? '' : 'a code and crop are required';
   if (o.op === 'upsert' && o.kind === 'containerLog') return (o.item as ContainerLog).unitId?.trim() ? '' : 'a container unit is required';
   if (o.op === 'upsert' && o.kind === 'tollgate') return (o.item as TollgateRecord).vslaId?.trim() && (o.item as TollgateRecord).gate >= 1 && (o.item as TollgateRecord).gate <= 5 ? '' : 'a VSLA group and valid gate (1-5) are required';
+  if (o.op === 'upsert' && o.kind === 'person') return personError(o.item) ? 'a person needs two names, a valid phone, an admin location and two next of kin' : '';
+  if (o.op === 'upsert' && o.kind === 'subscriber') return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.item.email) ? '' : 'a valid email address is required';
+  if (o.op === 'upsert' && o.kind === 'waGroup') return /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]+/.test(o.item.link) && o.item.name?.trim() ? '' : 'a name and a WhatsApp invite link (https://chat.whatsapp.com/…) are required';
   if (o.kind === 'plot' || o.kind === 'batch' || o.kind === 'store' || o.kind === 'item') return it.code?.trim() ? '' : 'a code is required';
   return it.name?.trim() ? '' : 'a name is required';
 }
@@ -236,6 +289,25 @@ export function vslaBalance(reg: Register, vslaId: string): number {
   const subs: VslaTxType[] = ['loan', 'share-out'];
   return (reg.vslaTxs ?? []).filter(t => t.vslaId === vslaId)
     .reduce((n, t) => n + (adds.includes(t.type) ? t.amount : subs.includes(t.type) ? -t.amount : 0), 0);
+}
+
+export const personById = (reg: Register, id?: string) => id ? (reg.people ?? []).find(p => p.id === id) : undefined;
+// The people in a group who are on the person register (members added before the register have no details).
+export const groupPeople = (reg: Register, groupId: string): Person[] =>
+  (reg.groups.find(g => g.id === groupId)?.members ?? []).flatMap(m => { const p = personById(reg, m.personId); return p ? [p] : []; });
+// Group members as plain names, with the person id when there is one.
+export const groupMembers = (reg: Register, groupId: string) => (reg.groups.find(g => g.id === groupId)?.members ?? []);
+
+// Puts something the project produced (a goat, honey, fish) into a store as a sellable product:
+// creates the item the first time and records an 'in' movement. Returns the ops and the movement id.
+export function productToStore(reg: Register, a: { storeId: string; name: string; unit: string; qty: number; by: string; note: string; date: string; price?: number | null }): { ops: FarmOp[]; moveId: string } {
+  const code = a.name.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 16) || 'PRODUCT';
+  const have = (reg.items ?? []).find(i => i.code === code);
+  const ops: FarmOp[] = [];
+  if (!have) ops.push({ op: 'upsert', kind: 'item', item: { id: code, code, name: a.name, unit: a.unit, kind: 'product', reorder: null, price: a.price ?? null } });
+  const moveId = newId('mv');
+  ops.push({ op: 'upsert', kind: 'move', item: { id: moveId, storeId: a.storeId, itemId: have?.id ?? code, date: a.date, dir: 'in', qty: a.qty, party: 'own production', orderId: '', by: a.by, note: a.note } });
+  return { ops, moveId };
 }
 
 export const plotLabel = (p: Plot, reg: Register) => {

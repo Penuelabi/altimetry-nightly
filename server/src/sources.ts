@@ -1,9 +1,10 @@
 import readXlsxFile from 'read-excel-file/node';
 import type { BulletinRow, PullResult, Station } from '@abuk/core';
-import { bulletinHeadline, whereIs, withinRadius } from '@abuk/core';
+import { bulletinHeadline, payamAt, whereIs, withinRadius } from '@abuk/core';
 import { cfg, need } from './config';
 import { csvObjects, findCol, num, parseCsv } from './csv';
-import { c, driveDownload, driveFind, eeCompute, fn, loadImage, meanAround, terrainExpr } from './adapters/google';
+import { c, driveDownload, driveFind, eeCompute, fn, loadImage, meanAround, meanOver, polygonGeometry, terrainExpr } from './adapters/google';
+import { waterExpr } from './satellite';
 
 const text = async (parent: string, name: string) => {
   const f = await driveFind(parent, name);
@@ -110,18 +111,23 @@ async function computeGee(lat: number, lon: number, radiusKm: number) {
   };
   try { need('gee'); } catch (e) { return { soilMoisture: null, floodExtentPct: null, errors: [(e as Error).message] }; }
   const [soilMoisture, floodExtentPct] = await Promise.all([
-    cfg.soilAsset ? run('soil moisture', async () => {
-      const r = await eeCompute(meanAround(loadImage(cfg.soilAsset), lat, lon, radiusKm * 1000, 9000));
-      const v = cfg.soilBand ? r[cfg.soilBand] : Object.values(r).find(x => typeof x === 'number');
+    // A configured soil-moisture asset wins; otherwise the newest ERA5-Land day (top 7 cm of soil, m³/m³), public like NDVI.
+    run('soil moisture', async () => {
+      const asset = cfg.soilAsset || 'ic:ECMWF/ERA5_LAND/DAILY_AGGR', band = cfg.soilAsset ? cfg.soilBand : 'volumetric_soil_water_layer_1';
+      const img = loadImage(asset);
+      const r = await eeCompute(meanAround(band ? fn('Image.select', { input: img, bandSelectors: c([band]) }) : img, lat, lon, radiusKm * 1000, cfg.soilAsset ? 9000 : 11132));
+      const v = band ? r[band] : Object.values(r).find(x => typeof x === 'number');
       return typeof v === 'number' ? Math.round(v * 1000) / 1000 : null;
-    }) : (errors.push('GEE_SOIL_MOISTURE_ASSET is not set'), null),
-    cfg.floodAsset ? run('flood extent', async () => {
-      // 1 = flooded, 0 = not; unmask so blanks count as dry. 90 m is plenty for a % over km² and ~9× faster than 30 m.
-      const img = fn('Image.unmask', { input: loadImage(cfg.floodAsset), value: c(0) });
-      const r = await eeCompute(meanAround(img, lat, lon, radiusKm * 1000, 90));
-      const v = Object.values(r).find(x => typeof x === 'number');
-      return typeof v === 'number' ? Math.round(v * 1000) / 10 : null;
-    }) : (errors.push('GEE_FLOOD_EXTENT_ASSET is not set'), null)
+    }),
+    // Flood extent is computed from public satellite data like NDVI, over the payam the phone is in
+    // (or a circle round the point outside any payam): no asset has to be uploaded or configured.
+    run('flood extent', async () => {
+      const area = payamAt(lat, lon);
+      const { flood } = waterExpr();
+      const r = await eeCompute(area ? meanOver(flood, polygonGeometry(area.polygons), 500) : meanAround(flood, lat, lon, radiusKm * 1000, 500));
+      const v = r.flood;
+      return typeof v === 'number' ? Math.round(Math.max(0, Math.min(1, v)) * 1000) / 10 : null;
+    })
   ]);
   return { soilMoisture, floodExtentPct, errors };
 }

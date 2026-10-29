@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { basinDepth, editAllowed, haversineKm, newId, polygonHa, whereIs, type Plot as FarmPlot, type Terrain, type Zone } from '@abuk/core';
+import { basinDepth, editAllowed, haversineKm, newId, polygonHa, whereIs, zoneDepths, type Plot as FarmPlot, type Terrain, type Zone } from '@abuk/core';
+import { useModel } from './common';
 import { farmChange, go, record, setState, useApp, type Plot } from '../store';
 import { api, explain } from '../api';
 import { useOnline, usePlace } from '../net';
@@ -15,7 +16,9 @@ export function MapScreen() {
   const [terrain, setTerrain] = useState<Terrain | null>(null);
   const [terrErr, setTerrErr] = useState('');
   const watch = useRef<number | null>(null);
-  const depth = basinDepth(0);
+  // The basin depth the flood model holds today: from depth readings near the phone when there are any.
+  const model = useModel(), depth = basinDepth(0, model);
+  const depthSrc = model.measured ? model.d0Src : 'design example, not measured';
 
   const stop = () => { if (watch.current !== null) navigator.geolocation.clearWatch(watch.current); watch.current = null; };
   useEffect(() => stop, []);
@@ -100,7 +103,7 @@ export function MapScreen() {
     { k: 'Elevation', v: terrain?.elevation != null ? `${terrain.elevation} m` : gpsAlt != null ? `${Math.round(gpsAlt)} m (GPS)` : '—', src: terrain ? 'terrain model' : terrErr ? 'terrain model unavailable' : 'refines when online' },
     { k: 'Slope', v: terrain?.slopePct != null ? `${terrain.slopePct} %` : '—', src: terrain ? 'terrain model' : 'needs connection' },
     cap.mode === 'walk' ? { k: 'Area', v: polygonHa(cap.pts).toFixed(2) + ' ha', src: cap.done ? 'closed boundary' : 'closes on finish' } : { k: 'Fixes', v: String(cap.pts.length), src: 'averaged' },
-    { k: 'Flood risk', v: `Basin · ${depth.toFixed(2)} m`, src: 'from flood model' }
+    { k: 'Flood depth', v: `${np.zone[0].toUpperCase()}${np.zone.slice(1)} · ${zoneDepths(model)[np.zone].toFixed(2)} m`, src: model.measured ? 'from depth readings' : 'design example' }
   ] : [];
 
   return (
@@ -112,7 +115,9 @@ export function MapScreen() {
           <span className="num" style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '3px 6px' }}>{place.gps ? `${place.lat.toFixed(5)}° N, ${place.lon.toFixed(5)}° E${place.acc ? ` ±${Math.round(place.acc)} m` : ''}` : 'Waiting for GPS… showing the farm'} · 150 m buffer</span>
         </div>
         <div style={{ position: 'absolute', right: 10, top: 10, zIndex: 500 }}>
-          <button onClick={() => go('flood')} style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '4px 7px' }}>Depth {depth.toFixed(2)} m</button>
+          <button onClick={() => go('depth')} title={depthSrc} style={{ fontSize: 11, background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-sm)', padding: '4px 7px', textAlign: 'left' }}>
+            Basin water {depth.toFixed(2)} m<span style={{ display: 'block', fontSize: 9.5, color: model.measured ? 'var(--color-accent-800)' : '#856404' }}>{model.measured ? 'measured · tap to add a reading' : 'example · tap to record depth'}</span>
+          </button>
         </div>
         {!online && <div style={{ position: 'absolute', left: 0, right: 0, top: 0, zIndex: 500, fontSize: 11, padding: '4px 8px', background: 'color-mix(in srgb, var(--color-bg) 85%, transparent)' }}>No signal: satellite imagery appears when online. GPS and plots still work.</div>}
       </div>

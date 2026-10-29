@@ -1,12 +1,13 @@
 import { useRef, useState, type ReactNode } from 'react';
-import { chainFor, editAllowed, newId, plotLabel, polygonHa, removeAllowed, type Crop, type CropCategory, type CropSeason, type Group, type OilBatch, type Plot, type ProcessRun, type Register, type Zone } from '@abuk/core';
-import { farmChange, useApp } from '../store';
+import { BLANK_KIN, NO_ADMIN, adminLabel, blankPerson, normPhone, personError, type Person, chainFor, editAllowed, newId, personById, personName, plotLabel, polygonHa, removeAllowed, type Crop, type CropCategory, type CropSeason, type Group, type OilBatch, type Plot, type ProcessRun, type Register, type Zone } from '@abuk/core';
+import { farmChange, getState, useApp } from '../store';
 import { useOnline, usePlace } from '../net';
+import { AdminPicker, NewPerson, PersonFields, PersonSelect, useHereAdmin } from '../pickers';
 import { LiveMap } from '../LiveMap';
 import { Photo, savePhoto } from '../photos';
 import { Chevron, Field, Seg } from '../ui';
 
-type Tab = 'plots' | 'crops' | 'groups' | 'batches' | 'runs';
+type Tab = 'plots' | 'crops' | 'groups' | 'people' | 'batches' | 'runs';
 const ZONES: [Zone, string][] = [['ridge', 'Ridge'], ['slope', 'Slope'], ['basin', 'Basin']];
 
 export function RegisterScreen() {
@@ -23,25 +24,27 @@ export function RegisterScreen() {
     tab === 'plots' ? reg.plots.map(p => ({ id: p.id, title: p.code, sub: `${p.zone} · ${[p.crop, ...(p.crops ?? [])].join(', ')}${p.areaHa ? ` · ${p.areaHa} ha` : ''} · ${groupName(reg, p.groupId) || p.holder || 'no group'}${p.boundary.length > 2 ? ' · mapped' : ''}` }))
     : tab === 'crops' ? reg.crops.map(c => ({ id: c.id, title: c.name, sub: [c.localName, c.category, c.season, c.photos?.length ? `${c.photos.length} photos` : ''].filter(Boolean).join(' · ') }))
     : tab === 'groups' ? reg.groups.map(g => ({ id: g.id, title: g.name, sub: `${g.members.length} members${g.lead ? ` · lead ${g.lead}` : ''}` }))
+    : tab === 'people' ? (reg.people ?? []).map(p => ({ id: p.id, title: personName(p), sub: `${p.phone}${p.phone2 ? ` · ${p.phone2}` : ''} · ${adminLabel(p.admin)}${reg.groups.filter(g => g.members.some(m => m.personId === p.id)).map(g => ` · ${g.name}`).join('')}` }))
     : tab === 'batches' ? reg.batches.map(b => ({ id: b.id, title: b.code, sub: `${b.product ?? 'Balanites oil'} · ${b.bottles} × ${b.unit ?? '1 L'} · plot ${reg.plots.find(p => p.id === b.plotId)?.code ?? '—'} · ${b.pressed}` }))
     : reg.runs.map(r => ({ id: r.id, title: `${runProduct(r)} · ${r.date}`, sub: r.steps.map(x => x.out).filter(Boolean).join(' → ') }));
 
   const form = (id: string) => {
     const isNew = id === 'new';
-    const remove = !isNew && canDel ? () => { farmChange({ op: 'remove', kind: tab === 'plots' ? 'plot' : tab === 'crops' ? 'crop' : tab === 'groups' ? 'group' : tab === 'batches' ? 'batch' : 'run', id }); close(); } : undefined;
+    const remove = !isNew && canDel ? () => { farmChange({ op: 'remove', kind: tab === 'plots' ? 'plot' : tab === 'crops' ? 'crop' : tab === 'groups' ? 'group' : tab === 'people' ? 'person' : tab === 'batches' ? 'batch' : 'run', id }); close(); } : undefined;
     if (tab === 'plots') return <PlotForm reg={reg} item={reg.plots.find(p => p.id === id)} onSave={p => { farmChange({ op: 'upsert', kind: 'plot', item: p }); close(); }} onCancel={close} onRemove={remove} />;
     if (tab === 'crops') return <CropForm reg={reg} item={reg.crops.find(c => c.id === id)} onSave={c => { farmChange({ op: 'upsert', kind: 'crop', item: c }); close(); }} onCancel={close} onRemove={remove} />;
     if (tab === 'groups') return <GroupForm item={reg.groups.find(g => g.id === id)} onSave={g => { farmChange({ op: 'upsert', kind: 'group', item: g }); close(); }} onCancel={close} onRemove={remove} />;
+    if (tab === 'people') return <PersonForm item={reg.people?.find(p => p.id === id)} onSave={p => { farmChange({ op: 'upsert', kind: 'person', item: p }); close(); }} onCancel={close} onRemove={remove} />;
     if (tab === 'batches') return <BatchForm reg={reg} item={reg.batches.find(b => b.id === id)} onSave={b => { farmChange({ op: 'upsert', kind: 'batch', item: b }); close(); }} onCancel={close} onRemove={remove} />;
     return <RunForm reg={reg} item={reg.runs.find(r => r.id === id)} onSave={r => { farmChange({ op: 'upsert', kind: 'run', item: r }); close(); }} onCancel={close} onRemove={remove} />;
   };
 
-  const LABEL: Record<Tab, string> = { plots: 'plot', crops: 'crop', groups: 'group', batches: 'product batch', runs: 'processing run' };
+  const LABEL: Record<Tab, string> = { plots: 'plot', crops: 'crop', groups: 'group', people: 'person', batches: 'product batch', runs: 'processing run' };
   return (
     <div className="pad g12" style={{ paddingTop: 14 }}>
       <p className="body" style={{ fontSize: 13 }}>The project's shared list of plots, crops, groups, oil batches and processing runs. Changes show on every phone after it syncs.{can ? '' : ' Only admins and group leads can change it.'}</p>
       <div style={{ overflowX: 'auto' }}>
-        <Seg items={[['plots', 'Plots'], ['crops', 'Crops'], ['groups', 'Groups'], ['batches', 'Batches'], ['runs', 'Processing']]} value={tab} onPick={pick} fontSize={12} />
+        <Seg items={[['plots', 'Plots'], ['crops', 'Crops'], ['groups', 'Groups'], ['people', 'People'], ['batches', 'Batches'], ['runs', 'Processing']]} value={tab} onPick={pick} fontSize={12} />
       </div>
       {s.farmOps.length > 0 && <div className="msg">{s.farmOps.length} change{s.farmOps.length > 1 ? 's' : ''} on this phone, {s.session?.demo ? 'kept here only (demo mode)' : online ? 'syncing…' : 'will sync when online'}.</div>}
       {can && open !== 'new' && <button className="btn" onClick={() => setOpen('new')}>+ Add {LABEL[tab]}</button>}
@@ -80,8 +83,8 @@ function Shell({ title, children, onSave, onCancel, onRemove, err }: { title: st
 }
 
 function PlotForm({ reg, item, onSave, onCancel, onRemove }: { reg: Register; item?: Plot; onSave: (p: Plot) => void; onCancel: () => void; onRemove?: () => void }) {
-  const place = usePlace();
-  const [p, setP] = useState<Plot>(item ?? { id: newId('plot'), code: '', zone: 'basin', crop: reg.crops[0]?.name ?? '', crops: [], groupId: '', holder: '', areaHa: null, boundary: [], notes: '' });
+  const place = usePlace(), hereAdmin = useHereAdmin();
+  const [p, setP] = useState<Plot>(item ?? { id: newId('plot'), code: '', zone: 'basin', crop: reg.crops[0]?.name ?? '', crops: [], groupId: '', holder: '', areaHa: null, boundary: [], notes: '', admin: hereAdmin });
   const [err, setErr] = useState('');
   const [cropForm, setCropForm] = useState(false);
   const [drawing, setDrawing] = useState(false);
@@ -119,6 +122,7 @@ function PlotForm({ reg, item, onSave, onCancel, onRemove }: { reg: Register; it
         <Field label="Group"><select className="input" value={p.groupId} onChange={e => set('groupId', e.target.value)}><option value="">Individual</option>{reg.groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
         <Field label="Holder (individual plots)"><input className="input" value={p.holder} disabled={!!p.groupId} onChange={e => set('holder', e.target.value)} /></Field>
       </div>
+      <AdminPicker value={p.admin ?? hereAdmin} onChange={admin => set('admin', admin)} label="Plot is in" />
       <Field label="Notes"><input className="input" value={p.notes} onChange={e => set('notes', e.target.value)} /></Field>
       <div className="col g6">
         <div className="between"><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Boundary</span><span className="sub num">{p.boundary.length > 2 ? `${p.boundary.length} corners · ${polygonHa(p.boundary).toFixed(2)} ha` : p.boundary.length ? `${p.boundary.length} corner${p.boundary.length > 1 ? 's' : ''}, need 3+` : 'not mapped'}</span></div>
@@ -187,28 +191,58 @@ export function CropForm({ reg, item, onSave, onCancel, onRemove }: { reg: Regis
   );
 }
 
-function GroupForm({ item, onSave, onCancel, onRemove }: { item?: Group; onSave: (g: Group) => void; onCancel: () => void; onRemove?: () => void }) {
-  const [g, setG] = useState<Group>(item ?? { id: newId('group'), name: '', lead: '', members: [] });
-  const [who, setWho] = useState('');
+// One person's details, edited in place (the same record every group, store, VSLA and alert reads from).
+function PersonForm({ item, onSave, onCancel, onRemove }: { item?: Person; onSave: (p: Person) => void; onCancel: () => void; onRemove?: () => void }) {
+  const here = useHereAdmin();
+  const [p, setP] = useState<Person>(item ? { ...item, kin: [...item.kin, BLANK_KIN, BLANK_KIN].slice(0, Math.max(2, item.kin.length)) } : blankPerson(newId('per'), here));
   const [err, setErr] = useState('');
-  const add = () => { if (!who.trim()) return; setG({ ...g, members: [...g.members, { id: newId('m'), name: who.trim(), workDays: 0 }] }); setWho(''); };
+  const save = () => { const bad = personError(p); if (bad) return setErr(bad); onSave({ ...p, phone: normPhone(p.phone), phone2: normPhone(p.phone2), kin: p.kin.map(k => ({ ...k, phone: normPhone(k.phone) })) }); };
+  return (
+    <Shell title={item ? `Edit ${personName(item)}` : 'New person'} onSave={save} onCancel={onCancel} onRemove={onRemove} err={err}>
+      <PersonFields value={p} onChange={x => { setP(x); setErr(''); }} />
+    </Shell>
+  );
+}
+
+function GroupForm({ item, onSave, onCancel, onRemove }: { item?: Group; onSave: (g: Group) => void; onCancel: () => void; onRemove?: () => void }) {
+  const s = useApp(), here = useHereAdmin();
+  const [g, setG] = useState<Group>(item ?? { id: newId('group'), name: '', lead: '', members: [], admin: here });
+  const [err, setErr] = useState('');
+  const [detail, setDetail] = useState<string | null>(null); // member id getting details
+  const people = s.farm.people ?? [];
+  const inGroup = g.members.flatMap(m => (m.personId ? [m.personId] : []));
+  // Members come from the person register (the full details are kept there); a new person is added on the spot.
+  const add = (id: string) => {
+    const p = getState().farm.people?.find(x => x.id === id);
+    if (p && !inGroup.includes(p.id)) setG(x => ({ ...x, members: [...x.members, { id: newId('m'), name: personName(p), workDays: 0, personId: p.id }] }));
+  };
+  const withDetails = detail ? g.members.find(m => m.id === detail) : null;
   return (
     <Shell title={item ? `Edit ${item.name}` : 'New group'} onSave={() => (g.name.trim() ? onSave({ ...g, name: g.name.trim() }) : setErr('Enter the group name.'))} onCancel={onCancel} onRemove={onRemove} err={err}>
       <div className="grid2">
         <Field label="Group name"><input className="input" value={g.name} placeholder="Group 7" onChange={e => { setG({ ...g, name: e.target.value }); setErr(''); }} /></Field>
-        <Field label="Group lead"><input className="input" value={g.lead} onChange={e => setG({ ...g, lead: e.target.value })} /></Field>
+        <Field label="Group lead"><select className="input" value={g.lead} onChange={e => setG({ ...g, lead: e.target.value })}>
+          <option value="">—</option>{g.lead && !g.members.some(m => m.name === g.lead) && <option>{g.lead}</option>}{g.members.map(m => <option key={m.id}>{m.name}</option>)}
+        </select></Field>
       </div>
+      <AdminPicker value={g.admin ?? NO_ADMIN} onChange={admin => setG({ ...g, admin })} label="Group is based in" />
       <div className="section">Members · {g.members.length}</div>
-      {g.members.map(m => (
-        <div key={m.id} className="rowg" style={{ alignItems: 'center', padding: '6px 0' }}>
-          <input className="input" style={{ minHeight: 36, fontSize: 14 }} value={m.name} onChange={e => setG({ ...g, members: g.members.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) })} />
-          <button className="btn plain sm" onClick={() => setG({ ...g, members: g.members.filter(x => x.id !== m.id) })} aria-label={`Remove ${m.name}`}>Remove</button>
-        </div>
-      ))}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
-        <input className="input" style={{ minHeight: 40 }} value={who} placeholder="New member's name" onChange={e => setWho(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <button className="btn md" style={{ padding: '0 12px' }} onClick={add}>Add</button>
-      </div>
+      {g.members.map(m => {
+        const p = personById(s.farm, m.personId);
+        return (
+          <div key={m.id} className="rowg" style={{ alignItems: 'center', padding: '6px 0' }}>
+            <span><span style={{ display: 'block', fontSize: 14 }}>{m.name}</span><span className="sub">{p ? `${p.phone}${p.phone2 ? ` · ${p.phone2}` : ''} · ${adminLabel(p.admin)}` : 'no personal details yet'}</span></span>
+            <span style={{ display: 'flex', gap: 6 }}>
+              {!p && <button className="btn plain sm" onClick={() => setDetail(m.id)}>Add details</button>}
+              <button className="btn plain sm" onClick={() => setG({ ...g, members: g.members.filter(x => x.id !== m.id) })} aria-label={`Remove ${m.name}`}>Remove</button>
+            </span>
+          </div>
+        );
+      })}
+      {withDetails
+        ? <NewPerson initial={{ name: withDetails.name.split(' ')[0], name2: withDetails.name.split(' ').slice(1).join(' '), admin: g.admin ?? here }} onCancel={() => setDetail(null)}
+            onSaved={p => { setG(x => ({ ...x, members: x.members.map(m => (m.id === detail ? { ...m, personId: p.id, name: personName(p) } : m)) })); setDetail(null); }} />
+        : <PersonSelect label="Add a member" value="" empty={people.length ? 'Pick from the list, or add a new person…' : 'Add the first person…'} only={people.filter(p => !inGroup.includes(p.id)).map(p => p.id)} onChange={id => id && add(id)} />}
     </Shell>
   );
 }
@@ -219,13 +253,13 @@ const prefix = (s: string) => (s.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCa
 // A traceable batch of any product: crop and product, source plot with its GPS, the processing run,
 // quantity and unit, quality, store and who packed it.
 function BatchForm({ reg, item, onSave, onCancel, onRemove }: { reg: Register; item?: OilBatch; onSave: (b: OilBatch) => void; onCancel: () => void; onRemove?: () => void }) {
-  const s = useApp(), place = usePlace();
+  const s = useApp(), place = usePlace(), hereAdmin = useHereAdmin();
   const yy = new Date().getFullYear() % 100;
   const firstPlot = reg.plots.find(p => p.zone === 'basin') ?? reg.plots[0];
   const crop0 = firstPlot?.crop ?? reg.crops[0]?.name ?? '';
   const nextCode = (crop: string) => { const pre = `${prefix(crop)}‑${yy}‑`; return `${pre}${String(reg.batches.filter(b => b.code.startsWith(pre)).length + 1).padStart(2, '0')}`; };
   const at = (plotId: string) => { const p = reg.plots.find(x => x.id === plotId); const c = p && centroid(p.boundary); return c ?? (place.gps ? { lat: place.lat, lon: place.lon } : { lat: null, lon: null }); };
-  const [b, setB] = useState<OilBatch>(item ?? { id: newId('batch'), code: nextCode(crop0), plotId: firstPlot?.id ?? '', crop: crop0, product: chainFor(crop0).product, unit: chainFor(crop0).unit, fruit: '', pressed: new Date().toISOString().slice(0, 10), bottles: 0, place: place.payam ? `${place.payam}, ${place.county}, ${place.state}` : '', ...at(firstPlot?.id ?? ''), runId: '', storeId: reg.stores?.[0]?.id ?? '', quality: '', packedBy: s.session?.user.id ?? '', notes: '' });
+  const [b, setB] = useState<OilBatch>(item ?? { id: newId('batch'), code: nextCode(crop0), plotId: firstPlot?.id ?? '', crop: crop0, product: chainFor(crop0).product, unit: chainFor(crop0).unit, fruit: '', pressed: new Date().toISOString().slice(0, 10), bottles: 0, place: adminLabel(hereAdmin), admin: hereAdmin, ...at(firstPlot?.id ?? ''), runId: '', storeId: reg.stores?.[0]?.id ?? '', quality: '', packedBy: s.session?.user.id ?? '', notes: '' });
   const [err, setErr] = useState('');
   const set = (patch: Partial<OilBatch>) => { setB(x => ({ ...x, ...patch })); setErr(''); };
   const pickPlot = (plotId: string) => { const p = reg.plots.find(x => x.id === plotId); set({ plotId, ...at(plotId), ...(p && !item ? { crop: p.crop, product: chainFor(p.crop).product, unit: chainFor(p.crop).unit, code: nextCode(p.crop) } : {}) }); };
@@ -262,7 +296,7 @@ function BatchForm({ reg, item, onSave, onCancel, onRemove }: { reg: Register; i
         <Field label="Kept in store"><select className="input" value={b.storeId ?? ''} onChange={e => set({ storeId: e.target.value })}><option value="">—</option>{(reg.stores ?? []).map(x => <option key={x.id} value={x.id}>{x.code}</option>)}</select></Field>
         <Field label="Packed by"><input className="input" value={b.packedBy ?? ''} onChange={e => set({ packedBy: e.target.value })} /></Field>
       </div>
-      <Field label="Place"><input className="input" value={b.place} onChange={e => set({ place: e.target.value })} /></Field>
+      <AdminPicker value={b.admin ?? hereAdmin} onChange={admin => set({ admin, place: adminLabel(admin) })} label="Place" />
       <Field label="Notes"><input className="input" value={b.notes ?? ''} onChange={e => set({ notes: e.target.value })} /></Field>
     </Shell>
   );
