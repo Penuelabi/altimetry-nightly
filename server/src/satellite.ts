@@ -34,7 +34,7 @@ export function waterExpr(): { water: Node; flood: Node } {
   const green = select(img, 'sur_refl_b04'), swir = select(img, 'sur_refl_b06');
   const mndwi = op('divide', op('subtract', green, swir), op('add', green, swir));
   const water = rename(op('gt', mndwi, constant(0)), 'water');
-  const occurrence = fn('Image.unmask', { input: select(fn('Image.load', { id: c('JRC/GSW1_4/GlobalSurfaceWater') }), 'occurrence'), value: c(0) });
+  const occurrence = fn('Image.unmask', { input: select(fn('Image.load', { id: c('JRC/GSW1_4/GlobalSurfaceWater') }), 'occurrence'), value: constant(0) });
   const permanent = op('gt', occurrence, constant(90));
   return { water, flood: rename(op('subtract', water, op('multiply', water, permanent)), 'flood') };
 }
