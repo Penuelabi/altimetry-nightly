@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { DEGRADATION_INDICATORS, newId, plotLabel, type DegradationAssessment } from '@abuk/core';
+import { DEGRADATION_INDICATORS, adminLabel, newId, plotLabel, type AdminLoc, type DegradationAssessment } from '@abuk/core';
 import { farmChange, useApp } from '../store';
+import { AdminPicker, useHereAdmin } from '../pickers';
 import { Field } from '../ui';
 
 const SEVERITY = [
@@ -11,7 +12,8 @@ const SEVERITY = [
 ];
 
 export function Degradation() {
-  const s = useApp();
+  const s = useApp(), here = useHereAdmin();
+  const [admin, setAdmin] = useState<AdminLoc>(here);
   const plots = s.farm.plots;
   const assessments = (s.farm.degradations ?? []).sort((a, b) => b.date.localeCompare(a.date));
   const [scores, setScores] = useState<Record<string, number>>({});
@@ -23,9 +25,10 @@ export function Degradation() {
 
   const save = () => {
     if (!form.site.trim()) return setErr('Enter a site name.');
+    if (!admin.state || !admin.county || !admin.payam) return setErr('Choose the state, county and payam.');
     const filled = Object.entries(scores).filter(([, v]) => v > 0);
     if (filled.length === 0) return setErr('Score at least one indicator.');
-    const a: DegradationAssessment = { id: newId('deg'), date: new Date().toISOString().slice(0, 10), site: form.site, plotId: form.plotId, by: s.session?.user.id ?? '', scores, photos: [], note: form.note };
+    const a: DegradationAssessment = { id: newId('deg'), date: new Date().toISOString().slice(0, 10), site: form.site, plotId: form.plotId, by: s.session?.user.id ?? '', scores, photos: [], note: form.note, admin };
     farmChange({ op: 'upsert', kind: 'degradation', item: a });
     setScores({}); setSaved(true); setErr('');
   };
@@ -44,6 +47,8 @@ export function Degradation() {
           </select>
         </Field>
       </div>
+
+      <AdminPicker value={admin} onChange={a => { setAdmin(a); setSaved(false); }} label="Where is the site" />
 
       <div className="col g6">
         <div className="section">Degradation indicators</div>
@@ -69,7 +74,7 @@ export function Degradation() {
           <h2 className="h2 h20 rule" style={{ marginBottom: 2 }}>Past assessments</h2>
           {assessments.map(a => (
             <div key={a.id} className="rowg">
-              <span><span style={{ display: 'block', fontSize: 14 }}>{a.site}</span><span className="sub">{a.date} · {a.by} · {Object.keys(a.scores).length} indicators scored</span></span>
+              <span><span style={{ display: 'block', fontSize: 14 }}>{a.site}</span><span className="sub">{a.date} · {a.by}{a.admin ? ` · ${adminLabel(a.admin)}` : ''} · {Object.keys(a.scores).length} indicators scored</span></span>
               <span style={{ textAlign: 'right' }}><span className="head num" style={{ display: 'block', fontSize: 20 }}>{avg(a)}/3</span><span className="it" style={{ fontSize: 11, color: 'var(--color-accent-700)' }}>avg severity</span></span>
             </div>
           ))}

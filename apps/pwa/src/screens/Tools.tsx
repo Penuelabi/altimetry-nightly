@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
-import { P2P_PEERS, PARTS, PICTO, STORE, TOOLS, bulletinInputs, pestInfo, pestOptions, plotLabel, type Part, editAllowed, leadAlert, newId, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
-import { farmChange, go, openRegister, record, setState, useApp, type Lead } from '../store';
+import { ICONS, P2P_PEERS, PARTS, PICTO, STORE, TOOLS, adminLabel, bulletinInputs, pestInfo, pestOptions, personName, plotLabel, removeAllowed, type AdminLoc, type Part, editAllowed, leadAlert, newId, parseGauge, qrCells, type GaugeReading } from '@abuk/core';
+import { farmChange, getState, go, openRegister, record, setState, useApp, type Lead } from '../store';
+import { AdminPicker, PersonSelect, nowLocal, useHereAdmin } from '../pickers';
+import { openLink, smsLink } from '../sms';
 import { api, explain } from '../api';
 import { oneFix, useOnline, usePlace } from '../net';
 import { Check, Chevron, Field, Icon, Seg, Toggle } from '../ui';
 import { allChecks, useHereData, useModel } from './common';
 import { loadChecks } from '../daily';
+import { RegisterAlerts } from './AlertsExtra';
 import { savePhoto } from '../photos';
 
 export function Tools() {
@@ -27,8 +30,7 @@ export function Tools() {
 // One message per group lead, built from live data (see leadAlert): their own plots' latest crop checks
 // from every phone, the fitted water model, rain forecast and the county bulletin. Sent from the phone's
 // own Messages app: the app fills in the number and text, the person presses Send, and it goes from their SIM.
-const smsLink = (numbers: string[], body: string) => `sms:${numbers.join(',')}?body=${encodeURIComponent(body)}`;
-const openMessages = (href: string) => { const a = document.createElement('a'); a.href = href; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); };
+const openMessages = openLink;
 const LEVEL_WORD = { warn: 'Warning', watch: 'Watch', clear: 'All clear' } as const;
 
 export function Alerts() {
@@ -97,6 +99,7 @@ export function Alerts() {
           {!leads.length && <div className="note" style={{ padding: '8px 0' }}>{!online ? 'Recipients load when the phone has signal.' : isAdmin ? 'No recipients yet. Tap “Add or edit” to add group leads and their phone numbers.' : 'No recipients yet. Ask an admin to add group leads.'}</div>}
         </>}
       </div>
+      <RegisterAlerts canSend={canSend} canEdit={canSend} alertFor={lead => leadAlert({ lead, reg: s.farm, checks, model, bulletin, rainNext7: weather?.rainNext7 ?? null, days, payam: place.payam, now: new Date() })} />
       <div className="note">A lead is matched to a group by the group name or the group’s lead in the Farm register; their plots are that group’s plots. Plots with no crop check in two weeks say so. Have a native speaker check the Arabic wording.</div>
       {msg && <div className="msg">{msg}</div>}
       {!canSend && <div className="note">Only admins and group leads send alerts.</div>}
@@ -144,52 +147,75 @@ const SEED_GAUGE: GaugeReading[] = [
 const SEED_HIST = [4.36, 4.33, 4.31, 4.29, 4.27, 4.24, 4.22, 4.18, 4.15, 4.12];
 
 export function Gauge() {
-  const s = useApp(), online = useOnline();
-  const [input, setInput] = useState('');
+  const s = useApp(), online = useOnline(), here = useHereAdmin();
+  const [level, setLevel] = useState('');
+  const [admin, setAdmin] = useState<AdminLoc>(here);
+  const [at, setAt] = useState(nowLocal());
+  const [sender, setSender] = useState('me'); // 'me', a person id, or 'other'
+  const [other, setOther] = useState('');
   const [msg, setMsg] = useState('');
+  const [busy, setBusy] = useState(false);
   useEffect(() => { if (online) api<GaugeReading[]>('/api/gauge').then(g => setState({ gauge: g }), () => {}); }, [online]);
   const rows = s.gauge ?? SEED_GAUGE;
   const okVals = rows.filter(r => r.status === 'ok' && r.v !== null).map(r => r.v as number).reverse();
   const h = (s.gauge && okVals.length >= 2 ? okVals : SEED_HIST).slice(-10);
   const mn = Math.min(...h) - 0.05, mx = Math.max(...h) + 0.05;
   const pts = h.map((v, i) => ({ x: 10 + i * 33, y: Math.round(62 - (v - mn) / (mx - mn) * 54) }));
+  const people = s.farm.people ?? [];
+  const senderName = sender === 'me' ? s.session?.user.name ?? '' : sender === 'other' ? other.trim() : personName(people.find(p => p.id === sender));
   const send = async () => {
-    const t = input.trim();
-    if (!t) return;
-    setInput('');
+    const v = Number(level);
+    if (!(v > 0) || v > 30) return setMsg('Enter the gauge level in metres, e.g. 4.12.');
+    if (!admin.state || !admin.county || !admin.payam) return setMsg('Choose the state, county and payam of the gauge.');
+    if (!senderName) return setMsg('Say who is sending the reading.');
+    const when = new Date(at);
+    if (isNaN(+when) || +when > Date.now() + 300_000) return setMsg('The date and time must not be in the future.');
+    setBusy(true);
     try {
-      const r = await api<{ reading: GaugeReading; reply: string }>('/api/gauge/test', { body: { text: t } });
-      setState(st => ({ gauge: [r.reading, ...(st.gauge ?? [])] })); setMsg(r.reading.status === 'ok' ? `Saved: ${r.reading.v?.toFixed(2)} m.` : r.reading.status === 'held' ? `Saved, but ${r.reading.v} m is far from the last reading, so an admin will check it.` : 'Not understood. Type G then the level, e.g. G 4.12');
+      const r = await api<{ reading: GaugeReading; reply: string }>('/api/gauge/test', { body: { text: `G ${v}`, at: when.toISOString(), sender: senderName, admin } });
+      setState(st => ({ gauge: [r.reading, ...(st.gauge ?? [])].sort((a, b) => b.at.localeCompare(a.at)) }));
+      setLevel(''); setAt(nowLocal());
+      setMsg(r.reading.status === 'ok' ? `Saved: ${r.reading.v?.toFixed(2)} m from ${senderName}.` : r.reading.status === 'held' ? `Saved, but ${r.reading.v} m is far from the last reading, so an admin will check it.` : 'Not understood.');
     } catch (e) {
       // Offline: show what the server will decide, so volunteers can practise the format.
-      const v = parseGauge(t, h[h.length - 1]);
-      setMsg(`${explain(e)} Format check: ${v.kind === 'bad' ? 'not understood' : v.kind === 'held' ? 'would be held for the admin' : 'would be accepted'}.`);
-    }
+      const c = parseGauge(`G ${v}`, h[h.length - 1]);
+      setMsg(`${explain(e)} Format check: ${c.kind === 'bad' ? 'not understood' : c.kind === 'held' ? 'would be held for the admin' : 'would be accepted'}.`);
+    } finally { setBusy(false); }
   };
   const when = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <div className="box" style={{ padding: '10px 12px', fontSize: 13, lineHeight: 1.5 }}>Read the staff gauge at Bor, then type <span className="mono">G</span> and the level in metres, e.g. <span className="mono">G 4.12</span>. Volunteers without the app can text the reading to their group lead, who enters it here.</div>
+      <div className="box" style={{ padding: '10px 12px', fontSize: 13, lineHeight: 1.5 }}>Read the staff gauge, then enter the level in metres below. Volunteers without the app can text <span className="mono">G 4.12</span> to their group lead, who enters it here with the volunteer's name.</div>
       <div>
-        <div className="between"><span className="kick sm">Bor gauge · last {h.length} readings</span><span className="head num" style={{ fontSize: 22 }}>{h[h.length - 1].toFixed(2)} m</span></div>
+        <div className="between"><span className="kick sm">Gauge · last {h.length} readings</span><span className="head num" style={{ fontSize: 22 }}>{h[h.length - 1].toFixed(2)} m</span></div>
         <svg viewBox="0 0 320 70" width="100%" height="70" style={{ display: 'block', borderBottom: '1px solid var(--color-divider)' }}>
           <polyline points={pts.map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke="var(--color-accent)" strokeWidth="1.6" />
           {pts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={i === pts.length - 1 ? 'var(--color-accent)' : 'var(--color-bg)'} stroke="var(--color-accent)" />)}
         </svg>
       </div>
-      <div className="col g6">
-        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Today's reading</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
-          <input className="input mono" style={{ minHeight: 42 }} placeholder="G 4.10" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} />
-          <button className="btn md" style={{ padding: '0 14px' }} onClick={send}>Send</button>
+      <div className="col g10">
+        <div className="kick sm">New reading</div>
+        <AdminPicker value={admin} onChange={setAdmin} label="Where is the gauge" />
+        <div className="grid2">
+          <Field label="Level (m)"><input className="input num" type="number" inputMode="decimal" step="0.01" placeholder="4.10" value={level} onChange={e => { setLevel(e.target.value); setMsg(''); }} /></Field>
+          <Field label="Date and time"><input className="input" type="datetime-local" value={at} max={nowLocal()} onChange={e => setAt(e.target.value)} style={{ fontSize: 14, padding: '0 8px' }} /></Field>
         </div>
+        <Field label="Sent by">
+          <select className="input" value={sender} onChange={e => setSender(e.target.value)}>
+            <option value="me">Me · {s.session?.user.name}</option>
+            {people.map(p => <option key={p.id} value={p.id}>{personName(p)} · {p.phone}</option>)}
+            <option value="other">Someone else (type the name)…</option>
+          </select>
+        </Field>
+        {sender === 'other' && <Field label="Name of the person who read it"><input className="input" value={other} onChange={e => setOther(e.target.value)} /></Field>}
+        <button className="btn lg" disabled={busy} onClick={send}>{busy ? 'Saving…' : 'Save reading'}</button>
         {msg && <div className="msg">{msg}</div>}
       </div>
       <div>
         <div className="section">Readings{s.gauge ? '' : ' · sample until first sync'}</div>
         {rows.slice(0, 12).map((m, i) => (
           <div key={i} className="rowg">
-            <span><span className="mono" style={{ display: 'block', fontSize: 13.5 }}>"{m.text}"</span><span className="sub">{m.from} · {when(m.at)}</span></span>
+            <span><span className="mono" style={{ display: 'block', fontSize: 13.5 }}>"{m.text}"</span><span className="sub">{m.from} · {when(m.at)}{m.admin ? ` · ${adminLabel(m.admin)}` : ''}</span></span>
             <span className="it" style={{ fontSize: 12, textAlign: 'right', color: m.status === 'ok' ? 'var(--color-neutral-700)' : 'var(--color-accent-800)' }}>{m.status === 'bad' ? 'not understood' : m.status === 'ok' ? `accepted · ${m.v!.toFixed(2)} m` : 'held for admin'}</span>
           </div>
         ))}
@@ -200,8 +226,30 @@ export function Gauge() {
 }
 
 // ---- iii Pictures & voice ----
+// Icons a new word can use: the built-in task pictures plus the app's tab icons.
+const ICON_CHOICES: { id: string; label: string; d: string }[] = [
+  ...PICTO.map(([id, label, d]) => ({ id, label, d })),
+  { id: 'home', label: 'House', d: ICONS.home }, { id: 'map', label: 'Place', d: ICONS.map }, { id: 'season', label: 'Calendar', d: ICONS.season },
+  { id: 'guide', label: 'Book', d: ICONS.guide }, { id: 'market', label: 'Market', d: ICONS.market }
+];
+
 export function Voice() {
   const s = useApp();
+  const words = s.farm.words ?? [];
+  const tiles = [
+    ...PICTO.map(([k, l, d]) => ({ k, l, d, ar: '', din: '', custom: false })),
+    ...words.map(w => ({ k: w.id, l: w.name, d: (ICON_CHOICES.find(i => i.id === w.icon) ?? ICON_CHOICES[0]).d, ar: w.ar, din: w.din, custom: true }))
+  ];
+  const [adding, setAdding] = useState(false);
+  const [nw, setNw] = useState({ en: '', ar: '', din: '', icon: 'plant' });
+  const [wordErr, setWordErr] = useState('');
+  const saveWord = () => {
+    if (!nw.en.trim() || !nw.ar.trim() || !nw.din.trim()) return setWordErr('Write the word in English, Arabic and Dinka.');
+    if (tiles.some(t => t.l.toLowerCase() === nw.en.trim().toLowerCase())) return setWordErr('That word is already on the screen.');
+    farmChange({ op: 'upsert', kind: 'word', item: { id: newId('word'), name: nw.en.trim(), ar: nw.ar.trim(), din: nw.din.trim(), icon: nw.icon, by: s.session?.user.id ?? '' } });
+    setNw({ en: '', ar: '', din: '', icon: 'plant' }); setAdding(false); setWordErr('');
+  };
+  const shown = (t: (typeof tiles)[number]) => (s.lang === 'ar' && t.ar) || (s.lang === 'din' && t.din) || t.l;
   const [playing, setPlaying] = useState<string | null>(null);
   const [recording, setRecording] = useState(false);
   const [have, setHave] = useState<Record<string, boolean>>({});
@@ -212,13 +260,13 @@ export function Voice() {
   // A lead can replace any tile's drawing with a photo of the real task on this farm.
   useEffect(() => {
     let urls: string[] = [];
-    Promise.all(PICTO.map(async ([k]) => [k, await idbGet<Blob>(`picto-photo-${k}`).catch(() => undefined)] as const)).then(r => {
+    Promise.all(tiles.map(async ({ k }) => [k, await idbGet<Blob>(`picto-photo-${k}`).catch(() => undefined)] as const)).then(r => {
       const m: Record<string, string> = {};
       for (const [k, b] of r) if (b) { const u = URL.createObjectURL(b); urls.push(u); m[k] = u; }
       setPics(m);
     });
     return () => urls.forEach(URL.revokeObjectURL);
-  }, []);
+  }, [words.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const setPhoto = async (f: File) => {
     if (!playing) return;
     await idbSet(`picto-photo-${playing}`, f).catch(() => {});
@@ -226,7 +274,7 @@ export function Voice() {
   };
   const canLead = s.session?.user.role !== 'Extension worker';
 
-  useEffect(() => { Promise.all(PICTO.map(async ([k]) => [k, !!(await idbGet(`prompt-${k}`).catch(() => null))] as const)).then(r => setHave(Object.fromEntries(r))); }, []);
+  useEffect(() => { Promise.all(tiles.map(async ({ k }) => [k, !!(await idbGet(`prompt-${k}`).catch(() => null))] as const)).then(r => setHave(Object.fromEntries(r))); }, [words.length]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => { audio.current?.pause(); rec.current?.state === 'recording' && rec.current.stop(); }, []);
 
   const tap = async (k: string) => {
@@ -253,21 +301,38 @@ export function Voice() {
     } catch { setRecording(false); }
   };
 
-  const label = PICTO.find(p => p[0] === playing)?.[1];
+  const label = tiles.find(t => t.k === playing)?.l;
   const status = recording ? `Recording "${label}"… tap Stop when done` : playing ? (have[playing] ? `Playing "${label}" in Thuɔŋjäŋ · tap again to mark done` : `No recording for "${label}" yet · tap again to mark done`) : s.doneP.length ? `${s.doneP.length} done today, saved for your group` : 'Nothing playing';
   const bar = (on: string, off = '4px') => (playing && have[playing] ? on : off);
   return (
     <div className="pad g12" style={{ padding: '14px 16px 24px' }}>
       <div style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--color-neutral-800)' }}>Tap a picture to hear it in Thuɔŋjäŋ. Tap again to record that you did it today.</div>
       <div className="grid2">
-        {PICTO.map(([k, l, d]) => (
+        {tiles.map(t => { const { k, d } = t, l = shown(t); return (
           <button key={k} onClick={() => tap(k)} style={{ height: 128, border: `1.5px solid ${playing === k ? 'var(--color-accent)' : 'var(--color-divider)'}`, borderRadius: 'var(--radius-lg)', background: s.doneP.includes(k) ? 'var(--color-accent-100)' : 'transparent', color: 'var(--color-accent-900)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, position: 'relative' }}>
             {pics[k] ? <img src={pics[k]} alt={l} style={{ width: 84, height: 70, objectFit: 'cover', borderRadius: 'var(--radius-md)' }} /> : <Icon d={d} size={52} sw={1.3} />}
             <span style={{ fontSize: 12, color: 'var(--color-neutral-800)' }}>{l}</span>
+            {t.custom && <span dir="auto" style={{ fontSize: 10.5, color: 'var(--color-neutral-600)' }}>{[t.l, t.ar, t.din].filter(x => x && x !== l).join(' · ')}</span>}
             <span style={{ position: 'absolute', top: 8, right: 10, fontSize: 13, color: 'var(--color-accent-800)' }}>{s.doneP.includes(k) ? '✓' : ''}</span>
           </button>
-        ))}
+        ); })}
       </div>
+      {canLead && (adding ? (
+        <div className="box col g10" style={{ padding: 12 }}>
+          <h2 className="h2 h20">New word</h2>
+          <Field label="English"><input className="input" value={nw.en} placeholder="e.g. Sorting seed" onChange={e => { setNw({ ...nw, en: e.target.value }); setWordErr(''); }} /></Field>
+          <Field label="Arabic"><input className="input" dir="rtl" value={nw.ar} onChange={e => { setNw({ ...nw, ar: e.target.value }); setWordErr(''); }} /></Field>
+          <Field label="Dinka (Thuɔŋjäŋ)"><input className="input" value={nw.din} onChange={e => { setNw({ ...nw, din: e.target.value }); setWordErr(''); }} /></Field>
+          <div className="col g6">
+            <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Picture</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{ICON_CHOICES.map(i => <button key={i.id} className={'chip' + (nw.icon === i.id ? ' on' : '')} style={{ minHeight: 44, minWidth: 44, padding: '0 8px', color: 'var(--color-accent-900)' }} aria-label={i.label} onClick={() => setNw({ ...nw, icon: i.id })}><Icon d={i.d} size={26} sw={1.4} /></button>)}</div>
+            <div className="sub">After saving, tap the new tile, then Record or Photo, to add the spoken word and your own picture.</div>
+          </div>
+          {wordErr && <div className="msg">{wordErr}</div>}
+          <div className="grid2"><button className="btn plain" onClick={() => { setAdding(false); setWordErr(''); }}>Cancel</button><button className="btn" onClick={saveWord}>Save word</button></div>
+        </div>
+      ) : <button className="btn plain" onClick={() => setAdding(true)}>+ Add a word in three languages</button>)}
+      {playing && words.some(w => w.id === playing) && removeAllowed(s.session?.user.role ?? '') && !recording && <button className="link" style={{ alignSelf: 'flex-start' }} onClick={() => { farmChange({ op: 'remove', kind: 'word', id: playing }); setPlaying(null); }}>Remove this word</button>}
       <div style={{ minHeight: 44, display: 'flex', alignItems: 'center', gap: 10, borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)', padding: '8px 0' }}>
         <span style={{ display: 'flex', gap: 3, alignItems: 'flex-end', height: 20 }}>{[bar('18px'), bar('10px'), bar('20px'), bar('10px')].map((h, i) => <span key={i} style={{ width: 3, height: recording ? '14px' : h, background: 'var(--color-accent)' }} />)}</span>
         <span style={{ fontSize: 13, color: 'var(--color-neutral-800)', flex: 1 }}>{status}</span>
@@ -380,32 +445,37 @@ export function Payout() {
   const g = s.farm.groups.find(x => x.id === gid);
   const [absent, setAbsent] = useState<string[]>([]);
   const [sale, setSale] = useState({ buyer: 'Nile Botanicals (40 L oil)', amount: '540', fund: '15' });
-  const [who, setWho] = useState('');
+  const [fromG, setFromG] = useState('');
   const [msg, setMsg] = useState('');
   const members = g?.members ?? [];
+  // The roll-call day is taken from the phone's clock; a day already added to the work days is not added twice.
+  const day = new Date().toISOString().slice(0, 10);
+  const counted = g?.lastRoll === day;
   const present = (id: string) => !absent.includes(id);
-  const days = members.map(m => m.workDays + (present(m.id) ? 1 : 0)), tot = days.reduce((a, b) => a + b, 0) || 1;
+  const days = members.map(m => m.workDays + (present(m.id) && !counted ? 1 : 0)), tot = days.reduce((a, b) => a + b, 0) || 1;
   const amount = Number(sale.amount) || 0, fund = Math.round(amount * (Number(sale.fund) || 0)) / 100, pool = amount - fund;
   const share = (i: number) => pool * days[i] / tot;
-  const addMember = () => {
-    if (!g || !who.trim()) return;
-    farmChange({ op: 'upsert', kind: 'group', item: { ...g, members: [...g.members, { id: newId('m'), name: who.trim(), workDays: 0 }] } });
-    setWho('');
+  const put = (m: { name: string; personId?: string }) => {
+    if (!g || (m.personId && members.some(x => x.personId === m.personId))) return;
+    farmChange({ op: 'upsert', kind: 'group', item: { ...g, members: [...g.members, { id: newId('m'), name: m.name, workDays: 0, ...(m.personId ? { personId: m.personId } : {}) }] } });
   };
+  const addPerson = (id: string) => { const p = getState().farm.people?.find(x => x.id === id); if (p) put({ name: personName(p), personId: p.id }); };
   const approve = () => {
     if (!g) return;
     if (!(amount > 0)) return setMsg('Enter the sale amount.');
     const here = members.filter(m => present(m.id)).map(m => m.id);
-    if (can) farmChange({ op: 'workdays', groupId: g.id, memberIds: here });
-    record('payout', { group: g.name, sale: sale.buyer, amount, fundPct: Number(sale.fund) || 0, pool, shares: members.map((m, i) => ({ id: m.id, name: m.name, days: days[i], usd: Math.round(share(i) * 100) / 100 })) });
-    setMsg(`Approved. Today's roll-call is added to work days, and the mobile‑money list goes to the project office at the next sync.`);
+    if (can && !counted) farmChange({ op: 'workdays', groupId: g.id, memberIds: here, date: day });
+    record('payout', { group: g.name, date: day, rollCall: { at: new Date().toISOString(), present: here, absent: members.filter(m => !present(m.id)).map(m => m.id) }, sale: sale.buyer, amount, fundPct: Number(sale.fund) || 0, pool, shares: members.map((m, i) => ({ id: m.id, personId: m.personId ?? '', name: m.name, days: days[i], usd: Math.round(share(i) * 100) / 100 })) });
+    setMsg(counted ? `Approved. Today's roll-call was already added to work days, so it is not counted twice. The mobile‑money list goes to the project office at the next sync.` : `Approved. Today's roll-call is added to work days, and the mobile‑money list goes to the project office at the next sync.`);
     setAbsent([]);
   };
-  const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const date = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  const other = s.farm.groups.find(x => x.id === fromG);
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <Field label="Group"><select className="input" value={gid} onChange={e => { setGid(e.target.value); setAbsent([]); setMsg(''); }}>{s.farm.groups.map(x => <option key={x.id} value={x.id}>{x.name} · {x.members.length} members</option>)}</select></Field>
+      <Field label="Group"><select className="input" value={gid} onChange={e => { setGid(e.target.value); setAbsent([]); setMsg(''); setFromG(''); }}>{s.farm.groups.map(x => <option key={x.id} value={x.id}>{x.name} · {x.members.length} members</option>)}</select></Field>
       <div className="between"><div><div className="kick">{g?.name ?? '—'} · roll‑call {date}</div><div className="head" style={{ fontSize: 24 }}>{members.length - absent.filter(a => members.some(m => m.id === a)).length} of {members.length} present</div></div><button className="btn plain sm" onClick={() => setAbsent([])}>All present</button></div>
+      {counted && <div className="msg">Today's roll-call is already in the work days for this group.</div>}
       <div>
         <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 52px 64px', gap: 8 }} className="lbl rule-b"><span /><span>Member</span><span style={{ textAlign: 'right' }}>Days</span><span style={{ textAlign: 'right' }}>Share</span></div>
         {members.map((m, i) => (
@@ -415,9 +485,16 @@ export function Payout() {
         ))}
         {!members.length && <div className="note" style={{ padding: '8px 0' }}>No members in this group yet.</div>}
         {can && g && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, marginTop: 8 }}>
-            <input className="input" style={{ minHeight: 40 }} value={who} placeholder="Add a member to this group" onChange={e => setWho(e.target.value)} onKeyDown={e => e.key === 'Enter' && addMember()} />
-            <button className="btn md" style={{ padding: '0 12px' }} onClick={addMember}>Add</button>
+          <div className="col g8" style={{ marginTop: 8 }}>
+            <PersonSelect label="Add a member from the people list" value="" empty="Pick a person, or add a new one…" only={(s.farm.people ?? []).filter(p => !members.some(m => m.personId === p.id)).map(p => p.id)} onChange={id => id && addPerson(id)} />
+            <Field label="Or copy a member from another group">
+              <select className="input" value={fromG} onChange={e => setFromG(e.target.value)}><option value="">Choose a group…</option>{s.farm.groups.filter(x => x.id !== gid && x.members.length).map(x => <option key={x.id} value={x.id}>{x.name} · {x.members.length}</option>)}</select>
+            </Field>
+            {other && <Field label={`Member of ${other.name}`}>
+              <select className="input" value="" onChange={e => { const m = other.members.find(x => x.id === e.target.value); if (m) put(m); }}>
+                <option value="">Choose…</option>{other.members.filter(m => !m.personId || !members.some(x => x.personId === m.personId)).map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+              </select>
+            </Field>}
           </div>
         )}
       </div>

@@ -1,4 +1,5 @@
 // Shapes shared by the server and every client.
+import type { AdminLoc } from './farm';
 export type Role = 'Admin' | 'Group lead' | 'Extension worker';
 
 export interface PublicUser { id: string; name: string; role: Role; meta: string; on: boolean; expires: string }
@@ -35,7 +36,8 @@ export interface SatelliteIndices {
 export type SyncKind = 'task' | 'harvest' | 'monitor' | 'plot' | 'offer' | 'store' | 'payout' | 'voice' | 'pest' | 'alert';
 export interface SyncRecord { id: string; kind: SyncKind; at: string; by: string; data: Record<string, unknown> }
 
-export interface GaugeReading { from: string; text: string; at: string; v: number | null; status: 'ok' | 'held' | 'bad' }
+// from is who sent it (a name, or the phone it came from); admin is where the gauge is; by is the signed-in worker who entered it.
+export interface GaugeReading { from: string; text: string; at: string; v: number | null; status: 'ok' | 'held' | 'bad'; admin?: AdminLoc; by?: string }
 
 export interface Health { [integration: string]: { configured: boolean; missing: string[] } }
 

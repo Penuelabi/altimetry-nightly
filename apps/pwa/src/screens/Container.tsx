@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { CONTAINER_TYPES, newId, type ContainerLog, type ContainerType, type ContainerUnit } from '@abuk/core';
+import { CONTAINER_TYPES, adminLabel, groupPeople, newId, personById, personName, plotLabel, type AdminLoc, type ContainerLog, type ContainerType, type ContainerUnit } from '@abuk/core';
 import { farmChange, useApp } from '../store';
+import { AdminPicker, PersonSelect, useHereAdmin } from '../pickers';
 import { Field } from '../ui';
 
 const ACTIONS = [
@@ -14,13 +15,13 @@ const ACTIONS = [
 const VEGETABLES = ['Tomato', 'Okra', 'Kale', 'Spinach', 'Onion', 'Pepper', 'Eggplant', 'Amaranth', 'Jute mallow', 'Moringa leaf'];
 
 export function Container() {
-  const s = useApp();
+  const s = useApp(), here = useHereAdmin();
   const units = s.farm.containers ?? [];
   const logs = s.farm.containerLogs ?? [];
   const [sel, setSel] = useState(units[0]?.id ?? '');
   const [addUnit, setAddUnit] = useState(false);
   const [addLog, setAddLog] = useState(false);
-  const [uf, setUf] = useState({ code: '', type: 'sack' as ContainerType, crop: VEGETABLES[0], location: '', note: '' });
+  const [uf, setUf] = useState({ code: '', type: 'sack' as ContainerType, crop: VEGETABLES[0], location: '', note: '', groupId: '', personId: '', plotId: '', admin: here as AdminLoc });
   const [lf, setLf] = useState({ action: 'water' as ContainerLog['action'], qty: '', unit: '', pest: '', note: '' });
   const [err, setErr] = useState('');
 
@@ -30,7 +31,12 @@ export function Container() {
 
   const saveUnit = () => {
     if (!uf.code.trim() || !uf.crop.trim()) return setErr('Enter a code and crop.');
-    const u: ContainerUnit = { id: newId('ctn'), code: uf.code, type: uf.type, crop: uf.crop, plantedDate: new Date().toISOString().slice(0, 10), location: uf.location, ownerId: s.session?.user.id ?? '', ownerName: s.session?.user.name ?? '', note: uf.note };
+    if (!uf.groupId) return setErr('Choose the group this container belongs to.');
+    if (!uf.personId) return setErr('Choose the member who looks after it.');
+    if (!uf.plotId) return setErr('Choose the plot it belongs to.');
+    if (!uf.admin.state || !uf.admin.county || !uf.admin.payam) return setErr('Choose the state, county and payam.');
+    const owner = personById(s.farm, uf.personId);
+    const u: ContainerUnit = { id: newId('ctn'), code: uf.code, type: uf.type, crop: uf.crop, plantedDate: new Date().toISOString().slice(0, 10), location: uf.location, ownerId: uf.personId, ownerName: personName(owner), note: uf.note, groupId: uf.groupId, plotId: uf.plotId, admin: uf.admin };
     farmChange({ op: 'upsert', kind: 'container', item: u });
     setSel(u.id); setAddUnit(false); setErr('');
   };
@@ -60,7 +66,7 @@ export function Container() {
             <span><span className="kick sm" style={{ display: 'block' }}>{unit.code} · {unit.type}</span><span style={{ fontSize: 14 }}>{unit.crop}</span></span>
             <span style={{ textAlign: 'right' }}><span className="head num" style={{ display: 'block', fontSize: 24 }}>{totalHarvest > 0 ? `${totalHarvest} g` : '—'}</span><span className="it" style={{ fontSize: 11 }}>total harvest</span></span>
           </div>
-          <div className="sub" style={{ marginTop: 4 }}>Planted {unit.plantedDate} · {unit.ownerName}{unit.location ? ` · ${unit.location}` : ''}</div>
+          <div className="sub" style={{ marginTop: 4 }}>Planted {unit.plantedDate} · {unit.ownerName}{unit.groupId ? ` · ${s.farm.groups.find(g => g.id === unit.groupId)?.name ?? ''}` : ''}{unit.plotId ? ` · plot ${s.farm.plots.find(p => p.id === unit.plotId)?.code ?? ''}` : ''}{unit.admin ? ` · ${adminLabel(unit.admin)}` : ''}{unit.location ? ` · ${unit.location}` : ''}</div>
         </div>
       )}
 
@@ -115,8 +121,16 @@ export function Container() {
                 {VEGETABLES.map(v => <option key={v}>{v}</option>)}
               </select>
             </Field>
-            <Field label="Location"><input className="input" value={uf.location} placeholder="e.g. behind house" onChange={e => setUf({ ...uf, location: e.target.value })} /></Field>
+            <Field label="Spot"><input className="input" value={uf.location} placeholder="e.g. behind house" onChange={e => setUf({ ...uf, location: e.target.value })} /></Field>
           </div>
+          <Field label="Group">
+            <select className="input" value={uf.groupId} onChange={e => { const g = s.farm.groups.find(x => x.id === e.target.value); setUf({ ...uf, groupId: e.target.value, personId: '', admin: g?.admin ?? uf.admin }); setErr(''); }}>
+              <option value="">Choose…</option>{s.farm.groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+            </select>
+          </Field>
+          {uf.groupId && <PersonSelect label="Member who looks after it" value={uf.personId} only={groupPeople(s.farm, uf.groupId).length ? groupPeople(s.farm, uf.groupId).map(p => p.id) : undefined} onChange={id => { setUf({ ...uf, personId: id }); setErr(''); }} />}
+          <Field label="Plot"><select className="input" value={uf.plotId} onChange={e => { setUf({ ...uf, plotId: e.target.value }); setErr(''); }}><option value="">Choose…</option>{s.farm.plots.map(p => <option key={p.id} value={p.id}>{plotLabel(p, s.farm)}</option>)}</select></Field>
+          <AdminPicker value={uf.admin} onChange={admin => setUf({ ...uf, admin })} label="Where" />
           {err && <div className="msg" style={{ fontSize: 12 }}>{err}</div>}
           <div className="grid2">
             <button className="btn plain" onClick={() => { setAddUnit(false); setErr(''); }}>Cancel</button>

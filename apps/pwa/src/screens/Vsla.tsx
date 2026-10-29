@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { TOLLGATES, VSLA_TX_TYPES, newId, vslaBalance, type TollgateCheck, type TollgateGate, type TollgateRecord, type VslaGroup, type VslaTx, type VslaTxType } from '@abuk/core';
-import { farmChange, useApp } from '../store';
+import { TOLLGATES, VSLA_TX_TYPES, adminLabel, newId, personById, personName, vslaBalance, type AdminLoc, type TollgateCheck, type TollgateGate, type TollgateRecord, type VslaGroup, type VslaTx, type VslaTxType } from '@abuk/core';
+import { farmChange, getState, useApp } from '../store';
+import { AdminPicker, PersonSelect, useHereAdmin } from '../pickers';
 import { Check, Field } from '../ui';
 
 const TX_LABELS: Record<VslaTxType, string> = { savings: 'Savings deposit', loan: 'Loan taken', repayment: 'Loan repayment', interest: 'Interest earned', fine: 'Fine', 'social-fund': 'Social fund', 'share-out': 'Share-out' };
@@ -154,7 +155,7 @@ function TollgatePanel({ tollgates, vslaId, userId }: { tollgates: TollgateRecor
 }
 
 export function Vsla() {
-  const s = useApp();
+  const s = useApp(), here = useHereAdmin();
   const groups = s.farm.vslaGroups ?? [];
   const txs = s.farm.vslaTxs ?? [];
   const tollgates = s.farm.tollgates ?? [];
@@ -162,8 +163,8 @@ export function Vsla() {
   const [adding, setAdding] = useState(false);
   const [newGroup, setNewGroup] = useState(false);
   const [view, setView] = useState<'savings' | 'readiness'>('savings');
-  const [form, setForm] = useState({ type: 'savings' as VslaTxType, memberName: '', amount: '', note: '' });
-  const [gf, setGf] = useState({ name: '', cycle: '2026-S1', members: '', meetDay: 'Monday', shareValue: '', currency: 'SSP' });
+  const [form, setForm] = useState({ type: 'savings' as VslaTxType, memberName: '', memberId: '', amount: '', note: '' });
+  const [gf, setGf] = useState({ name: '', cycle: '2026-S1', meetDay: 'Monday', shareValue: '', currency: 'SSP', admin: here as AdminLoc, memberIds: [] as string[] });
   const [err, setErr] = useState('');
 
   const grp = groups.find(g => g.id === sel);
@@ -171,18 +172,23 @@ export function Vsla() {
   const history = txs.filter(t => t.vslaId === sel).sort((a, b) => b.date.localeCompare(a.date));
 
   const saveGroup = () => {
-    if (!gf.name.trim() || !gf.members || Number(gf.shareValue) <= 0) return setErr('Enter a name, member count and share value.');
-    const g: VslaGroup = { id: newId('vsla'), name: gf.name, cycle: gf.cycle, members: Number(gf.members), meetDay: gf.meetDay, shareValue: Number(gf.shareValue), currency: gf.currency };
+    if (!gf.name.trim() || Number(gf.shareValue) <= 0) return setErr('Enter a name and share value.');
+    if (!gf.admin.state || !gf.admin.county || !gf.admin.payam) return setErr('Choose the state, county and payam.');
+    if (gf.memberIds.length < 1) return setErr('Add at least one member from the list, or add a new person.');
+    const g: VslaGroup = { id: newId('vsla'), name: gf.name, cycle: gf.cycle, members: gf.memberIds.length, meetDay: gf.meetDay, shareValue: Number(gf.shareValue), currency: gf.currency, admin: gf.admin, memberIds: gf.memberIds };
     farmChange({ op: 'upsert', kind: 'vslaGroup', item: g });
     setSel(g.id); setNewGroup(false); setErr('');
+    setGf({ ...gf, name: '', memberIds: [] });
   };
 
   const saveTx = () => {
-    if (!form.memberName.trim() || Number(form.amount) <= 0) return setErr('Enter a member name and amount.');
+    const who = personById(s.farm, form.memberId);
+    const memberName = who ? personName(who) : form.memberName.trim();
+    if (!memberName || Number(form.amount) <= 0) return setErr('Choose the member and enter an amount.');
     if (!grp) return;
-    const tx: VslaTx = { id: newId('vtx'), vslaId: grp.id, date: new Date().toISOString().slice(0, 10), type: form.type, memberId: '', memberName: form.memberName, amount: Number(form.amount), balance: 0, by: s.session?.user.id ?? '', note: form.note };
+    const tx: VslaTx = { id: newId('vtx'), vslaId: grp.id, date: new Date().toISOString().slice(0, 10), type: form.type, memberId: form.memberId, memberName, amount: Number(form.amount), balance: 0, by: s.session?.user.id ?? '', note: form.note };
     farmChange({ op: 'upsert', kind: 'vslaTx', item: tx });
-    setForm({ ...form, amount: '', note: '' }); setAdding(false); setErr('');
+    setForm({ ...form, memberId: '', memberName: '', amount: '', note: '' }); setAdding(false); setErr('');
   };
 
   return (
@@ -220,7 +226,7 @@ export function Vsla() {
           <div className="box" style={{ padding: '12px 14px' }}>
             <div className="between"><span className="kick sm">Fund balance</span><span className="head num" style={{ fontSize: 28 }}>{bal.toLocaleString('en')} {grp.currency}</span></div>
             <div className="grid2" style={{ fontSize: 12.5, color: 'var(--color-neutral-700)', marginTop: 6 }}>
-              <span>{grp.members} members · {grp.meetDay}s</span>
+              <span>{grp.memberIds?.length ?? grp.members} members · {grp.meetDay}s{grp.admin ? ` · ${adminLabel(grp.admin)}` : ''}</span>
               <span style={{ textAlign: 'right' }}>Share: {grp.shareValue} {grp.currency}</span>
             </div>
           </div>
@@ -235,7 +241,9 @@ export function Vsla() {
                 </select>
               </Field>
               <div className="grid2">
-                <Field label="Member name"><input className="input" value={form.memberName} onChange={e => { setForm({ ...form, memberName: e.target.value }); setErr(''); }} /></Field>
+                {grp.memberIds?.length
+                  ? <Field label="Member"><select className="input" value={form.memberId} onChange={e => { setForm({ ...form, memberId: e.target.value }); setErr(''); }}><option value="">Choose…</option>{grp.memberIds.map(id => { const p = personById(s.farm, id); return p ? <option key={id} value={id}>{personName(p)}</option> : null; })}</select></Field>
+                  : <Field label="Member name"><input className="input" value={form.memberName} onChange={e => { setForm({ ...form, memberName: e.target.value }); setErr(''); }} /></Field>}
                 <Field label={`Amount (${grp.currency})`}><input className="input num" type="number" inputMode="decimal" value={form.amount} onChange={e => { setForm({ ...form, amount: e.target.value }); setErr(''); }} /></Field>
               </div>
               <textarea className="input" rows={2} placeholder="Note (optional)" value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} />
@@ -269,16 +277,23 @@ export function Vsla() {
           <Field label="Group name"><input className="input" value={gf.name} placeholder="e.g. Duk Women's VSLA" onChange={e => { setGf({ ...gf, name: e.target.value }); setErr(''); }} /></Field>
           <div className="grid2">
             <Field label="Cycle"><input className="input" value={gf.cycle} placeholder="2026-S1" onChange={e => setGf({ ...gf, cycle: e.target.value })} /></Field>
-            <Field label="Members"><input className="input num" type="number" value={gf.members} onChange={e => setGf({ ...gf, members: e.target.value })} /></Field>
-          </div>
-          <div className="grid2">
-            <Field label="Meeting day">
-              <select className="input" value={gf.meetDay} onChange={e => setGf({ ...gf, meetDay: e.target.value })}>
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => <option key={d}>{d}</option>)}
-              </select>
-            </Field>
             <Field label="Share value (SSP)"><input className="input num" type="number" value={gf.shareValue} onChange={e => setGf({ ...gf, shareValue: e.target.value })} /></Field>
           </div>
+          <Field label="Meeting day">
+            <select className="input" value={gf.meetDay} onChange={e => setGf({ ...gf, meetDay: e.target.value })}>
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => <option key={d}>{d}</option>)}
+            </select>
+          </Field>
+          <AdminPicker value={gf.admin} onChange={admin => setGf({ ...gf, admin })} label="Group meets in" />
+          <div className="section">Members · {gf.memberIds.length}</div>
+          {gf.memberIds.map(id => { const p = personById(s.farm, id); return (
+            <div key={id} className="rowg" style={{ alignItems: 'center', padding: '4px 0' }}>
+              <span><span style={{ display: 'block', fontSize: 14 }}>{personName(p)}</span><span className="sub">{p?.phone} · {adminLabel(p?.admin)}</span></span>
+              <button className="btn plain sm" onClick={() => setGf({ ...gf, memberIds: gf.memberIds.filter(x => x !== id) })}>Remove</button>
+            </div>
+          ); })}
+          <PersonSelect label="Add a member" value="" empty="Pick from the list, or add a new person…" only={(s.farm.people ?? []).filter(p => !gf.memberIds.includes(p.id)).map(p => p.id)}
+            onChange={id => { if (id && getState().farm.people?.some(p => p.id === id)) { setGf({ ...gf, memberIds: [...gf.memberIds, id] }); setErr(''); } }} />
           {err && <div className="msg" style={{ fontSize: 12 }}>{err}</div>}
           <div className="grid2">
             <button className="btn plain" onClick={() => { setNewGroup(false); setErr(''); }}>Cancel</button>

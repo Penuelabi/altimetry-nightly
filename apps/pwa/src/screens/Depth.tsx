@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react';
 import { WATER_TREND, adminLabel, basinDepth, recessDays, whereIs, zoneDepths, type AdminLoc } from '@abuk/core';
 import { record, setState, today, useApp } from '../store';
 import { oneFix, useOnline, type Fix } from '../net';
-import { AdminPicker, useHereAdmin } from '../pickers';
+import { AdminPicker, nowLocal, useHereAdmin } from '../pickers';
 import { Field, Seg } from '../ui';
 import { allChecks, useModel } from './common';
 
 const WATER: [string, string][] = [['flooded', 'Flooded'], ['receding', 'Receding'], ['ponding', 'Ponding'], ['waterlogged', 'Waterlogged'], ['none', 'Dry']];
-const nowLocal = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
 
 // Measured water depth. The flood model starts from these readings: no readings, no measured depth.
 export function Depth() {

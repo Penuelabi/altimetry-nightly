@@ -1,7 +1,7 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from '@hono/node-server/serve-static';
-import type { GaugeReading, Role, SyncRecord } from '@abuk/core';
+import type { AdminLoc, GaugeReading, Role, SyncRecord } from '@abuk/core';
 import { applyOps, editAllowed, normId, opAllowed, opError, parseGauge, seedRegister, seedStore, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
 import { cfg, health, missing, NotConfigured } from './config';
 import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, changeUsers, checkKey, checkPin, issueSession, loadUsers, makeUser, pinFields, readSession, toPublic, type Session } from './auth';
@@ -267,13 +267,14 @@ app.post('/api/sms/alert', auth(['Admin', 'Group lead']), async c => {
 });
 
 const GAUGE_PATH = 'data/gauge.json';
-async function recordGauge(from: string, text: string): Promise<GaugeReading> {
+async function recordGauge(from: string, text: string, extra: { at?: string; admin?: AdminLoc; by?: string } = {}): Promise<GaugeReading> {
   let reading: GaugeReading | null = null;
   await updateJson<GaugeReading[]>(GAUGE_PATH, [], `gauge reading from ${from.slice(-3)}`, list => {
     const last = list.find(r => r.status === 'ok')?.v ?? null;
     const v = parseGauge(text, last);
-    reading = { from, text, at: new Date().toISOString(), v: v.kind === 'bad' ? null : v.v, status: v.kind };
-    return [reading, ...list].slice(0, 2000);
+    reading = { from, text, at: extra.at ?? new Date().toISOString(), v: v.kind === 'bad' ? null : v.v, status: v.kind, ...(extra.admin ? { admin: extra.admin } : {}), ...(extra.by ? { by: extra.by } : {}) };
+    // Newest reading first, so a reading entered late for an earlier day still lands in date order.
+    return [reading, ...list].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 2000);
   });
   return reading!;
 }
@@ -292,8 +293,11 @@ app.post('/api/sms/inbound', async c => {
 
 // Gauge readings typed into the app by any signed-in worker (no SMS gateway needed).
 app.post('/api/gauge/test', auth(), async c => {
-  const { text = '' } = await c.req.json<{ text?: string }>();
-  const r = await recordGauge(c.get('me').name, text);
+  const { text = '', at, sender, admin } = await c.req.json<{ text?: string; at?: string; sender?: string; admin?: AdminLoc }>();
+  const when = at ? Date.parse(at) : Date.now();
+  if (isNaN(when) || when > Date.now() + 5 * 60_000 || when < Date.now() - 30 * 864e5) return c.json({ error: 'invalid', message: 'The reading date must be within the last 30 days and not in the future.' }, 400);
+  const place = admin && admin.state && admin.county && admin.payam ? { state: String(admin.state), county: String(admin.county), payam: String(admin.payam), village: String(admin.village ?? '') } : undefined;
+  const r = await recordGauge(String(sender ?? '').trim().slice(0, 60) || c.get('me').name, text, { at: new Date(when).toISOString(), admin: place, by: c.get('me').id });
   return c.json({ reading: r, reply: replyFor(r) });
 });
 

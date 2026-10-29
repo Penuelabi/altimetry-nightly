@@ -140,3 +140,5 @@ export function MultiPick({ items, value, onChange, label }: { items: { id: stri
 }
 
 export const placeText = adminLabel;
+// Now, in the form a datetime-local input wants (local time).
+export const nowLocal = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };

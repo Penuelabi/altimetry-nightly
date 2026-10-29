@@ -46,7 +46,8 @@ export function personError(p: Person): string {
 }
 
 export interface Member { id: string; name: string; workDays: number; personId?: string }
-export interface Group { id: string; name: string; lead: string; members: Member[]; admin?: AdminLoc }
+// lastRoll is the date (YYYY-MM-DD) of the last roll-call added to work days, so one day is never counted twice.
+export interface Group { id: string; name: string; lead: string; members: Member[]; admin?: AdminLoc; lastRoll?: string }
 // crops: other crops grown on the plot besides the main one (intercrops, borders).
 export interface Plot { id: string; code: string; zone: Zone; crop: string; crops?: string[]; groupId: string; holder: string; areaHa: number | null; boundary: { lat: number; lon: number }[]; notes: string; admin?: AdminLoc }
 // A traceable batch of any processed product. `bottles` is the number of units (bottles, packs, sacks).
@@ -202,7 +203,7 @@ export type FarmOp =
   | { op: 'upsert'; kind: 'person'; item: Person } | { op: 'upsert'; kind: 'word'; item: Word }
   | { op: 'upsert'; kind: 'subscriber'; item: Subscriber } | { op: 'upsert'; kind: 'waGroup'; item: WaGroup }
   | { op: 'remove'; kind: Kind; id: string }
-  | { op: 'workdays'; groupId: string; memberIds: string[] };
+  | { op: 'workdays'; groupId: string; memberIds: string[]; date?: string };
 
 type ListKey = 'crops' | 'groups' | 'plots' | 'batches' | 'runs' | 'stores' | 'items' | 'moves' | 'orders' | 'herds' | 'livestockEvents' | 'forestLogs' | 'fishLogs' | 'vslaGroups' | 'vslaTxs' | 'degradations' | 'containers' | 'containerLogs' | 'tollgates' | 'people' | 'words' | 'subscribers' | 'waGroups';
 const LIST: Record<Kind, ListKey> = {
@@ -218,7 +219,7 @@ export function applyOps(reg: Register, ops: FarmOp[], at = new Date().toISOStri
   let r = reg;
   for (const o of ops) {
     if (o.op === 'workdays') {
-      r = { ...r, groups: r.groups.map(g => g.id !== o.groupId ? g : { ...g, members: g.members.map(m => o.memberIds.includes(m.id) ? { ...m, workDays: m.workDays + 1 } : m) }) };
+      r = { ...r, groups: r.groups.map(g => g.id !== o.groupId || (o.date && g.lastRoll === o.date) ? g : { ...g, ...(o.date ? { lastRoll: o.date } : {}), members: g.members.map(m => o.memberIds.includes(m.id) ? { ...m, workDays: m.workDays + 1 } : m) }) };
       continue;
     }
     const key = LIST[o.kind];
