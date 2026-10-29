@@ -25,17 +25,18 @@ import { Vsla } from './screens/Vsla';
 import { Degradation } from './screens/Degradation';
 import { Container } from './screens/Container';
 import { Satellite } from './screens/Satellite';
+import { Readiness } from './screens/Readiness';
 
 const SCREENS: Record<Screen, () => ReactElement> = {
   home: Home, map: MapScreen, flood: Flood, season: Season, tasks: Tasks, plot: Plot, harvest: Harvest, process: Process, market: Market,
   guide: Guide, species: Species, monitor: Monitor, sources: Sources, signin: Account, admin: Admin, tools: Tools, alerts: Alerts,
   gauge: Gauge, voice: Voice, pest: Pest, payout: Payout, store: Store, trace: Trace, p2p: P2p, register: RegisterScreen, herd: Herd,
-  vsla: Vsla, degradation: Degradation, container: Container, satellite: Satellite
+  vsla: Vsla, degradation: Degradation, container: Container, satellite: Satellite, readiness: Readiness
 };
 
 // Which bottom tab lights up for screens reached from inside another tab (as in the design).
 const navKeyFor = (s: Screen): NavKey => {
-  if (['monitor', 'signin', 'admin', 'register', 'tools', 'alerts', 'gauge', 'voice', 'pest', 'payout', 'store', 'p2p', 'tasks', 'harvest', 'herd', 'vsla', 'degradation', 'container', 'satellite'].includes(s)) return 'home';
+  if (['monitor', 'signin', 'admin', 'register', 'tools', 'alerts', 'gauge', 'voice', 'pest', 'payout', 'store', 'p2p', 'tasks', 'harvest', 'herd', 'vsla', 'degradation', 'container', 'satellite', 'readiness'].includes(s)) return 'home';
   if (['flood', 'plot', 'sources'].includes(s)) return 'map';
   if (['trace', 'process'].includes(s)) return 'market';
   if (s === 'species') return 'guide';

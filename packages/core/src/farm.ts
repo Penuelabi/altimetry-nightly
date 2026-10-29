@@ -69,6 +69,47 @@ export type VslaTxType = typeof VSLA_TX_TYPES[number];
 export interface VslaGroup { id: string; name: string; cycle: string; members: number; meetDay: string; shareValue: number; currency: string }
 export interface VslaTx { id: string; vslaId: string; date: string; type: VslaTxType; memberId: string; memberName: string; amount: number; balance: number; by: string; note: string }
 
+// Micro-finance readiness tollgates — 5 gates from savings group to cooperative credit.
+export const TOLLGATES = [
+  { gate: 1, name: 'Learn', short: 'Group formed, saving, money controls in place',
+    programChecks: ['Group formed with elected leaders', 'Members saving regularly', 'Two keyholders for funds', 'Group records started'],
+    financeChecks: ['Opening savings recorded', 'Meeting schedule established', 'Share value agreed'] },
+  { gate: 2, name: 'Prove', short: 'Internal loans repaid, season records kept',
+    programChecks: ['Internal loans issued and tracked', 'All internal loans repaid on schedule', 'Season records complete', 'Loss records kept for flood/drought'],
+    financeChecks: ['Savings and repayment records for several seasons', 'Season scorecards completed', 'Loan purpose plans documented'] },
+  { gate: 3, name: 'Grow', short: 'Referred to lender, first micro-loan',
+    programChecks: ['Group referred to lender', 'Lender assessment completed', 'First loan purpose agreed by group', 'Climate-adapted practices in place'],
+    financeChecks: ['Savings buffers demonstrated', 'Reinvestment checked at season review', 'First loan disbursed'] },
+  { gate: 4, name: 'Lead', short: 'First loan repaid, graduates train new groups',
+    programChecks: ['First loan fully repaid', 'Graduates training new groups', 'Larger loan amounts available', 'Group governance strong'],
+    financeChecks: ['Full repayment record', 'Reinvestment verified', 'Second loan cycle started'] },
+  { gate: 5, name: 'Own', short: 'Cooperative-level credit, community-run',
+    programChecks: ['Cooperative formally registered', 'Community-run governance', 'Multiple loan cycles completed', 'Training programme self-sustaining'],
+    financeChecks: ['Cooperative credit facility', 'Independent financial management', 'Audit trail complete'] },
+] as const;
+
+export type TollgateGate = 1 | 2 | 3 | 4 | 5;
+
+export interface TollgateCheck {
+  check: string;
+  kind: 'program' | 'finance';
+  done: boolean;
+  date: string;
+  by: string;
+  note: string;
+}
+
+export interface TollgateRecord {
+  id: string;
+  vslaId: string;
+  gate: TollgateGate;
+  checks: TollgateCheck[];
+  passed: boolean;
+  passedDate: string;
+  by: string;
+  note: string;
+}
+
 // Land degradation assessment — the 8 indicators from the UoJ survey, scored per site visit.
 export const DEGRADATION_INDICATORS = [
   { id: 'topsoil', label: 'Loss of topsoil' },
@@ -96,9 +137,10 @@ export interface Register {
   vslaGroups?: VslaGroup[]; vslaTxs?: VslaTx[];
   degradations?: DegradationAssessment[];
   containers?: ContainerUnit[]; containerLogs?: ContainerLog[];
+  tollgates?: TollgateRecord[];
 }
 
-export type Kind = 'crop' | 'group' | 'plot' | 'batch' | 'run' | 'store' | 'item' | 'move' | 'order' | 'herd' | 'livestockEvent' | 'forestLog' | 'fishLog' | 'vslaGroup' | 'vslaTx' | 'degradation' | 'container' | 'containerLog';
+export type Kind = 'crop' | 'group' | 'plot' | 'batch' | 'run' | 'store' | 'item' | 'move' | 'order' | 'herd' | 'livestockEvent' | 'forestLog' | 'fishLog' | 'vslaGroup' | 'vslaTx' | 'degradation' | 'container' | 'containerLog' | 'tollgate';
 export type FarmOp =
   | { op: 'upsert'; kind: 'crop'; item: Crop } | { op: 'upsert'; kind: 'group'; item: Group } | { op: 'upsert'; kind: 'plot'; item: Plot }
   | { op: 'upsert'; kind: 'batch'; item: OilBatch } | { op: 'upsert'; kind: 'run'; item: ProcessRun }
@@ -109,14 +151,15 @@ export type FarmOp =
   | { op: 'upsert'; kind: 'vslaGroup'; item: VslaGroup } | { op: 'upsert'; kind: 'vslaTx'; item: VslaTx }
   | { op: 'upsert'; kind: 'degradation'; item: DegradationAssessment }
   | { op: 'upsert'; kind: 'container'; item: ContainerUnit } | { op: 'upsert'; kind: 'containerLog'; item: ContainerLog }
+  | { op: 'upsert'; kind: 'tollgate'; item: TollgateRecord }
   | { op: 'remove'; kind: Kind; id: string }
   | { op: 'workdays'; groupId: string; memberIds: string[] };
 
-type ListKey = 'crops' | 'groups' | 'plots' | 'batches' | 'runs' | 'stores' | 'items' | 'moves' | 'orders' | 'herds' | 'livestockEvents' | 'forestLogs' | 'fishLogs' | 'vslaGroups' | 'vslaTxs' | 'degradations' | 'containers' | 'containerLogs';
+type ListKey = 'crops' | 'groups' | 'plots' | 'batches' | 'runs' | 'stores' | 'items' | 'moves' | 'orders' | 'herds' | 'livestockEvents' | 'forestLogs' | 'fishLogs' | 'vslaGroups' | 'vslaTxs' | 'degradations' | 'containers' | 'containerLogs' | 'tollgates';
 const LIST: Record<Kind, ListKey> = {
   crop: 'crops', group: 'groups', plot: 'plots', batch: 'batches', run: 'runs', store: 'stores', item: 'items', move: 'moves', order: 'orders',
   herd: 'herds', livestockEvent: 'livestockEvents', forestLog: 'forestLogs', fishLog: 'fishLogs',
-  vslaGroup: 'vslaGroups', vslaTx: 'vslaTxs', degradation: 'degradations', container: 'containers', containerLog: 'containerLogs'
+  vslaGroup: 'vslaGroups', vslaTx: 'vslaTxs', degradation: 'degradations', container: 'containers', containerLog: 'containerLogs', tollgate: 'tollgates'
 };
 
 export const newId = (prefix: string) => `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -146,7 +189,7 @@ export const editAllowed = (role: string) => role === 'Admin' || role === 'Group
 export function opAllowed(role: string, o: FarmOp, reg: Register): boolean {
   if (o.op === 'remove') return removeAllowed(role);
   if (editAllowed(role)) return true;
-  if (o.op === 'upsert' && (o.kind === 'move' || o.kind === 'order' || o.kind === 'livestockEvent' || o.kind === 'forestLog' || o.kind === 'fishLog' || o.kind === 'vslaTx' || o.kind === 'degradation' || o.kind === 'containerLog')) return true;
+  if (o.op === 'upsert' && (o.kind === 'move' || o.kind === 'order' || o.kind === 'livestockEvent' || o.kind === 'forestLog' || o.kind === 'fishLog' || o.kind === 'vslaTx' || o.kind === 'degradation' || o.kind === 'containerLog' || o.kind === 'tollgate')) return true;
   if (o.op === 'upsert' && o.kind === 'crop') { const cur = reg.crops.find(c => c.id === o.item.id); return !!cur && cur.name === o.item.name; }
   return false;
 }
@@ -167,6 +210,7 @@ export function opError(o: FarmOp): string {
   if (o.op === 'upsert' && o.kind === 'degradation') return (o.item as DegradationAssessment).site?.trim() && Object.keys((o.item as DegradationAssessment).scores).length > 0 ? '' : 'a site and at least one indicator score are required';
   if (o.op === 'upsert' && o.kind === 'container') return (o.item as ContainerUnit).code?.trim() && (o.item as ContainerUnit).crop?.trim() ? '' : 'a code and crop are required';
   if (o.op === 'upsert' && o.kind === 'containerLog') return (o.item as ContainerLog).unitId?.trim() ? '' : 'a container unit is required';
+  if (o.op === 'upsert' && o.kind === 'tollgate') return (o.item as TollgateRecord).vslaId?.trim() && (o.item as TollgateRecord).gate >= 1 && (o.item as TollgateRecord).gate <= 5 ? '' : 'a VSLA group and valid gate (1-5) are required';
   if (o.kind === 'plot' || o.kind === 'batch' || o.kind === 'store' || o.kind === 'item') return it.code?.trim() ? '' : 'a code is required';
   return it.name?.trim() ? '' : 'a name is required';
 }
