@@ -153,7 +153,6 @@ async function computeSatIndices(lat: number, lon: number, radiusKm: number): Pr
   const now = new Date();
   const month = now.getMonth() + 1;
   const end = now.toISOString().slice(0, 10);
-  const d30ago = new Date(now.getTime() - 30 * 86400_000).toISOString().slice(0, 10);
 
   const [ndviRaw, histNdvi, precipRaw, pdsiRaw] = await Promise.all([
     // Current NDVI from latest MODIS MOD13A2 (16-day, 1 km)
@@ -168,21 +167,20 @@ async function computeSatIndices(lat: number, lon: number, radiusKm: number): Pr
     guard('VCI', async () => {
       const coll = fn('ImageCollection.load', { id: c('MODIS/061/MOD13A2') });
       const monthly = fn('Collection.filter', { collection: coll, filter: fn('Filter.calendarRange', { start: c(month), end: c(month), field: c('month') }) });
-      const ndviOnly = fn('ImageCollection.select', { collection: monthly, bandSelectors: c(['NDVI']) });
-      const minImg = fn('ImageCollection.reduce', { collection: ndviOnly, reducer: fn('Reducer.min', {}) });
-      const maxImg = fn('ImageCollection.reduce', { collection: ndviOnly, reducer: fn('Reducer.max', {}) });
-      const combined = fn('Image.addBands', { dstImg: minImg, srcImg: maxImg });
+      const range = fn('ImageCollection.reduce', { collection: monthly, reducer: fn('Reducer.minMax', {}) });
+      const combined = fn('Image.select', { input: range, bandSelectors: c(['NDVI_min', 'NDVI_max']) });
       const r = await eeCompute(meanAround(combined, lat, lon, radiusM, 1000));
       return { min: typeof r.NDVI_min === 'number' ? r.NDVI_min : null, max: typeof r.NDVI_max === 'number' ? r.NDVI_max : null };
     }, { min: null as number | null, max: null as number | null }),
 
-    // CHIRPS daily rainfall sum for last 30 days
+    // CHIRPS daily rainfall: sum of the 30 most recent days available (CHIRPS lags a few days)
     guard('Precip', async () => {
       const chirps = fn('ImageCollection.load', { id: c('UCSB-CHG/CHIRPS/DAILY') });
-      const recent = fn('Collection.filter', { collection: chirps, filter: fn('Filter.date', { start: c(d30ago), end: c(end) }) });
+      const recent = fn('Collection.limit', { collection: chirps, limit: c(30), key: c('system:time_start'), ascending: c(false) });
       const sumImg = fn('ImageCollection.reduce', { collection: recent, reducer: fn('Reducer.sum', {}) });
       const r = await eeCompute(meanAround(sumImg, lat, lon, radiusM, 5566));
-      return typeof r.precipitation_sum === 'number' ? Math.round(r.precipitation_sum * 10) / 10 : null;
+      const v = Object.values(r).find(x => typeof x === 'number');
+      return typeof v === 'number' ? Math.round(v * 10) / 10 : null;
     }, null as number | null),
 
     // TerraClimate PDSI (latest month, global 4 km) as SPEI proxy
