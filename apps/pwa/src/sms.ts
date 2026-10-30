@@ -15,3 +15,5 @@ export async function copyText(text: string): Promise<boolean> {
 // Straight to one person: their WhatsApp chat (number with country code, digits only) or a mail to their address.
 export const whatsappTo = (number: string, body: string) => `https://wa.me/${number.replace(/\D/g, '')}?text=${encodeURIComponent(body)}`;
 export const mailTo = (address: string, subject: string, body: string) => `mailto:${encodeURIComponent(address)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+// Gmail's compose page, opened as the chosen Gmail account (the admin presses Send there).
+export const gmailTo = (from: string, to: string, subject: string, body: string) => `https://mail.google.com/mail/?view=cm&fs=1&authuser=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

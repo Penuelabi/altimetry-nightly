@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import { pinMessage, type NewKeyResponse, type PinIssued, type PublicUser, type Role, type SignupRequest } from '@abuk/core';
 import { useApp } from '../store';
 import { BASE, api, explain } from '../api';
-import { copyText, mailTo, openLink, whatsappShare, whatsappTo } from '../sms';
+import { copyText, gmailTo, mailTo, openLink, whatsappShare, whatsappTo } from '../sms';
+
+// The Gmail account approval emails go from. Remembered on this phone.
+const FROM_KEY = 'abuk-mail-from', DEFAULT_FROM = 'penuelabi@gmail.com';
+const readFrom = () => { try { return localStorage.getItem(FROM_KEY) || DEFAULT_FROM; } catch { return DEFAULT_FROM; } };
 import { useOnline } from '../net';
 import { Field, Seg } from '../ui';
 
@@ -21,6 +25,7 @@ export function Admin() {
   const [issued, setIssued] = useState<(PinIssued & { reset: boolean }) | null>(null);
   const [pick, setPick] = useState<Record<string, { role: Role; exp: string }>>({});
   const [note, setNote] = useState('');
+  const [from, setFrom] = useState(readFrom);
 
   useEffect(() => {
     if (!online || !isAdmin) return;
@@ -67,7 +72,10 @@ export function Admin() {
   const text = issued ? pinMessage({ name: issued.user.name, id: issued.user.id, pin: issued.pin, url: BASE || location.origin, reset: issued.reset }) : '';
   const sendIssued = () => {
     if (!issued) return;
-    if (issued.kind === 'email' && issued.contact) openLink(mailTo(issued.contact, 'Your Abuk Project access', text));
+    if (issued.kind === 'email' && issued.contact) {
+      try { localStorage.setItem(FROM_KEY, from.trim()); } catch { /* remembering is optional */ }
+      openLink(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(from.trim()) ? gmailTo(from.trim(), issued.contact, 'Your Abuk Project access', text) : mailTo(issued.contact, 'Your Abuk Project access', text));
+    }
     else openLink(issued.contact ? whatsappTo(issued.contact, text) : whatsappShare(text));
   };
 
@@ -77,11 +85,16 @@ export function Admin() {
         <div className="card accent" style={{ padding: 14 }}>
           <div className="kick sm">{issued.reset ? 'New PIN' : 'Approved'} for {issued.user.name} · {issued.user.id} · shown once</div>
           <div className="head num" style={{ fontSize: 40, letterSpacing: '.2em' }}>{issued.pin}</div>
-          <div className="sub">Send it now, from your own {issued.kind === 'email' ? 'mail' : 'WhatsApp'}{issued.contact ? ` to ${issued.contact}` : ''}. The worker is asked to choose their own PIN at first sign-in. The server keeps only a hash.</div>
+          <div className="sub">Send it now, from your own {issued.kind === 'email' ? 'Gmail' : 'WhatsApp'}{issued.contact ? ` to ${issued.contact}` : ''}. The worker is asked to choose their own PIN at first sign-in. The server keeps only a hash.</div>
           <div className="grid2" style={{ gap: 8 }}>
-            <button className="btn md" onClick={sendIssued}>{issued.kind === 'email' && issued.contact ? 'Send by email' : 'Send on WhatsApp'}</button>
+            <button className="btn md" onClick={sendIssued}>{issued.kind === 'email' && issued.contact ? 'Send from Gmail' : 'Send on WhatsApp'}</button>
             <button className="btn plain md" onClick={async () => setNote((await copyText(text)) ? 'Message copied.' : 'Could not copy. Select the PIN and send it by hand.')}>Copy message</button>
           </div>
+          {issued.kind === 'email' && issued.contact && <>
+            <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Send from this Gmail account (you press Send in Gmail)</div>
+            <input className="input" style={{ minHeight: 40 }} type="email" inputMode="email" aria-label="Send from" value={from} onChange={e => setFrom(e.target.value)} />
+            <button className="link" style={{ alignSelf: 'flex-start', fontSize: 12.5 }} onClick={() => openLink(mailTo(issued.contact, 'Your Abuk Project access', text))}>Use this phone's mail app instead</button>
+          </>}
           <button className="link" style={{ alignSelf: 'flex-start' }} onClick={() => { setIssued(null); setNote(''); }}>Done, hide it</button>
         </div>
       )}
