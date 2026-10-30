@@ -4,7 +4,7 @@ import { go, openRegister, setState, signOut, startSession, useApp, type RosterE
 import { api, ApiFail, explain } from '../api';
 import { useOnline, usePlace } from '../net';
 import { Field, Seg } from '../ui';
-import { BUILD, NATIVE, applyNow, checkForUpdate, installApk, useUpdate } from '../update';
+import { APK_URL, BUILD, NATIVE, applyNow, checkForUpdate, installApk, isNative, useUpdate } from '../update';
 
 async function sha(text: string) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -30,6 +30,24 @@ const OTHER = '__other__';
 // The link /join (or #join) opens the sign-up form directly.
 const joinLink = () => /^\/join\/?$/.test(location.pathname) || location.hash === '#join';
 const leaveJoin = () => { if (joinLink()) history.replaceState(null, '', '/'); };
+
+// On the web page only (the Android app has no use for it): where to get the app and how to install it.
+function GetTheApp() {
+  if (isNative()) return null;
+  return (
+    <div className="box col g8" style={{ padding: 14 }}>
+      <div className="kick sm">Get the Android app</div>
+      <div style={{ fontSize: 13.5, lineHeight: 1.45 }}>The app works without signal and sends your records when the phone is online.</div>
+      <a className="btn lg" href={APK_URL} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>Download the app (APK)</a>
+      <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13, lineHeight: 1.45 }}>
+        <li>Tap Download and wait for the file (abuk-project-latest.apk).</li>
+        <li>Open the file. If Android asks, allow "Install unknown apps" for your browser, then tap Install.</li>
+        <li>Open Abuk Project and sign in with your name and PIN.</li>
+      </ol>
+      <div className="sub">iPhone or computer: keep using this web page. In your browser's menu choose "Add to Home screen" to put it on your phone.</div>
+    </div>
+  );
+}
 
 // Anyone can ask for access with an email address or a WhatsApp number. An admin approves it and sends back a worker ID and a PIN.
 function RequestAccess({ onBack }: { onBack: () => void }) {
@@ -73,6 +91,7 @@ function RequestAccess({ onBack }: { onBack: () => void }) {
         <button className="link" style={{ alignSelf: 'flex-start' }} onClick={onBack}>Back to sign in</button>
         <div className="note">Your contact is only seen by the project admins and is used to send you your PIN.</div>
       </>}
+      <GetTheApp />
     </div>
   );
 }
@@ -156,6 +175,7 @@ export function SignIn() {
       {err && <div className="msg">{err}</div>}
       <div className="note" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>The access key from your admin is needed once. Then use your PIN: it works on any phone with signal, and offline on phones you have used before. 5 wrong PINs lock PIN sign‑in for 15 minutes.</div>
       <button className="link" style={{ alignSelf: 'flex-start' }} onClick={() => setRequesting(true)}>New here? Ask for access</button>
+      <GetTheApp />
       {(import.meta.env.DEV || import.meta.env.VITE_DEMO === '1') && <button className="link" onClick={demo}>Open demo with sample data (test build)</button>}
     </div>
   );
