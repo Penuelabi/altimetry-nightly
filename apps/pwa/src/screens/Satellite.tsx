@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { payamAt, type SatelliteIndices } from '@abuk/core';
+import { countiesOf, listPayams, payamAt, payamByCode, payamsOf, statesList, type SatelliteIndices } from '@abuk/core';
 import { api } from '../api';
 import { usePlace } from '../net';
 import { setState, useApp } from '../store';
+import { Field } from '../ui';
+import { PlaceRecords, type Sel } from './PlaceRecords';
 
 const Z_BANDS = (dry: string, wet: string) => [
   { max: -2, label: `Extreme ${dry}`, color: '#a02018' },
@@ -52,38 +54,73 @@ function fmtVal(key: string, v: number | null, unit: string) {
   return `${v > 0 && key !== 'ndvi' ? '+' : ''}${v}`;
 }
 
+// Values already fetched for other payams in this session (the phone keeps only the one at its own GPS position).
+const fetched = new Map<string, SatelliteIndices>();
+
 export function Satellite() {
   const s = useApp();
   const place = usePlace();
-  const area = useMemo(() => payamAt(place.lat, place.lon), [place.lat, place.lon]);
+  const gpsArea = useMemo(() => payamAt(place.lat, place.lon), [place.lat, place.lon]);
+  // null means "follow the phone's GPS"; picking a state, county and payam looks at that place instead.
+  const [pick, setPick] = useState<Sel | null>(null);
+  const sel: Sel = pick ?? { state: gpsArea?.state ?? '', county: gpsArea?.county ?? '', payam: gpsArea?.payam ?? '' };
+  const area = useMemo(() => {
+    if (!pick) return gpsArea;
+    const p = listPayams().find(x => x.state === pick.state && x.county === pick.county && x.payam === pick.payam);
+    return p ? payamByCode(p.pcode) : null;
+  }, [pick?.state, pick?.county, pick?.payam, gpsArea?.pcode]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const today = new Date().toISOString().slice(0, 10);
-  const mine = s.satIndices && area && s.satIndices.pcode === area.pcode ? s.satIndices : null;
+  const stored = area ? (s.satIndices?.pcode === area.pcode ? s.satIndices : fetched.get(area.pcode) ?? null) : null;
+  const mine = stored;
+  const away = !!pick;
 
   const refresh = async () => {
-    if (!area) return setErr('Your GPS position is outside the payam boundaries, so there is nothing to average over.');
+    if (!area) return setErr(away ? 'Choose a payam to get satellite values.' : 'Your GPS position is outside the payam boundaries, so there is nothing to average over.');
     if (!s.session || s.session.demo) return setErr('Sign in to fetch live satellite data.');
     setBusy(true); setErr('');
     try {
       const r = await api<SatelliteIndices>(`/api/sources/satellite?pcode=${area.pcode}`);
-      setState({ satIndices: r });
+      fetched.set(area.pcode, r);
+      if (!away) setState({ satIndices: r });
+      else setState({}); // re-render
       if (r.errors.length) setErr(r.errors.join('; '));
     } catch (e) { setErr((e as Error).message); }
     finally { setBusy(false); }
   };
 
-  // Fetch on opening, and again when the phone moves into another payam or the stored values are from an earlier day.
+  // Fetch on opening, and again when the phone moves into another payam, another place is chosen, or the values are from an earlier day.
   useEffect(() => {
     if (area && s.session && !s.session.demo && (!mine || mine.asOf !== today)) void refresh();
   }, [area?.pcode, !!s.session]);
 
+  const states = statesList(), counties = sel.state ? countiesOf(sel.state) : [], payams = sel.state && sel.county ? payamsOf(sel.state, sel.county) : [];
+  const choose = (next: Sel) => { setPick(next); setErr(''); };
+
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <div className="box" style={{ padding: '10px 14px' }}>
-        <div className="kick sm">Payam at your GPS position</div>
-        <div className="head" style={{ fontSize: 22 }}>{area ? area.payam : 'Outside the boundaries'}</div>
-        <div className="sub">{area ? `${area.county} county, ${area.state} · ${area.areaKm2.toLocaleString('en')} km²` : 'Move into a South Sudan payam to see values.'}</div>
+      <div className="box col g8" style={{ padding: '10px 14px' }}>
+        <div className="between"><span className="kick sm">{away ? 'Place you are looking at' : 'Payam at your GPS position'}</span>{away && <button className="btn plain sm" onClick={() => { setPick(null); setErr(''); }}>Back to my location</button>}</div>
+        <div className="head" style={{ fontSize: 22 }}>{sel.payam || (sel.county ? `${sel.county} county` : sel.state) || 'Outside the boundaries'}</div>
+        <div className="sub">{area ? `${area.county} county, ${area.state} · ${area.areaKm2.toLocaleString('en')} km²` : away ? 'Choose a payam to see satellite values; records below show for what you picked.' : 'Move into a South Sudan payam to see values, or pick a place below.'}</div>
+        <div className="grid2">
+          <Field label="State">
+            <select className="input" value={sel.state} onChange={e => choose({ state: e.target.value, county: '', payam: '' })}>
+              <option value="">All</option>{states.map(x => <option key={x}>{x}</option>)}
+            </select>
+          </Field>
+          <Field label="County">
+            <select className="input" value={sel.county} disabled={!sel.state} onChange={e => choose({ ...sel, county: e.target.value, payam: '' })}>
+              <option value="">All</option>{counties.map(x => <option key={x}>{x}</option>)}
+            </select>
+          </Field>
+        </div>
+        <Field label="Payam">
+          <select className="input" value={sel.payam} disabled={!sel.county} onChange={e => choose({ ...sel, payam: e.target.value })}>
+            <option value="">All</option>{payams.map(x => <option key={x}>{x}</option>)}
+          </select>
+        </Field>
       </div>
 
       <p className="body" style={{ fontSize: 13, color: 'var(--color-neutral-800)' }}>
@@ -121,13 +158,15 @@ export function Satellite() {
       )}
 
       {mine && <div className="sub" style={{ textAlign: 'center' }}>Data as of {mine.asOf} · {mine.payam} payam</div>}
-      {!mine && s.satIndices && area && <div className="sub" style={{ textAlign: 'center' }}>Showing nothing for {area.payam} yet; the last fetch was for {s.satIndices.payam}.</div>}
+      {!mine && area && <div className="sub" style={{ textAlign: 'center' }}>No satellite values for {area.payam} yet.</div>}
 
       {err && <div className="msg" style={{ fontSize: 12 }}>{err}</div>}
 
       <button className="btn lg" onClick={refresh} disabled={busy || !area}>
         {busy ? 'Fetching from Earth Engine…' : mine ? 'Refresh indices' : 'Fetch satellite data'}
       </button>
+
+      <PlaceRecords sel={sel} area={area} floodPct={mine?.floodPct ?? null} />
 
       <div className="col g6" style={{ marginTop: 4 }}>
         <div className="section">About these indices</div>

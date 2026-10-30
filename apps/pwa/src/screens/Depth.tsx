@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { WATER_TREND, adminLabel, basinDepth, recessDays, whereIs, zoneDepths, type AdminLoc } from '@abuk/core';
+import { WATER_TREND, adminLabel, basinDepth, listPayams, payamByCode, recessDays, whereIs, zoneDepths, type AdminLoc } from '@abuk/core';
 import { record, setState, today, useApp } from '../store';
-import { oneFix, useOnline, type Fix } from '../net';
+import { oneFix, useOnline, usePlace, type Fix } from '../net';
 import { AdminPicker, nowLocal, useHereAdmin } from '../pickers';
 import { Field, Seg } from '../ui';
 import { allChecks, useModel } from './common';
@@ -10,7 +10,7 @@ const WATER: [string, string][] = [['flooded', 'Flooded'], ['receding', 'Recedin
 
 // Measured water depth. The flood model starts from these readings: no readings, no measured depth.
 export function Depth() {
-  const s = useApp(), online = useOnline(), model = useModel(), here = useHereAdmin();
+  const s = useApp(), online = useOnline(), model = useModel(), here = useHereAdmin(), where = usePlace();
   const [zone, setZone] = useState<'basin' | 'slope' | 'ridge'>('basin');
   const [plot, setPlot] = useState('');
   const [admin, setAdmin] = useState<AdminLoc>(here);
@@ -48,12 +48,19 @@ export function Depth() {
     const when = new Date(at);
     if (isNaN(+when) || +when > Date.now() + 3600_000) return setErr('The date and time must not be in the future.');
     const depthCm = water === 'none' ? 0 : depth;
+    // The model only uses readings that have a position: the GPS fix, else the phone's last known place when the reading is for
+    // the payam it is in, else the middle of the payam that was chosen.
+    const pa = listPayams().find(x => x.state === admin.state && x.county === admin.county && x.payam === admin.payam);
+    const area = pa ? payamByCode(pa.pcode) : null;
+    const ring = area?.polygons[0]?.[0] ?? [];
+    const mid = ring.length ? { lat: ring.reduce((n, q) => n + q[1], 0) / ring.length, lon: ring.reduce((n, q) => n + q[0], 0) / ring.length } : null;
+    const at0 = fix && (!pa || whereIs(fix.lat, fix.lon)?.pcode === pa.pcode) ? { lat: fix.lat, lon: fix.lon } : admin.payam === where.payam && admin.county === where.county ? { lat: where.lat, lon: where.lon } : mid;
     const rid = record('monitor', {
       plot: label, crop: '', acts: ['Water depth'], ew: s.session?.user.id ?? '', date: at.slice(0, 10), stampedAt: when.toISOString(),
-      gps: fix && { lat: fix.lat, lon: fix.lon, acc: fix.acc }, place: admin, zone: p ? p.zone : zone, measuredBy: by.trim(), source: 'depth-form', notes: note,
+      gps: at0 && { lat: at0.lat, lon: at0.lon, acc: fix && at0.lat === fix.lat ? fix.acc : null }, place: admin, zone: p ? p.zone : zone, measuredBy: by.trim(), source: 'depth-form', notes: note,
       condition: { water, floodDepthCm: String(depthCm), trend, moisture: '', around: '', aroundDepthCm: '', aroundDistanceM: '', surface: [], crackWidth: '' }
     });
-    setState(st => ({ monLog: [{ plot: label, crop: '', acts: 'Water depth', ew: s.session?.user.id ?? '', date: today(), cond: 3, synced: false, rid, field: `${water}${depthCm ? ` ${depthCm} cm` : ''}`, at: when.toISOString(), ...(fix ? { lat: fix.lat, lon: fix.lon } : {}), water, depthCm, around: '', aroundDepthCm: null, trend }, ...st.monLog].slice(0, 300) }));
+    setState(st => ({ monLog: [{ plot: label, crop: '', acts: 'Water depth', ew: s.session?.user.id ?? '', date: today(), cond: 3, synced: false, rid, field: `${water}${depthCm ? ` ${depthCm} cm` : ''}`, at: when.toISOString(), ...(at0 ? { lat: at0.lat, lon: at0.lon } : {}), water, depthCm, around: '', aroundDepthCm: null, trend }, ...st.monLog].slice(0, 300) }));
     setSaved(`Saved: ${label}, ${depthCm} cm. The flood model now starts from this reading.`);
     setCm(''); setNote(''); setErr('');
   };
