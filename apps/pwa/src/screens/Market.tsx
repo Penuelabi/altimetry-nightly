@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { LISTINGS, PROC, chainFor, editAllowed } from '@abuk/core';
+import { PROC, chainFor, editAllowed } from '@abuk/core';
 import { runProduct } from './Register';
-import { go, openRegister, record, setState, tab, useApp } from '../store';
+import { openRegister, tab, useApp } from '../store';
 
 export function Process() {
   const s = useApp();
@@ -36,42 +36,4 @@ export function Process() {
   );
 }
 
-export function Market() {
-  const s = useApp();
-  const [note, setNote] = useState('');
-  const msg = s.offer === 'accepted' ? 'Accepted. Pickup booked for 3 Nov at Bor; Group 4 lead notified.' : s.offer === 'countered' ? 'Counter sent at $14.00 / L. Waiting for reply.' : '';
-  const answer = (offer: 'accepted' | 'countered') => { setState({ offer }); record('offer', { buyer: 'Nile Botanicals', litres: 40, price: offer === 'accepted' ? 13.5 : 14, answer: offer }); };
-  return (
-    <div className="pad">
-      <div>
-        <div className="kick muted">Cooperative sales · 2026 season</div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}><span className="head num" style={{ fontSize: 42 }}>{s.offer === 'accepted' ? '$19,180' : '$18,640'}</span><span style={{ fontSize: 12.5, color: 'var(--color-accent-700)' }}>shared across 160 farmers</span></div>
-      </div>
-      {s.offer === 'open' && (
-        <div className="card accent">
-          <div className="kick">New offer · Juba</div>
-          <div style={{ fontSize: 14, lineHeight: 1.45 }}>Nile Botanicals asks for <strong style={{ fontWeight: 600 }}>40 L Balanites oil</strong> at $13.50 / L, collected at Bor.</div>
-          <div className="grid2" style={{ gap: 8 }}>
-            <button className="btn plain md" onClick={() => answer('countered')}>Counter</button>
-            <button className="btn md" onClick={() => answer('accepted')}>Accept · $540</button>
-          </div>
-        </div>
-      )}
-      {msg && <div className="it" style={{ fontSize: 13, color: 'var(--color-accent-800)', borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)', padding: '8px 0' }}>{msg}</div>}
-      <div>
-        <h2 className="h2 h20 rule" style={{ marginBottom: 2 }}>Our listings</h2>
-        {LISTINGS.map(l => (
-          <div key={l.name} className="rowg" style={{ padding: '10px 0' }}>
-            <span><span style={{ display: 'block', fontSize: 14 }}>{l.name}</span><span className="sub">{l.stock} in stock · {l.offers}</span></span>
-            <span style={{ textAlign: 'right' }}><span className="head num" style={{ display: 'block', fontSize: 20 }}>{l.price}</span><span style={{ fontSize: 11, color: 'var(--color-neutral-700)' }}>{l.unit}</span></span>
-          </div>
-        ))}
-      </div>
-      {note && <div className="msg">{note}</div>}
-      <div className="grid2">
-        <button className="btn plain" onClick={() => go('process')}>Stock & processing</button>
-        <button className="btn" onClick={() => setNote('Listing new produce opens once the buyer marketplace is connected. Offers from buyers already arrive here.')}>List produce</button>
-      </div>
-    </div>
-  );
-}
+export { Market } from './MarketBoard';

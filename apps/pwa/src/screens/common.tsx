@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { basinDepth, fitModel, greeting, haversineKm, MOUNDS, T, type Model, type PullResult } from '@abuk/core';
+import { ZONES, autoTasks, basinDepth, fitModel, greeting, haversineKm, MOUNDS, T, zoneDepths, zoneSummary, type FarmTask, type Model, type PullResult, type ZoneKey } from '@abuk/core';
 import { api } from '../api';
 import { useOnline, usePlace } from '../net';
 import { fetchWeather, lastWeather, type Weather } from '../weather';
-import { getState, record, setState, useApp, type State } from '../store';
+import { farmChange, getState, go, record, setState, useApp, type State } from '../store';
 
 export function toggleTask(id: number) {
   let done = false;
@@ -20,8 +20,16 @@ export const useGreet = () => {
 };
 
 // Mound line colours on the map diagrams: grey when the crest is under water.
-export const moundLines = (ys: number[], depth = basinDepth(0)) =>
-  ys.map((y, i) => ({ y, c: MOUNDS[i][1] < depth ? 'var(--color-neutral-600)' : 'var(--color-accent)' }));
+export const moundLines = (ys: number[], depth = basinDepth(0), mounds: [string, number][] = MOUNDS) =>
+  ys.flatMap((y, i) => (mounds[i] ? [{ y, c: mounds[i][1] < depth ? 'var(--color-neutral-600)' : 'var(--color-accent)' }] : []));
+
+// The mound rows the flood model checks: the surveyed rows in the shared register, else the design survey it started with.
+export function useMounds(): { rows: [string, number][]; surveyed: boolean; note: string } {
+  const m = useApp().farm.mounds ?? [];
+  if (!m.length) return { rows: MOUNDS, surveyed: false, note: 'Crest heights are the design survey the app started with. A group lead or admin can enter the measured heights below.' };
+  const latest = [...m].filter(x => x.surveyedAt).sort((a, b) => b.surveyedAt.localeCompare(a.surveyedAt))[0];
+  return { rows: m.map(x => [x.id, x.crest] as [string, number]), surveyed: true, note: latest ? `Crest heights entered in the app, last updated ${latest.surveyedAt}${latest.by ? ` by ${latest.by}` : ''}.` : 'Crest heights from the shared register.' };
+}
 
 export const basinOpacity = (depth = basinDepth(0)) => (depth / 1.2 * 0.6).toFixed(2);
 
@@ -59,4 +67,41 @@ export function useHereData() {
     }
   }, [online, place.gps, Math.round(place.lat * 100), Math.round(place.lon * 100)]); // eslint-disable-line react-hooks/exhaustive-deps
   return { weather, sat: s.satHere };
+}
+
+// ---- Home: today's work and zones, built from the shared register and from what has been recorded ----
+const todayStr = () => new Date().toISOString().slice(0, 10);
+export interface TaskItem { key: string; title: string; zone: string; who: string; due: string; done: boolean; auto: boolean; why: string; tick: () => void; reg?: FarmTask }
+
+// Live phones: the shared task list plus jobs that are due because nothing has been recorded lately. The demo keeps its sample list.
+export function useTasks(): { items: TaskItem[]; today: TaskItem[]; open: number } {
+  const s = useApp(), model = useModel();
+  const day = todayStr();
+  if (s.session?.demo || !s.session) {
+    const items = s.tasks.map(x => ({ key: `demo-${x.id}`, title: x.t, zone: x.zone, who: x.who, due: x.due === 'today' ? day : '', done: x.done, auto: false, why: 'sample task', tick: () => toggleTask(x.id) }));
+    return { items, today: items.filter(x => x.due === day), open: items.filter(x => !x.done).length };
+  }
+  const reg = (s.farm.tasks ?? []).map(x => ({
+    key: x.id, title: x.title, zone: x.zone, who: x.who, due: x.due, done: x.done, auto: false, why: `added by ${x.by}`, reg: x,
+    tick: () => farmChange({ op: 'upsert', kind: 'task', item: { ...x, done: !x.done, ...(x.done ? { doneAt: undefined, doneBy: undefined } : { doneAt: new Date().toISOString(), doneBy: s.session?.user.id ?? '' }) } })
+  }));
+  const go2 = (id: string) => (id === 'auto-gauge' ? () => go('gauge') : id === 'auto-depth' ? () => go('depth') : () => go('monitor'));
+  const auto = autoTasks({ now: new Date(), plots: s.farm.plots, checks: allChecks(s), gauge: s.gauge ?? [], depthMeasured: model.measured })
+    .map(a => ({ key: a.id, title: a.title, zone: a.zone, who: 'anyone', due: day, done: false, auto: true, why: a.why, tick: go2(a.id) }));
+  const items: TaskItem[] = [...reg.sort((a, b) => a.due.localeCompare(b.due)), ...auto];
+  // Today: everything due today or earlier that is open, and what was ticked today.
+  const today = items.filter(x => (x.due <= day && !x.done) || (x.done && x.reg?.doneAt?.slice(0, 10) === day));
+  return { items, today, open: items.filter(x => !x.done).length };
+}
+
+export interface ZoneRow { n: string; key: ZoneKey; name: string; ha: string; crops: string; status: string; source: string }
+// The three zones as the register and the flood model describe them: plots and area registered in each, and the water depth now.
+export function useZoneRows(): ZoneRow[] {
+  const s = useApp(), model = useModel(), d = zoneDepths(model);
+  return ZONES.map(z => {
+    const sum = zoneSummary(s.farm, z.key);
+    const ha = sum.mapped ? `${sum.ha} ha` : `${sum.plots} plot${sum.plots === 1 ? '' : 's'}`;
+    const water = z.key === 'ridge' ? 'dry' : `${d[z.key].toFixed(2)} m water${model.measured ? '' : ' · example'}`;
+    return { n: z.n, key: z.key, name: z.name, ha, crops: sum.crops.join(', ') || 'no plots registered', status: water, source: `${sum.plots} registered plot${sum.plots === 1 ? '' : 's'}${sum.mapped < sum.plots ? `, ${sum.mapped} with a mapped area` : ''}` };
+  });
 }

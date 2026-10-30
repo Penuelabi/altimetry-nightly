@@ -11,7 +11,9 @@ export const RATE = 0.025;
 export const SLOPE_STEP = 0.70;
 export const CREST = 1.0;
 
-export interface Model { d0: number; rate: number; d0Src: string; rateSrc: string; measured: boolean }
+// used says what the fit rests on: the plots read, how many readings, how near, and whether the river gauge set the fall rate.
+export interface ModelBasis { plots: string[]; readings: number; radiusKm: number; gauge: boolean }
+export interface Model { d0: number; rate: number; d0Src: string; rateSrc: string; measured: boolean; used?: ModelBasis }
 export const DEFAULT_MODEL: Model = { d0: D0, rate: RATE, d0Src: 'design example (no depth measured nearby yet)', rateSrc: 'design assumption, 2.5 cm a day', measured: false };
 
 export const basinDepth = (day: number, m: Pick<Model, 'd0' | 'rate'> = DEFAULT_MODEL) => Math.min(2, Math.max(0, m.d0 - m.rate * day));
@@ -30,8 +32,8 @@ export type MoundState = 'submerged' | 'risk' | 'clear';
 export const moundState = (crest: number, depth: number): MoundState =>
   crest < depth ? 'submerged' : crest - depth < 0.08 ? 'risk' : 'clear';
 
-export function moundRows(depth: number, m: Pick<Model, 'd0' | 'rate'> = DEFAULT_MODEL) {
-  return MOUNDS.map(([id, h]) => {
+export function moundRows(depth: number, m: Pick<Model, 'd0' | 'rate'> = DEFAULT_MODEL, mounds: [string, number][] = MOUNDS) {
+  return mounds.map(([id, h]) => {
     const st = moundState(h, depth);
     const clearIn = m.rate > 0 ? Math.ceil((m.d0 - h) / m.rate) : null;
     return {
@@ -106,5 +108,6 @@ export function fitModel(obs: DepthObs[], gauge: GaugeObs[], at: { lat: number; 
   }
   // Bring the measured depth forward from the day it was read to today.
   if (d0At) d0 = Math.max(0, d0 - rate * days(now.toISOString(), d0At));
-  return { d0, rate, d0Src, rateSrc, measured };
+  const gaugeUsed = !slopes.length && rateSrc !== DEFAULT_MODEL.rateSrc;
+  return { d0, rate, d0Src, rateSrc, measured, used: { plots: [...new Set(recent.filter(o => o.depthCm != null || WET.includes(o.water) || o.water).map(o => o.plot))], readings: recent.length, radiusKm, gauge: gaugeUsed } };
 }

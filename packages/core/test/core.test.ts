@@ -208,7 +208,7 @@ describe('fitting the flood model to measurements', () => {
   const now = new Date('2026-10-28T12:00:00Z'), here = { lat: 7.731, lon: 31.402 };
   const obs = (plot: string, daysAgo: number, cm: number | null, water = 'flooded', dLat = 0) => ({ at: new Date(now.getTime() - daysAgo * 864e5).toISOString(), plot, lat: here.lat + dLat, lon: here.lon, depthCm: cm, water });
   it('falls back to the design figures, labelled, when nothing is measured', () => {
-    expect(fitModel([], [], here, now)).toEqual(DEFAULT_MODEL);
+    expect(fitModel([], [], here, now)).toEqual({ ...DEFAULT_MODEL, used: { plots: [], readings: 0, radiusKm: 2, gauge: false } });
   });
   it('uses repeat readings of a plot for the rate and brings depth forward to today', () => {
     const m = fitModel([obs('B‑07', 4, 60), obs('B‑07', 2, 54)], [], here, now);
@@ -318,5 +318,47 @@ describe('people register, store and roll-call', () => {
     expect(z.ridge).toBe(0);
     expect(z.basin).toBeCloseTo(0.92);
     expect(z.slope).toBeCloseTo(0.22);
+  });
+});
+
+import { autoTasks, listingLeft, salesTotal, zoneSummary, type Listing, type Offer, type Register } from '../src';
+
+describe('register helpers for Home, tasks and the Market', () => {
+  const day = (n: number) => new Date(Date.UTC(2026, 9, 30) - n * 864e5).toISOString();
+  const now = new Date(Date.UTC(2026, 9, 30, 12));
+  const listing: Listing = { id: 'ls1', name: 'Balanites oil', qty: 100, unit: 'L', price: 14, status: 'open', note: '', by: 'x', at: day(5) };
+  const offer = (o: Partial<Offer>): Offer => ({ id: 'of', listingId: 'ls1', buyer: 'Nile Botanicals', phone: '', product: 'Balanites oil', qty: 40, unit: 'L', price: 13.5, status: 'open', pickup: '', note: '', by: 'x', at: '2026-10-20T08:00:00.000Z', ...o });
+
+  it('counts plots, area and groups for a zone from the register', () => {
+    const reg = seedRegister();
+    const z = zoneSummary(reg, 'basin');
+    expect(z.plots).toBe(reg.plots.filter(p => p.zone === 'basin').length);
+    expect(z.ha).toBeCloseTo(reg.plots.filter(p => p.zone === 'basin').reduce((n, p) => n + (p.areaHa ?? 0), 0), 2);
+  });
+  it('adds automatic jobs only when nothing has been recorded lately', () => {
+    const reg = seedRegister();
+    const none = autoTasks({ now, plots: [], checks: [], gauge: [], depthMeasured: false }).map(t => t.id);
+    expect(none).toEqual(['auto-gauge', 'auto-depth']);
+    const fresh = autoTasks({ now, plots: [], checks: [], gauge: [{ at: day(1) }], depthMeasured: true });
+    expect(fresh).toEqual([]);
+    const p = reg.plots[0];
+    const stale = autoTasks({ now, plots: [p], checks: [{ at: day(20), plot: p.code }], gauge: [{ at: day(1) }], depthMeasured: true });
+    expect(stale.map(t => t.id)).toEqual([`auto-check-${p.id}`]);
+    expect(autoTasks({ now, plots: [p], checks: [{ at: day(2), plot: p.code }], gauge: [{ at: day(1) }], depthMeasured: true })).toEqual([]);
+  });
+  it('takes accepted and delivered offers out of what is left, and totals them in dollars', () => {
+    const reg: Register = { ...seedRegister(), listings: [listing], offers: [offer({ id: 'a', status: 'accepted', qty: 40 }), offer({ id: 'b', status: 'delivered', qty: 10, price: 14 }), offer({ id: 'c', status: 'open', qty: 30 }), offer({ id: 'd', status: 'declined', qty: 20 })] };
+    expect(listingLeft(reg, listing)).toBe(50);
+    expect(salesTotal(reg, 2026)).toEqual({ usd: 680, offers: 2 });
+    expect(salesTotal(reg, 2025)).toEqual({ usd: 0, offers: 0 });
+  });
+  it('rejects incomplete tasks, mounds, listings and offers', () => {
+    expect(opError({ op: 'upsert', kind: 'listing', item: { ...listing, qty: 0 } })).not.toBe('');
+    expect(opError({ op: 'upsert', kind: 'listing', item: listing })).toBe('');
+    expect(opError({ op: 'upsert', kind: 'offer', item: offer({ buyer: ' ' }) })).not.toBe('');
+    expect(opError({ op: 'upsert', kind: 'offer', item: offer({ price: 0 }) })).not.toBe('');
+    expect(opError({ op: 'upsert', kind: 'offer', item: offer({}) })).toBe('');
+    expect(opError({ op: 'upsert', kind: 'mound', item: { id: 'B-01', crest: 4, note: '', surveyedAt: '2026-10-30', by: 'x' } })).not.toBe('');
+    expect(opError({ op: 'upsert', kind: 'mound', item: { id: 'B-01', crest: 1.1, note: '', surveyedAt: '2026-10-30', by: 'x' } })).toBe('');
   });
 });

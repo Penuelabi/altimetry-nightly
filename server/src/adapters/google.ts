@@ -52,7 +52,7 @@ export async function driveDownload(f: DriveFile): Promise<Buffer> {
 }
 
 const knownTabs = new Set<string>();
-async function ensureTab(tab: string) {
+async function ensureTab(tab: string, header: string[] = ['record_id', 'recorded_at', 'worker_id', 'data']) {
   if (knownTabs.has(tab)) return;
   const meta = await (await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}?fields=sheets.properties.title`)).json() as { sheets: { properties: { title: string } }[] };
   meta.sheets.forEach(x => knownTabs.add(x.properties.title));
@@ -62,7 +62,7 @@ async function ensureTab(tab: string) {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ requests: [{ addSheet: { properties: { title: tab } } }] })
   });
   await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(`${tab}!A1`)}?valueInputOption=RAW`, {
-    method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ values: [['record_id', 'recorded_at', 'worker_id', 'data']] })
+    method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ values: [header] })
   });
   knownTabs.add(tab);
 }
@@ -73,6 +73,17 @@ export async function sheetsAppend(tab: string, rows: (string | number)[][]) {
   const range = encodeURIComponent(`${tab}!A1`);
   await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ values: rows })
+  });
+}
+
+// Makes the tab hold exactly these rows (first row is the header): used to keep a readable copy of the farm register in the sheet.
+export async function sheetsReplace(tab: string, rows: (string | number)[][]) {
+  need('sheets');
+  await ensureTab(tab, rows[0]?.map(String) ?? ['id']);
+  const range = encodeURIComponent(`${tab}!A1:ZZ`);
+  await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}:clear`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+  await gfetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(`${tab}!A1`)}?valueInputOption=RAW`, {
+    method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ values: rows.length ? rows : [['id']] })
   });
 }
 

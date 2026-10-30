@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { basinDepth, bulletinInputs, dayLabel, headline, moundRows, nextRise, plantAlert, recessDays, slopeDepth, soilWord, type BulletinInputs, type Model, type PullResult } from '@abuk/core';
-import { useHereData, useModel } from './common';
+import { MOUNDS, SLOPE_STEP, basinDepth, bulletinInputs, dayLabel, editAllowed, headline, moundRows, nextRise, plantAlert, recessDays, slopeDepth, soilWord, type BulletinInputs, type Model, type PullResult } from '@abuk/core';
+import { useHereData, useModel, useMounds } from './common';
 import type { Weather } from '../weather';
-import { go, useApp } from '../store';
+import { farmChange, go, useApp } from '../store';
 import { useOnline, usePlace } from '../net';
 
 const ago = (iso: string) => {
@@ -46,8 +46,54 @@ function inputs(p: PullResult | null, m: Model, w: Weather | null, sat: { floodP
   ];
 }
 
+// One line saying which readings the water depth rests on.
+function basisText(m: Model, where: string) {
+  const u = m.used;
+  if (!m.measured || !u) return `No depth reading or crop check within ${u?.radiusKm ?? 2} km of ${where} in the last 3 weeks, so the depth is the design example, not a measurement. Record one under Map, Water depth.`;
+  const plots = u.plots.slice(0, 4).join(', ') + (u.plots.length > 4 ? ` and ${u.plots.length - 4} more` : '');
+  return `Fitted from ${u.readings} reading${u.readings === 1 ? '' : 's'} (crop checks and depth readings from every phone) at ${plots || 'nearby plots'}, within ${u.radiusKm} km of ${where}, last 3 weeks. The deepest recent reading starts the model; it is brought forward to today at the fall rate.`;
+}
+const Src = ({ children }: { children: string }) => <div style={{ fontSize: 11, color: 'var(--color-neutral-600)', lineHeight: 1.45, marginTop: 4 }}>{children}</div>;
+
+// Surveyed mound crest heights: group leads and admins enter the measured height of each row.
+function MoundSurvey({ onDone }: { onDone: () => void }) {
+  const s = useApp(), cur = useMounds();
+  const [rows, setRows] = useState(cur.rows.map(([id, h]) => ({ id, h: String(h) })));
+  const [err, setErr] = useState('');
+  const save = () => {
+    const bad = rows.find(r => !r.id.trim() || !(Number(r.h) > 0 && Number(r.h) <= 3));
+    if (bad) return setErr(`${bad.id || 'A row'} needs a name and a crest height between 0 and 3 m.`);
+    if (new Set(rows.map(r => r.id.trim())).size !== rows.length) return setErr('Each mound row needs its own name.');
+    const day = new Date().toISOString().slice(0, 10);
+    const old = new Map((s.farm.mounds ?? []).map(m => [m.id, m]));
+    farmChange(
+      ...(s.farm.mounds ?? []).filter(m => !rows.some(r => r.id.trim() === m.id)).map(m => ({ op: 'remove' as const, kind: 'mound' as const, id: m.id })),
+      ...rows.map(r => ({ op: 'upsert' as const, kind: 'mound' as const, item: { id: r.id.trim(), crest: Number(r.h), note: old.get(r.id.trim())?.note ?? '', surveyedAt: old.get(r.id.trim())?.crest === Number(r.h) && old.get(r.id.trim())?.surveyedAt ? old.get(r.id.trim())!.surveyedAt : day, by: old.get(r.id.trim())?.crest === Number(r.h) ? old.get(r.id.trim())!.by : s.session?.user.name ?? '' } }))
+    );
+    onDone();
+  };
+  return (
+    <div className="box col g8" style={{ padding: 12 }}>
+      <div className="kick sm">Mound survey · crest height above the basin floor (m)</div>
+      {rows.map((r, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 6, alignItems: 'center' }}>
+          <input className="input" style={{ minHeight: 40 }} value={r.id} aria-label="Mound row name" onChange={e => { setRows(rows.map((x, j) => (j === i ? { ...x, id: e.target.value } : x))); setErr(''); }} />
+          <input className="input num" style={{ minHeight: 40 }} type="number" inputMode="decimal" step="0.01" value={r.h} aria-label={`Crest height of ${r.id}`} onChange={e => { setRows(rows.map((x, j) => (j === i ? { ...x, h: e.target.value } : x))); setErr(''); }} />
+          <button className="btn plain sm" aria-label={`Remove ${r.id}`} onClick={() => setRows(rows.filter((_, j) => j !== i))}>×</button>
+        </div>
+      ))}
+      <button className="btn plain sm" onClick={() => setRows([...rows, { id: `B‑${String(rows.length + 1).padStart(2, '0')}`, h: '1.00' }])}>+ Add a mound row</button>
+      {err && <div className="msg">{err}</div>}
+      <div className="grid2"><button className="btn plain" onClick={onDone}>Cancel</button><button className="btn" onClick={save}>Save survey</button></div>
+    </div>
+  );
+}
+
 export function Flood() {
   const s = useApp(), online = useOnline(), place = usePlace();
+  const [editing, setEditing] = useState(false);
+  const mounds = useMounds();
+  const can = !!s.session && !s.session.demo && editAllowed(s.session.user.role);
   const [day, setDay] = useState(0);
   const model = useModel(), { weather, sat } = useHereData();
   const bd = basinDepth(day, model), sd = slopeDepth(day, model), total = recessDays(model), rise = nextRise(model);
@@ -85,24 +131,29 @@ export function Flood() {
           </div>
         ))}
         <div style={{ fontSize: 11, color: 'var(--color-accent-800)' }}>│ gold line = 1.0 m mound crest</div>
+        <Src>{`${basisText(model, place.payam)} Slope = basin depth minus ${SLOPE_STEP.toFixed(2)} m (the farm survey's height of the slope above the basin floor, not measured separately). The ridge is taken as dry in a normal year.`}</Src>
       </div>
       <div className="grid2" style={{ gap: 0, borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
-        <div style={{ padding: '10px 0' }}><div className="lbl">Basin dry in</div><div className="head num" style={{ fontSize: 28 }}>{total == null ? 'not falling' : `${Math.max(0, total - day)} days`}</div></div>
+        <div style={{ padding: '10px 0' }}><div className="lbl">Basin dry in</div><div className="head num" style={{ fontSize: 28 }}>{total == null ? 'not falling' : `${Math.max(0, total - day)} days`}</div><div className="sub">basin depth ÷ fall rate · {model.rateSrc}</div></div>
         <div style={{ padding: '10px 0 10px 12px', borderLeft: '1px solid var(--color-divider)' }}><div className="lbl">Next flood rise</div><div className="head" style={{ fontSize: 28 }}>{rise.when}</div><div className="sub">{rise.src}</div></div>
       </div>
       <div className="card accent" style={{ gap: 4 }}>
         <div className="kick">Planting window</div>
         <div style={{ fontSize: 14, lineHeight: 1.45 }}>{plantAlert(bd, model)}</div>
+        <Src>Worked out from the basin dry-in date above (3 days before it for the basin edge) and the slope step. The crops named are the project's recession crops; the dates move whenever a new depth reading or gauge reading arrives.</Src>
       </div>
       <div>
         <H2plain>Balanites mound rows</H2plain>
-        {moundRows(bd, model).map(m => (
+        {moundRows(bd, model, mounds.rows).map(m => (
           <div key={m.id} style={{ display: 'grid', gridTemplateColumns: '48px 1fr auto', gap: 8, padding: '7px 0', borderBottom: '1px solid var(--color-divider)', fontSize: 13, alignItems: 'baseline' }}>
             <span className="num">{m.id}</span>
             <span className="num" style={{ color: 'var(--color-neutral-700)' }}>crest {m.h.toFixed(2)} m</span>
             <span className="it" style={{ color: m.state === 'submerged' ? 'var(--color-text)' : m.state === 'risk' ? 'var(--color-accent-800)' : 'var(--color-neutral-600)' }}>{m.status}</span>
           </div>
         ))}
+        <Src>{`${mounds.note} A row is under water when its crest is lower than the basin depth, and at risk with under 8 cm to spare; it clears once the falling basin depth drops to its crest.`}</Src>
+        {can && !editing && <button className="btn plain sm" style={{ marginTop: 8 }} onClick={() => setEditing(true)}>Enter the measured crest heights</button>}
+        {editing && <div style={{ marginTop: 8 }}><MoundSurvey onDone={() => setEditing(false)} /></div>}
       </div>
       <div>
         <div className="between rule-b"><h2 className="h2 h20">Model inputs</h2><button className="link" onClick={() => go('sources')}>Data sources</button></div>
@@ -112,7 +163,7 @@ export function Flood() {
             <span className="num" style={{ fontSize: 13.5, textAlign: 'right' }}>{i.v}</span>
           </div>
         ))}
-        <p className="body note" style={{ marginTop: 10 }}>How it works: the water depth and how fast it falls are fitted to crop‑check depth readings within 2 km of you, else the Bor gauge trend; mound and slope heights come from the farm survey. Rain, evaporation, soil moisture and flood extent are shown alongside to judge whether the fall will hold. {s.autoPull?.state === 'ok' || s.lastPull ? `Data downloaded ${ago((s.autoPull?.state === 'ok' ? s.autoPull.at : s.lastPull!.at))}; refreshes by itself once a day with signal.` : online ? 'Downloading data for your location…' : 'Data downloads by itself once the phone has signal.'}</p>
+        <p className="body note" style={{ marginTop: 10 }}>How it works: the water depth and how fast it falls are fitted to depth readings and crop checks within 2 km of you (any worker's phone), else the Bor gauge trend; mound heights come from the survey entered above and the slope step from the farm survey. Rain, evaporation, soil moisture and flood extent are shown alongside to judge whether the fall will hold. {s.autoPull?.state === 'ok' || s.lastPull ? `Data downloaded ${ago((s.autoPull?.state === 'ok' ? s.autoPull.at : s.lastPull!.at))}; refreshes by itself once a day with signal.` : online ? 'Downloading data for your location…' : 'Data downloads by itself once the phone has signal.'}</p>
       </div>
     </div>
   );

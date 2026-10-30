@@ -69,9 +69,15 @@ Phone numbers never ship in the app. Add them to `config/leads.json` in the acce
 - the offline outbox
 
 **Still sample or preview:**
-- the basin-depth recession model: a linear 0.92 m at 2.5 cm/day, as in the design; not yet fitted to gauge data
+- the basin-depth model shows the design example (0.92 m, 2.5 cm/day) until a depth reading or crop check is recorded within 2 km, then it is fitted to those readings (the screen says which); the gauge trend sets the fall rate when there are no depth readings
 - the bulletin text and model inputs until the first pull
-- zone, plot, processing, market and payout figures
+- demo mode (not signed in) shows sample tasks, zones and market listings; signed in, Home, Tasks, zones and the Market come from the register
+
+**Where data is saved (also shown in the app under Home, Where your data is saved):**
+- synced records (crop checks, depth readings, harvests…): Google Sheet `SHEET_ID`, one tab per kind
+- the farm register (`config/farm.json`) and river gauge (`data/gauge.json`): private GitHub repo
+- a readable copy of each register list is rewritten into the same sheet as tabs `register_<list>` (plots, groups, people, stores, moves, tasks, mounds, listings, offers…) and the gauge into `gauge_readings`, after each change; admins can force it with *Back up to Drive now* (`POST /api/storage/backup`). `GET /api/storage` reports what is configured and the last mirror result. The service account needs edit access to the sheet.
+- photos: Cloud Storage bucket `PHOTO_BUCKET` (a service account cannot upload into a normal user's Drive; use a Shared Drive if photos must be in Drive)
 - the pest matcher (no reference library yet)
 - the QR pattern (placeholder)
 - Bluetooth phone-to-phone swap: browsers can't do it, so it's left for the Android builds

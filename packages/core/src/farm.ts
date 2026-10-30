@@ -177,6 +177,18 @@ export interface Word { id: string; name: string; ar: string; din: string; icon:
 export interface Subscriber { id: string; name: string; email: string; on: boolean }
 export interface WaGroup { id: string; name: string; link: string }
 
+// A job on the shared task list (it syncs to every phone and is copied to the Drive sheet). due is a date, YYYY-MM-DD;
+// zone is Ridge, Slope, Basin, All or a place such as Store.
+export interface FarmTask { id: string; title: string; zone: string; who: string; groupId?: string; due: string; done: boolean; doneAt?: string; doneBy?: string; by: string; at: string; admin?: AdminLoc }
+// A surveyed row of Balanites mounds: crest height above the basin floor, in metres.
+export interface Mound { id: string; crest: number; plotId?: string; note: string; surveyedAt: string; by: string }
+
+// Market: what the cooperative has for sale, and the offers buyers make (prices in US dollars per unit).
+export const LISTING_STATUS = ['open', 'sold out', 'withdrawn'] as const;
+export interface Listing { id: string; name: string; storeId?: string; itemId?: string; qty: number; unit: string; price: number; groupId?: string; admin?: AdminLoc; status: typeof LISTING_STATUS[number]; note: string; by: string; at: string }
+export const OFFER_STATUS_MARKET = ['open', 'accepted', 'countered', 'declined', 'delivered'] as const;
+export interface Offer { id: string; listingId?: string; buyer: string; phone: string; product: string; qty: number; unit: string; price: number; status: typeof OFFER_STATUS_MARKET[number]; counterPrice?: number; pickup: string; moveId?: string; note: string; by: string; at: string; answeredAt?: string }
+
 export interface Register {
   version: number; updated: string; crops: Crop[]; groups: Group[]; plots: Plot[]; batches: OilBatch[]; runs: ProcessRun[];
   people?: Person[]; words?: Word[]; subscribers?: Subscriber[]; waGroups?: WaGroup[];
@@ -186,9 +198,10 @@ export interface Register {
   degradations?: DegradationAssessment[];
   containers?: ContainerUnit[]; containerLogs?: ContainerLog[];
   tollgates?: TollgateRecord[];
+  tasks?: FarmTask[]; mounds?: Mound[]; listings?: Listing[]; offers?: Offer[];
 }
 
-export type Kind = 'crop' | 'group' | 'plot' | 'batch' | 'run' | 'store' | 'item' | 'move' | 'order' | 'herd' | 'livestockEvent' | 'forestLog' | 'fishLog' | 'vslaGroup' | 'vslaTx' | 'degradation' | 'container' | 'containerLog' | 'tollgate' | 'person' | 'word' | 'subscriber' | 'waGroup';
+export type Kind = 'crop' | 'group' | 'plot' | 'batch' | 'run' | 'store' | 'item' | 'move' | 'order' | 'herd' | 'livestockEvent' | 'forestLog' | 'fishLog' | 'vslaGroup' | 'vslaTx' | 'degradation' | 'container' | 'containerLog' | 'tollgate' | 'person' | 'word' | 'subscriber' | 'waGroup' | 'task' | 'mound' | 'listing' | 'offer';
 export type FarmOp =
   | { op: 'upsert'; kind: 'crop'; item: Crop } | { op: 'upsert'; kind: 'group'; item: Group } | { op: 'upsert'; kind: 'plot'; item: Plot }
   | { op: 'upsert'; kind: 'batch'; item: OilBatch } | { op: 'upsert'; kind: 'run'; item: ProcessRun }
@@ -202,15 +215,17 @@ export type FarmOp =
   | { op: 'upsert'; kind: 'tollgate'; item: TollgateRecord }
   | { op: 'upsert'; kind: 'person'; item: Person } | { op: 'upsert'; kind: 'word'; item: Word }
   | { op: 'upsert'; kind: 'subscriber'; item: Subscriber } | { op: 'upsert'; kind: 'waGroup'; item: WaGroup }
+  | { op: 'upsert'; kind: 'task'; item: FarmTask } | { op: 'upsert'; kind: 'mound'; item: Mound }
+  | { op: 'upsert'; kind: 'listing'; item: Listing } | { op: 'upsert'; kind: 'offer'; item: Offer }
   | { op: 'remove'; kind: Kind; id: string }
   | { op: 'workdays'; groupId: string; memberIds: string[]; date?: string };
 
-type ListKey = 'crops' | 'groups' | 'plots' | 'batches' | 'runs' | 'stores' | 'items' | 'moves' | 'orders' | 'herds' | 'livestockEvents' | 'forestLogs' | 'fishLogs' | 'vslaGroups' | 'vslaTxs' | 'degradations' | 'containers' | 'containerLogs' | 'tollgates' | 'people' | 'words' | 'subscribers' | 'waGroups';
+type ListKey = 'crops' | 'groups' | 'plots' | 'batches' | 'runs' | 'stores' | 'items' | 'moves' | 'orders' | 'herds' | 'livestockEvents' | 'forestLogs' | 'fishLogs' | 'vslaGroups' | 'vslaTxs' | 'degradations' | 'containers' | 'containerLogs' | 'tollgates' | 'people' | 'words' | 'subscribers' | 'waGroups' | 'tasks' | 'mounds' | 'listings' | 'offers';
 const LIST: Record<Kind, ListKey> = {
   crop: 'crops', group: 'groups', plot: 'plots', batch: 'batches', run: 'runs', store: 'stores', item: 'items', move: 'moves', order: 'orders',
   herd: 'herds', livestockEvent: 'livestockEvents', forestLog: 'forestLogs', fishLog: 'fishLogs',
   vslaGroup: 'vslaGroups', vslaTx: 'vslaTxs', degradation: 'degradations', container: 'containers', containerLog: 'containerLogs', tollgate: 'tollgates',
-  person: 'people', word: 'words', subscriber: 'subscribers', waGroup: 'waGroups'
+  person: 'people', word: 'words', subscriber: 'subscribers', waGroup: 'waGroups', task: 'tasks', mound: 'mounds', listing: 'listings', offer: 'offers'
 };
 
 export const newId = (prefix: string) => `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -240,7 +255,7 @@ export const editAllowed = (role: string) => role === 'Admin' || role === 'Group
 export function opAllowed(role: string, o: FarmOp, reg: Register): boolean {
   if (o.op === 'remove') return removeAllowed(role);
   if (editAllowed(role)) return true;
-  if (o.op === 'upsert' && (o.kind === 'move' || o.kind === 'order' || o.kind === 'livestockEvent' || o.kind === 'forestLog' || o.kind === 'fishLog' || o.kind === 'vslaTx' || o.kind === 'degradation' || o.kind === 'containerLog' || o.kind === 'tollgate' || o.kind === 'person' || o.kind === 'word')) return true;
+  if (o.op === 'upsert' && (o.kind === 'move' || o.kind === 'order' || o.kind === 'livestockEvent' || o.kind === 'forestLog' || o.kind === 'fishLog' || o.kind === 'vslaTx' || o.kind === 'degradation' || o.kind === 'containerLog' || o.kind === 'tollgate' || o.kind === 'person' || o.kind === 'word' || o.kind === 'task')) return true;
   if (o.op === 'upsert' && o.kind === 'crop') { const cur = reg.crops.find(c => c.id === o.item.id); return !!cur && cur.name === o.item.name; }
   return false;
 }
@@ -263,6 +278,10 @@ export function opError(o: FarmOp): string {
   if (o.op === 'upsert' && o.kind === 'containerLog') return (o.item as ContainerLog).unitId?.trim() ? '' : 'a container unit is required';
   if (o.op === 'upsert' && o.kind === 'tollgate') return (o.item as TollgateRecord).vslaId?.trim() && (o.item as TollgateRecord).gate >= 1 && (o.item as TollgateRecord).gate <= 5 ? '' : 'a VSLA group and valid gate (1-5) are required';
   if (o.op === 'upsert' && o.kind === 'person') return personError(o.item) ? 'a person needs two names, a valid phone, an admin location and two next of kin' : '';
+  if (o.op === 'upsert' && o.kind === 'task') return o.item.title?.trim() && /^d{4}-d{2}-d{2}$/.test(o.item.due) ? '' : 'a task needs a title and a due date';
+  if (o.op === 'upsert' && o.kind === 'mound') return o.item.crest > 0 && o.item.crest <= 3 && o.item.id?.trim() ? '' : 'a mound needs a name and a crest height between 0 and 3 m';
+  if (o.op === 'upsert' && o.kind === 'listing') return o.item.name?.trim() && o.item.qty > 0 && o.item.price >= 0 && (LISTING_STATUS as readonly string[]).includes(o.item.status) ? '' : 'a listing needs a name, a quantity above 0 and a price';
+  if (o.op === 'upsert' && o.kind === 'offer') return o.item.buyer?.trim() && o.item.qty > 0 && o.item.price > 0 && (OFFER_STATUS_MARKET as readonly string[]).includes(o.item.status) ? '' : 'an offer needs a buyer, a quantity and a price above 0';
   if (o.op === 'upsert' && o.kind === 'subscriber') return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.item.email) ? '' : 'a valid email address is required';
   if (o.op === 'upsert' && o.kind === 'waGroup') return /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]+/.test(o.item.link) && o.item.name?.trim() ? '' : 'a name and a WhatsApp invite link (https://chat.whatsapp.com/…) are required';
   if (o.kind === 'plot' || o.kind === 'batch' || o.kind === 'store' || o.kind === 'item') return it.code?.trim() ? '' : 'a code is required';
@@ -338,4 +357,42 @@ export function seedStore(): Required<Pick<Register, 'stores' | 'items' | 'moves
     items: STORE.map(([name, unit, , need]) => ({ id: code(name), code: code(name), name, unit, kind: kind(name), reorder: need })),
     moves: [], orders: []
   };
+}
+
+// ---- Home screen: zones and today's work come from the register and from what has been recorded ----
+export type ZoneKey = 'ridge' | 'slope' | 'basin';
+export interface ZoneSummary { plots: number; ha: number; mapped: number; crops: string[]; groups: number }
+// What the register holds for a zone: plots, area of those with a measured area, crops, groups.
+export function zoneSummary(reg: Register, zone: ZoneKey): ZoneSummary {
+  const ps = reg.plots.filter(p => p.zone === zone);
+  const crops = [...new Set(ps.flatMap(p => [p.crop, ...(p.crops ?? [])]).filter(Boolean))];
+  return { plots: ps.length, ha: Math.round(ps.reduce((n, p) => n + (p.areaHa ?? 0), 0) * 100) / 100, mapped: ps.filter(p => p.areaHa != null).length, crops, groups: new Set(ps.map(p => p.groupId).filter(Boolean)).size };
+}
+
+export interface AutoTask { id: string; title: string; zone: string; why: string }
+const DAY = 864e5;
+const daysAgo = (iso: string | undefined, now: Date) => (iso ? Math.floor((now.getTime() - Date.parse(iso)) / DAY) : null);
+// Jobs the app can see are due because nothing has been recorded lately. They are not saved: they go away once the record is made.
+export function autoTasks(i: { now: Date; plots: Plot[]; checks: { at: string; plot: string }[]; gauge: { at: string }[]; depthMeasured: boolean }): AutoTask[] {
+  const out: AutoTask[] = [];
+  const g = daysAgo([...i.gauge].sort((a, b) => b.at.localeCompare(a.at))[0]?.at, i.now);
+  if (g == null || g >= 3) out.push({ id: 'auto-gauge', title: 'Send the Bor river gauge reading', zone: 'All', why: g == null ? 'no gauge reading recorded yet' : `last gauge reading ${g} days ago` });
+  if (!i.depthMeasured) out.push({ id: 'auto-depth', title: 'Record the water depth in the basin', zone: 'Basin', why: 'no depth reading in the last 2 weeks, so the flood model shows the design example' });
+  const last = new Map<string, string>();
+  for (const c of i.checks) if (!last.has(c.plot) || c.at > last.get(c.plot)!) last.set(c.plot, c.at);
+  const due = i.plots.map(p => ({ p, d: daysAgo(last.get(p.code), i.now) })).filter(x => x.d == null || x.d >= 14).sort((a, b) => (b.d ?? 999) - (a.d ?? 999)).slice(0, 3);
+  for (const { p, d } of due) out.push({ id: `auto-check-${p.id}`, title: `Crop check on ${p.code} (${p.crop})`, zone: p.zone[0].toUpperCase() + p.zone.slice(1), why: d == null ? 'never checked' : `last checked ${d} days ago` });
+  return out;
+}
+
+// ---- Market ----
+// Quantity of a listing not yet promised to a buyer: what was listed minus accepted and delivered offers.
+export function listingLeft(reg: Register, l: Listing): number {
+  const taken = (reg.offers ?? []).filter(o => o.listingId === l.id && (o.status === 'accepted' || o.status === 'delivered')).reduce((n, o) => n + o.qty, 0);
+  return Math.max(0, l.qty - taken);
+}
+// Sales agreed in a year (accepted or delivered offers) in US dollars, and how many offers that was.
+export function salesTotal(reg: Register, year: number): { usd: number; offers: number } {
+  const done = (reg.offers ?? []).filter(o => (o.status === 'accepted' || o.status === 'delivered') && (o.answeredAt ?? o.at).startsWith(String(year)));
+  return { usd: Math.round(done.reduce((n, o) => n + o.qty * o.price, 0) * 100) / 100, offers: done.length };
 }

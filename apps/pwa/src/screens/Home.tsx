@@ -1,7 +1,7 @@
-import { briefing, DEFAULT_MODEL, recessDays, SLOPE_STEP, ZONES, type Task } from '@abuk/core';
+import { briefing, dayLabel, DEFAULT_MODEL, recessDays, SLOPE_STEP, zoneSummary } from '@abuk/core';
 import { go, openRegister, setState, tab, useApp } from '../store';
 import { Check, Stat } from '../ui';
-import { allChecks, basinOpacity, moundLines, toggleTask, useGreet, useHereData, useL, useModel } from './common';
+import { allChecks, basinOpacity, moundLines, useGreet, useHereData, useL, useModel, useMounds, useTasks, useZoneRows, type TaskItem } from './common';
 import { usePlace } from '../net';
 
 const MONTHS = 'JFMAMJJASOND'.split('');
@@ -13,15 +13,17 @@ export function Home() {
   return s.homeLayout === 'almanac' ? <Almanac /> : s.homeLayout === 'field' ? <Field /> : <Ledger />;
 }
 
-const TaskRow = ({ t, round, meta }: { t: Task; round?: boolean; meta?: boolean }) => (
-  <button className="row" onClick={() => toggleTask(t.id)}>
+const TaskRow = ({ t, round, meta }: { t: TaskItem; round?: boolean; meta?: boolean }) => (
+  <button className="row" onClick={t.tick}>
     <Check on={t.done} round={round} />
     <span style={{ flex: 1 }}>
-      <span style={{ display: 'block', fontSize: 14, lineHeight: 1.35, textDecoration: t.done ? 'line-through' : 'none' }}>{t.t}</span>
-      {meta && <span className="sub">{t.zone} · {t.who}</span>}
+      <span style={{ display: 'block', fontSize: 14, lineHeight: 1.35, textDecoration: t.done ? 'line-through' : 'none' }}>{t.title}</span>
+      {meta && <span className="sub">{t.zone} · {t.auto ? `automatic: ${t.why}` : t.who}</span>}
     </span>
   </button>
 );
+
+const SourceLine = ({ children }: { children: string }) => <div className="sub" style={{ fontSize: 11, marginTop: 4, lineHeight: 1.4 }}>{children}</div>;
 
 function Ledger() {
   const s = useApp(), L = useL(), place = usePlace(), model = useModel();
@@ -35,8 +37,7 @@ function Ledger() {
     weather, satellite: sat, rate: { v: model.rate, measured: model.rateSrc !== DEFAULT_MODEL.rateSrc }
   });
   const sow = recessDays(model);
-  const today = s.tasks.filter(t => t.due === 'today').slice(0, 3);
-  const open = s.tasks.filter(t => !t.done).length;
+  const { today: todayAll, open } = useTasks(), today = todayAll.slice(0, 4), zones = useZoneRows();
   const BTN: [string, () => void, boolean, string?][] = [
     ['Log harvest', () => go('harvest'), true], ['Map a plot', () => tab('map'), true], ['Processing', () => go('process'), false],
     ['Flood model', () => go('flood'), false], ['Crop check', () => go('monitor'), true], ['Data sources', () => go('sources'), false],
@@ -44,6 +45,7 @@ function Ledger() {
     ['Container farming', () => go('container'), true], ['Satellite indices', () => go('satellite'), true],
     ['Finance readiness', () => go('readiness'), true], ['Livestock & fish', () => go('herd'), false],
     ['Farm register · plots, crops, groups', () => openRegister('plots'), false, 'span2'],
+    ['Where your data is saved', () => go('datamap'), false, 'span2'],
     ['Field tools · SMS alerts, voice, payout, store…', () => go('tools'), true, 'span2']
   ];
   return (
@@ -62,17 +64,20 @@ function Ledger() {
       </button>
       <div>
         <div className="between rule-b"><h2 className="h2">{L.tasks}</h2><button className="link" onClick={() => go('tasks')}>{L.seeAll} · {open} open</button></div>
-        {today.map(t => <TaskRow key={t.id} t={t} meta />)}
+        {today.map(t => <TaskRow key={t.key} t={t} meta />)}
+        {!today.length && <div className="note" style={{ padding: '8px 0' }}>Nothing due today.</div>}
+        <SourceLine>{s.session && !s.session.demo ? "From the shared task list (group leads add tasks under See all) plus jobs the app sees are due because nothing has been recorded lately." : "Sample tasks. Sign in to see your project's task list."}</SourceLine>
       </div>
       <div>
         <h2 className="h2 rule" style={{ marginBottom: 4 }}>{L.zones}</h2>
-        {ZONES.map(z => (
+        {zones.map(z => (
           <button key={z.n} onClick={() => tab('map')} className="row" style={{ display: 'grid', gridTemplateColumns: '22px 1fr auto', gap: 10, alignItems: 'baseline', padding: '10px 0' }}>
             <span className="head num" style={{ fontSize: 20, color: 'var(--color-accent)' }}>{z.n}</span>
             <span><span style={{ display: 'block', fontSize: 14 }}>{z.name} <span style={{ color: 'var(--color-neutral-700)', fontSize: 12 }}>· {z.ha}</span></span><span className="sub">{z.crops}</span></span>
             <span className="it" style={{ fontSize: 12, color: 'var(--color-accent-800)' }}>{z.status}</span>
           </button>
         ))}
+        <SourceLine>{`Area and crops come from the plots in the farm register; water depth is the flood model (${model.measured ? 'from depth readings near you' : 'the design example until a depth is recorded'}).`}</SourceLine>
       </div>
       <div className="grid2">
         {BTN.map(([label, fn, accent, cls]) => <button key={label} className={`btn${accent ? '' : ' plain'} ${cls ?? ''}`} onClick={fn}>{label}</button>)}
@@ -82,8 +87,9 @@ function Ledger() {
 }
 
 function Almanac() {
-  const s = useApp(), L = useL(), greet = useGreet(), sow = recessDays(useModel());
-  const today = s.tasks.filter(t => t.due === 'today').slice(0, 3);
+  const s = useApp(), L = useL(), greet = useGreet(), almModel = useModel(), sow = recessDays(almModel);
+  const today = useTasks().today.slice(0, 4);
+  const top = Object.entries(s.farm.plots.reduce<Record<string, { n: number; ha: number; g: Set<string> }>>((m, p) => { const e = (m[p.crop] ??= { n: 0, ha: 0, g: new Set() }); e.n++; e.ha += p.areaHa ?? 0; if (p.groupId) e.g.add(p.groupId); return m; }, {})).sort((a, b) => b[1].n - a[1].n).slice(0, 3);
   const hatch = (c: string, w: number) => `repeating-linear-gradient(${w}deg,${c} 0 1px,transparent 1px 5px)`;
   const cell = { display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontStyle: 'italic', color: 'var(--color-neutral-700)', borderLeft: '1px solid var(--color-divider)' } as const;
   const now = new Date(), yearPct = (now.getMonth() + now.getDate() / 31) / 12 * 100;
@@ -100,21 +106,22 @@ function Almanac() {
           <div style={{ ...cell, gridColumn: '12 / 13', fontSize: 10, color: 'var(--color-accent-800)', background: hatch('var(--color-accent-200)', 90) }}>Rec.</div>
           <div style={{ position: 'absolute', top: -6, bottom: -6, left: `${yearPct}%`, borderLeft: '2px solid var(--color-accent)' }} />
         </div>
-        <div className="between sub" style={{ marginTop: 10 }}><span>Today ▲ late flood</span><span>Recession opens ~4 Dec</span></div>
+        <div className="between sub" style={{ marginTop: 10 }}><span>Today ▲ late flood</span><span>{sow == null ? 'Recession date: water not falling' : sow <= 0 ? 'Recession open now' : `Recession opens ~${dayLabel(sow)}`}</span></div>
       </div>
       <div>
         <div className="kick">Next window · {sow == null ? 'water not falling yet' : sow <= 0 ? 'open now' : `in ${sow} days`}</div>
         <h1 className="h1" style={{ margin: '4px 0 6px', fontSize: 32 }}>Sow the recession silt.</h1>
-        <p className="body">As water leaves the basin, broadcast cowpea, Feterita sorghum and jute mallow between the Balanites mounds. Seed stock check is on this week's list.</p>
+        <p className="body">As water leaves the basin, broadcast cowpea, Feterita sorghum and jute mallow between the Balanites mounds. The date comes from the flood model ({almModel.measured ? 'measured depth' : 'design example until a depth is recorded'}).</p>
       </div>
       <div className="grid3" style={{ borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
-        {[['Cowpea', '6 groups · 7 ha'], ['Sorghum', 'Feterita · 9 ha'], ['Kudra', 'jute · 2 ha']].map(([n, d], i) => (
+        {(top.length ? top.map(([n, e]) => [n, `${e.n} plot${e.n === 1 ? '' : 's'}${e.ha ? ` · ${Math.round(e.ha * 10) / 10} ha` : ''}${e.g.size ? ` · ${e.g.size} group${e.g.size === 1 ? '' : 's'}` : ''}`]) : [['No plots yet', 'add them in the farm register']]).map(([n, d], i) => (
           <div key={n} style={{ padding: i ? '10px 8px' : '10px 4px', borderLeft: i ? '1px solid var(--color-divider)' : undefined }}><div className="head" style={{ fontSize: 22 }}>{n}</div><div className="sub">{d}</div></div>
         ))}
       </div>
       <div>
         <div className="between rule-b"><h2 className="h2">{L.tasks}</h2><button className="link" onClick={() => go('tasks')}>{L.seeAll}</button></div>
-        {today.map(t => <TaskRow key={t.id} t={t} round />)}
+        {today.map(t => <TaskRow key={t.key} t={t} round />)}
+        <SourceLine>Shared task list and automatic jobs, as on the main Home screen.</SourceLine>
       </div>
       <button className="btn" onClick={() => tab('season')}>Open full crop calendar</button>
     </div>
@@ -122,15 +129,18 @@ function Almanac() {
 }
 
 const ZINFO = {
-  basin: { kicker: 'Zone 3 · 22 ha', head: 'Balanites mounds and recession crops.', body: 'Balanites anchor on raised mounds; recession sowing of cowpea, sorghum and kudra follows the falling water.', stats: [['Trees', '1,936'], ['Mound rows', '24'], ['Groups', '7']] },
-  slope: { kicker: 'Zone 2 · 8 ha · 0.22 m water', head: 'Groundnut lifted; sesame drying.', body: 'Transition soils between ridge and basin. Rainfed groundnut, sesame, millet and okra finish before the flood climbs the slope.', stats: [['Plots', '11'], ['Slope', '0.6%'], ['Groups', '3']] },
-  ridge: { kicker: 'Zone 1 · 10 ha · dry', head: 'Moringa cut due on R‑02.', body: 'Safe from flood. High‑density Moringa leaf blocks, gum arabic tapping rows, shea and tamarind on the boundary.', stats: [['Moringa', '62k'], ['Gum trees', '410'], ['Groups', '2']] }
+  basin: { n: '3', name: 'Floodplain basin', head: 'Balanites mounds and recession crops.', body: 'Balanites anchor on raised mounds; recession sowing of cowpea, sorghum and kudra follows the falling water.' },
+  slope: { n: '2', name: 'Slope', head: 'Between the ridge and the flood.', body: 'Transition soils between ridge and basin. Rainfed groundnut, sesame, millet and okra finish before the flood climbs the slope.' },
+  ridge: { n: '1', name: 'Dry ridge', head: 'Safe from flood.', body: 'High-density Moringa leaf blocks, gum arabic tapping rows, shea and tamarind on the boundary.' }
 } as const;
 const ZONE_TASK = { basin: 'Basin', ridge: 'Ridge', slope: 'Slope' } as const;
 
 function Field() {
   const s = useApp(), L = useL();
-  const z = ZINFO[s.zone], place = usePlace(), model = useModel(), sow = recessDays(model);
+  const z = ZINFO[s.zone], place = usePlace(), model = useModel(), sow = recessDays(model), mounds = useMounds(), tasks = useTasks();
+  const sum = zoneSummary(s.farm, s.zone);
+  const stats: [string, string][] = [['Plots', String(sum.plots)], ['Area', sum.mapped ? `${sum.ha} ha` : '—'], ['Groups', String(sum.groups)]];
+  const kicker = `Zone ${z.n} · ${sum.mapped ? `${sum.ha} ha` : `${sum.plots} plots`}`;
   // Live line for the basin and slope: fitted water depth and fall rate near the phone.
   const live = s.zone === 'ridge' ? '' : (() => {
     const d = s.zone === 'basin' ? model.d0 : Math.max(0, model.d0 - SLOPE_STEP);
@@ -147,10 +157,10 @@ function Field() {
           <rect x="0" y="120" width="360" height="130" fill="var(--color-neutral-500)" fillOpacity={basinOpacity(model.d0)} />
           <path d="M0 70 C90 62 180 78 360 68" fill="none" stroke="var(--color-neutral-500)" strokeDasharray="3 3" />
           <path d="M0 120 C100 112 220 128 360 118" fill="none" stroke="var(--color-neutral-500)" strokeDasharray="3 3" />
-          {moundLines([150, 163, 176, 189, 202, 215, 228, 241], model.d0).map(l => <line key={l.y} x1="20" x2="340" y1={l.y} y2={l.y} stroke={l.c} strokeWidth="2" />)}
-          <text x="14" y="22" {...lbl} fill="var(--color-accent-800)">1 · DRY RIDGE · 10 HA</text>
-          <text x="14" y="88" {...lbl} fill="var(--color-neutral-700)">2 · SLOPE · 8 HA</text>
-          <text x="14" y="138" {...lbl} fill="var(--color-neutral-900)">3 · FLOODPLAIN BASIN · 22 HA</text>
+          {moundLines([150, 163, 176, 189, 202, 215, 228, 241], model.d0, mounds.rows).map(l => <line key={l.y} x1="20" x2="340" y1={l.y} y2={l.y} stroke={l.c} strokeWidth="2" />)}
+          <text x="14" y="22" {...lbl} fill="var(--color-accent-800)">1 · DRY RIDGE</text>
+          <text x="14" y="88" {...lbl} fill="var(--color-neutral-700)">2 · SLOPE</text>
+          <text x="14" y="138" {...lbl} fill="var(--color-neutral-900)">3 · FLOODPLAIN BASIN</text>
           <circle cx="300" cy="190" r="5" fill="none" stroke="var(--color-accent)" strokeWidth="2" />
           <circle cx="300" cy="190" r="12" fill="none" stroke="var(--color-accent)" strokeOpacity=".4" />
         </svg>
@@ -163,19 +173,20 @@ function Field() {
           ))}
         </div>
         <div>
-          <div className="kick">{z.kicker}{live}</div>
+          <div className="kick">{kicker}{live}</div>
           <h1 className="h1" style={{ margin: '4px 0 6px', fontSize: 30, lineHeight: 1.05 }}>{z.head}</h1>
           <p className="body">{z.body}{s.zone === 'basin' ? ` ${model.rate > 0 ? `Water is falling ${(model.rate * 100).toFixed(1)} cm a day (${model.rateSrc === DEFAULT_MODEL.rateSrc ? 'design estimate' : 'measured'})${sow != null && sow > 0 ? `; the basin should be dry in about ${sow} days.` : '.'}` : 'The water is not falling yet.'}` : ''}</p>
         </div>
         <div className="grid3" style={{ borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
-          {z.stats.map(([k, v]) => <Stat key={k} k={k} v={v} />)}
+          {stats.map(([k, v]) => <Stat key={k} k={k} v={v} />)}
         </div>
+        <SourceLine>{`Plots, area and groups are counted from the farm register (${sum.plots} plots in this zone).`}</SourceLine>
         <div>
           <div style={{ fontSize: 13, color: 'var(--color-neutral-700)', marginBottom: 2 }}>{L.tasks} in this zone</div>
-          {s.tasks.filter(t => t.zone === ZONE_TASK[s.zone]).slice(0, 3).map(t => <TaskRow key={t.id} t={t} />)}
+          {tasks.items.filter(t => t.zone === ZONE_TASK[s.zone] && !t.done).slice(0, 3).map(t => <TaskRow key={t.key} t={t} meta />)}
         </div>
         <div className="grid2">
-          <button className="btn" onClick={() => go('plot')}>Open plot B‑07</button>
+          <button className="btn" onClick={() => go('plot')}>Open a plot</button>
           <button className="btn plain" onClick={() => go('flood')}>Flood model</button>
         </div>
       </div>

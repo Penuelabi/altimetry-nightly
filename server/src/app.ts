@@ -11,6 +11,7 @@ import { parseInbound, sendSms } from './adapters/sms';
 import { geeSummary, pull, terrain } from './sources';
 import { resolvePayam, satelliteForPayam } from './satellite';
 import { overview, recentChecks } from './dashboard';
+import { mirrorGauge, mirrorRegister, mirrorStatus } from './mirror';
 
 type Env = { Variables: { me: Session } };
 export const app = new Hono<Env>();
@@ -198,7 +199,25 @@ app.post('/api/farm/ops', auth(), async c => {
   }
   if (!ops.length) return c.json(withStore((await readJson<Register>(FARM_PATH, seedRegister())).data));
   const r = await updateJson<Register>(FARM_PATH, seedRegister(), `farm: ${ops.length} change${ops.length > 1 ? 's' : ''} by ${me.id}`, reg => applyOps(withStore(reg), ops.slice(0, 200)));
+  // Readable copy in the Drive sheet. A failure shows under /api/storage and never fails the save; wait a few seconds so the copy finishes while the server is busy with this request.
+  await Promise.race([mirrorRegister(r.data).catch(() => {}), new Promise(res => setTimeout(res, 8000))]);
   return c.json(r.data);
+});
+
+// Where each kind of data is kept, and whether the copy in Drive is up to date.
+app.get('/api/storage', auth(), c => c.json({
+  records: { sheet: !missing('sheets').length },
+  register: { github: !missing('github').length },
+  photos: { bucket: !missing('photos').length },
+  mirror: mirrorStatus,
+  sheetUrl: c.get('me').role === 'Admin' && cfg.sheetId ? `https://docs.google.com/spreadsheets/d/${cfg.sheetId}` : ''
+}));
+// Admin: rewrite the Drive copy now (register and gauge log) instead of waiting for the next change.
+app.post('/api/storage/backup', auth(['Admin']), async c => {
+  const reg = withStore((await readJson<Register>(FARM_PATH, seedRegister())).data);
+  await mirrorRegister(reg, true);
+  await mirrorGauge((await readJson<GaugeReading[]>(GAUGE_PATH, [])).data);
+  return c.json(mirrorStatus);
 });
 
 // ---- photos (crop checks, pest checks, crops) ----
@@ -269,13 +288,14 @@ app.post('/api/sms/alert', auth(['Admin', 'Group lead']), async c => {
 const GAUGE_PATH = 'data/gauge.json';
 async function recordGauge(from: string, text: string, extra: { at?: string; admin?: AdminLoc; by?: string } = {}): Promise<GaugeReading> {
   let reading: GaugeReading | null = null;
-  await updateJson<GaugeReading[]>(GAUGE_PATH, [], `gauge reading from ${from.slice(-3)}`, list => {
+  const saved = await updateJson<GaugeReading[]>(GAUGE_PATH, [], `gauge reading from ${from.slice(-3)}`, list => {
     const last = list.find(r => r.status === 'ok')?.v ?? null;
     const v = parseGauge(text, last);
     reading = { from, text, at: extra.at ?? new Date().toISOString(), v: v.kind === 'bad' ? null : v.v, status: v.kind, ...(extra.admin ? { admin: extra.admin } : {}), ...(extra.by ? { by: extra.by } : {}) };
     // Newest reading first, so a reading entered late for an earlier day still lands in date order.
     return [reading, ...list].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 2000);
   });
+  void mirrorGauge(saved.data);
   return reading!;
 }
 const replyFor = (r: GaugeReading) => r.status === 'ok' ? `Abuk: gauge ${r.v!.toFixed(2)} m received. Thank you.` : r.status === 'held' ? `Abuk: ${r.v} m is far from the last reading; the admin will check it.` : 'Abuk: not understood. Send G then the level, e.g. G 4.12';
