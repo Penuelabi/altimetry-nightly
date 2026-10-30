@@ -11,7 +11,7 @@ Awerial,Lakes,Nile km 4919,hydroweb:112358,0.0,6.0,Nile km 4725,hydroweb:105858,
 Ayod,Jonglei,White Nile km 4336,hydroweb:7874,0.0,16.0,White Nile km 4436,hydroweb:7876,0.1,7.0,False,medium,OK (gauge on the county),medium,False,False
 Baliet,Upper Nile,"Sobat, River",dahiti:18743,0.0,33.0,Sobat km 4122,hydroweb:7953,0.0,14.0,False,high,REVIEW DATA AGE,medium,True,False
 Bor South,Jonglei,White Nile km 4681,hydroweb:7889,0.0,8.0,Lnyl L Byd km 4670,hydroweb:112359,0.0,6.0,False,medium,OK (gauge on the county),medium,False,False
-Budi,Eastern Equatoria,Pager km 5350,hydroweb:102552,88.0,8.0,Achwa km 5095,hydroweb:105857,134.2,8.0,False,medium,OK,medium,False,False
+Budi,Eastern Equatoria,Pager km 5350,hydroweb:102552,88.0,8.0,Pager Trib01 km 5350,hydroweb:106717,118.0,4.0,False,medium,OK,medium,False,False
 Canal/Pigi,Jonglei,"White Nile, River",dahiti:12178,0.0,18.0,White Nile km 4002,hydroweb:201767,0.0,6.0,False,high,OK (gauge on the county),high,False,False
 Cueibet,Lakes,Gulnam km 4631,hydroweb:110221,25.6,284.0,Gulnam km 4574,hydroweb:104260,41.2,26.0,False,high,REVIEW DATA AGE,medium,True,False
 Duk,Jonglei,White Nile km 4500,hydroweb:7877,0.1,7.0,White Nile km 4515,hydroweb:7878,0.4,7.0,False,medium,OK (gauge on the county),medium,False,False
@@ -38,7 +38,7 @@ Luakpiny/Nasir,Upper Nile,Baro km 4388,hydroweb:203704,0.0,21.0,Sobat km 4301,hy
 Maban,Upper Nile,R Adar km 3880,hydroweb:107566,54.8,27.0,R Adar km 3865,hydroweb:113243,59.7,4.0,False,high,OK,high,False,False
 Magwi,Eastern Equatoria,Nile km 5018,hydroweb:203765,18.6,10.0,Achwa km 5095,hydroweb:105857,0.0,8.0,False,high,OK,high,False,False
 Maiwut,Upper Nile,Baro km 4450,hydroweb:7821,7.2,25.0,Baro km 4454,hydroweb:7822,10.8,23.0,False,medium,OK (gauge on the county),medium,False,False
-Malakal,Upper Nile,"Sobat, River",dahiti:11815,18.0,20.0,"White Nile, River",dahiti:14196,0.0,20.0,False,high,OK,high,False,False
+Malakal,Upper Nile,"Sobat, River",dahiti:11815,18.0,20.0,White Nile km 3961,hydroweb:7895,0.0,4.0,False,high,OK,high,False,False
 Manyo,Upper Nile,"White Nile, River",dahiti:16323,0.0,27.0,White Nile km 3739,hydroweb:7893,0.0,6.0,False,high,OK (gauge on the county),high,False,False
 Maridi,Western Equatoria,Yei km 4848,hydroweb:203361,40.5,20.0,Yei km 4779,hydroweb:105342,41.3,10.0,False,medium,OK,medium,False,False
 Mayendit,Unity,Bahr Al Arab Trib 02 km 4435,hydroweb:104261,2.3,26.0,Bahr Al Arab Trib 02 km 4426,hydroweb:103843,8.3,28.0,False,high,OK (gauge on the county),high,False,False
@@ -49,7 +49,7 @@ Mundri East,Western Equatoria,Yei km 4848,hydroweb:203361,0.0,20.0,Yei km 4779,h
 Mundri West,Western Equatoria,Yei km 4779,hydroweb:105342,0.0,10.0,Yei km 4848,hydroweb:203361,1.1,20.0,False,high,OK (gauge on the county),high,False,False
 Mvolo,Western Equatoria,Gulnam km 4669,hydroweb:104259,52.8,26.0,Yei km 4779,hydroweb:105342,32.3,10.0,False,high,OK,high,False,False
 Nagero,Western Equatoria,Jur km 4964,hydroweb:108192,7.5,24.0,Jur km 4973,hydroweb:108191,13.1,24.0,False,medium,OK (gauge on the county),medium,False,False
-Nyirol,Jonglei,Fulus km 4165,hydroweb:106193,0.0,87.0,"Sobat, River",dahiti:23358,0.0,16.0,False,high,REVIEW DATA AGE,medium,True,False
+Nyirol,Jonglei,Fulus km 4165,hydroweb:106193,0.0,87.0,Fulus km 4114,hydroweb:106720,0.0,4.0,False,high,REVIEW DATA AGE,medium,True,False
 Nzara,Western Equatoria,Jur km 4973,hydroweb:108191,23.4,24.0,Ibba km 4410,hydroweb:111296,0.0,9.0,False,high,OK,high,False,False
 Panyijiar,Unity,Gulnam km 4574,hydroweb:104260,22.2,26.0,White Nile km 4528,hydroweb:7879,0.0,7.0,False,high,OK,high,False,False
 Panyikang,Upper Nile,"White Nile, River",dahiti:15557,0.0,35.0,Sobat km 4023,hydroweb:7815,0.0,20.0,False,medium,REVIEW DATA AGE,low,True,False
@@ -71,7 +71,7 @@ Torit,Eastern Equatoria,White Nile km 4934,hydroweb:7853,53.2,26.0,Achwa km 5095
 Twic,Warrap,Lol Trib01 km 4417,hydroweb:103547,0.0,30.0,Lol km 4471,hydroweb:7824,0.0,30.0,False,high,OK (gauge on the county),high,False,False
 Twic East,Jonglei,"White Nile, River",dahiti:17749,0.0,37.0,White Nile km 4536,hydroweb:7880,0.0,7.0,False,medium,REVIEW DATA AGE,low,True,False
 Ulang,Upper Nile,Sobat Trib 01 km 4390,hydroweb:113241,0.1,4.0,Sobat km 4264,hydroweb:201706,0.0,17.0,False,high,OK (gauge on the county),high,False,False
-Uror,Jonglei,Fulus km 4188,hydroweb:106719,25.3,31.0,Pibor km 4497,hydroweb:7938,41.0,27.0,False,high,REVIEW DATA AGE,medium,True,False
+Uror,Jonglei,Fulus km 4188,hydroweb:106719,25.3,4.0,Pibor km 4497,hydroweb:7938,41.0,27.0,False,high,OK,high,False,False
 Wau,Western Bahr el Ghazal,Jur km 4808,hydroweb:111154,0.0,10.0,Busseri km 4772,hydroweb:111155,0.0,10.0,False,high,OK (gauge on the county),high,False,False
 Wulu,Lakes,"Unknown, River",dahiti:2686,7.0,39.0,Ibba km 4410,hydroweb:111296,7.0,9.0,False,high,REVIEW DATA AGE,medium,True,False
 Yambio,Western Equatoria,Ibba km 4410,hydroweb:111296,21.3,9.0,Jur km 4973,hydroweb:108191,60.3,24.0,False,medium,OK,medium,False,False
