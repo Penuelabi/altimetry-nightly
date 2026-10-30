@@ -7,7 +7,7 @@ This repo implements the Claude Design handoff in `project/AbukApp.dc.html`, the
 | `packages/core` | Shared by every client: seed data from the design, the flood recession model, form validation, geo helpers, API types. |
 | `server` | Node API (Hono). It holds every secret and talks to GitHub, Google Drive / Sheets / Earth Engine, and the SMS gateway. |
 | `apps/dashboard` | Admin dashboard, served by the server at `/admin`: updates per day, items needing attention (floods, damage, pests, poor crop health), a map of plots and crop checks, latest updates with CSV download, workers and farm-register history. Admins sign in with their access key. |
-| `apps/pwa` | Installable, offline-first web app (React + Vite). It covers all 24 screens and the three home layouts (pick one under the header logo → Home screen). |
+| `apps/pwa` | Installable, offline-first web app (React + Vite), also served by the server at its root address (`/`, same build as the APK, same API, no extra set-up; built in the Dockerfile). It covers all 24 screens and the three home layouts (pick one under the header logo → Home screen). |
 
 React Native and Kotlin/Compose ports come next. They will reuse `packages/core` (RN) and the same server API.
 

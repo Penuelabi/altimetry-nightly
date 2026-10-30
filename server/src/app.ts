@@ -331,3 +331,9 @@ const DASH = process.env.DASHBOARD_DIR || 'apps/dashboard/dist';
 app.get('/admin', c => c.redirect('/admin/'));
 app.use('/admin/*', serveStatic({ root: DASH, rewriteRequestPath: p => p.replace(/^\/admin/, '') }));
 app.get('/admin/*', serveStatic({ path: `${DASH}/index.html` }));
+
+// ---- the field app as a web page (the same build that goes into the APK; built from apps/pwa) ----
+// Same address as the API, so no cross-origin set-up. Files first, then index.html for any page address.
+const WEB = process.env.WEB_DIR || 'apps/pwa/dist';
+app.use('*', (c, next) => (c.req.path.startsWith('/api/') ? next() : serveStatic({ root: WEB })(c, next)));
+app.get('*', (c, next) => (c.req.path.startsWith('/api/') || /\.[a-z0-9]+$/i.test(c.req.path) ? next() : serveStatic({ path: `${WEB}/index.html` })(c, next)));
