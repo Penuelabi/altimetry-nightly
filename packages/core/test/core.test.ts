@@ -397,5 +397,7 @@ describe('self sign-up', () => {
     expect(m).toContain('4821');
     expect(m).toContain('https://x.test');
     expect(pinMessage({ name: 'A B', id: 'EW‑001', pin: '4821', url: 'u', reset: true })).toContain('reset');
+    expect(pinMessage({ name: 'A B', id: 'EW‑001', pin: '4821', url: 'u', reply: '+211917939818' })).toContain('WhatsApp +211917939818');
+    expect(m).not.toContain('Questions');
   });
 });

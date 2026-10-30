@@ -35,14 +35,15 @@ export function signupError(i: { name: string; kind: string; contact: string; no
 export const weakPin = (pin: string) => /^(\d)\1{3}$/.test(pin) || '0123456789'.includes(pin) || '9876543210'.includes(pin);
 
 // The text the admin sends with the worker ID and temporary PIN.
-export function pinMessage(i: { name: string; id: string; pin: string; url: string; reset?: boolean }): string {
+export function pinMessage(i: { name: string; id: string; pin: string; url: string; reset?: boolean; reply?: string }): string {
   const first = i.name.trim().split(/\s+/)[0];
   return [
     `Hello ${first},`,
     i.reset ? 'Your Abuk Project PIN has been reset.' : 'Your Abuk Project access is approved.',
     `Worker ID: ${i.id}`,
     `Temporary PIN: ${i.pin}`,
-    `Open ${i.url}, choose your name, and enter the PIN. The app then asks you to choose your own 4-digit PIN. Keep it private.`
+    `Open ${i.url}, choose your name, and enter the PIN. The app then asks you to choose your own 4-digit PIN. Keep it private.`,
+    ...(i.reply ? [`Questions? WhatsApp ${i.reply}.`] : [])
   ].join('\n');
 }
 

@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { pinMessage, type NewKeyResponse, type PinIssued, type PublicUser, type Role, type SignupRequest } from '@abuk/core';
+import { normContact, pinMessage, type NewKeyResponse, type PinIssued, type PublicUser, type Role, type SignupRequest } from '@abuk/core';
 import { useApp } from '../store';
 import { BASE, api, explain } from '../api';
 import { copyText, gmailTo, mailTo, openLink, whatsappShare, whatsappTo } from '../sms';
 
 // The Gmail account approval emails go from. Remembered on this phone.
 const FROM_KEY = 'abuk-mail-from', DEFAULT_FROM = 'penuelabi@gmail.com';
+// The WhatsApp number the project writes from; shown to the worker so they can reply to it.
+const WA_KEY = 'abuk-wa-from', DEFAULT_WA = '+211917939818';
+const readWa = () => { try { return localStorage.getItem(WA_KEY) || DEFAULT_WA; } catch { return DEFAULT_WA; } };
 const readFrom = () => { try { return localStorage.getItem(FROM_KEY) || DEFAULT_FROM; } catch { return DEFAULT_FROM; } };
 import { useOnline } from '../net';
 import { Field, Seg } from '../ui';
@@ -26,6 +29,7 @@ export function Admin() {
   const [pick, setPick] = useState<Record<string, { role: Role; exp: string }>>({});
   const [note, setNote] = useState('');
   const [from, setFrom] = useState(readFrom);
+  const [waFrom, setWaFrom] = useState(readWa);
 
   useEffect(() => {
     if (!online || !isAdmin) return;
@@ -69,14 +73,17 @@ export function Admin() {
   };
   const pending = reqs.filter(r => r.status === 'pending');
   const joinUrl = `${BASE || location.origin}/join`;
-  const text = issued ? pinMessage({ name: issued.user.name, id: issued.user.id, pin: issued.pin, url: BASE || location.origin, reset: issued.reset }) : '';
+  const text = issued ? pinMessage({ name: issued.user.name, id: issued.user.id, pin: issued.pin, url: BASE || location.origin, reset: issued.reset, reply: normContact('whatsapp', waFrom) || undefined }) : '';
   const sendIssued = () => {
     if (!issued) return;
     if (issued.kind === 'email' && issued.contact) {
       try { localStorage.setItem(FROM_KEY, from.trim()); } catch { /* remembering is optional */ }
       openLink(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(from.trim()) ? gmailTo(from.trim(), issued.contact, 'Your Abuk Project access', text) : mailTo(issued.contact, 'Your Abuk Project access', text));
     }
-    else openLink(issued.contact ? whatsappTo(issued.contact, text) : whatsappShare(text));
+    else {
+      try { localStorage.setItem(WA_KEY, waFrom.trim()); } catch { /* remembering is optional */ }
+      openLink(issued.contact ? whatsappTo(issued.contact, text) : whatsappShare(text));
+    }
   };
 
   return (
@@ -90,6 +97,10 @@ export function Admin() {
             <button className="btn md" onClick={sendIssued}>{issued.kind === 'email' && issued.contact ? 'Send from Gmail' : 'Send on WhatsApp'}</button>
             <button className="btn plain md" onClick={async () => setNote((await copyText(text)) ? 'Message copied.' : 'Could not copy. Select the PIN and send it by hand.')}>Copy message</button>
           </div>
+          {issued.kind !== 'email' && <>
+            <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>The message asks the worker to reply on this WhatsApp number. WhatsApp sends from the account signed in on this phone, so use the phone that has this number.</div>
+            <input className="input num" style={{ minHeight: 40 }} type="tel" inputMode="tel" aria-label="Project WhatsApp number" value={waFrom} onChange={e => setWaFrom(e.target.value)} />
+          </>}
           {issued.kind === 'email' && issued.contact && <>
             <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Send from this Gmail account (you press Send in Gmail)</div>
             <input className="input" style={{ minHeight: 40 }} type="email" inputMode="email" aria-label="Send from" value={from} onChange={e => setFrom(e.target.value)} />
