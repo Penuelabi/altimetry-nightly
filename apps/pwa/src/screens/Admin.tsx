@@ -63,6 +63,7 @@ export function Admin() {
     catch (e) { setErr(explain(e)); }
   };
   const pending = reqs.filter(r => r.status === 'pending');
+  const joinUrl = `${BASE || location.origin}/join`;
   const text = issued ? pinMessage({ name: issued.user.name, id: issued.user.id, pin: issued.pin, url: BASE || location.origin, reset: issued.reset }) : '';
   const sendIssued = () => {
     if (!issued) return;
@@ -85,6 +86,15 @@ export function Admin() {
         </div>
       )}
       {note && <div className="msg">{note}</div>}
+      <div className="box col g6" style={{ padding: '10px 12px' }}>
+        <div className="kick sm">Link for new workers</div>
+        <div className="mono" style={{ fontSize: 12.5, wordBreak: 'break-all' }}>{joinUrl}</div>
+        <div className="sub">It opens the form to ask for access. Send it to people who want to join; their requests appear below.</div>
+        <div className="grid2" style={{ gap: 8 }}>
+          <button className="btn plain md" onClick={async () => setNote((await copyText(joinUrl)) ? 'Link copied.' : 'Could not copy. Select the link and copy it by hand.')}>Copy link</button>
+          <button className="btn plain md" onClick={() => openLink(whatsappShare(`Ask for access to the Abuk Project app: ${joinUrl}`))}>Share on WhatsApp</button>
+        </div>
+      </div>
       {pending.length > 0 && (
         <div>
           <div className="between rule-b"><h2 className="h2 h20">Sign-up requests</h2><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>{pending.length} waiting</span></div>

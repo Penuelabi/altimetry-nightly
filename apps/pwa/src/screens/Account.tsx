@@ -27,6 +27,9 @@ const Lockup = () => <img src="/lockup.png" alt="South Sudan Hydro-Climate Watch
 
 const localPin = async (pin: string) => { const salt = crypto.getRandomValues(new Uint32Array(4)).join('-'); return { salt, hash: await sha(salt + pin) }; };
 const OTHER = '__other__';
+// The link /join (or #join) opens the sign-up form directly.
+const joinLink = () => /^\/join\/?$/.test(location.pathname) || location.hash === '#join';
+const leaveJoin = () => { if (joinLink()) history.replaceState(null, '', '/'); };
 
 // Anyone can ask for access with an email address or a WhatsApp number. An admin approves it and sends back a worker ID and a PIN.
 function RequestAccess({ onBack }: { onBack: () => void }) {
@@ -91,7 +94,7 @@ export function SignIn() {
   const [pin, setPin] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
-  const [requesting, setRequesting] = useState(false);
+  const [requesting, setRequesting] = useState(joinLink);
 
   const withKey = async () => {
     const bad = signinError(id, key);
@@ -123,7 +126,7 @@ export function SignIn() {
     finally { setBusy(false); }
   };
 
-  if (requesting) return <RequestAccess onBack={() => setRequesting(false)} />;
+  if (requesting) return <RequestAccess onBack={() => { leaveJoin(); setRequesting(false); }} />;
   const demo = () => setState({ session: { token: 'demo', demo: true, expires: new Date(Date.now() + 864e5).toISOString(), user: { id: 'EW‑014', name: 'Achol Deng', role: 'Admin', meta: 'Group 4 · demo', on: true, expires: '' } } });
   return (
     <div className="pad" style={{ padding: '22px 18px 24px' }}>
