@@ -1,12 +1,12 @@
 import { randomBytes, randomInt, scryptSync, timingSafeEqual } from 'node:crypto';
 import { SignJWT, jwtVerify } from 'jose';
 import type { PublicUser, Role } from '@abuk/core';
-import { normId } from '@abuk/core';
+import { normId, weakPin, type ContactKind, type SignupRequest } from '@abuk/core';
 import { cfg, need } from './config';
 import { readJson, updateJson } from './adapters/github';
 
 // users.json in the private GitHub repo. Only scrypt hashes of keys are stored.
-export interface StoredUser { id: string; name: string; role: Role; salt: string; hash: string; on: boolean; created: string; expires: string; lastSeen?: string; note?: string; pinSalt?: string; pinHash?: string; pinFails?: number; pinLockedUntil?: string }
+export interface StoredUser { id: string; name: string; role: Role; salt: string; hash: string; on: boolean; created: string; expires: string; lastSeen?: string; note?: string; pinSalt?: string; pinHash?: string; pinFails?: number; pinLockedUntil?: string; pinTemp?: boolean; contact?: string; contactKind?: ContactKind; signupId?: string }
 export interface UsersFile { users: StoredUser[] }
 export const USERS_PATH = 'users.json';
 
@@ -26,16 +26,16 @@ export function nextId(users: StoredUser[], role: Role) {
   return `${pre}‑${String(Math.max(0, ...used) + 1).padStart(3, '0')}`;
 }
 
-export function makeUser(users: StoredUser[], name: string, role: Role, days: number, now = new Date()) {
+export function makeUser(users: StoredUser[], name: string, role: Role, days: number, now = new Date(), extra: Partial<StoredUser> = {}) {
   const key = newKey(), salt = randomBytes(16).toString('hex');
-  const user: StoredUser = { id: nextId(users, role), name, role, salt, hash: hashKey(key, salt), on: true, created: now.toISOString(), expires: new Date(now.getTime() + days * 864e5).toISOString() };
+  const user: StoredUser = { id: nextId(users, role), name, role, salt, hash: hashKey(key, salt), on: true, created: now.toISOString(), expires: new Date(now.getTime() + days * 864e5).toISOString(), ...extra };
   return { user, key };
 }
 
 const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 export function toPublic(u: StoredUser): PublicUser {
   const meta = !u.on ? (u.note || 'revoked') : `key exp. ${fmt(u.expires)}` + (u.lastSeen ? ` · seen ${fmt(u.lastSeen)}` : ' · not signed in');
-  return { id: u.id, name: u.name, role: u.role, meta, on: u.on, expires: u.expires };
+  return { id: u.id, name: u.name, role: u.role, meta, on: u.on, expires: u.expires, ...(u.pinTemp ? { tempPin: true } : {}) };
 }
 
 let usersCache: { at: number; data: UsersFile } | null = null;
@@ -64,7 +64,17 @@ const secret = () => { need('session'); return new TextEncoder().encode(cfg.sess
 // 4-digit PINs are guessable, so they lock after PIN_MAX_FAILS wrong tries; the access key still works.
 export const PIN = /^\d{4}$/;
 export const PIN_MAX_FAILS = 5, PIN_LOCK_MIN = 15;
-export function pinFields(pin: string) { const pinSalt = randomBytes(16).toString('hex'); return { pinSalt, pinHash: hashKey(pin, pinSalt), pinFails: 0, pinLockedUntil: undefined }; }
+export function pinFields(pin: string) { const pinSalt = randomBytes(16).toString('hex'); return { pinSalt, pinHash: hashKey(pin, pinSalt), pinFails: 0, pinLockedUntil: undefined, pinTemp: undefined }; }
+// A PIN the admin hands out: random, not easy to guess, and the worker must replace it at first sign-in.
+export function newPin() { for (;;) { const p = String(randomInt(10000)).padStart(4, '0'); if (!weakPin(p)) return p; } }
+export const tempPinFields = (pin: string) => ({ ...pinFields(pin), pinTemp: true as const });
+
+// signups.json in the same private repo: requests from people asking for access, until an admin decides.
+export interface SignupsFile { requests: SignupRequest[] }
+export const SIGNUPS_PATH = 'signups.json';
+export const SIGNUP_MAX_PENDING = 200;
+export async function loadSignups(): Promise<SignupsFile> { return (await readJson<SignupsFile>(SIGNUPS_PATH, { requests: [] })).data; }
+export const changeSignups = (message: string, change: (f: SignupsFile) => SignupsFile) => updateJson<SignupsFile>(SIGNUPS_PATH, { requests: [] }, message, change);
 
 export type PinVerdict = Verdict | { ok: false; error: string; fail: true };
 export function checkPin(file: UsersFile, rawId: string, pin: string, now = new Date()): PinVerdict {

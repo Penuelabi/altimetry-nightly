@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { signinError, type SigninResponse } from '@abuk/core';
+import { SIGNUP_NOTE_MAX, signupError, signinError, type ContactKind, type PublicUser, type SigninResponse, type SignupRequest } from '@abuk/core';
 import { go, openRegister, setState, signOut, startSession, useApp, type RosterEntry } from '../store';
 import { api, ApiFail, explain } from '../api';
 import { useOnline, usePlace } from '../net';
@@ -28,6 +28,52 @@ const Lockup = () => <img src="/lockup.png" alt="South Sudan Hydro-Climate Watch
 const localPin = async (pin: string) => { const salt = crypto.getRandomValues(new Uint32Array(4)).join('-'); return { salt, hash: await sha(salt + pin) }; };
 const OTHER = '__other__';
 
+// Anyone can ask for access with an email address or a WhatsApp number. An admin approves it and sends back a worker ID and a PIN.
+function RequestAccess({ onBack }: { onBack: () => void }) {
+  const online = useOnline();
+  const [name, setName] = useState('');
+  const [kind, setKind] = useState<ContactKind>('whatsapp');
+  const [contact, setContact] = useState('');
+  const [note, setNote] = useState('');
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+  const send = async () => {
+    const bad = signupError({ name, kind, contact, note });
+    if (bad) return setErr(bad);
+    if (!online) return setErr('Sending the request needs signal. Try again where the phone has network.');
+    setBusy(true);
+    try { await api('/api/auth/signup', { body: { name, kind, contact, note } }); setSent(true); }
+    catch (e) { setErr(explain(e)); }
+    finally { setBusy(false); }
+  };
+  return (
+    <div className="pad" style={{ padding: '22px 18px 24px' }}>
+      <Lockup />
+      <div>
+        <div className="kick">Abuk Project</div>
+        <h1 className="h1" style={{ margin: '4px 0 6px', fontSize: 34, lineHeight: 1.02 }}>Ask for access</h1>
+      </div>
+      {sent ? <>
+        <div className="msg">Request sent. When an admin approves it, they will send your worker ID and a 4-digit PIN to your {kind === 'email' ? 'email address' : 'WhatsApp'}. Then come back here, choose your name and enter the PIN.</div>
+        <button className="btn lg" onClick={onBack}>Back to sign in</button>
+      </> : <>
+        <Field label="Full name"><input className="input" style={{ minHeight: 44, fontSize: 16 }} value={name} onChange={e => { setName(e.target.value); setErr(''); }} autoComplete="name" /></Field>
+        <div style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>Where should the admin send your PIN?</div>
+        <Seg items={[['whatsapp', 'WhatsApp'], ['email', 'Email']]} value={kind} onPick={k => { setKind(k); setContact(''); setErr(''); }} />
+        <Field label={kind === 'email' ? 'Email address' : 'WhatsApp number'}>
+          <input className="input" style={{ minHeight: 44, fontSize: 16 }} type={kind === 'email' ? 'email' : 'tel'} inputMode={kind === 'email' ? 'email' : 'tel'} placeholder={kind === 'email' ? 'name@example.com' : '+211 912 345 678'} value={contact} onChange={e => { setContact(e.target.value); setErr(''); }} autoComplete={kind === 'email' ? 'email' : 'tel'} />
+        </Field>
+        <Field label="Your group or place (optional)"><input className="input" style={{ minHeight: 44, fontSize: 16 }} maxLength={SIGNUP_NOTE_MAX} placeholder="e.g. Group 4, Duk Padiet" value={note} onChange={e => setNote(e.target.value)} /></Field>
+        {err && <div className="msg">{err}</div>}
+        <button className="btn lg" onClick={send} disabled={busy}>{busy ? 'Sending…' : 'Send request'}</button>
+        <button className="link" style={{ alignSelf: 'flex-start' }} onClick={onBack}>Back to sign in</button>
+        <div className="note">Your contact is only seen by the project admins and is used to send you your PIN.</div>
+      </>}
+    </div>
+  );
+}
+
 export function SignIn() {
   const s = useApp(), online = useOnline(), place = usePlace();
   // Everyone the phone knows: workers who signed in here before, plus the project roster when online.
@@ -45,6 +91,7 @@ export function SignIn() {
   const [pin, setPin] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [requesting, setRequesting] = useState(false);
 
   const withKey = async () => {
     const bad = signinError(id, key);
@@ -70,10 +117,13 @@ export function SignIn() {
     try {
       const r = await api<SigninResponse>('/api/auth/signin-pin', { body: { id, pin: v } });
       startSession({ token: r.token, user: r.user, expires: r.expires, pin: await localPin(v) });
+      // A PIN the admin chose: go straight to the page where the worker sets their own.
+      if (r.user.tempPin) setState({ screen: 'signin', hist: [] });
     } catch (e) { setPin(''); setErr(explain(e)); }
     finally { setBusy(false); }
   };
 
+  if (requesting) return <RequestAccess onBack={() => setRequesting(false)} />;
   const demo = () => setState({ session: { token: 'demo', demo: true, expires: new Date(Date.now() + 864e5).toISOString(), user: { id: 'EW‑014', name: 'Achol Deng', role: 'Admin', meta: 'Group 4 · demo', on: true, expires: '' } } });
   return (
     <div className="pad" style={{ padding: '22px 18px 24px' }}>
@@ -102,6 +152,7 @@ export function SignIn() {
       {busy && method === 'pin' && <div className="note">Checking…</div>}
       {err && <div className="msg">{err}</div>}
       <div className="note" style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 10 }}>The access key from your admin is needed once. Then use your PIN: it works on any phone with signal, and offline on phones you have used before. 5 wrong PINs lock PIN sign‑in for 15 minutes.</div>
+      <button className="link" style={{ alignSelf: 'flex-start' }} onClick={() => setRequesting(true)}>New here? Ask for access</button>
       {(import.meta.env.DEV || import.meta.env.VITE_DEMO === '1') && <button className="link" onClick={demo}>Open demo with sample data (test build)</button>}
     </div>
   );
@@ -139,19 +190,26 @@ export function Account() {
   const [pin, setPin] = useState('');
   const [pinMsg, setPinMsg] = useState('');
   const u = s.session!.user;
+  const online = useOnline();
+  const [waiting, setWaiting] = useState(0);
+  useEffect(() => { if (online && u.role === 'Admin' && !s.session?.demo) api<SignupRequest[]>('/api/admin/signups').then(r => setWaiting(r.filter(x => x.status === 'pending').length), () => {}); }, [online, u.role]); // eslint-disable-line react-hooks/exhaustive-deps
   const setNewPin = async (v: string) => {
     setPin(v); setPinMsg('');
     if (v.length < 4) return;
     setPin('');
+    let synced = true;
     if (!s.session?.demo) {
       try { await api('/api/auth/pin', { body: { pin: v } }); }
       catch (e) {
         if (!(e instanceof ApiFail) || e.status !== 0) return setPinMsg(explain(e));
+        synced = false;
         setPinMsg('Saved on this phone only (no signal). Set it again with signal to use it on other phones.');
       }
     }
     const p = await localPin(v);
-    setState(st => ({ pin: p, accounts: st.accounts.map(a => (a.user.id === st.session?.user.id ? { ...a, pin: p } : a)) }));
+    // The admin's temporary PIN is replaced on the server only once the new one has been saved there.
+    const done = (x: PublicUser): PublicUser => (synced ? { ...x, tempPin: false } : x);
+    setState(st => ({ pin: p, accounts: st.accounts.map(a => (a.user.id === st.session?.user.id ? { ...a, pin: p, user: done(a.user) } : a)), session: st.session ? { ...st.session, user: done(st.session.user) } : st.session }));
     setPinMsg(m => m || 'PIN set. Use it to sign in next time, on this phone even without signal.');
   };
   const exp = new Date(s.session!.expires).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -164,6 +222,7 @@ export function Account() {
           <div key={k} style={{ padding: '9px 0', borderBottom: '1px solid var(--color-divider)' }}><div className="lbl">{k}</div><div style={{ fontSize: 14 }}>{v}</div></div>
         ))}
       </div>
+      {u.tempPin && <div className="msg">Your admin gave you a temporary PIN. Choose your own 4-digit PIN now, one only you know.</div>}
       <div style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--color-neutral-800)' }}>{s.pin ? 'Change your 4‑digit PIN for offline unlock.' : 'Set a 4‑digit PIN for offline unlock.'}</div>
       <PinBoxes value={pin} onChange={setNewPin} label="New PIN" />
       {pinMsg && <div className="msg">{pinMsg}</div>}
@@ -172,7 +231,7 @@ export function Account() {
         <Seg items={[['ledger', 'Ledger'], ['almanac', 'Almanac'], ['field', 'Field map']]} value={s.homeLayout} onPick={v => setState({ homeLayout: v })} />
       </div>
       <button className="btn plain" onClick={() => openRegister('plots')}>Farm register · plots, crops, groups, batches</button>
-      {u.role === 'Admin' && <button className="btn plain" onClick={() => go('admin')}>Manage users & access keys</button>}
+      {u.role === 'Admin' && <button className="btn plain" onClick={() => go('admin')}>Manage users & access keys{waiting ? ` · ${waiting} request${waiting === 1 ? '' : 's'} waiting` : ''}</button>}
       <AppVersion />
       <button className="btn lg" onClick={() => setState({ screen: 'home', hist: [] })}>Continue</button>
       <button className="link" style={{ color: 'var(--color-neutral-700)', fontSize: 13 }} onClick={signOut}>Sign out{s.outbox.length ? ` (${s.outbox.length} records still waiting to sync stay on this phone)` : ''}</button>

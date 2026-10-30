@@ -1,10 +1,10 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from '@hono/node-server/serve-static';
-import type { AdminLoc, GaugeReading, Role, SyncRecord } from '@abuk/core';
-import { applyOps, editAllowed, normId, opAllowed, opError, parseGauge, seedRegister, seedStore, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
+import type { AdminLoc, ContactKind, GaugeReading, Role, SignupRequest, SyncRecord } from '@abuk/core';
+import { applyOps, editAllowed, newId, normContact, normId, opAllowed, opError, parseGauge, signupError, SIGNUP_NOTE_MAX, weakPin, seedRegister, seedStore, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
 import { cfg, health, missing, NotConfigured } from './config';
-import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, changeUsers, checkKey, checkPin, issueSession, loadUsers, makeUser, pinFields, readSession, toPublic, type Session } from './auth';
+import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, SIGNUP_MAX_PENDING, changeSignups, loadSignups, newPin, tempPinFields, changeUsers, checkKey, checkPin, issueSession, loadUsers, makeUser, pinFields, readSession, toPublic, type Session, type StoredUser } from './auth';
 import { readJson, updateJson } from './adapters/github';
 import { photoGet, photoPut, sheetsAppend } from './adapters/google';
 import { parseInbound, sendSms } from './adapters/sms';
@@ -91,7 +91,7 @@ app.post('/api/auth/signin-pin', async c => {
 app.post('/api/auth/pin', auth(), async c => {
   const { pin = '' } = await c.req.json<{ pin?: string }>();
   if (!PIN.test(pin)) return c.json({ error: 'invalid', message: 'The PIN has 4 digits.' }, 400);
-  if (/^(\d)\1{3}$|^(0123|1234|2345|3456|4567|5678|6789|9876|8765|7654|6543|5432|4321|3210)$/.test(pin)) return c.json({ error: 'invalid', message: 'Choose a PIN that is harder to guess than 1111 or 1234.' }, 400);
+  if (weakPin(pin)) return c.json({ error: 'invalid', message: 'Choose a PIN that is harder to guess than 1111 or 1234.' }, 400);
   const me = c.get('me');
   await changeUsers(`set PIN ${me.id} (hash only)`, f => ({ users: f.users.map(u => (u.id === me.id ? { ...u, ...pinFields(pin) } : u)) }));
   return c.json({ ok: true });
@@ -120,6 +120,78 @@ app.post('/api/admin/users/:id/toggle', auth(['Admin']), async c => {
   if (id === me.id) return c.json({ error: 'invalid', message: 'You cannot revoke your own key.' }, 400);
   const r = await changeUsers(`toggle ${id} by ${me.id}`, f => ({ users: f.users.map(u => u.id === id ? { ...u, on: !u.on, note: u.on ? `revoked ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : undefined } : u) }));
   return c.json(r.data.users.map(toPublic));
+});
+
+// ---- self sign-up: request by email or WhatsApp, admin approves and sends the temporary PIN ----
+const signupHits = new Map<string, number[]>();
+const signupLimited = (ip: string) => {
+  const now = Date.now(), hits = (signupHits.get(ip) || []).filter(t => now - t < 3_600_000);
+  hits.push(now); signupHits.set(ip, hits);
+  return hits.length > 5;
+};
+const clean = (s: unknown, max: number) => String(s ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, max);
+
+app.post('/api/auth/signup', async c => {
+  if (signupLimited(c.req.header('x-forwarded-for') || 'local')) return c.json({ error: 'too_many', message: 'Too many requests from this connection. Try again in an hour.' }, 429);
+  const b = await c.req.json<{ name?: string; kind?: string; contact?: string; note?: string }>().catch(() => ({} as { name?: string; kind?: string; contact?: string; note?: string }));
+  const name = clean(b.name, 80), note = clean(b.note, SIGNUP_NOTE_MAX), kind = String(b.kind ?? '');
+  const bad = signupError({ name, kind, contact: String(b.contact ?? ''), note });
+  if (bad) return c.json({ error: 'invalid', message: bad }, 400);
+  const contact = normContact(kind as ContactKind, String(b.contact));
+  let full = false;
+  await changeSignups('sign-up request (contact stored, never a key or PIN)', f => {
+    // The same person asking twice is not a second request; the answer to them is the same either way.
+    if (f.requests.some(r => r.status === 'pending' && r.kind === kind && r.contact === contact)) return f;
+    if (f.requests.filter(r => r.status === 'pending').length >= SIGNUP_MAX_PENDING) { full = true; return f; }
+    const req: SignupRequest = { id: newId('su'), name, kind: kind as ContactKind, contact, note, at: new Date().toISOString(), status: 'pending' };
+    return { requests: [req, ...f.requests].slice(0, 500) };
+  });
+  if (full) return c.json({ error: 'busy', message: 'Too many requests are waiting. Ask your admin directly.' }, 503);
+  return c.json({ ok: true });
+});
+
+app.get('/api/admin/signups', auth(['Admin']), async c => {
+  const rs = (await loadSignups()).requests;
+  return c.json([...rs.filter(r => r.status === 'pending'), ...rs.filter(r => r.status !== 'pending').slice(0, 30)]);
+});
+
+// Approve: make the worker with a random temporary PIN, shown once to the admin to send. Safe to repeat for the same request.
+app.post('/api/admin/signups/:id/approve', auth(['Admin']), async c => {
+  const id = c.req.param('id'), me = c.get('me');
+  const { role = 'Extension worker', exp = '90 days' } = await c.req.json<{ role?: Role; exp?: string }>().catch(() => ({} as { role?: Role; exp?: string }));
+  if (!['Admin', 'Group lead', 'Extension worker'].includes(role)) return c.json({ error: 'invalid', message: 'Unknown role.' }, 400);
+  const req = (await loadSignups()).requests.find(r => r.id === id);
+  if (!req) return c.json({ error: 'not_found', message: 'That request is gone.' }, 404);
+  if (req.status === 'rejected') return c.json({ error: 'invalid', message: 'That request was rejected.' }, 400);
+  const pin = newPin();
+  let worker: StoredUser | null = null;
+  await changeUsers(`approve sign-up ${id} by ${me.id} (hash only)`, f => {
+    const have = f.users.find(u => u.signupId === id);
+    if (have) { worker = { ...have, ...tempPinFields(pin), on: true }; return { users: f.users.map(u => (u.id === have.id ? worker! : u)) }; }
+    const made = makeUser(f.users, req.name, role, EXPIRY_DAYS[exp] ?? 90, new Date(), { signupId: id, contact: req.contact, contactKind: req.kind, ...tempPinFields(pin) });
+    worker = made.user;
+    return { users: [made.user, ...f.users] };
+  });
+  const u = worker as unknown as StoredUser;
+  await changeSignups(`sign-up ${id} approved by ${me.id}`, f => ({ requests: f.requests.map(r => (r.id === id ? { ...r, status: 'approved' as const, decidedAt: new Date().toISOString(), decidedBy: me.id, userId: u.id } : r)) }));
+  return c.json({ user: toPublic(u), pin, contact: req.contact, kind: req.kind });
+});
+
+app.post('/api/admin/signups/:id/reject', auth(['Admin']), async c => {
+  const id = c.req.param('id'), me = c.get('me');
+  const r = await changeSignups(`sign-up ${id} rejected by ${me.id}`, f => ({ requests: f.requests.map(x => (x.id === id && x.status === 'pending' ? { ...x, status: 'rejected' as const, decidedAt: new Date().toISOString(), decidedBy: me.id } : x)) }));
+  return c.json(r.data.requests.filter(x => x.status === 'pending'));
+});
+
+// Forgotten PIN: a new temporary one, to send the same way.
+app.post('/api/admin/users/:id/reset-pin', auth(['Admin']), async c => {
+  const id = c.req.param('id'), me = c.get('me');
+  const pin = newPin();
+  let worker: StoredUser | null = null;
+  await changeUsers(`reset PIN ${id} by ${me.id} (hash only)`, f => ({ users: f.users.map(u => { if (u.id !== id) return u; worker = { ...u, ...tempPinFields(pin) }; return worker; }) }));
+  if (!worker) return c.json({ error: 'not_found', message: 'No such worker.' }, 404);
+  const u = worker as unknown as StoredUser;
+  return c.json({ user: toPublic(u), pin, contact: u.contact ?? '', kind: u.contactKind ?? null });
 });
 
 // ---- data sources ----

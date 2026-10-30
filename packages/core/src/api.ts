@@ -2,7 +2,8 @@
 import type { AdminLoc } from './farm';
 export type Role = 'Admin' | 'Group lead' | 'Extension worker';
 
-export interface PublicUser { id: string; name: string; role: Role; meta: string; on: boolean; expires: string }
+// tempPin: the admin chose this person's current PIN, so the app asks them to set their own.
+export interface PublicUser { id: string; name: string; role: Role; meta: string; on: boolean; expires: string; tempPin?: boolean }
 export interface SigninResponse { token: string; user: PublicUser; expires: string }
 export interface NewKeyResponse { user: PublicUser; key: string; commit: string }
 

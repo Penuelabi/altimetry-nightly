@@ -362,3 +362,40 @@ describe('register helpers for Home, tasks and the Market', () => {
     expect(opError({ op: 'upsert', kind: 'mound', item: { id: 'B-01', crest: 1.1, note: '', surveyedAt: '2026-10-30', by: 'x' } })).toBe('');
   });
 });
+
+import { normContact, pinMessage, signupError, weakPin } from '../src';
+
+describe('self sign-up', () => {
+  it('accepts a South Sudan or international WhatsApp number and tidies it', () => {
+    expect(normContact('whatsapp', '0912 345 678')).toBe('+211912345678');
+    expect(normContact('whatsapp', '+211 912-345-678')).toBe('+211912345678');
+    expect(normContact('whatsapp', '00256 700 123 456')).toBe('+256700123456');
+    expect(normContact('whatsapp', '12345')).toBe('');
+    expect(normContact('whatsapp', 'abc')).toBe('');
+  });
+  it('accepts an email in any case and rejects the malformed', () => {
+    expect(normContact('email', ' Nyibol@Example.org ')).toBe('nyibol@example.org');
+    expect(normContact('email', 'nyibol@')).toBe('');
+    expect(normContact('email', 'no spaces@x.org')).toBe('');
+  });
+  it('says what is missing from a request', () => {
+    const ok = { name: 'Nyibol Garang', kind: 'email', contact: 'n@x.org' };
+    expect(signupError(ok)).toBe('');
+    expect(signupError({ ...ok, name: 'Nyibol' })).toContain('first and last name');
+    expect(signupError({ ...ok, kind: 'sms' })).toContain('email or WhatsApp');
+    expect(signupError({ ...ok, contact: 'x' })).toContain('email');
+    expect(signupError({ ...ok, note: 'x'.repeat(201) })).toContain('note');
+  });
+  it('treats easy PINs as weak and others as fine', () => {
+    for (const p of ['1111', '0000', '1234', '4321', '0123', '9876']) expect(weakPin(p)).toBe(true);
+    for (const p of ['4821', '7305', '1357']) expect(weakPin(p)).toBe(false);
+  });
+  it('writes the message the admin sends', () => {
+    const m = pinMessage({ name: 'Nyibol Garang', id: 'EW‑012', pin: '4821', url: 'https://x.test' });
+    expect(m).toContain('Hello Nyibol');
+    expect(m).toContain('EW‑012');
+    expect(m).toContain('4821');
+    expect(m).toContain('https://x.test');
+    expect(pinMessage({ name: 'A B', id: 'EW‑001', pin: '4821', url: 'u', reset: true })).toContain('reset');
+  });
+});

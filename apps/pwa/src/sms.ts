@@ -11,3 +11,7 @@ export const openLink = (href: string) => { const a = document.createElement('a'
 export async function copyText(text: string): Promise<boolean> {
   try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
 }
+
+// Straight to one person: their WhatsApp chat (number with country code, digits only) or a mail to their address.
+export const whatsappTo = (number: string, body: string) => `https://wa.me/${number.replace(/\D/g, '')}?text=${encodeURIComponent(body)}`;
+export const mailTo = (address: string, subject: string, body: string) => `mailto:${encodeURIComponent(address)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import type { NewKeyResponse, PublicUser, Role } from '@abuk/core';
+import { pinMessage, type NewKeyResponse, type PinIssued, type PublicUser, type Role, type SignupRequest } from '@abuk/core';
 import { useApp } from '../store';
-import { api, explain } from '../api';
+import { BASE, api, explain } from '../api';
+import { copyText, mailTo, openLink, whatsappShare, whatsappTo } from '../sms';
 import { useOnline } from '../net';
 import { Field, Seg } from '../ui';
 
@@ -16,8 +17,16 @@ export function Admin() {
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
   const isAdmin = s.session?.user.role === 'Admin';
+  const [reqs, setReqs] = useState<SignupRequest[]>([]);
+  const [issued, setIssued] = useState<(PinIssued & { reset: boolean }) | null>(null);
+  const [pick, setPick] = useState<Record<string, { role: Role; exp: string }>>({});
+  const [note, setNote] = useState('');
 
-  useEffect(() => { if (online && isAdmin) api<PublicUser[]>('/api/admin/users').then(setUsers, e => setErr(explain(e))); }, [online, isAdmin]);
+  useEffect(() => {
+    if (!online || !isAdmin) return;
+    api<PublicUser[]>('/api/admin/users').then(setUsers, e => setErr(explain(e)));
+    api<SignupRequest[]>('/api/admin/signups').then(setReqs, () => {});
+  }, [online, isAdmin]);
 
   if (!isAdmin) return <div className="pad"><p className="body">Only admins can manage users and access keys.</p></div>;
 
@@ -37,8 +46,66 @@ export function Admin() {
     catch (e) { setErr(explain(e)); }
   };
 
+  const refresh = () => { api<PublicUser[]>('/api/admin/users').then(setUsers, () => {}); api<SignupRequest[]>('/api/admin/signups').then(setReqs, () => {}); };
+  const approve = async (r: SignupRequest) => {
+    const o = pick[r.id] ?? { role: 'Extension worker' as Role, exp: '90 days' };
+    setErr(''); setNote('');
+    try { setIssued({ ...(await api<PinIssued>(`/api/admin/signups/${encodeURIComponent(r.id)}/approve`, { body: o })), reset: false }); refresh(); }
+    catch (e) { setErr(explain(e)); }
+  };
+  const reject = async (r: SignupRequest) => {
+    try { await api(`/api/admin/signups/${encodeURIComponent(r.id)}/reject`, { method: 'POST' }); setNote(`Request from ${r.name} rejected.`); refresh(); }
+    catch (e) { setErr(explain(e)); }
+  };
+  const resetPin = async (u: PublicUser) => {
+    setErr(''); setNote('');
+    try { setIssued({ ...(await api<PinIssued>(`/api/admin/users/${encodeURIComponent(u.id)}/reset-pin`, { method: 'POST' })), reset: true }); refresh(); }
+    catch (e) { setErr(explain(e)); }
+  };
+  const pending = reqs.filter(r => r.status === 'pending');
+  const text = issued ? pinMessage({ name: issued.user.name, id: issued.user.id, pin: issued.pin, url: BASE || location.origin, reset: issued.reset }) : '';
+  const sendIssued = () => {
+    if (!issued) return;
+    if (issued.kind === 'email' && issued.contact) openLink(mailTo(issued.contact, 'Your Abuk Project access', text));
+    else openLink(issued.contact ? whatsappTo(issued.contact, text) : whatsappShare(text));
+  };
+
   return (
     <div className="pad" style={{ paddingTop: 14 }}>
+      {issued && (
+        <div className="card accent" style={{ padding: 14 }}>
+          <div className="kick sm">{issued.reset ? 'New PIN' : 'Approved'} for {issued.user.name} · {issued.user.id} · shown once</div>
+          <div className="head num" style={{ fontSize: 40, letterSpacing: '.2em' }}>{issued.pin}</div>
+          <div className="sub">Send it now, from your own {issued.kind === 'email' ? 'mail' : 'WhatsApp'}{issued.contact ? ` to ${issued.contact}` : ''}. The worker is asked to choose their own PIN at first sign-in. The server keeps only a hash.</div>
+          <div className="grid2" style={{ gap: 8 }}>
+            <button className="btn md" onClick={sendIssued}>{issued.kind === 'email' && issued.contact ? 'Send by email' : 'Send on WhatsApp'}</button>
+            <button className="btn plain md" onClick={async () => setNote((await copyText(text)) ? 'Message copied.' : 'Could not copy. Select the PIN and send it by hand.')}>Copy message</button>
+          </div>
+          <button className="link" style={{ alignSelf: 'flex-start' }} onClick={() => { setIssued(null); setNote(''); }}>Done, hide it</button>
+        </div>
+      )}
+      {note && <div className="msg">{note}</div>}
+      {pending.length > 0 && (
+        <div>
+          <div className="between rule-b"><h2 className="h2 h20">Sign-up requests</h2><span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>{pending.length} waiting</span></div>
+          {pending.map(r => {
+            const o = pick[r.id] ?? { role: 'Extension worker' as Role, exp: '90 days' };
+            return (
+              <div key={r.id} className="col g8" style={{ padding: '10px 0', borderBottom: '1px solid var(--color-divider)' }}>
+                <div><span style={{ display: 'block', fontSize: 14 }}>{r.name}</span><span className="sub">{r.kind === 'email' ? 'Email' : 'WhatsApp'} {r.contact} · {new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}{r.note ? ` · ${r.note}` : ''}</span></div>
+                <div className="grid2" style={{ gap: 8 }}>
+                  <select className="input" aria-label="Role" style={{ minHeight: 40 }} value={o.role} onChange={e => setPick({ ...pick, [r.id]: { ...o, role: e.target.value as Role } })}><option>Extension worker</option><option>Group lead</option><option>Admin</option></select>
+                  <select className="input" aria-label="Access lasts" style={{ minHeight: 40 }} value={o.exp} onChange={e => setPick({ ...pick, [r.id]: { ...o, exp: e.target.value } })}><option value="30 days">30 days</option><option value="90 days">90 days</option><option value="1 year">1 year</option></select>
+                </div>
+                <div className="grid2" style={{ gap: 8 }}>
+                  <button className="btn md" onClick={() => approve(r)}>Approve and get PIN</button>
+                  <button className="btn plain md" onClick={() => reject(r)}>Reject</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
       <p className="body" style={{ fontSize: 13.5 }}>Only admins see this. A new key is shown once. GitHub stores a salted hash of it, never the key itself, in the private access repository <span className="mono" style={{ fontSize: 12 }}>users.json</span>.</p>
       <div className="box col g10" style={{ padding: 14 }}>
         <h2 className="h2 h20">New user</h2>
@@ -66,7 +133,7 @@ export function Admin() {
         {users?.map(u => (
           <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, padding: '10px 0', borderBottom: '1px solid var(--color-divider)', alignItems: 'center', opacity: u.on ? 1 : 0.5 }}>
             <span><span style={{ display: 'block', fontSize: 14 }}>{u.name} <span className="mono" style={{ fontSize: 11.5, color: 'var(--color-neutral-700)' }}>{u.id}</span></span><span className="sub">{u.role} · {u.meta}</span></span>
-            {u.id !== s.session?.user.id && <button className="btn plain sm" onClick={() => toggle(u.id)}>{u.on ? 'Revoke' : 'Restore'}</button>}
+            <span style={{ display: 'flex', gap: 6 }}>{u.on && <button className="btn plain sm" onClick={() => resetPin(u)}>Reset PIN</button>}{u.id !== s.session?.user.id && <button className="btn plain sm" onClick={() => toggle(u.id)}>{u.on ? 'Revoke' : 'Restore'}</button>}</span>
           </div>
         ))}
       </div>

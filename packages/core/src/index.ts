@@ -12,3 +12,4 @@ export * from './bulletin';
 export * from './alerts';
 export * from './pests';
 export * from './chains';
+export * from './signup';

@@ -68,6 +68,8 @@ Phone numbers never ship in the app. Add them to `config/leads.json` in the acce
 - real phone GPS for plot mapping and crop checks
 - the offline outbox
 
+**Signing up and approving workers:** anyone can ask for access on the sign-in page (name plus a WhatsApp number or email). Requests are written to `signups.json` in the private access repo (5 requests per connection per hour, 200 waiting at most). An admin approves in the app under Manage users & access keys: that creates the worker with a random temporary 4-digit PIN (hash only is stored) and shows it once, with buttons to send it from the admin's own WhatsApp or mail app. The server sends nothing itself. The worker is asked to choose their own PIN at first sign-in. *Reset PIN* does the same for a forgotten PIN. Access keys still work as before.
+
 **Still sample or preview:**
 - the basin-depth model shows the design example (0.92 m, 2.5 cm/day) until a depth reading or crop check is recorded within 2 km, then it is fitted to those readings (the screen says which); the gauge trend sets the fall rate when there are no depth readings
 - the bulletin text and model inputs until the first pull

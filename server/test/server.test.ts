@@ -177,3 +177,21 @@ describe('PIN sign-in', () => {
     expect(r.status).toBe(400);
   });
 });
+
+import { newPin, tempPinFields } from '../src/auth';
+import { weakPin } from '@abuk/core';
+
+describe('admin-issued PIN', () => {
+  it('makes random PINs that are never weak', () => {
+    for (let i = 0; i < 300; i++) { const p = newPin(); expect(p).toMatch(/^\d{4}$/); expect(weakPin(p)).toBe(false); }
+  });
+  it('lets a worker in with the temporary PIN, flags it, and clears the flag when they choose their own', () => {
+    const { user } = makeUser([], 'Nyibol Garang', 'Extension worker', 30, new Date(), { ...tempPinFields('4821'), contact: '+211912345678', contactKind: 'whatsapp' });
+    const file = { users: [user] };
+    expect(checkPin(file, user.id, '4821').ok).toBe(true);
+    expect(checkPin(file, user.id, '4822').ok).toBe(false);
+    expect(toPublic(user).tempPin).toBe(true);
+    const own = { ...user, ...tempPinFields('4821'), pinTemp: undefined };
+    expect(toPublic(own).tempPin).toBeUndefined();
+  });
+});
