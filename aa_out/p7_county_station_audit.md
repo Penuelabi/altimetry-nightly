@@ -4,9 +4,9 @@
 
 | Verdict | Counties |
 | --- | --- |
-| OK (gauge on the county) | 38 |
+| OK (gauge on the county) | 39 |
 | OK | 24 |
-| REVIEW DATA AGE | 14 |
+| REVIEW DATA AGE | 13 |
 | REVIEW LINK | 3 |
 
 ## Counties to review
@@ -20,15 +20,14 @@
 | Cueibet | Gulnam km 4631 | 25.6 | 285.0 | Gulnam km 4574 | 41.2 | linked reading 285 days old |
 | Wulu | Unknown, River | 7.0 | 40.0 | Ibba km 4410 | 7.0 | linked reading 40 days old |
 | Raja | Wadi Boro, River | 6.9 | 56.0 | Chel km 5095 | 0.0 | linked reading 56 days old |
-| Abiemnhom | Bhar-al-arab, River | 0.0 | 60.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 60 days old |
-| Aweil West | Wadi Boro, River | 0.0 | 58.0 | Lol km 4833 | 0.0 | linked reading 58 days old |
-| Panyikang | White Nile, River | 0.0 | 36.0 | White Nile km 4084 | 0.0 | linked reading 36 days old |
-| Nyirol | Fulus km 4165 | 0.0 | 88.0 | Fulus km 4114 | 0.0 | linked reading 88 days old |
 | Baliet | Sobat, River | 0.0 | 34.0 | Sobat km 4122 | 0.0 | linked reading 34 days old |
+| Nyirol | Fulus km 4165 | 0.0 | 88.0 | Fulus km 4114 | 0.0 | linked reading 88 days old |
+| Abiemnhom | Bhar-al-arab, River | 0.0 | 33.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 33 days old |
+| Aweil West | Wadi Boro, River | 0.0 | 58.0 | Lol km 4833 | 0.0 | linked reading 58 days old |
+| Panyikang | White Nile, River | 0.0 | 36.0 | Sobat km 4023 | 0.0 | linked reading 36 days old |
+| Terekeka | White Nile, River | 0.0 | 36.0 | White Nile, River | 0.0 | linked reading 36 days old |
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 285.0 | Gulnam km 4669 | 2.9 | linked reading 285 days old |
 | Tonj North | Unknown, River | 0.0 | 40.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 40 days old |
-| Terekeka | White Nile, River | 0.0 | 36.0 | Nile km 4843 | 0.0 | linked reading 36 days old |
-| Twic | Lol Trib01 km 4417 | 0.0 | 31.0 | Bhr Lgzl Trib 04 km 4404 | 8.3 | linked reading 31 days old |
-| Twic East | White Nile, River | 0.0 | 38.0 | White Nile, River | 0.0 | linked reading 38 days old |
+| Twic East | White Nile, River | 0.0 | 38.0 | White Nile km 4536 | 0.0 | linked reading 38 days old |
 
 Rules: review when the linked gauge is over 100 km from the county, its latest reading is over 30 days old, or a fresh gauge is at least 25 km closer. The link file is not changed by this audit.

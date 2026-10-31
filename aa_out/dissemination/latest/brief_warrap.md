@@ -1,6 +1,6 @@
 # Warrap - anticipatory action situation brief
 
-Prepared 2026-10-31 01:05 UTC for the Warrap state TWG-AA. Rain and soil data to 2026-10-27; ECMWF run 2026-10-30 12 UTC.
+Prepared 2026-10-31 15:43 UTC for the Warrap state TWG-AA. Rain and soil data to 2026-10-28; ECMWF run 2026-10-31 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,12 +12,12 @@ Prepared 2026-10-31 01:05 UTC for the Warrap state TWG-AA. Rain and soil data to
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Gogrial East | Warrap | **ORANGE** | drought / dry spell | 4 | 0% | 9,049 |
-| Gogrial West | Warrap | **ORANGE** | drought / dry spell | 3 | 0% | 34,800 |
-| Tonj East | Warrap | **ORANGE** | drought / dry spell | 8 | 0% | 105 |
-| Tonj North | Warrap | **ORANGE** | drought / dry spell | 5 | 0% | 7,001 |
-| Tonj South | Warrap | **ORANGE** | drought / dry spell | 9 | 0% | 3,140 |
-| Twic | Warrap | **ORANGE** | drought / dry spell | 2 | 0% | 11,366 |
+| Gogrial East | Warrap | **ORANGE** | drought / dry spell | 3 | 0% | 9,049 |
+| Gogrial West | Warrap | **ORANGE** | drought / dry spell | 2 | 0% | 34,800 |
+| Tonj East | Warrap | **ORANGE** | drought / dry spell | 4 | 0% | 105 |
+| Tonj North | Warrap | **ORANGE** | drought / dry spell | 4 | 0% | 7,001 |
+| Tonj South | Warrap | **ORANGE** | drought / dry spell | 6 | 0% | 3,140 |
+| Twic | Warrap | **ORANGE** | drought / dry spell | 1 | 0% | 11,366 |
 
 ## Decisions for the group
 - Agree the warning for the 6 counties with an alert and the channels (radio hubs, chiefs, SMS).
