@@ -6,10 +6,10 @@ Aweil Centre,Northern Bahr el Ghazal,Chel km 4862,hydroweb:101700,0.0,15.0,Chel 
 Aweil East,Northern Bahr el Ghazal,Lol km 4620,hydroweb:203695,0.0,17.0,Lol km 4696,hydroweb:200088,0.0,10.0,False,medium,OK (gauge on the county),medium,False,False
 Aweil North,Northern Bahr el Ghazal,Lol km 4838,hydroweb:7906,0.0,13.0,Lol km 4729,hydroweb:111156,0.0,12.0,False,medium,OK (gauge on the county),medium,False,False
 Aweil South,Northern Bahr el Ghazal,Bahr km 4651,hydroweb:7813,0.0,9.0,Lol km 4620,hydroweb:203695,6.6,17.0,False,high,OK (gauge on the county),high,False,False
-Aweil West,Northern Bahr el Ghazal,"Wadi Boro, River",dahiti:23343,0.0,59.0,Lol km 4833,hydroweb:113744,0.0,4.0,False,high,REVIEW DATA AGE,medium,True,False
+Aweil West,Northern Bahr el Ghazal,"Wadi Boro, River",dahiti:23343,0.0,32.0,"Wadi Boro, River",dahiti:23344,0.0,30.0,False,high,REVIEW DATA AGE,medium,True,False
 Awerial,Lakes,Nile km 4919,hydroweb:112358,0.0,8.0,Nile km 4725,hydroweb:105858,0.0,10.0,False,high,OK (gauge on the county),high,False,False
 Ayod,Jonglei,White Nile km 4336,hydroweb:7874,0.0,18.0,White Nile km 4436,hydroweb:7876,0.1,9.0,False,medium,OK (gauge on the county),medium,False,False
-Baliet,Upper Nile,"Sobat, River",dahiti:18743,0.0,35.0,Sobat km 4122,hydroweb:7953,0.0,16.0,False,high,REVIEW DATA AGE,medium,True,False
+Baliet,Upper Nile,"Sobat, River",dahiti:18743,0.0,12.0,Sobat km 4122,hydroweb:7953,0.0,16.0,False,high,OK (gauge on the county),high,False,False
 Bor South,Jonglei,White Nile km 4681,hydroweb:7889,0.0,10.0,Lnyl L Byd km 4670,hydroweb:112359,0.0,8.0,False,medium,OK (gauge on the county),medium,False,False
 Budi,Eastern Equatoria,Pager km 5350,hydroweb:102552,88.0,10.0,Pager Trib01 km 5350,hydroweb:106717,118.0,6.0,False,medium,OK,medium,False,False
 Canal/Pigi,Jonglei,"White Nile, River",dahiti:12178,0.0,20.0,White Nile km 4002,hydroweb:201767,0.0,8.0,False,high,OK (gauge on the county),high,False,False
@@ -56,7 +56,7 @@ Panyikang,Upper Nile,"White Nile, River",dahiti:15557,0.0,37.0,Sobat km 4023,hyd
 Pariang,Unity,Bahr Al Arab km 4263,hydroweb:111300,17.2,11.0,Bhar El Gazal km 4143,hydroweb:7829,0.0,16.0,False,high,OK,high,False,False
 Pibor,Jonglei,Lotilla km 4712,hydroweb:7909,0.0,14.0,Pibor km 4625,hydroweb:101872,0.0,14.0,False,high,OK (gauge on the county),high,False,False
 Pochalla,Jonglei,Baro Trib 01 km 4483,hydroweb:102319,14.8,12.0,Baro Trib 01 km 4543,hydroweb:107881,17.2,27.0,False,medium,OK,medium,False,False
-Raja,Western Bahr el Ghazal,"Wadi Boro, River",dahiti:23344,6.9,57.0,Chel km 5095,hydroweb:107357,0.0,30.0,False,high,REVIEW DATA AGE,medium,True,False
+Raja,Western Bahr el Ghazal,"Wadi Boro, River",dahiti:23344,6.9,30.0,Chel km 5095,hydroweb:107357,0.0,30.0,False,high,OK (gauge on the county),high,False,False
 Renk,Upper Nile,White Nile km 3750,hydroweb:201707,0.0,19.0,White Nile km 3679,hydroweb:7970,0.0,12.0,False,high,OK (gauge on the county),high,False,False
 Rubkona,Unity,Bahr Al Arab km 4333,hydroweb:104262,14.1,28.0,Bahr Al Arab km 4263,hydroweb:111300,0.0,11.0,False,high,OK,high,False,False
 Rumbek Centre,Lakes,Gulnam km 4631,hydroweb:110221,0.0,286.0,Gulnam km 4669,hydroweb:104259,2.9,28.0,False,high,REVIEW DATA AGE,medium,True,False

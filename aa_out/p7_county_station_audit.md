@@ -4,9 +4,9 @@
 
 | Verdict | Counties |
 | --- | --- |
-| OK (gauge on the county) | 39 |
+| OK (gauge on the county) | 41 |
 | OK | 24 |
-| REVIEW DATA AGE | 13 |
+| REVIEW DATA AGE | 11 |
 | REVIEW LINK | 3 |
 
 ## Counties to review
@@ -19,11 +19,9 @@
 | Tonj South | Unknown, River | 30.2 | 41.0 | Ibba km 4410 | 30.2 | linked reading 41 days old |
 | Cueibet | Gulnam km 4631 | 25.6 | 286.0 | Gulnam km 4574 | 41.2 | linked reading 286 days old |
 | Wulu | Unknown, River | 7.0 | 41.0 | Ibba km 4410 | 7.0 | linked reading 41 days old |
-| Raja | Wadi Boro, River | 6.9 | 57.0 | Chel km 5095 | 0.0 | linked reading 57 days old |
-| Baliet | Sobat, River | 0.0 | 35.0 | Sobat km 4122 | 0.0 | linked reading 35 days old |
-| Nyirol | Fulus km 4165 | 0.0 | 89.0 | Fulus km 4114 | 0.0 | linked reading 89 days old |
 | Abiemnhom | Bhar-al-arab, River | 0.0 | 34.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 34 days old |
-| Aweil West | Wadi Boro, River | 0.0 | 59.0 | Lol km 4833 | 0.0 | linked reading 59 days old |
+| Aweil West | Wadi Boro, River | 0.0 | 32.0 | Wadi Boro, River | 0.0 | linked reading 32 days old |
+| Nyirol | Fulus km 4165 | 0.0 | 89.0 | Fulus km 4114 | 0.0 | linked reading 89 days old |
 | Panyikang | White Nile, River | 0.0 | 37.0 | Sobat km 4023 | 0.0 | linked reading 37 days old |
 | Terekeka | White Nile, River | 0.0 | 37.0 | White Nile, River | 0.0 | linked reading 37 days old |
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 286.0 | Gulnam km 4669 | 2.9 | linked reading 286 days old |
