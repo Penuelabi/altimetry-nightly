@@ -105,7 +105,7 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None, pdf=None, label=''
     alt = os.environ.get('ALTIMETRY_OUT_DIR', 'altdata')
     sub = (os.environ.get('SUBSCRIBE_URL') or '').strip()
     if kind == 'weekly':
-        news, note = db.fetch_news()
+        news, note = db.compiled_news(today)          # data/news.json: the weekly compiled and verified news
         subject, text, html = db.build_weekly(doc, news, note, sub, sender, today)
     else:
         merged = os.path.join(alt, 'merged_altimetry_stations.csv')
@@ -116,21 +116,42 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None, pdf=None, label=''
         except Exception as e:
             print(f'WARNING: gauge watch skipped: {type(e).__name__}: {e}')
         subject, text, html = db.build_daily(doc, gauges, sub, sender, today)
-    try:
-        import nile_pulse
-        pu = nile_pulse.pulse(today)
-        if pu:
-            text = nile_pulse.text_block(pu) + '\n\n' + text
-            i = html.lower().find('<body')
-            j = html.find('>', i) + 1 if i >= 0 else 0
-            html = html[:j] + nile_pulse.html_block(pu) + html[j:]
-    except Exception as e:
-        print(f'WARNING: Nile pulse block skipped: {type(e).__name__}: {e}')
+    chart = None
+    if kind == 'weekly':
+        # weekly: the Lake Victoria level graph (last 10 passes) replaces the Nile travel-time countdown block
+        try:
+            chart = db.lake_chart_png(10)
+            cap_h, cap_t = db.lake_caption(10)
+            block_h = ((f'<div style="font-family:Arial,sans-serif;max-width:860px;margin-bottom:10px"><img src="cid:lakechart" alt="Lake Victoria water level, last 10 passes" '
+                        f'style="max-width:100%;height:auto">{cap_h}</div>') if chart else
+                       (f'<div style="font-family:Arial,sans-serif;max-width:860px;font-size:12px"><pre style="font-family:inherit">{cap_t}</pre></div>' if cap_t else ''))
+            if cap_t:
+                text = cap_t + '\n\n' + text
+            if block_h:
+                i = html.lower().find('<body')
+                j = html.find('>', i) + 1 if i >= 0 else 0
+                html = html[:j] + block_h + html[j:]
+        except Exception as e:
+            print(f'WARNING: Lake Victoria chart skipped: {type(e).__name__}: {e}')
+            chart = None
+    else:
+        try:
+            import nile_pulse
+            pu = nile_pulse.pulse(today)
+            if pu:
+                text = nile_pulse.text_block(pu) + '\n\n' + text
+                i = html.lower().find('<body')
+                j = html.find('>', i) + 1 if i >= 0 else 0
+                html = html[:j] + nile_pulse.html_block(pu) + html[j:]
+        except Exception as e:
+            print(f'WARNING: Nile pulse block skipped: {type(e).__name__}: {e}')
     msg = EmailMessage()
     msg['Subject'], msg['From'], msg['To'] = subject, sender, to
     msg['Reply-To'] = sender
     msg.set_content(text)
     msg.add_alternative(html, subtype='html')
+    if chart:
+        msg.get_body(('html',)).add_related(chart, 'image', 'png', cid='<lakechart>', filename='lake_victoria_levels.png')
     pdf = pdf or _best_pdf(out)
     if os.path.exists(pdf):
         with open(pdf, 'rb') as fh:

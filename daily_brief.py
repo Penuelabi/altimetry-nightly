@@ -20,6 +20,7 @@ import pandas as pd
 
 SUBSCRIBE_PAGE = 'https://claude.ai/artifact/NW1fEYxo4VQ2BoUfsVfQoK'   # one-click subscribe / unsubscribe page
 APP_URL = 'https://penuelabi.users.earthengine.app/view/south-sudan-weather-forecast'
+ANDROID_JOIN_URL = 'https://abuk-server-26ltd3lrlq-ew.a.run.app/join/'   # sign up for the Android app
 SIGNATURE_LINES = [
     'ALLAU, Denis Abi, PhD',
     'Abuk Project',
@@ -176,11 +177,13 @@ def _footer(subscribe_url, unsubscribe_to):
               else '. To stop receiving it, reply with "unsubscribe".')
     stop_t = f'unsubscribe: {unsub}' if unsub else 'reply "unsubscribe" to stop'
     h = (f'<p style="font-size:12px">Open the live map: <a href="{APP_URL}">{APP_URL}</a></p>'
+         + f'<p style="font-size:12px">Subscribe to the Android app: <a href="{ANDROID_JOIN_URL}">{ANDROID_JOIN_URL}</a></p>'
          + (f'<p style="font-size:12px">Subscribe to the email list: <a href="{html.escape(subscribe_url)}">{html.escape(subscribe_url)}</a>'
             f'{stop_h}</p>' if subscribe_url else
             f'<p style="font-size:12px">To join or leave this list, reply to {html.escape(unsubscribe_to)}.</p>')
          + f'<p style="font-size:13px">{_signature_html()}</p>')
     t = (f'\nLive map: {APP_URL}\n'
+         + f'Subscribe to the Android app: {ANDROID_JOIN_URL}\n'
          + (f'Subscribe to the email list: {subscribe_url} ({stop_t})\n' if subscribe_url else '')
          + '\n' + _signature_text() + '\n')
     return h, t
@@ -288,36 +291,129 @@ def fetch_news(days=7, limit=8, timeout=20):
         return [], f'ReliefWeb news not available ({type(e).__name__}: {e}).'
 
 
+NEWS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'news.json')
+LAKE_PULSE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'lake_victoria_pulse.json')
+
+
+def _short(text, n=300):
+    text = ' '.join(str(text or '').split())
+    if len(text) <= n:
+        return text
+    cut = max(text.rfind('; ', 0, n), text.rfind('. ', 0, n))
+    if cut < n * 0.35:
+        cut = text.rfind(' ', 0, n)
+    return text[:cut].rstrip(' ;,.') + ' ...'
+
+
+def compiled_news(today=None, days=7, limit=10, path=None):
+    """Items of the weekly compiled and verified news (data/news.json) dated in the last `days` days, newest first."""
+    today = today or datetime.datetime.utcnow()
+    today = today.date() if isinstance(today, datetime.datetime) else today
+    try:
+        doc = json.load(open(path or NEWS_PATH, encoding='utf-8'))
+    except Exception as e:
+        return [], f'Compiled news not available ({type(e).__name__}: {e}).'
+    out = []
+    for it in doc.get('items', []):
+        try:
+            d = datetime.date.fromisoformat(str(it.get('date')))
+        except ValueError:
+            continue
+        if d > today or (today - d).days > days:
+            continue
+        where = ', '.join(it.get('counties') or []) or str(it.get('scope') or 'Countrywide')
+        out.append(dict(date=str(d), hazard=str(it.get('hazard', '')), where=where, text=_short(it.get('text')),
+                        source=str(it.get('source', '')), url=str(it.get('url', ''))))
+    out.sort(key=lambda x: x['date'], reverse=True)
+    return out[:limit], ('' if out else f'No compiled news items dated in the last {days} days.')
+
+
+def lake_levels(n=10, path=None, levels_path=None):
+    """(last n (date, level_m) passes of the Lake Victoria level station, trigger level, trigger label, source label)."""
+    import nile_pulse
+    try:
+        cfg = json.load(open(path or LAKE_PULSE_PATH, encoding='utf-8'))
+    except Exception:
+        cfg = {}
+    uid = cfg.get('level_station', 'hydroweb:1300000000016')
+    ser = nile_pulse._series(uid, levels_path)[-n:]
+    trig = cfg.get('trigger_level_m')
+    return (ser, float(trig) if trig else None, str(cfg.get('trigger_label', 'trigger level')).replace(' (', ', ').replace(')', ''),
+            'Hydroweb Lake Victoria' if uid.startswith('hydroweb') else uid)
+
+
+def lake_chart_png(n=10, path=None, levels_path=None):
+    """PNG bytes of the last n Lake Victoria level passes with the trigger level, or None when not available."""
+    ser, trig, label, src = lake_levels(n, path, levels_path)
+    if len(ser) < 2:
+        return None
+    try:
+        import io
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        import matplotlib.dates as mdates
+    except Exception as e:
+        print(f'WARNING: lake chart skipped ({type(e).__name__}: {e})')
+        return None
+    xs, ys = [d for d, _ in ser], [v for _, v in ser]
+    fig, ax = plt.subplots(figsize=(7.2, 2.9), dpi=110)
+    ax.plot(xs, ys, color='#1565c0', marker='o', markersize=4, linewidth=1.6)
+    lo, hi = min(ys), max(ys)
+    if trig is not None:
+        ax.axhline(trig, color='#c62828', linestyle='--', linewidth=1.2)
+        ax.text(xs[0], trig, f' {label}: {trig:.2f} m', color='#c62828', fontsize=8, va='bottom')
+        hi = max(hi, trig)
+    pad = max((hi - lo) * 0.12, 0.03)
+    ax.set_ylim(lo - pad, hi + pad * 1.6)
+    ax.annotate(f'{ys[-1]:.2f} m', (xs[-1], ys[-1]), textcoords='offset points', xytext=(0, 8), ha='right', fontsize=9, color='#1565c0')
+    ax.set_ylabel('Level (m a.s.l.)', fontsize=9)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
+    ax.tick_params(labelsize=8)
+    ax.grid(alpha=0.25)
+    for sp in ('top', 'right'):
+        ax.spines[sp].set_visible(False)
+    ax.set_title(f'Lake Victoria water level, last {len(ys)} satellite passes ({src})', fontsize=10, loc='left')
+    fig.tight_layout()
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    plt.close(fig)
+    return buf.getvalue()
+
+
+def lake_caption(n=10, path=None, levels_path=None):
+    """(html, text) caption and list of the last n Lake Victoria level passes."""
+    ser, trig, label, src = lake_levels(n, path, levels_path)
+    if not ser:
+        return '', ''
+    d, v = ser[-1]
+    gap = (f'; {abs(v - trig):.2f} m {"below" if v < trig else "above"} the {trig:.2f} m trigger level ({label})' if trig else '')
+    line = f'Latest pass {d:%d %b %Y}: {v:.2f} m{gap}. Source: {src}; passes are a few days apart.'
+    txt = 'Lake Victoria water level, last passes:\n' + '\n'.join(f'  {dd:%d %b %Y}  {vv:.2f} m' for dd, vv in ser) + '\n' + line
+    return f'<p style="font-size:12px;color:#555;margin-top:2px">{html.escape(line)}</p>', txt
+
+
 def build_weekly(doc, news=None, news_note='', subscribe_url='', reply_to='penuelabi@gmail.com', today=None):
     df = county_frame(doc)
     ver = doc.get('forecast_verification') or {}
     date = (today or datetime.datetime.utcnow()).strftime('%d %b %Y')
     subject = f'South Sudan hydro-climate weekly outlook {date}'
-    # confidence
-    n = len(df)
-    have = {k: int(df[k].notna().sum()) for k in ('sm_z', 'rain30', 'rain2w', 'wb30', 'pop_flood')}
-    conf = [('Soil moisture (SMAP L4)', f'{have["sm_z"]}/{n} counties with data'),
-            ('Rainfall to date (GSMaP)', f'{have["rain30"]}/{n} counties'),
-            ('2-week rain forecast (ECMWF ENS)', f'{have["rain2w"]}/{n} counties; ' + (
-                f'past-forecast check: {ver.get("summary")}' if ver.get('summary') else 'forecast verification is still building up')),
-            ('Runoff / water surplus', f'{have["wb30"]}/{n} counties (30-day balance from SMAP)'),
-            ('Flood-prone people (map-based)', f'{have["pop_flood"]}/{n} counties, WorldPop shares scaled to 2025 county totals')]
     # priorities: counties with highest hazard likelihood in the next 2 weeks
     pri = df.assign(sc=df[['p_heavy', 'p_dry']].max(axis=1).fillna(0)).sort_values(['sc', 'level'], ascending=False).head(8)
     prows = [[html.escape(r.county), html.escape(r.state), _badge(r.level), 'heavy rain' if (r.p_heavy or 0) >= (r.p_dry or 0) else 'dry spell',
               f'{r.sc * 100:.0f}%'] for r in pri.itertuples()]
     ptxt = [f'  {r.county} ({r.state}): {r.level}, {"heavy rain" if (r.p_heavy or 0) >= (r.p_dry or 0) else "dry spell"} chance {r.sc * 100:.0f}%'
             for r in pri.itertuples()]
-    nh = ''.join(f'<li><a href="{html.escape(x["url"])}">{html.escape(x["title"])}</a> <span style="color:#777">({html.escape(x["source"])}, {x["date"]})</span></li>'
-                 for x in (news or [])) or f'<li style="color:#777">{html.escape(news_note or "No matching reports this week.")}</li>'
-    nt = '\n'.join(f'  - {x["title"]} ({x["source"]}, {x["date"]}) {x["url"]}' for x in (news or [])) or f'  {news_note or "No matching reports this week."}'
+    nh = ''.join(f'<li style="margin-bottom:5px"><b>{x["date"]}</b> &middot; {html.escape(x["hazard"])} &middot; {html.escape(x["where"])}: '
+                 f'{html.escape(x["text"])} <a href="{html.escape(x["url"])}">{html.escape(x["source"])}</a></li>'
+                 for x in (news or [])) or f'<li style="color:#777">{html.escape(news_note or "No compiled news this week.")}</li>'
+    nt = '\n'.join(f'  - {x["date"]} | {x["hazard"]} | {x["where"]}: {x["text"]} ({x["source"]}) {x["url"]}' for x in (news or [])) or f'  {news_note or "No compiled news this week."}'
     foot_h, foot_t = _footer(subscribe_url, reply_to)
     body_h = (f'<div style="font-family:Arial,sans-serif;max-width:860px"><h2>South Sudan hydro-climate weekly outlook &ndash; {date}</h2>'
-              f'<h3>How confident is this week&rsquo;s forecast?</h3>{_table(["Input", "Coverage and checks"], [[html.escape(a), html.escape(b)] for a, b in conf])}'
               f'<h3>Priorities for the next 2 weeks (counties and towns to watch)</h3>'
               f'{_table(["County", "State", "Alert", "Main hazard", "Chance"], prows)}'
-              f'<h3>Climate and flood news from the past week</h3><ul style="font-size:13px">{nh}</ul>'
+              f'<h3>Climate, flood and health news from the past week (compiled and verified)</h3><ul style="font-size:13px">{nh}</ul>'
               f'<p style="font-size:11px;color:#777">Decision support, not an official warning.</p>{foot_h}</div>')
-    body_t = '\n'.join([f'South Sudan hydro-climate weekly outlook - {date}', '', 'Forecast confidence:'] + [f'  {a}: {b}' for a, b in conf]
-                       + ['', 'Priorities for the next 2 weeks:'] + ptxt + ['', 'News from the past week:', nt, '', foot_t])
+    body_t = '\n'.join([f'South Sudan hydro-climate weekly outlook - {date}']
+                       + ['', 'Priorities for the next 2 weeks:'] + ptxt + ['', 'News from the past week (compiled and verified):', nt, '', foot_t])
     return subject, body_t, body_h
