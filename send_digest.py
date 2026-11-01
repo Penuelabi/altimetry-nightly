@@ -104,9 +104,20 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None, pdf=None, label=''
     import daily_brief as db
     alt = os.environ.get('ALTIMETRY_OUT_DIR', 'altdata')
     sub = (os.environ.get('SUBSCRIBE_URL') or '').strip()
+    chart = None
     if kind == 'weekly':
         news, note = db.compiled_news(today)          # data/news.json: the weekly compiled and verified news
-        subject, text, html = db.build_weekly(doc, news, note, sub, sender, today)
+        lake_h = lake_t = ''
+        try:                                          # Lake Victoria graph (last 10 observations), placed after the priorities
+            chart = db.lake_chart_png(10)
+            _, lake_t = db.lake_caption(10)
+            if chart:
+                lake_h = ('<div style="margin:12px 0"><img src="cid:lakechart" alt="Lake Victoria, last 10 observations (m)" '
+                          'style="max-width:100%;height:auto"></div>')
+        except Exception as e:
+            print(f'WARNING: Lake Victoria chart skipped: {type(e).__name__}: {e}')
+            chart = None
+        subject, text, html = db.build_weekly(doc, news, note, sub, sender, today, lake_h, lake_t)
     else:
         merged = os.path.join(alt, 'merged_altimetry_stations.csv')
         gauges = None
@@ -116,25 +127,6 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None, pdf=None, label=''
         except Exception as e:
             print(f'WARNING: gauge watch skipped: {type(e).__name__}: {e}')
         subject, text, html = db.build_daily(doc, gauges, sub, sender, today)
-    chart = None
-    if kind == 'weekly':
-        # weekly: the Lake Victoria level graph (last 10 passes) replaces the Nile travel-time countdown block
-        try:
-            chart = db.lake_chart_png(10)
-            cap_h, cap_t = db.lake_caption(10)
-            block_h = ((f'<div style="font-family:Arial,sans-serif;max-width:860px;margin-bottom:10px"><img src="cid:lakechart" alt="Lake Victoria water level, last 10 passes" '
-                        f'style="max-width:100%;height:auto">{cap_h}</div>') if chart else
-                       (f'<div style="font-family:Arial,sans-serif;max-width:860px;font-size:12px"><pre style="font-family:inherit">{cap_t}</pre></div>' if cap_t else ''))
-            if cap_t:
-                text = cap_t + '\n\n' + text
-            if block_h:
-                i = html.lower().find('<body')
-                j = html.find('>', i) + 1 if i >= 0 else 0
-                html = html[:j] + block_h + html[j:]
-        except Exception as e:
-            print(f'WARNING: Lake Victoria chart skipped: {type(e).__name__}: {e}')
-            chart = None
-    else:
         try:
             import nile_pulse
             pu = nile_pulse.pulse(today)

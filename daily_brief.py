@@ -343,7 +343,7 @@ def lake_levels(n=10, path=None, levels_path=None):
 
 
 def lake_chart_png(n=10, path=None, levels_path=None):
-    """PNG bytes of the last n Lake Victoria level passes with the trigger level, or None when not available."""
+    """PNG bytes of the last n Lake Victoria level observations, drawn like the web-app chart; None when unavailable."""
     ser, trig, label, src = lake_levels(n, path, levels_path)
     if len(ser) < 2:
         return None
@@ -352,48 +352,62 @@ def lake_chart_png(n=10, path=None, levels_path=None):
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-        import matplotlib.dates as mdates
     except Exception as e:
         print(f'WARNING: lake chart skipped ({type(e).__name__}: {e})')
         return None
-    xs, ys = [d for d, _ in ser], [v for _, v in ser]
-    fig, ax = plt.subplots(figsize=(7.2, 2.9), dpi=110)
-    ax.plot(xs, ys, color='#1565c0', marker='o', markersize=4, linewidth=1.6)
+    labels, ys = [f'{d:%m-%d}' for d, _ in ser], [v for _, v in ser]
+    xs = list(range(len(ys)))
     lo, hi = min(ys), max(ys)
-    if trig is not None:
-        ax.axhline(trig, color='#c62828', linestyle='--', linewidth=1.2)
-        ax.text(xs[0], trig, f' {label}: {trig:.2f} m', color='#c62828', fontsize=8, va='bottom')
-        hi = max(hi, trig)
-    pad = max((hi - lo) * 0.12, 0.03)
-    ax.set_ylim(lo - pad, hi + pad * 1.6)
-    ax.annotate(f'{ys[-1]:.2f} m', (xs[-1], ys[-1]), textcoords='offset points', xytext=(0, 8), ha='right', fontsize=9, color='#1565c0')
-    ax.set_ylabel('Level (m a.s.l.)', fontsize=9)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
-    ax.tick_params(labelsize=8)
-    ax.grid(alpha=0.25)
-    for sp in ('top', 'right'):
+    below = trig is None or ys[-1] < trig
+    col = '#1565c0' if below else '#c62828'
+    fig, ax = plt.subplots(figsize=(7.2, 3.6), dpi=110)
+    ax.plot(xs, ys, color=col, linewidth=3, marker='o', markersize=6, solid_capstyle='round')
+    pad = max((hi - lo) * 0.35, 0.02)
+    ax.set_ylim(lo - pad, hi + pad)
+    ax.set_xlim(-0.5, len(ys) - 0.5)
+    ax.set_yticks([lo, hi])
+    ax.set_yticklabels([f'{lo:.2f}', f'{hi:.2f}'], fontsize=9, color='#444')
+    ax.set_xticks(xs)
+    ax.set_xticklabels(labels, rotation=45, ha='right', fontsize=9, color='#444')
+    ax.grid(axis='y', color='#ddd', linewidth=0.8)
+    ax.set_axisbelow(True)
+    for sp in ('top', 'right', 'left'):
         ax.spines[sp].set_visible(False)
-    ax.set_title(f'Lake Victoria water level, last {len(ys)} satellite passes ({src})', fontsize=10, loc='left')
-    fig.tight_layout()
+    ax.spines['bottom'].set_color('#999')
+    ax.tick_params(length=0)
+    imax, imin = ys.index(hi), ys.index(lo)
+    ax.annotate(f'max {hi:.2f}', (imax, hi), textcoords='offset points', xytext=(0, 12), ha='center', fontsize=9, color='#222',
+                arrowprops=dict(arrowstyle='-', color='#888', lw=0.8))
+    ax.annotate(f'min {lo:.2f}', (imin, lo), textcoords='offset points', xytext=(0, -16), ha='center', fontsize=9, color='#222',
+                arrowprops=dict(arrowstyle='-', color='#888', lw=0.8))
+    fig.suptitle(f'Lake Victoria, last {len(ys)} observations (m)', fontsize=12, fontweight='bold', x=0.02, ha='left')
+    if trig is not None:
+        t = f'{trig:.2f}'
+        label = label.split(', Hydroweb')[0]
+        foot = (f'Blue: below {label} ({t} m' + (', outside the range shown).' if not lo - pad <= trig <= hi + pad else ').'))
+        if not below:
+            foot = f'Red: at or above {label} ({t} m).'
+    else:
+        foot = ''
+    fig.tight_layout(rect=(0, 0.05 if foot else 0, 1, 0.95))
+    if foot:
+        fig.text(0.02, 0.012, foot, fontsize=8.5, color='#555', ha='left')
     buf = io.BytesIO()
-    fig.savefig(buf, format='png')
+    fig.savefig(buf, format='png', facecolor='white')
     plt.close(fig)
     return buf.getvalue()
 
 
 def lake_caption(n=10, path=None, levels_path=None):
-    """(html, text) caption and list of the last n Lake Victoria level passes."""
+    """(html, text) for the Lake Victoria block; the text lists the last n observations."""
     ser, trig, label, src = lake_levels(n, path, levels_path)
     if not ser:
         return '', ''
-    d, v = ser[-1]
-    gap = (f'; {abs(v - trig):.2f} m {"below" if v < trig else "above"} the {trig:.2f} m trigger level ({label})' if trig else '')
-    line = f'Latest pass {d:%d %b %Y}: {v:.2f} m{gap}. Source: {src}; passes are a few days apart.'
-    txt = 'Lake Victoria water level, last passes:\n' + '\n'.join(f'  {dd:%d %b %Y}  {vv:.2f} m' for dd, vv in ser) + '\n' + line
-    return f'<p style="font-size:12px;color:#555;margin-top:2px">{html.escape(line)}</p>', txt
+    txt = f'Lake Victoria, last {len(ser)} observations (m):\n' + '\n'.join(f'  {dd:%Y-%m-%d}  {vv:.2f}' for dd, vv in ser)
+    return '', txt
 
 
-def build_weekly(doc, news=None, news_note='', subscribe_url='', reply_to='penuelabi@gmail.com', today=None):
+def build_weekly(doc, news=None, news_note='', subscribe_url='', reply_to='penuelabi@gmail.com', today=None, lake_h='', lake_t=''):
     df = county_frame(doc)
     ver = doc.get('forecast_verification') or {}
     date = (today or datetime.datetime.utcnow()).strftime('%d %b %Y')
@@ -412,8 +426,9 @@ def build_weekly(doc, news=None, news_note='', subscribe_url='', reply_to='penue
     body_h = (f'<div style="font-family:Arial,sans-serif;max-width:860px"><h2>South Sudan hydro-climate weekly outlook &ndash; {date}</h2>'
               f'<h3>Priorities for the next 2 weeks (counties and towns to watch)</h3>'
               f'{_table(["County", "State", "Alert", "Main hazard", "Chance"], prows)}'
+              f'{lake_h}'
               f'<h3>Climate, flood and health news from the past week (compiled and verified)</h3><ul style="font-size:13px">{nh}</ul>'
               f'<p style="font-size:11px;color:#777">Decision support, not an official warning.</p>{foot_h}</div>')
     body_t = '\n'.join([f'South Sudan hydro-climate weekly outlook - {date}']
-                       + ['', 'Priorities for the next 2 weeks:'] + ptxt + ['', 'News from the past week (compiled and verified):', nt, '', foot_t])
+                       + ['', 'Priorities for the next 2 weeks:'] + ptxt + (['', lake_t] if lake_t else []) + ['', 'News from the past week (compiled and verified):', nt, '', foot_t])
     return subject, body_t, body_h
