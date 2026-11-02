@@ -361,6 +361,102 @@ if c.get('payams_complete') and (not c.get('new_complete') or c.get('new_source'
         save(c)
         print('2025 table saved:', saved, 'payams;', sum(len(v) for v in by.values()), 'of', n, 'in the table')
 
+# --- 1e. which river stations are upstream of, in, or downstream of each payam and county (HydroBASINS network) ----------------
+# Writes station_relation.csv (place, pcode, county, station_uid, relation, distance_km) for the REL_NEAREST stations nearest to each
+# payam and county that sit on its river network; the Abuk app reads it to say "upstream of / mid-stream in / downstream of".
+# Same rule as county_station_link.py: station basin inside the place's upstream catchment = upstream, the place's basin inside the
+# station's upstream catchment = downstream, same level-6 basin = local (mid-stream).
+REL_OUT = os.path.join(os.environ.get('EXPOSURE_OUT_DIR', os.path.join(HERE, 'exposure_out')), 'station_relation.csv')
+HYBAS_LEVEL, REL_NEAREST = 6, 12
+
+
+def station_relations():
+    import math
+    ssp = os.path.join(ALT, 'station_status.csv')
+    if not os.path.exists(ssp):
+        print('station relations skipped: station_status.csv not found'); return
+    stt = pd.read_csv(ssp)
+    stt = stt[stt['type'].astype(str).str.lower().eq('river')].dropna(subset=['latitude', 'longitude']).drop_duplicates('station_uid')
+    k_pcode = next((k for k in keys if k.lower() in ('adm3_pcode', 'adm3_pcod', 'pcode3', 'pcode')), None)
+    hb = (ee.FeatureCollection(f'WWF/HydroSHEDS/v1/Basins/hybas_{HYBAS_LEVEL}')
+          .filterBounds(ee.Geometry.Rectangle([21.0, -12.0, 42.0, 24.5])))
+    children = {}
+    for hid, nd in hb.reduceColumns(ee.Reducer.toList(2), ['HYBAS_ID', 'NEXT_DOWN']).get('list').getInfo():
+        children.setdefault(int(nd), []).append(int(hid))
+
+    def trace(start):
+        seen, stack = {int(start)}, [int(start)]
+        while stack:
+            for ch in children.get(stack.pop(), []):
+                if ch not in seen:
+                    seen.add(ch); stack.append(ch)
+        return seen
+
+    def basins(feats):
+        out = {}
+        for i in range(0, len(feats), 300):
+            pts = ee.FeatureCollection([ee.Feature(ee.Geometry.Point([float(f['lon']), float(f['lat'])]), {'id': f['id']}) for f in feats[i:i + 300]])
+            joined = ee.Join.saveFirst('basin').apply(pts, hb, ee.Filter.intersects(leftField='.geo', rightField='.geo'))
+            for h in joined.map(lambda f: ee.Feature(None, {'id': f.get('id'), 'hybas': ee.Feature(f.get('basin')).get('HYBAS_ID')})).getInfo()['features']:
+                if h['properties'].get('hybas') is not None:
+                    out[h['properties']['id']] = int(h['properties']['hybas'])
+        return out
+
+    sb = basins([{'id': r.station_uid, 'lon': r.longitude, 'lat': r.latitude} for r in stt.itertuples()])
+    sup = {}
+    cp = os.path.join(ALT, 'cache_station_catchments.csv')
+    if os.path.exists(cp):
+        for r in pd.read_csv(cp, dtype={'hybas_ids': str}).itertuples():
+            ids = {int(x) for x in str(r.hybas_ids).split(';') if x}
+            if ids:
+                sup[r.station_uid] = ids
+    for uid, b in sb.items():
+        sup.setdefault(uid, trace(b))
+
+    cen = payam.map(lambda f: ee.Feature(f.geometry().centroid(100), {'pcode': f.get(k_pcode) if k_pcode else f.get(A3), 'county': f.get(A2)})).getInfo()['features']
+    places = [{'kind': 'payam', 'pcode': f['properties']['pcode'], 'county': f['properties']['county'], 'lon': f['geometry']['coordinates'][0], 'lat': f['geometry']['coordinates'][1]} for f in cen]
+    by_county = {}
+    for pl in places:
+        by_county.setdefault(pl['county'], []).append(pl)
+    for cty, lst in by_county.items():  # the county point is the payam centre closest to the average of its payam centres, so it lies inside the county
+        mx, my = sum(p['lon'] for p in lst) / len(lst), sum(p['lat'] for p in lst) / len(lst)
+        best = min(lst, key=lambda p: (p['lon'] - mx) ** 2 + (p['lat'] - my) ** 2)
+        places.append({'kind': 'county', 'pcode': str(best['pcode'])[:6], 'county': cty, 'lon': best['lon'], 'lat': best['lat']})  # ADM2 code, e.g. SS0305
+    for i, pl in enumerate(places):
+        pl['id'] = str(i)
+    pb = basins(places)
+
+    def km(a, b, c, d):
+        p1, p2, dl = math.radians(b), math.radians(d), math.radians(c - a)
+        return 6371 * 2 * math.asin(math.sqrt(math.sin((p2 - p1) / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2))
+
+    rows = []
+    for pl in places:
+        base = pb.get(pl['id'])
+        if base is None:
+            continue
+        up = trace(base)
+        near = sorted(stt.itertuples(), key=lambda r: km(pl['lon'], pl['lat'], r.longitude, r.latitude))[:REL_NEAREST]
+        for r in near:
+            sbase = sb.get(r.station_uid)
+            if sbase is None:
+                continue
+            rel = 'local' if sbase == base else 'upstream' if sbase in up else 'downstream' if base in sup.get(r.station_uid, set()) else None
+            if rel:
+                rows.append({'place': pl['kind'], 'pcode': pl['pcode'], 'county': pl['county'], 'station_uid': r.station_uid,
+                             'relation': rel, 'distance_km': round(km(pl['lon'], pl['lat'], r.longitude, r.latitude), 1)})
+    os.makedirs(os.path.dirname(REL_OUT), exist_ok=True)
+    pd.DataFrame(rows, columns=['place', 'pcode', 'county', 'station_uid', 'relation', 'distance_km']).to_csv(REL_OUT, index=False)
+    print(f'station relations: {len(rows)} links for {len(places)} places and {len(sb)} river stations -> {REL_OUT}',
+          pd.Series([r['relation'] for r in rows]).value_counts().to_dict())
+
+
+try:
+    station_relations()
+except Exception:
+    print('station relations failed (the app then shows no upstream / downstream label):')
+    traceback.print_exc()
+
 # --- 2. station exposure (25 km) -----------------------------------------------------------------------------------
 ss = os.path.join(ALT, 'station_status.csv')
 if not os.path.exists(ss):
