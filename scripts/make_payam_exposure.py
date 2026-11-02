@@ -8,7 +8,7 @@ What goes in (download the files from Drive first; give --cache and/or --populat
 
   --all-payams  Write every payam in the cache, not only those in the --population files. This is the default when no
                 --population file is given: then the payam codes and the population come from the cache's "payams_pop"
-                table (WorldPop 2020, whole country), which exposure-cache.yml fills once its population step has run.
+                table (GHSL GHS-POP 2020, whole country), which exposure-cache.yml fills once its population step has run.
   --population  Population-by-payam exports (Duk_population_by_payam.csv, KapoetaEast_population_by_payam.csv, ...).
                 Files, folders or wildcards, as many as you like. Needs ADM2_EN, ADM3_EN, ADM3_PCODE and a "sum"
                 column. A *_exposure_by_payam.csv export (columns pop and exposed) works too and also gives
@@ -403,7 +403,7 @@ def main():
         if a.risk:
             parts.append('counts from the supplied risk table take priority')
         if cache_pop:
-            parts.append('population: WorldPop 2020 inside the same area')
+            parts.append('population: GHSL GHS-POP 2020 inside the same area')
         if pop_risk:
             parts.append('population: the exposed share from the *_exposure_by_payam exports')
         if estimated:
