@@ -85,7 +85,7 @@ BULLETIN_FILES = [
 
 # Built by make_payam_exposure.py for the Abuk app and uploaded to the main Drive folder by the exposure-cache workflow
 # (python drive_sync.py push exposure). It must already exist there: a service account can only update files in a personal Drive.
-EXPOSURE_FILES = ['payam_exposure.csv']
+EXPOSURE_FILES = ['payam_exposure.csv', 'station_relation.csv']
 
 
 def drive_service():
