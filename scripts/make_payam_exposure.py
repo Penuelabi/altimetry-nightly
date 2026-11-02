@@ -36,6 +36,12 @@ What goes in (download the files from Drive first; give --cache and/or --populat
                 buildings (or of land area, from the cache) at risk. It is only an estimate and the hazard column
                 says so. In the cache the share of buildings at risk is far lower than the share of land at risk
                 (about 2% against more than half), so the two choices differ a lot; neither knows where people live.
+  --county-population FILE
+                A table with ADM2_EN and population (data/county_population_ocha.csv: the latest UN OCHA county totals
+                from the CSRF county profiles). After the two population layers are combined, the payams of each listed
+                county are scaled together so they add up to that total; each payam keeps its share, so the pattern
+                inside the county stays. The raw layers stay in population_ghsl and population_2025. Counties not in
+                the file keep the layer figures.
   --hazard TEXT           What "at risk" means; printed on the card. Default is built from --year.
   --as-of TEXT            Shown on the card. Default is the --buildings year, else the current year.
 
@@ -440,6 +446,39 @@ def combine_sources(payams):
     return n
 
 
+def anchor_population(payams, path):
+    """Scale the payams of each county so their population adds up to the county total in `path` (ADM2_EN, population).
+    Each payam keeps its share of the county and its at-risk share; the at-risk figure never exceeds the payam total.
+    A county whose payams have no population at all cannot be shared out and keeps what it has."""
+    targets = {}
+    for row in read_table(path):
+        name, total = pick(row, 'adm2_en', 'county'), num(pick(row, 'population'))
+        if name and total:
+            targets[norm(name)] = total
+    by_county = defaultdict(list)
+    for r in payams.rows:
+        by_county[norm(r['ADM2_EN'])].append(r)
+    n = 0
+    for key, total in targets.items():
+        rows = by_county.get(key)
+        have = sum(r['population'] for r in rows or [] if r['population'] != '')
+        if not rows or have <= 0:
+            continue
+        f = total / have
+        for r in rows:
+            if r['population'] == '':
+                continue
+            old = r['population']
+            r['population'] = whole(old * f)
+            if r['population_at_risk'] != '':
+                r['population_at_risk'] = whole(min(r['population_at_risk'] * f, r['population']))
+        n += 1
+    missing = [r['ADM2_EN'] for r in payams.rows if norm(r['ADM2_EN']) not in targets]
+    print('population scaled to the county totals of %s for %d counties; %d counties not in that file kept the layer figures' %
+          (os.path.basename(path), n, len({norm(c) for c in missing})))
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser(description='Build payam_exposure.csv for the Abuk app.', formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
     ap.add_argument('--population', nargs='*', default=[], metavar='FILE')
@@ -453,6 +492,7 @@ def main():
     ap.add_argument('--estimate-population', choices=('buildings', 'area'))
     ap.add_argument('--persons-per-building', type=float, default=4.5, metavar='N',
                     help='where population is below the number of buildings, use buildings x N (default 4.5; 0 turns it off)')
+    ap.add_argument('--county-population', metavar='FILE')
     ap.add_argument('--hazard', default=None)
     ap.add_argument('--as-of', default=None)
     ap.add_argument('-o', '--output', default='payam_exposure.csv')
@@ -480,6 +520,7 @@ def main():
     if a.persons_per_building > 0 and any(r['population_2025'] != '' for r in payams.rows):
         raised += floor_population(payams, a.persons_per_building, 'population_2025', 'population_2025_at_risk')
     combined = combine_sources(payams)
+    anchored = anchor_population(payams, a.county_population) if a.county_population else 0
 
     hazard = a.hazard
     if hazard is None:
@@ -503,6 +544,8 @@ def main():
         if combined:
             parts.append('population: the larger of GHSL 2020 and the April 2025 grid, never below %g x buildings; '
                          'schools and health facilities: the larger of the original lists and the SSD_Facilities subtypes' % a.persons_per_building)
+        if anchored:
+            parts.append('population is scaled to the county totals of UN OCHA 2025 (CSRF county profiles), shared out as in the grids')
         hazard = '; '.join(parts)
     if a.as_of is not None:
         as_of = a.as_of
