@@ -60,7 +60,8 @@ from collections import defaultdict
 csv.field_size_limit(2**31 - 1)  # the population exports carry a whole polygon in one cell
 
 COLUMNS = ['ADM3_PCODE', 'ADM3_EN', 'ADM2_EN', 'hazard', 'as_of', 'population', 'population_at_risk', 'buildings',
-           'buildings_at_risk', 'schools', 'schools_at_risk', 'health_facilities', 'health_at_risk']
+           'buildings_at_risk', 'schools', 'schools_at_risk', 'health_facilities', 'health_at_risk',
+           'population_2025', 'population_2025_at_risk']
 KINDS = {'population': 'population', 'buildings': 'buildings', 'schools': 'schools', 'health': 'health_facilities'}
 RISK_FIELD = {'population': 'population_at_risk', 'buildings': 'buildings_at_risk', 'schools': 'schools_at_risk', 'health': 'health_at_risk'}
 TRUE = {'1', 'true', 'yes', 'y', 'flooded', 'at risk', 'x'}
@@ -87,6 +88,10 @@ def num(s):
     except ValueError:
         return None
     return v if v >= 0 else None
+
+
+def fac_col(subtype):
+    return 'fac_' + (re.sub(r'[^a-z0-9]+', '_', subtype.lower()).strip('_') or 'unknown')
 
 
 def whole(v):
@@ -203,6 +208,9 @@ def load_cache(path, basis, payams, create=False):
     if basis == 'now' and not now:
         sys.exit('%s has no "payams_now" table (the flooded-now step has not finished); use --basis risk' % path)
     pops = data.get('payams_pop') or {}
+    new = data.get('payams_new') or {}
+    if not new:
+        warn('%s has no "payams_new" table yet, so population_2025 and the facility columns stay empty' % os.path.basename(path))
     if create and not pops:
         warn('%s has no "payams_pop" table yet, so the rows have no payam code or population (run exposure-cache.yml with the '
              'population step first)' % os.path.basename(path))
@@ -232,6 +240,14 @@ def load_cache(path, basis, payams, create=False):
                     continue
                 r[total_col] = whole(total)
                 r[risk_col] = whole(None if risk is None else min(risk, total))
+            e25 = (new.get(county) or {}).get(name) or {}
+            if e25:
+                p25, p25_risk = num(e25.get('pop25')), num(e25.get('pop25_risk') if basis == 'risk' else e25.get('pop25_now'))
+                if p25 is not None:
+                    r['population_2025'] = whole(p25)
+                    r['population_2025_at_risk'] = whole(None if p25_risk is None else min(p25_risk, p25))
+                tot, rk = e25.get('fac_t') or {}, e25.get('fac_r' if basis == 'risk' else 'fac_n') or {}
+                r['_fac'] = {k: (int(v), int(rk.get(k, 0))) for k, v in tot.items()}
             pop_total = num(entry.get('pop'))
             if r['population'] == '' and pop_total:
                 pop_risk = num(entry.get('pop_risk') if basis == 'risk' else entry.get('pop_now'))
@@ -439,6 +455,8 @@ def main():
             parts.append('population: estimated from the share of %s at risk' % ('land area' if a.estimate_population == 'area' else 'buildings'))
         if raised:
             parts.append('population: where the layer gave fewer people than buildings it is %g x buildings' % a.persons_per_building)
+        if any('_fac' in r for r in payams.rows):
+            parts.append('population_2025: SSD_2025q2 population grid (April 2025); fac_*: SSD_Facilities counted by Facility subtype')
         hazard = '; '.join(parts)
     if a.as_of is not None:
         as_of = a.as_of
@@ -452,8 +470,14 @@ def main():
         r['hazard'], r['as_of'] = hazard, as_of
 
     rows = sorted(payams.rows, key=lambda r: (r['ADM3_PCODE'] or '~', r['ADM3_EN']))
+    subtypes = sorted({k for r in rows for k in r.get('_fac', {})}, key=lambda k: fac_col(k))
+    fields = COLUMNS + [c for k in subtypes for c in (fac_col(k), fac_col(k) + '_at_risk')]
+    for r in rows:
+        if '_fac' in r:
+            for k in subtypes:
+                r[fac_col(k)], r[fac_col(k) + '_at_risk'] = r['_fac'].get(k, (0, 0))
     with open(a.output, 'w', newline='', encoding='utf-8') as f:
-        w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction='ignore')
+        w = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore', restval='')
         w.writeheader()
         w.writerows(rows)
 
