@@ -450,3 +450,29 @@ describe('exposure figures', () => {
     expect(countText(null)).toBe('—');
   });
 });
+
+import { countyArea, countyCentre, countyCode, isCountyArea, relationNote, statesList, countiesOf } from '../src';
+
+describe('county view', () => {
+  const state = statesList()[0], county = countiesOf(state)[0];
+  it('joins the payams of a county into one area with a county code', () => {
+    const parts = payamsIn(county, state), whole = countyArea(state, county)!;
+    expect(isCountyArea(whole)).toBe(true);
+    expect(whole.payam).toBe('');
+    expect(whole.areaKm2).toBe(parts.reduce((n, p) => n + p.areaKm2, 0));
+    expect(whole.polygons.length).toBe(parts.flatMap(p => p.polygons).length);
+    expect(countyCode(state, county)).toMatch(/^SS\d{4}$/);
+    expect(parts.some(p => p.pcode.startsWith(countyCode(state, county)))).toBe(true);
+    expect(countyArea(state, 'No such county')).toBeNull();
+  });
+  it('puts the county centre inside the span of its payams', () => {
+    const c = countyCentre(payamsIn(county, state));
+    expect(c.lat).not.toBe(0);
+    expect(c.lon).toBeGreaterThan(20);
+  });
+  it('says what upstream, mid-stream and downstream mean for the place', () => {
+    expect(relationNote('upstream', 'Duk county')).toMatch(/^Upstream of Duk county/);
+    expect(relationNote('local', 'Duk county')).toMatch(/^Mid-stream/);
+    expect(relationNote('downstream', 'Duk county')).toMatch(/^Downstream of Duk county/);
+  });
+});

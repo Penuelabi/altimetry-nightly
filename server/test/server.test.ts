@@ -252,3 +252,27 @@ describe('payam exposure file', () => {
     expect(parseExposure('')).toEqual([]);
   });
 });
+
+import { countyExposure } from '../src/exposure';
+import { parseRelations, relationFor } from '../src/relation';
+
+describe('county exposure and station relations', () => {
+  const rows = parseExposure(['ADM3_PCODE,ADM3_EN,ADM2_EN,population,population_at_risk,schools,schools_at_risk',
+    'SS030501,Ageer,Duk,100,10,5,1', 'SS030502,Dongchak,Duk,200,,3,', 'SS030601,Other,Elsewhere,50,5,1,1'].join('\n'));
+  it('adds the payams of a county by county code, whatever the county is called', () => {
+    const duk = countyExposure(rows, { ccode: 'ss0305', county: 'Duk County' });
+    expect(duk?.population).toEqual({ total: 300, risk: 10 });
+    expect(duk?.schools).toEqual({ total: 8, risk: 1 });
+    expect(countyExposure(rows, { county: 'duk' })?.population.total).toBe(300);
+    expect(countyExposure(rows, { ccode: 'SS9999' })).toBeNull();
+  });
+  it('reads station_relation.csv and looks a place up by payam code or county code', () => {
+    const links = parseRelations(['place,pcode,county,station_uid,relation,distance_km',
+      'payam,SS030501,Duk,dahiti:1,upstream,12', 'payam,SS030501,Duk,dahiti:2,local,40', 'county,SS0305,Duk,dahiti:2,downstream,30', 'county,SS0305,Duk,dahiti:3,sideways,9'].join('\n'));
+    expect(links).toHaveLength(3);
+    expect([...relationFor(links, { pcode: 'ss030501' })]).toEqual([['dahiti:1', 'upstream'], ['dahiti:2', 'local']]);
+    expect([...relationFor(links, { ccode: 'SS0305' })]).toEqual([['dahiti:2', 'downstream']]);
+    expect(relationFor(links, {}).size).toBe(0);
+    expect(parseRelations('a,b\n1,2')).toEqual([]);
+  });
+});

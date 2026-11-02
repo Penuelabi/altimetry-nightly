@@ -1,6 +1,6 @@
-// Water level graph for the station nearest to any payam: pick state, county and payam, see its last observations.
+// Water level graph for the station nearest to any payam, or to a whole county when the payam is left on All.
 import { useEffect, useMemo, useState } from 'react';
-import { countiesOf, countText, distanceNote, levelSummary, listPayams, payamAt, payamByCode, payamCentre, payamsOf, riskShare, statesList, type Count, type ExposureResult, type Obs, type StationLevels, type StationSeries } from '@abuk/core';
+import { countiesOf, countText, countyCentre, countyCode, distanceNote, levelSummary, listPayams, payamAt, payamByCode, payamCentre, payamsIn, payamsOf, relationNote, RELATION_LABEL, riskShare, statesList, type Count, type ExposureResult, type Obs, type StationLevels, type StationSeries } from '@abuk/core';
 import { api, explain } from '../api';
 import { useOnline, usePlace } from '../net';
 import { getState, setState, useApp } from '../store';
@@ -100,44 +100,51 @@ export function Stations() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [which, setWhich] = useState(0);
-  const key = area?.pcode ?? '';
+  // No payam chosen but a county is: the county's middle, and the figures for all its payams together.
+  const countyMode = !area && !!sel.state && !!sel.county && !sel.payam;
+  const countyPayams = useMemo(() => (countyMode ? payamsIn(sel.county, sel.state) : []), [countyMode, sel.state, sel.county]);
+  const target = area
+    ? { key: area.pcode, name: area.payam, ...payamCentre(area), q: `pcode=${encodeURIComponent(area.pcode)}&payam=${encodeURIComponent(area.payam)}&county=${encodeURIComponent(area.county)}`, cq: `pcode=${encodeURIComponent(area.pcode)}&county=${encodeURIComponent(area.county)}` }
+    : countyMode && countyPayams.length
+      ? { key: `county:${sel.state}|${sel.county}`, name: `${sel.county} county`, ...countyCentre(countyPayams), q: `ccode=${countyCode(sel.state, sel.county)}&county=${encodeURIComponent(sel.county)}`, cq: `ccode=${countyCode(sel.state, sel.county)}&county=${encodeURIComponent(sel.county)}` }
+      : null;
+  const key = target?.key ?? '';
   const data: StationLevels | undefined = key ? s.stationLevels[key] : undefined;
   const exposure: ExposureResult | undefined = key ? s.exposure[key] : undefined;
   const live = !!s.session && !s.session.demo;
 
   const load = async () => {
-    if (!area) return setErr('Choose a state, county and payam first.');
+    if (!target) return setErr('Choose a state and county first (leave payam on All for the whole county).');
     if (!live) return setErr('Sign in to see station readings. Demo mode has no station data.');
     if (!online) return setErr(data ? 'No signal: showing the readings saved on this phone.' : 'No signal, and nothing saved for this place yet.');
     setBusy(true); setErr('');
-    const c = payamCentre(area);
     // Two separate lookups: a missing station file must not hide the at-risk counts, and the other way round.
-    const q = `pcode=${encodeURIComponent(area.pcode)}&payam=${encodeURIComponent(area.payam)}&county=${encodeURIComponent(area.county)}`;
     const [r, x] = await Promise.allSettled([
-      api<StationLevels>(`/api/stations/near?lat=${c.lat.toFixed(4)}&lon=${c.lon.toFixed(4)}&n=3&obs=10`),
-      api<ExposureResult>(`/api/exposure?${q}`),
+      api<StationLevels>(`/api/stations/near?lat=${target.lat.toFixed(4)}&lon=${target.lon.toFixed(4)}&n=3&obs=10&${target.cq}`),
+      api<ExposureResult>(`/api/exposure?${target.q}`),
     ]);
-    if (x.status === 'fulfilled') setState(st => ({ exposure: { ...st.exposure, [area.pcode]: x.value } }));
-    if (r.status === 'fulfilled') { setState(st => ({ stationLevels: { ...st.stationLevels, [area.pcode]: r.value } })); setWhich(0); }
+    if (x.status === 'fulfilled') setState(st => ({ exposure: { ...st.exposure, [target.key]: x.value } }));
+    if (r.status === 'fulfilled') { setState(st => ({ stationLevels: { ...st.stationLevels, [target.key]: r.value } })); setWhich(0); }
     else setErr(explain(r.reason));
     setBusy(false);
   };
   // Fetch when the place changes, unless it was fetched in the last hour.
   useEffect(() => {
     setWhich(0);
-    if (!area || !live || !online) return;
-    const have = getState().stationLevels[area.pcode];
-    if (!have || !getState().exposure[area.pcode] || Date.now() - Date.parse(have.at) > 3_600_000) load();
+    if (!target || !live || !online) return;
+    const have = getState().stationLevels[target.key];
+    if (!have || !getState().exposure[target.key] || Date.now() - Date.parse(have.at) > 3_600_000) load();
   }, [key, live, online]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const states = statesList(), counties = sel.state ? countiesOf(sel.state) : [], payams = sel.state && sel.county ? payamsOf(sel.state, sel.county) : [];
+  const name = target?.name ?? 'the place';
   const choose = (next: Sel) => { setPick(next); setErr(''); };
   const st: StationSeries | undefined = data?.stations[Math.min(which, (data?.stations.length ?? 1) - 1)];
   const sum = st ? levelSummary(st.obs) : null;
 
   return (
     <div className="pad g14" style={{ paddingTop: 14 }}>
-      <p className="body" style={{ fontSize: 13.5 }}>Water level at the river or lake station nearest to a place. Choose a state, county and payam to see its last 10 observations.</p>
+      <p className="body" style={{ fontSize: 13.5 }}>Water level at the river or lake station nearest to a place, and whether that station is upstream, mid-stream or downstream of it. Choose a state and county; leave payam on All to see the whole county.</p>
       <div className="box col g8" style={{ padding: 12 }}>
         <div className="between"><span className="kick sm">{pick ? 'Place you are looking at' : 'Payam at your GPS position'}</span>{pick && <button className="btn plain sm" onClick={() => { setPick(null); setErr(''); }}>Back to my location</button>}</div>
         <div className="grid2" style={{ gap: 8 }}>
@@ -154,7 +161,7 @@ export function Stations() {
         </div>
         <Field label="Payam">
           <select className="input" value={sel.payam} disabled={!sel.county} onChange={e => choose({ ...sel, payam: e.target.value })}>
-            <option value="" disabled>Choose…</option>{payams.map(x => <option key={x}>{x}</option>)}
+            <option value="">All of the county</option>{payams.map(x => <option key={x}>{x}</option>)}
           </select>
         </Field>
       </div>
@@ -164,21 +171,27 @@ export function Stations() {
 
       {data && st && sum && (
         <>
-          {data.stations.length > 1 && <Seg items={data.stations.map((x, i) => [i, `${x.name.split(',')[0]} · ${Math.round(x.km)} km`] as [number, string])} value={Math.min(which, data.stations.length - 1)} onPick={setWhich} fontSize={11.5} />}
+          {data.stations.length > 1 && <Seg items={data.stations.map((x, i) => [i, `${x.name.split(',')[0]} · ${Math.round(x.km)} km${x.relation ? ` · ${RELATION_LABEL[x.relation].toLowerCase()}` : ''}`] as [number, string])} value={Math.min(which, data.stations.length - 1)} onPick={setWhich} fontSize={11.5} />}
           <LevelChart title={st.name} obs={st.obs} />
+          {st.relation && (
+            <div className="box" style={{ padding: '10px 12px', borderLeft: `4px solid ${st.relation === 'upstream' ? '#2060a0' : st.relation === 'local' ? 'var(--color-accent)' : '#c87830'}` }}>
+              <div className="kick sm">{RELATION_LABEL[st.relation]}</div>
+              <div className="sub" style={{ lineHeight: 1.45, fontSize: 12.5 }}>{relationNote(st.relation, name)}</div>
+            </div>
+          )}
           <div className="grid3" style={{ gap: 0, borderTop: '1px solid var(--color-divider)' }}>
-            {[['Latest', `${m(sum.last.v)} m`, dayLabel(sum.last.d)], ['Change', sum.change == null ? '—' : `${sum.change > 0 ? '+' : ''}${m(sum.change, 2)} m`, 'since the one before'], ['Distance', `${Math.round(st.km)} km`, `from ${area?.payam ?? 'the payam'}`]].map(([k, v, sub], i) => (
+            {[['Latest', `${m(sum.last.v)} m`, dayLabel(sum.last.d)], ['Change', sum.change == null ? '—' : `${sum.change > 0 ? '+' : ''}${m(sum.change, 2)} m`, 'since the one before'], ['Distance', `${Math.round(st.km)} km`, `from ${name}`]].map(([k, v, sub], i) => (
               <div key={k} style={{ padding: '9px 8px', borderBottom: '1px solid var(--color-divider)', borderLeft: i ? '1px solid var(--color-divider)' : undefined }}><div className="lbl">{k}</div><div className="head num" style={{ fontSize: 20 }}>{v}</div><div className="sub">{sub}</div></div>
             ))}
           </div>
-          <div className="sub" style={{ lineHeight: 1.45 }}>{st.name}{st.type ? ` (${st.type})` : ''} is {Math.round(st.km)} km from the middle of {area?.payam}: {distanceNote(st.km)}.</div>
+          <div className="sub" style={{ lineHeight: 1.45 }}>{st.name}{st.type ? ` (${st.type})` : ''} is {Math.round(st.km)} km from the middle of {name}: {distanceNote(st.km)}.{st.relation ? '' : ' It is not on the same river network as this place, so it is neither upstream nor downstream of it.'}</div>
           <p className="note">{data.stale ? 'The server could not refresh the readings just now, so these are the last ones it had. ' : ''}Readings come from the project's satellite water-level file in Drive (merged_altimetry_stations), refreshed each night. Height is metres above the sea-level reference, so only the rise and fall matter, not the number itself. Saved on this phone, last updated {new Date(data.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.</p>
           <button className="btn plain" onClick={load} disabled={busy}>{busy ? 'Updating…' : 'Update now'}</button>
         </>
       )}
       {data && !st && <div className="note">No station in the data has readings.</div>}
-      {area && exposure && <ExposureCard payam={area.payam} res={exposure} />}
-      {!data && !busy && !err && <button className="btn" onClick={load} disabled={!area}>Show the nearest station</button>}
+      {target && exposure && <ExposureCard payam={name} res={exposure} />}
+      {!data && !busy && !err && <button className="btn" onClick={load} disabled={!target}>Show the nearest station</button>}
     </div>
   );
 }

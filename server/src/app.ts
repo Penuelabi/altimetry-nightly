@@ -2,9 +2,10 @@ import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from '@hono/node-server/serve-static';
 import type { AdminLoc, ContactKind, GaugeReading, Role, SignupRequest, SyncRecord } from '@abuk/core';
-import { nearestStations, type ExposureResult, type StationLevels } from '@abuk/core';
+import { countyArea, nearestStations, type ExposureResult, type StationLevels } from '@abuk/core';
 import { stationHistory } from './stations';
-import { exposureTable, findExposure } from './exposure';
+import { countyExposure, exposureTable, findExposure } from './exposure';
+import { relationFor, relationTable } from './relation';
 import { applyOps, editAllowed, newId, normContact, normId, opAllowed, opError, parseGauge, signupError, SIGNUP_NOTE_MAX, weakPin, seedRegister, seedStore, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
 import { cfg, health, missing, NotConfigured } from './config';
 import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, SIGNUP_MAX_PENDING, changeSignups, loadSignups, newPin, tempPinFields, changeUsers, checkKey, checkPin, issueSession, loadUsers, makeUser, pinFields, readSession, toPublic, type Session, type StoredUser } from './auth';
@@ -216,7 +217,9 @@ app.get('/api/stations/near', auth(), async c => {
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return c.json({ error: 'invalid', message: 'Give lat and lon.' }, 400);
   const n = Math.min(5, Math.max(1, Math.round(Number(c.req.query('n')) || 3))), obs = Math.min(60, Math.max(3, Math.round(Number(c.req.query('obs')) || 10)));
   const { list, stale } = await stationHistory();
-  const stations = nearestStations(list, { lat, lon }, n, obs);
+  // pcode (a payam) or county (the whole county) lets each station say whether it is upstream of, in, or downstream of that place.
+  const rel = relationFor(await relationTable(), { pcode: c.req.query('pcode') ?? '', ccode: c.req.query('ccode') ?? '', county: c.req.query('county') ?? '' });
+  const stations = nearestStations(list, { lat, lon }, n, obs).map(s => (rel.has(s.uid) ? { ...s, relation: rel.get(s.uid) } : s));
   const out: StationLevels = { at: new Date().toISOString(), from: { lat, lon }, asOf: stations.flatMap(s => s.obs.map(o => o.d)).sort().pop() ?? '', stations, ...(stale ? { stale: true } : {}) };
   return c.json(out);
 });
@@ -224,9 +227,11 @@ app.get('/api/stations/near', auth(), async c => {
 // People, buildings, schools and health facilities at risk inside one payam (payam_exposure.csv in the Drive folder).
 app.get('/api/exposure', auth(), async c => {
   const pcode = c.req.query('pcode') ?? '', payam = c.req.query('payam') ?? '', county = c.req.query('county') ?? '';
-  if (!/^[A-Za-z0-9_-]{2,20}$/.test(pcode)) return c.json({ error: 'invalid', message: 'Give the payam code.' }, 400);
+  const ccode = c.req.query('ccode') ?? '';
+  const wholeCounty = !pcode && !payam && (/^[A-Za-z0-9]{4,8}$/.test(ccode) || (county.length >= 2 && county.length <= 80));
+  if (!wholeCounty && !/^[A-Za-z0-9_-]{2,20}$/.test(pcode)) return c.json({ error: 'invalid', message: 'Give the payam code, or the county code for the whole county.' }, 400);
   const { rows, found, stale } = await exposureTable();
-  const out: ExposureResult = { at: new Date().toISOString(), fileFound: found, row: findExposure(rows, { pcode, payam, county }), ...(stale ? { stale: true } : {}) };
+  const out: ExposureResult = { at: new Date().toISOString(), fileFound: found, row: wholeCounty ? countyExposure(rows, { ccode, county }) : findExposure(rows, { pcode, payam, county }), ...(stale ? { stale: true } : {}) };
   return c.json(out);
 });
 
@@ -238,7 +243,12 @@ app.get('/api/sources/gee', auth(), async c => {
 
 // Satellite indices averaged over one payam: ?pcode=SS030504, or ?lat=&lon= for the payam that point is in.
 app.get('/api/sources/satellite', auth(), async c => {
-  const pcode = c.req.query('pcode');
+  const pcode = c.req.query('pcode'), county = c.req.query('county'), state = c.req.query('state');
+  // ?county=&state= averages over the whole county (every payam together) when no payam is chosen.
+  if (!pcode && county && state) {
+    const whole = countyArea(state, county);
+    return whole ? c.json(await satelliteForPayam(whole)) : c.json({ error: 'not_found', message: `unknown county ${county}, ${state}` }, 404);
+  }
   const p = pcode ? null : coords(c);
   if (!pcode && !p) return c.json({ error: 'invalid', message: 'pcode, or lat and lon, is required' }, 400);
   const area = resolvePayam(pcode ? { pcode } : p!);

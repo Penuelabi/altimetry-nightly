@@ -3,7 +3,10 @@ import { haversineKm, type LatLon } from './geo';
 import type { PayamArea } from './admin';
 
 export interface Obs { d: string; v: number }
-export interface StationSeries { uid: string; name: string; type: string; lat: number; lon: number; km: number; obs: Obs[] }
+// Where a station sits on the river network compared with the place asked about (from the HydroBASINS network):
+// upstream of it, on the same stretch (mid-stream), or downstream of it. Absent when the station is not on its river network.
+export type StreamRelation = 'upstream' | 'local' | 'downstream';
+export interface StationSeries { uid: string; name: string; type: string; lat: number; lon: number; km: number; obs: Obs[]; relation?: StreamRelation }
 export interface StationLevels {
   at: string;
   from: LatLon;
@@ -19,6 +22,21 @@ export function payamCentre(a: Pick<PayamArea, 'polygons'>): LatLon {
   const ring = a.polygons.map(p => p[0]).filter(Boolean).sort((x, y) => y.length - x.length)[0] ?? [];
   if (!ring.length) return { lat: 0, lon: 0 };
   return { lon: ring.reduce((n, p) => n + p[0], 0) / ring.length, lat: ring.reduce((n, p) => n + p[1], 0) / ring.length };
+}
+
+// The middle of a county: the average of its payams' middles.
+export function countyCentre(payams: Pick<PayamArea, 'polygons'>[]): LatLon {
+  const cs = payams.map(payamCentre).filter(c => c.lat || c.lon);
+  if (!cs.length) return { lat: 0, lon: 0 };
+  return { lat: cs.reduce((n, c) => n + c.lat, 0) / cs.length, lon: cs.reduce((n, c) => n + c.lon, 0) / cs.length };
+}
+
+export const RELATION_LABEL: Record<StreamRelation, string> = { upstream: 'Upstream', local: 'Mid-stream', downstream: 'Downstream' };
+// One sentence on what the relation means for the place.
+export function relationNote(rel: StreamRelation, place: string): string {
+  if (rel === 'upstream') return `Upstream of ${place}: water that passes this station flows on toward ${place}, so a rise here is an early warning.`;
+  if (rel === 'local') return `Mid-stream: this station is on the river reach that drains ${place}, so it shows what the water is doing there.`;
+  return `Downstream of ${place}: water here has already passed ${place}; a high level here can back water up toward it.`;
 }
 
 // The n stations nearest to a point, each with its newest `obs` observations (oldest first).

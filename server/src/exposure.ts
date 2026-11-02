@@ -68,6 +68,22 @@ export function findExposure(rows: Exposure[], q: { pcode?: string; payam?: stri
   return named.length === 1 ? named[0] : null;
 }
 
+// Every payam of one county added together (no payam chosen). A figure is empty only when it is empty in every payam.
+export function countyExposure(rows: Exposure[], q: { ccode?: string; county?: string }): Exposure | null {
+  const ccode = (q.ccode ?? '').toUpperCase();
+  const mine = ccode ? rows.filter(r => r.pcode.startsWith(ccode)) : rows.filter(r => r.county && q.county && key(r.county) === key(q.county));
+  if (!mine.length) return null;
+  const sum = (pick: (r: Exposure) => number | null): number | null => {
+    const v = mine.map(pick).filter((x): x is number => x != null);
+    return v.length ? v.reduce((a, b) => a + b, 0) : null;
+  };
+  const count = (k: Kind): Count => ({ total: sum(r => r[k].total), risk: sum(r => r[k].risk) });
+  return {
+    pcode: '', payam: '', county: mine[0].county, hazard: mine[0].hazard, asOf: mine.map(r => r.asOf).sort().pop() ?? '',
+    population: count('population'), buildings: count('buildings'), schools: count('schools'), health: count('health'),
+  };
+}
+
 const FRESH_MS = 30 * 60_000, MISSING_MS = 5 * 60_000;
 let cache: { at: number; mod: string; found: boolean; rows: Exposure[] } | null = null;
 let inflight: Promise<{ rows: Exposure[]; found: boolean; stale: boolean }> | null = null;

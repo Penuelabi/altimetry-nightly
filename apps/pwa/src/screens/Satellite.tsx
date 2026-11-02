@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { countiesOf, listPayams, payamAt, payamByCode, payamsOf, statesList, type SatelliteIndices } from '@abuk/core';
+import { countiesOf, countyArea, isCountyArea, listPayams, payamAt, payamByCode, payamsOf, statesList, type SatelliteIndices } from '@abuk/core';
 import { api } from '../api';
 import { usePlace } from '../net';
 import { setState, useApp } from '../store';
@@ -67,8 +67,11 @@ export function Satellite() {
   const area = useMemo(() => {
     if (!pick) return gpsArea;
     const p = listPayams().find(x => x.state === pick.state && x.county === pick.county && x.payam === pick.payam);
-    return p ? payamByCode(p.pcode) : null;
+    if (p) return payamByCode(p.pcode);
+    // A county with the payam left on All: all its payams together.
+    return pick.state && pick.county && !pick.payam ? countyArea(pick.state, pick.county) : null;
   }, [pick?.state, pick?.county, pick?.payam, gpsArea?.pcode]);
+  const wholeCounty = isCountyArea(area);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const today = new Date().toISOString().slice(0, 10);
@@ -77,13 +80,15 @@ export function Satellite() {
   const away = !!pick;
 
   const refresh = async () => {
-    if (!area) return setErr(away ? 'Choose a payam to get satellite values.' : 'Your GPS position is outside the payam boundaries, so there is nothing to average over.');
+    if (!area) return setErr(away ? 'Choose a state and county to get satellite values.' : 'Your GPS position is outside the payam boundaries, so there is nothing to average over.');
     if (!s.session || s.session.demo) return setErr('Sign in to fetch live satellite data.');
     setBusy(true); setErr('');
     try {
-      const r = await api<SatelliteIndices>(`/api/sources/satellite?pcode=${area.pcode}`);
+      const r = await api<SatelliteIndices>(wholeCounty
+        ? `/api/sources/satellite?county=${encodeURIComponent(area.county)}&state=${encodeURIComponent(area.state)}`
+        : `/api/sources/satellite?pcode=${area.pcode}`);
       fetched.set(area.pcode, r);
-      if (!away) setState({ satIndices: r });
+      if (!away && !wholeCounty) setState({ satIndices: r });
       else setState({}); // re-render
       if (r.errors.length) setErr(r.errors.join('; '));
     } catch (e) { setErr((e as Error).message); }
@@ -103,7 +108,7 @@ export function Satellite() {
       <div className="box col g8" style={{ padding: '10px 14px' }}>
         <div className="between"><span className="kick sm">{away ? 'Place you are looking at' : 'Payam at your GPS position'}</span>{away && <button className="btn plain sm" onClick={() => { setPick(null); setErr(''); }}>Back to my location</button>}</div>
         <div className="head" style={{ fontSize: 22 }}>{sel.payam || (sel.county ? `${sel.county} county` : sel.state) || 'Outside the boundaries'}</div>
-        <div className="sub">{area ? `${area.county} county, ${area.state} · ${area.areaKm2.toLocaleString('en')} km²` : away ? 'Choose a payam to see satellite values; records below show for what you picked.' : 'Move into a South Sudan payam to see values, or pick a place below.'}</div>
+        <div className="sub">{area ? `${area.county} county, ${area.state} · ${area.areaKm2.toLocaleString('en')} km²` : away ? 'Choose a county to see satellite values; records below show for what you picked.' : 'Move into a South Sudan payam to see values, or pick a place below.'}</div>
         <div className="grid2">
           <Field label="State">
             <select className="input" value={sel.state} onChange={e => choose({ state: e.target.value, county: '', payam: '' })}>
@@ -118,13 +123,13 @@ export function Satellite() {
         </div>
         <Field label="Payam">
           <select className="input" value={sel.payam} disabled={!sel.county} onChange={e => choose({ ...sel, payam: e.target.value })}>
-            <option value="">All</option>{payams.map(x => <option key={x}>{x}</option>)}
+            <option value="">All of the county</option>{payams.map(x => <option key={x}>{x}</option>)}
           </select>
         </Field>
       </div>
 
       <p className="body" style={{ fontSize: 13, color: 'var(--color-neutral-800)' }}>
-        Every value below is the average over all satellite pixels inside this payam, from Google Earth Engine.
+        Every value below is the average over all satellite pixels inside this {wholeCounty ? 'county (all its payams together)' : 'payam'}, from Google Earth Engine.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -157,8 +162,8 @@ export function Satellite() {
         </div>
       )}
 
-      {mine && <div className="sub" style={{ textAlign: 'center' }}>Data as of {mine.asOf} · {mine.payam} payam</div>}
-      {!mine && area && <div className="sub" style={{ textAlign: 'center' }}>No satellite values for {area.payam} yet.</div>}
+      {mine && <div className="sub" style={{ textAlign: 'center' }}>Data as of {mine.asOf} · {wholeCounty ? `${mine.county} county` : `${mine.payam} payam`}</div>}
+      {!mine && area && <div className="sub" style={{ textAlign: 'center' }}>No satellite values for {wholeCounty ? `${area.county} county` : area.payam} yet.</div>}
 
       {err && <div className="msg" style={{ fontSize: 12 }}>{err}</div>}
 
@@ -166,7 +171,7 @@ export function Satellite() {
         {busy ? 'Fetching from Earth Engine…' : mine ? 'Refresh indices' : 'Fetch satellite data'}
       </button>
 
-      <PlaceRecords sel={sel} area={area} floodPct={mine?.floodPct ?? null} />
+      <PlaceRecords sel={sel} area={wholeCounty ? null : area} floodPct={mine?.floodPct ?? null} />
 
       <div className="col g6" style={{ marginTop: 4 }}>
         <div className="section">About these indices</div>

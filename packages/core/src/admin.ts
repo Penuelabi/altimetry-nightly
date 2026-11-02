@@ -86,6 +86,31 @@ export function payamsIn(county: string, state?: string): PayamArea[] {
   return index.filter(e => e.p.county === county && (!state || e.p.state === state)).map(toArea);
 }
 
+// A whole county as one area (its payams' boundaries together), so a value can be averaged over the county when no payam is chosen.
+// pcode is `county:State|County`; payam is empty. Rings are thinned to about 12,000 points so the boundary stays small to send.
+export const COUNTY_PREFIX = 'county:';
+export function countyArea(state: string, county: string): PayamArea | null {
+  const parts = payamsIn(county, state);
+  if (!parts.length) return null;
+  const polys = parts.flatMap(p => p.polygons);
+  const points = polys.reduce((n, poly) => n + poly.reduce((m, ring) => m + ring.length, 0), 0);
+  const step = Math.max(1, Math.ceil(points / 12000));
+  const thin = (ring: number[][]) => {
+    if (step === 1 || ring.length < 12) return ring;
+    const out = ring.filter((_, i) => i % step === 0);
+    return out.length >= 3 ? [...out, out[0]] : ring;
+  };
+  return { payam: '', county, state, pcode: `${COUNTY_PREFIX}${state}|${county}`, polygons: polys.map(poly => poly.map(thin)), areaKm2: parts.reduce((n, p) => n + p.areaKm2, 0) };
+}
+// The 6-character county code of a county in this app: the commonest first six characters of its payam codes (e.g. SS0305).
+// Used to match payam_exposure.csv and station_relation.csv rows, because county names differ between the app and OCHA.
+export function countyCode(state: string, county: string): string {
+  const counts = new Map<string, number>();
+  for (const p of payamsIn(county, state)) counts.set(p.pcode.slice(0, 6), (counts.get(p.pcode.slice(0, 6)) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
+}
+export const isCountyArea = (a: { pcode: string } | null | undefined) => !!a && a.pcode.startsWith(COUNTY_PREFIX);
+
 // All payams, light (no boundaries), sorted by state, county, then name.
 export function listPayams(): Place[] {
   index ??= build();
