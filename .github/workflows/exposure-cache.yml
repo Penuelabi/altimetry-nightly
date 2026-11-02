@@ -45,7 +45,7 @@ jobs:
         if: always()
         run: |
           mkdir -p "$EXPOSURE_OUT_DIR"
-          python scripts/make_payam_exposure.py --cache data/exposure_cache.json --basis now -o "$EXPOSURE_OUT_DIR/payam_exposure.csv" 2>&1 | tee "$RUNNER_TEMP/payam_exposure.log"
+          python scripts/make_payam_exposure.py --cache data/exposure_cache.json --basis now --county-population data/county_population_ocha.csv -o "$EXPOSURE_OUT_DIR/payam_exposure.csv" 2>&1 | tee "$RUNNER_TEMP/payam_exposure.log"
           tail -n 14 "$RUNNER_TEMP/payam_exposure.log" >> "$GITHUB_STEP_SUMMARY" || true
       - name: Upload payam_exposure.csv to the Drive folder
         run: python drive_sync.py push exposure
