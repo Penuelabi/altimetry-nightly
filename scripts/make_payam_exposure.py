@@ -356,6 +356,32 @@ def estimate_population(payams, how):
     return n
 
 
+def floor_population(payams, per_building):
+    """A payam cannot have fewer people than buildings: where it does (or has no population), use buildings x per_building.
+    The at-risk figure keeps its share of the total; with no at-risk figure it falls back to buildings at risk x per_building."""
+    n = 0
+    for r in payams.rows:
+        b = r['buildings']
+        if b == '' or not b:
+            continue
+        floor = b * per_building
+        old = r['population']
+        if old != '' and old >= b:
+            continue
+        r['population'] = whole(floor)
+        risk = r['population_at_risk']
+        if old != '' and risk != '':
+            risk = risk * floor / old
+        elif r['buildings_at_risk'] != '':
+            risk = r['buildings_at_risk'] * per_building
+        else:
+            risk = ''
+        r['population_at_risk'] = '' if risk == '' else whole(min(risk, floor))
+        n += 1
+    print('population raised to %g x buildings for %d payams with fewer people than buildings' % (per_building, n))
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser(description='Build payam_exposure.csv for the Abuk app.', formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
     ap.add_argument('--population', nargs='*', default=[], metavar='FILE')
@@ -367,6 +393,8 @@ def main():
     ap.add_argument('--facilities', metavar='FILE')
     ap.add_argument('--risk', metavar='FILE')
     ap.add_argument('--estimate-population', choices=('buildings', 'area'))
+    ap.add_argument('--persons-per-building', type=float, default=4.5, metavar='N',
+                    help='where population is below the number of buildings, use buildings x N (default 4.5; 0 turns it off)')
     ap.add_argument('--hazard', default=None)
     ap.add_argument('--as-of', default=None)
     ap.add_argument('-o', '--output', default='payam_exposure.csv')
@@ -390,6 +418,7 @@ def main():
     if a.risk:
         load_risk(a.risk, payams)
     estimated = estimate_population(payams, a.estimate_population) if a.estimate_population else 0
+    raised = floor_population(payams, a.persons_per_building) if a.persons_per_building > 0 else 0
 
     hazard = a.hazard
     if hazard is None:
@@ -408,6 +437,8 @@ def main():
             parts.append('population: the exposed share from the *_exposure_by_payam exports')
         if estimated:
             parts.append('population: estimated from the share of %s at risk' % ('land area' if a.estimate_population == 'area' else 'buildings'))
+        if raised:
+            parts.append('population: where the layer gave fewer people than buildings it is %g x buildings' % a.persons_per_building)
         hazard = '; '.join(parts)
     if a.as_of is not None:
         as_of = a.as_of
