@@ -51,23 +51,37 @@ function LevelChart({ title, obs }: { title: string; obs: Obs[] }) {
   );
 }
 
-// What sits inside the payam and how much of it is at risk, from payam_exposure.csv in the Drive folder.
+// Same look as the satellite index tiles: how much of each is at risk, coloured by the share, from payam_exposure.csv in the Drive folder.
+const RISK_BANDS = [
+  { max: 2, label: 'Very few', color: 'var(--color-accent)' },
+  { max: 10, label: 'Low', color: '#7ba840' },
+  { max: 25, label: 'Moderate', color: '#b8a040' },
+  { max: 50, label: 'High', color: '#c87830' },
+  { max: 100, label: 'Very high', color: '#c03020' },
+];
 function ExposureCard({ payam, res }: { payam: string; res: ExposureResult }) {
   const row = res.row;
   if (!row) return <div className="note">{res.fileFound ? `payam_exposure.csv has no row for ${payam}.` : 'The at-risk counts for this payam are not available yet: payam_exposure.csv is not in the project Drive folder.'}</div>;
   const items: [string, Count][] = [['Population', row.population], ['Buildings', row.buildings], ['Schools', row.schools], ['Health facilities', row.health]];
   return (
-    <div className="box col g8" style={{ padding: 12 }}>
-      <div className="kick sm">Within {payam}</div>
-      {items.map(([label, c]) => {
-        const pct = riskShare(c);
-        return (
-          <div key={label} className="rowg" style={{ padding: '6px 0', borderBottom: '1px solid var(--color-divider)' }}>
-            <span>{label}<span className="sub"> {countText(c.total)} in all</span></span>
-            <span className="num"><b>{countText(c.risk)}</b> at risk{pct != null ? <span className="sub"> {pct}%</span> : null}</span>
-          </div>
-        );
-      })}
+    <div className="col g8">
+      <div className="kick sm">At risk within {payam}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {items.map(([label, c]) => {
+          const pct = riskShare(c);
+          const band = pct == null ? null : RISK_BANDS.find(r => pct <= r.max) ?? RISK_BANDS[RISK_BANDS.length - 1];
+          const color = band?.color ?? 'var(--color-neutral-600)';
+          return (
+            <div key={label} className="box" style={{ padding: '14px 12px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: color }} />
+              <div className="kick sm" style={{ letterSpacing: '.12em', marginBottom: 2 }}>{label.toUpperCase()}</div>
+              <div className="head num" style={{ fontSize: 28, color }}>{countText(c.risk)}</div>
+              <div style={{ fontSize: 12, color, fontWeight: 600, marginBottom: 4 }}>{band ? `${band.label} · ${pct}% at risk` : 'At risk not known'}</div>
+              <div className="sub" style={{ fontSize: 11 }}>{c.total == null ? 'Total not known' : `${countText(c.total)} in all`}</div>
+            </div>
+          );
+        })}
+      </div>
       <p className="note">{row.hazard ? `At risk means: ${row.hazard}. ` : ''}{row.asOf ? `As of ${row.asOf}. ` : ''}{res.stale ? 'The server could not refresh these just now, so these are the last it had.' : ''}</p>
     </div>
   );
@@ -158,13 +172,6 @@ export function Stations() {
             ))}
           </div>
           <div className="sub" style={{ lineHeight: 1.45 }}>{st.name}{st.type ? ` (${st.type})` : ''} is {Math.round(st.km)} km from the middle of {area?.payam}: {distanceNote(st.km)}.</div>
-          <div>
-            <div className="kick sm" style={{ borderBottom: '1px solid var(--color-divider)', paddingBottom: 4 }}>Observations</div>
-            {[...st.obs].reverse().map((o, i, a) => {
-              const prev = a[i + 1];
-              return <div key={o.d} className="rowg" style={{ padding: '7px 0', borderBottom: '1px solid var(--color-divider)' }}><span>{dayLabel(o.d)}</span><span className="num">{m(o.v, 3)} m{prev ? <span className="sub"> {o.v - prev.v >= 0 ? '+' : ''}{m(o.v - prev.v, 2)}</span> : null}</span></div>;
-            })}
-          </div>
           <p className="note">{data.stale ? 'The server could not refresh the readings just now, so these are the last ones it had. ' : ''}Readings come from the project's satellite water-level file in Drive (merged_altimetry_stations), refreshed each night. Height is metres above the sea-level reference, so only the rise and fall matter, not the number itself. Saved on this phone, last updated {new Date(data.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.</p>
           <button className="btn plain" onClick={load} disabled={busy}>{busy ? 'Updating…' : 'Update now'}</button>
         </>
