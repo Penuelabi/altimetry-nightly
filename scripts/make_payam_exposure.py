@@ -4,8 +4,11 @@
 Python 3.8+, standard library only. Upload the result to the project Drive folder under the exact name
 payam_exposure.csv; the server picks it up within 30 minutes.
 
-What goes in (download the files from Drive first; every input is optional except --population):
+What goes in (download the files from Drive first; give --cache and/or --population; everything else is optional):
 
+  --all-payams  Write every payam in the cache, not only those in the --population files. This is the default when no
+                --population file is given: then the payam codes and the population come from the cache's "payams_pop"
+                table (WorldPop 2020, whole country), which exposure-cache.yml fills once its population step has run.
   --population  Population-by-payam exports (Duk_population_by_payam.csv, KapoetaEast_population_by_payam.csv, ...).
                 Files, folders or wildcards, as many as you like. Needs ADM2_EN, ADM3_EN, ADM3_PCODE and a "sum"
                 column. A *_exposure_by_payam.csv export (columns pop and exposed) works too and also gives
@@ -184,10 +187,12 @@ def load_population(paths, payams):
     return with_risk
 
 
-def load_cache(path, basis, payams):
+def load_cache(path, basis, payams, create=False):
     """Schools, health facilities and buildings (totals and at risk) from data/exposure_cache.json.
 
-    Returns (what "at risk" means, the date the cache was built).
+    Also population per payam and the payam codes when the cache has the "payams_pop" table. With create=True every
+    payam in the cache gets a row, so the whole country is written; otherwise only payams already in the population files.
+    Returns (what "at risk" means, the date the cache was built, how many payams got population from the cache).
     """
     with open(path, encoding='utf-8') as f:
         data = json.load(f)
@@ -197,14 +202,25 @@ def load_cache(path, basis, payams):
         sys.exit('%s has no "payams" table; is it data/exposure_cache.json?' % path)
     if basis == 'now' and not now:
         sys.exit('%s has no "payams_now" table (the flooded-now step has not finished); use --basis risk' % path)
-    matched, missing = 0, []
+    pops = data.get('payams_pop') or {}
+    if create and not pops:
+        warn('%s has no "payams_pop" table yet, so the rows have no payam code or population (run exposure-cache.yml with the '
+             'population step first)' % os.path.basename(path))
+    matched, missing, pop_filled = 0, [], 0
     for county, plist in table.items():
         for p in plist:
             name = p.get('payam', '')
-            r = payams.find('', name, county, quiet=True)
+            entry = (pops.get(county) or {}).get(name) or {}
+            code = str(entry.get('pcode') or '').upper()
+            r = payams.find(code, name, county, quiet=True)
+            if r is None and create:
+                r = payams.add(code, name, county)
             if r is None:
                 missing.append('%s / %s' % (county, name))
                 continue
+            if code and not r['ADM3_PCODE']:
+                r['ADM3_PCODE'] = code
+                payams.by_code[code] = r
             at = (now.get(county) or {}).get(name) or {}
             for total_col, risk_col, total_key, risk_key, now_key in (
                     ('schools', 'schools_at_risk', 'schools', 'schools_risk', 'schools_now'),
@@ -216,6 +232,12 @@ def load_cache(path, basis, payams):
                     continue
                 r[total_col] = whole(total)
                 r[risk_col] = whole(None if risk is None else min(risk, total))
+            pop_total = num(entry.get('pop'))
+            if r['population'] == '' and pop_total:
+                pop_risk = num(entry.get('pop_risk') if basis == 'risk' else entry.get('pop_now'))
+                r['population'] = whole(pop_total)
+                r['population_at_risk'] = whole(None if pop_risk is None else min(pop_risk, pop_total))
+                pop_filled += 1
             area, area_risk = num(p.get('area_km2')), num(p.get('area_risk_km2') if basis == 'risk' else at.get('area_now_km2'))
             if area and area_risk is not None:
                 r['_area_share'] = min(1.0, area_risk / area)
@@ -229,7 +251,7 @@ def load_cache(path, basis, payams):
         text = 'inside the current maximum flood extent (Sentinel-1)'
     else:
         text = 'flooded now or in at least 15%% of past same-season years (%s)' % (data.get('risk_basis') or 'Sentinel-1')
-    return text, built
+    return text, built, pop_filled
 
 
 def load_buildings(path, year, payams):
@@ -336,7 +358,8 @@ def estimate_population(payams, how):
 
 def main():
     ap = argparse.ArgumentParser(description='Build payam_exposure.csv for the Abuk app.', formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
-    ap.add_argument('--population', nargs='+', required=True, metavar='FILE')
+    ap.add_argument('--population', nargs='*', default=[], metavar='FILE')
+    ap.add_argument('--all-payams', action='store_true')
     ap.add_argument('--cache', metavar='FILE')
     ap.add_argument('--basis', choices=('risk', 'now'), default='risk')
     ap.add_argument('--buildings', metavar='FILE')
@@ -350,12 +373,16 @@ def main():
     a = ap.parse_args()
 
     payams = Payams()
+    if not a.population and not a.cache:
+        sys.exit('give --cache (the whole country) and/or --population (the payams in those files)')
     pop_risk = load_population(a.population, payams)
-    if not payams.rows:
+    if a.population and not payams.rows:
         sys.exit('no payams found in the population files (need ADM3_EN and a "sum" column)')
-    label, cache_text, cache_built = '', '', ''
+    label, cache_text, cache_built, cache_pop = '', '', '', 0
     if a.cache:
-        cache_text, cache_built = load_cache(a.cache, a.basis, payams)
+        cache_text, cache_built, cache_pop = load_cache(a.cache, a.basis, payams, create=a.all_payams or not a.population)
+    if not payams.rows:
+        sys.exit('no payams to write')
     if a.buildings:
         label = load_buildings(a.buildings, a.year, payams)
     if a.facilities:
@@ -375,6 +402,8 @@ def main():
             parts.append('schools and health facilities taken from the supplied facility list')
         if a.risk:
             parts.append('counts from the supplied risk table take priority')
+        if cache_pop:
+            parts.append('population: WorldPop 2020 inside the same area')
         if pop_risk:
             parts.append('population: the exposed share from the *_exposure_by_payam exports')
         if estimated:
