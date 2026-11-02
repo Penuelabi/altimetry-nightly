@@ -7,6 +7,7 @@ Writes data/exposure_cache.json:
   payams   {county: [ {payam, area_km2, area_risk_km2, schools, schools_risk, health, health_risk, buildings, buildings_risk,
                        roads_km, roads_risk_km} ]}
   county   {county: {schools, schools_risk, health, health_risk}}
+  payams_pop {county: {payam: {pcode, pop, pop_risk, pop_now}}}   WorldPop 2020 inside each payam and inside the at-risk / flooded-now area
   stations {station_uid: {county, payam, pop, pop_risk, schools, schools_risk, health, health_risk, buildings, buildings_risk,
                           counties, payams: [ {payam, county, pop, pop_risk, bld, sch, sch_r, hl, hl_r} ]}}
 
@@ -227,6 +228,54 @@ if flooded is not None and risk_basis.startswith('Sentinel-1 same-season baselin
         c['now_complete'] = sum(len(v) for v in by.values()) >= 0.98 * n
         save(c)
         print('flooded-now table saved:', len(nrows), 'payams')
+
+# --- 1c. population per payam (WorldPop 2020), with the payam code the Abuk app looks payams up by ----------------------
+# Whole country, incremental like the flooded-now table. Adds c['payams_pop'] = {county: {payam: {pcode, pop, pop_risk, pop_now}}};
+# every existing key is left as it was, so the county report and the other readers of this file are not affected.
+c = load()
+if c.get('payams_complete') and (not c.get('pop_complete') or REFRESH) and left() > 900:
+    K_PCODE = next((k for k in keys if k.lower() in ('adm3_pcode', 'adm3_pcod', 'pcode3', 'pcode')), None)
+    has_now = flooded is not None and risk_basis.startswith('Sentinel-1 same-season baseline +')
+    popimg = wp.rename('pop').addBands(wp.multiply(risk).rename('pop_risk'))
+    if has_now:
+        popimg = popimg.addBands(wp.multiply(flooded).rename('pop_now'))
+    n = payam.size().getInfo()
+    lst = payam.toList(n)
+    done = {} if REFRESH else (c.get('payams_pop') or {})
+    meta = payam.reduceColumns(ee.Reducer.toList(2), [A2, A3]).get('list').getInfo()
+    todo = [i for i, (cn, pn) in enumerate(meta) if pn not in (done.get(cn) or {})]
+    print(f'population: {len(meta) - len(todo)} payams already done, {len(todo)} to do; payam code field: {K_PCODE}')
+    prow = []
+    for i in range(0, len(todo), CHUNK):
+        if left() < 600:
+            print('budget used up during the population table; it will continue on the next run'); break
+        sub = ee.FeatureCollection([lst.get(j) for j in todo[i:i + CHUNK]])
+
+        def popf(f):
+            s = popimg.reduceRegion(ee.Reducer.sum(), f.geometry(), 100, maxPixels=1e10, tileScale=8)
+            props = {'payam': f.get(A3), 'county': f.get(A2), 'pop': s.get('pop'), 'pop_risk': s.get('pop_risk')}
+            if has_now:
+                props['pop_now'] = s.get('pop_now')
+            if K_PCODE:
+                props['pcode'] = f.get(K_PCODE)
+            return ee.Feature(None, props)
+        for attempt in range(2):
+            try:
+                prow += [r['properties'] for r in sub.map(popf).getInfo()['features']]
+                break
+            except Exception as e:
+                print(f'  population payams {i}-{i + CHUNK} attempt {attempt + 1} failed: {str(e)[:200]}')
+        print(f'population payams {min(i + CHUNK, len(todo))}/{len(todo)}', flush=True)
+    if prow:
+        by = {k: dict(v) for k, v in done.items()}
+        for r in prow:
+            by.setdefault(r['county'], {})[r['payam']] = {k: (round(v) if isinstance(v, float) else v) for k, v in r.items()
+                                                          if k not in ('county', 'payam') and v is not None}
+        c['payams_pop'] = by
+        c['pop_source'] = 'WorldPop 100 m, 2020'
+        c['pop_complete'] = sum(len(v) for v in by.values()) >= 0.98 * n
+        save(c)
+        print('population table saved:', len(prow), 'payams')
 
 # --- 2. station exposure (25 km) -----------------------------------------------------------------------------------
 ss = os.path.join(ALT, 'station_status.csv')

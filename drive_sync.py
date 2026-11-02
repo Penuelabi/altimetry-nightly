@@ -83,6 +83,11 @@ BULLETIN_FILES = [
 ]
 
 
+# Built by make_payam_exposure.py for the Abuk app and uploaded to the main Drive folder by the exposure-cache workflow
+# (python drive_sync.py push exposure). It must already exist there: a service account can only update files in a personal Drive.
+EXPOSURE_FILES = ['payam_exposure.csv']
+
+
 def drive_service():
     key = os.environ['GEE_SERVICE_ACCOUNT_KEY'].strip()
     info = json.loads(key if key.startswith('{') else open(key, encoding='utf-8').read())
@@ -223,10 +228,14 @@ def push(svc, folder_id, local_dir, sync_files=None):
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    if not args or args[0] not in ('pull', 'push') or (len(args) > 1 and args[1] != 'bulletin'):
-        sys.exit("usage: python drive_sync.py pull|push [bulletin]")
+    if not args or args[0] not in ('pull', 'push') or (len(args) > 1 and args[1] not in ('bulletin', 'exposure')):
+        sys.exit("usage: python drive_sync.py pull|push [bulletin|exposure]")
     service = drive_service()
-    if len(args) > 1:
+    if len(args) > 1 and args[1] == 'exposure':
+        folder = os.environ['DRIVE_FOLDER_ID'].strip()
+        local = os.environ.get('EXPOSURE_OUT_DIR', 'exposure_out')
+        files, only = EXPOSURE_FILES, []
+    elif len(args) > 1:
         folder = os.environ['BULLETIN_FOLDER_ID'].strip()
         local = os.environ.get('BULLETIN_OUT_DIR', 'bulletin')
         files, only = BULLETIN_FILES, []
