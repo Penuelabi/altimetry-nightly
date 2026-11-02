@@ -421,7 +421,7 @@ def station_relations():
     for cty, lst in by_county.items():  # the county point is the payam centre closest to the average of its payam centres, so it lies inside the county
         mx, my = sum(p['lon'] for p in lst) / len(lst), sum(p['lat'] for p in lst) / len(lst)
         best = min(lst, key=lambda p: (p['lon'] - mx) ** 2 + (p['lat'] - my) ** 2)
-        places.append({'kind': 'county', 'pcode': '', 'county': cty, 'lon': best['lon'], 'lat': best['lat']})
+        places.append({'kind': 'county', 'pcode': str(best['pcode'])[:6], 'county': cty, 'lon': best['lon'], 'lat': best['lat']})  # ADM2 code, e.g. SS0305
     for i, pl in enumerate(places):
         pl['id'] = str(i)
     pb = basins(places)
