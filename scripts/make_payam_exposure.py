@@ -372,7 +372,7 @@ def estimate_population(payams, how):
     return n
 
 
-def floor_population(payams, per_building):
+def floor_population(payams, per_building, pop_col='population', risk_col='population_at_risk'):
     """A payam cannot have fewer people than buildings: where it does (or has no population), use buildings x per_building.
     The at-risk figure keeps its share of the total; with no at-risk figure it falls back to buildings at risk x per_building."""
     n = 0
@@ -381,20 +381,20 @@ def floor_population(payams, per_building):
         if b == '' or not b:
             continue
         floor = b * per_building
-        old = r['population']
+        old = r[pop_col]
         if old != '' and old >= b:
             continue
-        r['population'] = whole(floor)
-        risk = r['population_at_risk']
-        if old != '' and risk != '':
+        r[pop_col] = whole(floor)
+        risk = r[risk_col]
+        if old not in ('', 0) and risk != '':
             risk = risk * floor / old
         elif r['buildings_at_risk'] != '':
             risk = r['buildings_at_risk'] * per_building
         else:
             risk = ''
-        r['population_at_risk'] = '' if risk == '' else whole(min(risk, floor))
+        r[risk_col] = '' if risk == '' else whole(min(risk, floor))
         n += 1
-    print('population raised to %g x buildings for %d payams with fewer people than buildings' % (per_building, n))
+    print('%s raised to %g x buildings for %d payams with fewer people than buildings' % (pop_col, per_building, n))
     return n
 
 
@@ -435,6 +435,8 @@ def main():
         load_risk(a.risk, payams)
     estimated = estimate_population(payams, a.estimate_population) if a.estimate_population else 0
     raised = floor_population(payams, a.persons_per_building) if a.persons_per_building > 0 else 0
+    if a.persons_per_building > 0 and any(r['population_2025'] != '' for r in payams.rows):
+        raised += floor_population(payams, a.persons_per_building, 'population_2025', 'population_2025_at_risk')
 
     hazard = a.hazard
     if hazard is None:
