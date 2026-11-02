@@ -19,14 +19,14 @@
 | Tonj South | Unknown, River | 30.2 | 42.0 | Ibba km 4410 | 30.2 | linked reading 42 days old |
 | Cueibet | Gulnam km 4631 | 25.6 | 287.0 | Gulnam km 4574 | 41.2 | linked reading 287 days old |
 | Wulu | Unknown, River | 7.0 | 42.0 | Ibba km 4410 | 7.0 | linked reading 42 days old |
-| Raja | Wadi Boro, River | 6.9 | 31.0 | Lol km 4861 | 38.8 | linked reading 31 days old |
+| Raja | Wadi Boro, River | 6.9 | 31.0 | Chel km 5095 | 0.0 | linked reading 31 days old |
 | Nyirol | Fulus km 4165 | 0.0 | 90.0 | Fulus km 4114 | 0.0 | linked reading 90 days old |
 | Aweil West | Wadi Boro, River | 0.0 | 33.0 | Lol km 4833 | 0.0 | linked reading 33 days old |
 | Abiemnhom | Bhar-al-arab, River | 0.0 | 35.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 35 days old |
-| Panyikang | White Nile, River | 0.0 | 38.0 | White Nile km 4084 | 0.0 | linked reading 38 days old |
-| Terekeka | White Nile, River | 0.0 | 38.0 | Nile km 4843 | 0.0 | linked reading 38 days old |
+| Panyikang | White Nile, River | 0.0 | 38.0 | Sobat km 4023 | 0.0 | linked reading 38 days old |
+| Terekeka | White Nile, River | 0.0 | 38.0 | White Nile, River | 0.0 | linked reading 38 days old |
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 287.0 | Gulnam km 4669 | 2.9 | linked reading 287 days old |
 | Tonj North | Unknown, River | 0.0 | 42.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 42 days old |
-| Twic East | White Nile, River | 0.0 | 40.0 | White Nile, River | 0.0 | linked reading 40 days old |
+| Twic East | White Nile, River | 0.0 | 40.0 | White Nile km 4536 | 0.0 | linked reading 40 days old |
 
 Rules: review when the linked gauge is over 100 km from the county, its latest reading is over 30 days old, or a fresh gauge is at least 25 km closer. The link file is not changed by this audit.
