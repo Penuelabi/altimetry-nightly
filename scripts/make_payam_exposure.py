@@ -7,9 +7,17 @@ payam_exposure.csv; the server picks it up within 30 minutes.
 What goes in (download the files from Drive first; every input is optional except --population):
 
   --population  Population-by-payam exports (Duk_population_by_payam.csv, KapoetaEast_population_by_payam.csv, ...).
-                Files, folders or wildcards, as many as you like. Needs ADM3_PCODE, ADM3_EN and a "sum" column.
+                Files, folders or wildcards, as many as you like. Needs ADM2_EN, ADM3_EN, ADM3_PCODE and a "sum"
+                column. They give the payam codes the app looks payams up by, so only payams in these files are written.
+  --cache       data/exposure_cache.json from the main branch (written every Sunday by exposure-cache.yml after the
+                flood extent is exported). It gives schools, health facilities and buildings with how many are at
+                risk, for all payams. It has no payam codes and no population, hence --population. Payams are
+                matched by county and payam name; the ones that do not match are counted and listed at the end.
+  --basis       Which cache counts are "at risk": "risk" (default; flooded now OR flooded in at least 15% of past
+                same-season years) or "now" (only inside the current maximum flood extent). Buildings the job found
+                too many to count (-1) stay empty.
   --buildings   Flooded-buildings table: ADM3_EN, total_buildings, then one column per year with the buildings
-                flooded that year (GHS_OBAT_FloodedBuildings_by_Year_Payam*.csv).
+                flooded that year (GHS_OBAT_FloodedBuildings_by_Year_Payam*.csv). Overrides the cache buildings.
   --year        Which year of --buildings counts as "at risk": a year (2025), "latest" (default) or "worst"
                 (the year with the most flooded buildings in each payam).
   --facilities  One row per school or health facility: a payam code (ADM3_PCODE) or payam name (ADM3_EN, optionally
@@ -19,22 +27,27 @@ What goes in (download the files from Drive first; every input is optional excep
                 schools_at_risk, health_at_risk (and the matching totals). These values win over everything else:
                 use it for numbers from your own flood-extent analysis.
 
-  --estimate-population   Opt in: where population_at_risk is empty, estimate it as the population times the
-                          share of buildings at risk. It is an estimate and the hazard column says so.
+  --estimate-population buildings|area
+                Opt in: where population_at_risk is empty, estimate it as the population times the share of
+                buildings (or of land area, from the cache) at risk. It is only an estimate and the hazard column
+                says so. In the cache the share of buildings at risk is far lower than the share of land at risk
+                (about 2% against more than half), so the two choices differ a lot; neither knows where people live.
   --hazard TEXT           What "at risk" means; printed on the card. Default is built from --year.
   --as-of TEXT            Shown on the card. Default is the --buildings year, else the current year.
 
 Nothing is guessed silently: a cell with no source stays empty and the app shows a dash, never a zero.
 
-Example:
+Later sources win over earlier ones: population, cache, buildings, facilities, risk.
+
+Example (cache from the main branch: git show origin/main:data/exposure_cache.json > exposure_cache.json):
   python make_payam_exposure.py --population downloads/*_population_by_payam.csv \\
-      --buildings downloads/GHS_OBAT_FloodedBuildings_by_Year_Payam610.csv --year 2025 \\
-      --facilities downloads/facilities.csv --risk downloads/my_risk.csv -o payam_exposure.csv
+      --cache exposure_cache.json --basis risk --estimate-population area -o payam_exposure.csv
 """
 import argparse
 import csv
 import datetime
 import glob
+import json
 import os
 import re
 import sys
@@ -121,7 +134,7 @@ class Payams:
             self.by_code[code.upper()] = r
         return r
 
-    def find(self, code='', payam='', county='', create=False, source=''):
+    def find(self, code='', payam='', county='', create=False, source='', quiet=False):
         if code and code.upper() in self.by_code:
             return self.by_code[code.upper()]
         if payam:
@@ -131,11 +144,13 @@ class Payams:
             if len(hits) == 1:
                 return hits[0]
             if len(hits) > 1:
-                warn('%s: "%s" matches %d payams; add ADM3_PCODE or ADM2_EN to tell them apart' % (source, payam, len(hits)))
+                if not quiet:
+                    warn('%s: "%s" matches %d payams; add ADM3_PCODE or ADM2_EN to tell them apart' % (source, payam, len(hits)))
                 return None
         if create:
             return self.add(code, payam, county)
-        warn('%s: no payam "%s" %s in the population files, row skipped' % (source, payam or code, code))
+        if not quiet:
+            warn('%s: no payam "%s" %s in the population files, row skipped' % (source, payam or code, code))
         return None
 
 
@@ -152,6 +167,54 @@ def load_population(paths, payams):
                 r['population'] = whole(val)
                 n += 1
         print('%s: %d payams' % (os.path.basename(path), n))
+
+
+def load_cache(path, basis, payams):
+    """Schools, health facilities and buildings (totals and at risk) from data/exposure_cache.json.
+
+    Returns (what "at risk" means, the date the cache was built).
+    """
+    with open(path, encoding='utf-8') as f:
+        data = json.load(f)
+    table = data.get('payams') or {}
+    now = data.get('payams_now') or {}
+    if not table:
+        sys.exit('%s has no "payams" table; is it data/exposure_cache.json?' % path)
+    if basis == 'now' and not now:
+        sys.exit('%s has no "payams_now" table (the flooded-now step has not finished); use --basis risk' % path)
+    matched, missing = 0, []
+    for county, plist in table.items():
+        for p in plist:
+            name = p.get('payam', '')
+            r = payams.find('', name, county, quiet=True)
+            if r is None:
+                missing.append('%s / %s' % (county, name))
+                continue
+            at = (now.get(county) or {}).get(name) or {}
+            for total_col, risk_col, total_key, risk_key, now_key in (
+                    ('schools', 'schools_at_risk', 'schools', 'schools_risk', 'schools_now'),
+                    ('health_facilities', 'health_at_risk', 'health', 'health_risk', 'health_now'),
+                    ('buildings', 'buildings_at_risk', 'buildings', 'buildings_risk', 'buildings_now')):
+                total = num(p.get(total_key))  # num() turns the job's "-1 = too many to count" into empty
+                risk = num(p.get(risk_key) if basis == 'risk' else at.get(now_key))
+                if total is None:
+                    continue
+                r[total_col] = whole(total)
+                r[risk_col] = whole(None if risk is None else min(risk, total))
+            area, area_risk = num(p.get('area_km2')), num(p.get('area_risk_km2') if basis == 'risk' else at.get('area_now_km2'))
+            if area and area_risk is not None:
+                r['_area_share'] = min(1.0, area_risk / area)
+            matched += 1
+    print('%s: %d of %d payams matched to the population files' % (os.path.basename(path), matched, matched + len(missing)))
+    if missing:
+        warn('%d cache payams are not in the population files (a county without a population file, or a different '
+             'spelling), for example: %s' % (len(missing), '; '.join(missing[:5])))
+    built = str(data.get('generated_utc') or '')[:10]
+    if basis == 'now':
+        text = 'inside the current maximum flood extent (Sentinel-1)'
+    else:
+        text = 'flooded now or in at least 15%% of past same-season years (%s)' % (data.get('risk_basis') or 'Sentinel-1')
+    return text, built
 
 
 def load_buildings(path, year, payams):
@@ -238,24 +301,34 @@ def load_risk(path, payams):
     print('%s: %d payams (these values override the other sources)' % (os.path.basename(path), n))
 
 
-def estimate_population(payams):
+def estimate_population(payams, how):
+    """Population at risk where nothing better is known: population x share of buildings (or of land area) at risk."""
     n = 0
     for r in payams.rows:
-        if r['population_at_risk'] == '' and r['population'] != '' and r['buildings'] and r['buildings_at_risk'] != '':
-            r['population_at_risk'] = whole(r['population'] * r['buildings_at_risk'] / r['buildings'])
-            n += 1
-    print('estimated population at risk for %d payams from the share of buildings at risk' % n)
+        if r['population_at_risk'] != '' or r['population'] == '':
+            continue
+        if how == 'buildings' and r['buildings'] and r['buildings_at_risk'] != '':
+            share = r['buildings_at_risk'] / r['buildings']
+        elif how == 'area' and '_area_share' in r:
+            share = r['_area_share']
+        else:
+            continue
+        r['population_at_risk'] = whole(r['population'] * share)
+        n += 1
+    print('estimated population at risk for %d payams from the share of %s at risk' % (n, how))
     return n
 
 
 def main():
     ap = argparse.ArgumentParser(description='Build payam_exposure.csv for the Abuk app.', formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
     ap.add_argument('--population', nargs='+', required=True, metavar='FILE')
+    ap.add_argument('--cache', metavar='FILE')
+    ap.add_argument('--basis', choices=('risk', 'now'), default='risk')
     ap.add_argument('--buildings', metavar='FILE')
     ap.add_argument('--year', default='latest')
     ap.add_argument('--facilities', metavar='FILE')
     ap.add_argument('--risk', metavar='FILE')
-    ap.add_argument('--estimate-population', action='store_true')
+    ap.add_argument('--estimate-population', choices=('buildings', 'area'))
     ap.add_argument('--hazard', default=None)
     ap.add_argument('--as-of', default=None)
     ap.add_argument('-o', '--output', default='payam_exposure.csv')
@@ -265,29 +338,45 @@ def main():
     load_population(a.population, payams)
     if not payams.rows:
         sys.exit('no payams found in the population files (need ADM3_EN and a "sum" column)')
-    label = ''
+    label, cache_text, cache_built = '', '', ''
+    if a.cache:
+        cache_text, cache_built = load_cache(a.cache, a.basis, payams)
     if a.buildings:
         label = load_buildings(a.buildings, a.year, payams)
     if a.facilities:
         load_facilities(a.facilities, payams)
     if a.risk:
         load_risk(a.risk, payams)
-    estimated = estimate_population(payams) if a.estimate_population else 0
+    estimated = estimate_population(payams, a.estimate_population) if a.estimate_population else 0
 
     hazard = a.hazard
     if hazard is None:
-        hazard = ('buildings flooded in ' + label if label != 'worst year' else 'buildings flooded in the worst year on record') if label else ''
+        parts = []
+        if cache_text:
+            parts.append(('schools and health facilities' if a.buildings else 'schools, health facilities and buildings') + ': ' + cache_text)
+        if label:
+            parts.append('buildings: flooded in ' + (label if label != 'worst year' else 'the worst year on record'))
+        if a.facilities:
+            parts.append('schools and health facilities taken from the supplied facility list')
         if a.risk:
-            hazard = (hazard + '; ' if hazard else '') + 'other counts from the supplied risk table'
+            parts.append('counts from the supplied risk table take priority')
         if estimated:
-            hazard += '; population estimated from the share of buildings flooded'
-    as_of = a.as_of if a.as_of is not None else (label if re.fullmatch(r'\d{4}', label) else str(datetime.date.today().year))
+            parts.append('population: estimated from the share of %s at risk' % ('land area' if a.estimate_population == 'area' else 'buildings'))
+        hazard = '; '.join(parts)
+    if a.as_of is not None:
+        as_of = a.as_of
+    elif cache_built:
+        as_of = cache_built
+    elif re.fullmatch(r'\d{4}', label):
+        as_of = label
+    else:
+        as_of = str(datetime.date.today().year)
     for r in payams.rows:
         r['hazard'], r['as_of'] = hazard, as_of
 
     rows = sorted(payams.rows, key=lambda r: (r['ADM3_PCODE'] or '~', r['ADM3_EN']))
     with open(a.output, 'w', newline='', encoding='utf-8') as f:
-        w = csv.DictWriter(f, fieldnames=COLUMNS)
+        w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction='ignore')
         w.writeheader()
         w.writerows(rows)
 
