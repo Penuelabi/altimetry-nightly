@@ -61,7 +61,12 @@ csv.field_size_limit(2**31 - 1)  # the population exports carry a whole polygon 
 
 COLUMNS = ['ADM3_PCODE', 'ADM3_EN', 'ADM2_EN', 'hazard', 'as_of', 'population', 'population_at_risk', 'buildings',
            'buildings_at_risk', 'schools', 'schools_at_risk', 'health_facilities', 'health_at_risk',
-           'population_2025', 'population_2025_at_risk']
+           'population_2025', 'population_2025_at_risk', 'population_ghsl', 'population_ghsl_at_risk',
+           'schools_old', 'schools_old_at_risk', 'schools_subtype', 'schools_subtype_at_risk',
+           'health_old', 'health_old_at_risk', 'health_subtype', 'health_subtype_at_risk']
+# Facility subtypes (SSD_Facilities, field "Facility subtype") that count as schools and as health facilities
+SCHOOL_SUBTYPES = {'nursery_ecd', 'primary_school', 'secondary_school', 'university', 'vocational_school', 'school_type_not_specified'}
+HEALTH_SUBTYPES = {'hospital', 'phcc', 'phcu', 'mobile_phcu'}
 KINDS = {'population': 'population', 'buildings': 'buildings', 'schools': 'schools', 'health': 'health_facilities'}
 RISK_FIELD = {'population': 'population_at_risk', 'buildings': 'buildings_at_risk', 'schools': 'schools_at_risk', 'health': 'health_at_risk'}
 TRUE = {'1', 'true', 'yes', 'y', 'flooded', 'at risk', 'x'}
@@ -398,6 +403,43 @@ def floor_population(payams, per_building, pop_col='population', risk_col='popul
     return n
 
 
+def pick_max(r, total_col, risk_col, candidates):
+    """Put the larger total (and the at-risk figure that goes with it) from (total, at_risk) candidates into the row."""
+    have = [(t, k) for t, k in candidates if t != '']
+    if not have:
+        return
+    t, k = max(have, key=lambda c: c[0])
+    r[total_col], r[risk_col] = t, k
+
+
+def combine_sources(payams):
+    """Population, schools and health facilities each come from two sources; the columns the app reads hold the larger one.
+
+    population: GHSL GHS-POP 2020 (population_ghsl) or the 2025 grid (population_2025).
+    schools / health_facilities: the original school and health lists (*_old) or the SSD_Facilities subtype counts (*_subtype).
+    The other source stays in its own columns. Payams without the second source keep their single figure.
+    """
+    n = 0
+    for r in payams.rows:
+        r['population_ghsl'], r['population_ghsl_at_risk'] = r['population'], r['population_at_risk']
+        pick_max(r, 'population', 'population_at_risk', [(r['population_ghsl'], r['population_ghsl_at_risk']),
+                                                         (r['population_2025'], r['population_2025_at_risk'])])
+        r['schools_old'], r['schools_old_at_risk'] = r['schools'], r['schools_at_risk']
+        r['health_old'], r['health_old_at_risk'] = r['health_facilities'], r['health_at_risk']
+        fac = r.get('_fac')
+        if fac is None:
+            continue
+        n += 1
+        for kind, subtypes, total_col, risk_col, old in (('schools', SCHOOL_SUBTYPES, 'schools', 'schools_at_risk', 'schools_old'),
+                                                         ('health', HEALTH_SUBTYPES, 'health_facilities', 'health_at_risk', 'health_old')):
+            tot = sum(t for k, (t, _) in fac.items() if fac_col(k)[4:] in subtypes)
+            risk = sum(x for k, (_, x) in fac.items() if fac_col(k)[4:] in subtypes)
+            r[kind + '_subtype'], r[kind + '_subtype_at_risk'] = tot, risk
+            pick_max(r, total_col, risk_col, [(r[old], r[old + '_at_risk']), (tot, risk)])
+    print('larger of the two sources used for population, schools and health facilities in %d payams' % n)
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser(description='Build payam_exposure.csv for the Abuk app.', formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
     ap.add_argument('--population', nargs='*', default=[], metavar='FILE')
@@ -437,6 +479,7 @@ def main():
     raised = floor_population(payams, a.persons_per_building) if a.persons_per_building > 0 else 0
     if a.persons_per_building > 0 and any(r['population_2025'] != '' for r in payams.rows):
         raised += floor_population(payams, a.persons_per_building, 'population_2025', 'population_2025_at_risk')
+    combined = combine_sources(payams)
 
     hazard = a.hazard
     if hazard is None:
@@ -449,16 +492,17 @@ def main():
             parts.append('schools and health facilities taken from the supplied facility list')
         if a.risk:
             parts.append('counts from the supplied risk table take priority')
-        if cache_pop:
+        if cache_pop and not combined:
             parts.append('population: GHSL GHS-POP 2020 inside the same area')
         if pop_risk:
             parts.append('population: the exposed share from the *_exposure_by_payam exports')
         if estimated:
             parts.append('population: estimated from the share of %s at risk' % ('land area' if a.estimate_population == 'area' else 'buildings'))
-        if raised:
+        if raised and not combined:
             parts.append('population: where the layer gave fewer people than buildings it is %g x buildings' % a.persons_per_building)
-        if any('_fac' in r for r in payams.rows):
-            parts.append('population_2025: SSD_2025q2 population grid (April 2025); fac_*: SSD_Facilities counted by Facility subtype')
+        if combined:
+            parts.append('population: the larger of GHSL 2020 and the April 2025 grid, never below %g x buildings; '
+                         'schools and health facilities: the larger of the original lists and the SSD_Facilities subtypes' % a.persons_per_building)
         hazard = '; '.join(parts)
     if a.as_of is not None:
         as_of = a.as_of
