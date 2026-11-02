@@ -168,6 +168,10 @@ def load_population(paths, payams):
             val = num(pick(row, 'sum', 'population', 'pop'))
             if not (code or name) or val is None:
                 continue
+            if val <= 0:
+                # A payam with nobody in it is almost always a failed export, not a fact: leave it empty.
+                warn('%s: population of %s is 0, ignored' % (os.path.basename(path), name or code))
+                continue
             r = payams.find(code, name, pick(row, 'adm2_en', 'county'), create=True, source=path)
             if r is not None:
                 r['population'] = whole(val)
