@@ -1,34 +1,14 @@
 name: Exposure cache for the county report (weekly, incremental)
-
 on:
-  schedule:
-    - cron: '0 18 * * 0'      # Sundays 18:00 UTC; the county report reads data/exposure_cache.json
   workflow_dispatch:
-    inputs:
-      refresh:
-        description: 'Recompute everything (1) or only what is missing (blank)'
-        required: false
-        default: ''
-
 permissions:
-  contents: write
-
-concurrency:
-  group: exposure-cache
-  cancel-in-progress: false
-
+  contents: read
 jobs:
-  exposure:
+  diag:
     runs-on: ubuntu-24.04
-    timeout-minutes: 345
+    timeout-minutes: 20
     env:
       GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
-      DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
-      ALTIMETRY_OUT_DIR: ${{ github.workspace }}/altdata
-      EXPOSURE_OUT_DIR: ${{ github.workspace }}/exposure_out
-      EXPOSURE_REFRESH: ${{ github.event.inputs.refresh }}
-      EXPOSURE_BUDGET_MIN: '320'
-      PYTHONUNBUFFERED: '1'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -37,32 +17,4 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-bulletin.txt
       - run: pip install -r requirements-bulletin.txt
-      - name: Pull station list from Drive
-        run: python drive_sync.py pull
-      - name: Compute exposure (payams, then stations)
-        run: python exposure_cache.py 2>&1 | tee "$RUNNER_TEMP/exposure.log"
-      - name: Build payam_exposure.csv for the Abuk app
-        if: always()
-        run: |
-          mkdir -p "$EXPOSURE_OUT_DIR"
-          python scripts/make_payam_exposure.py --cache data/exposure_cache.json --basis now -o "$EXPOSURE_OUT_DIR/payam_exposure.csv" 2>&1 | tee "$RUNNER_TEMP/payam_exposure.log"
-          tail -n 14 "$RUNNER_TEMP/payam_exposure.log" >> "$GITHUB_STEP_SUMMARY" || true
-      - name: Upload payam_exposure.csv to the Drive folder
-        run: python drive_sync.py push exposure
-      - name: Keep a copy of the cache with the run
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: exposure-cache
-          path: data/exposure_cache.json
-      - name: Commit the cache
-        # Only on main: a run started on another branch must not push its half of the history to main.
-        if: always() && github.ref_name == 'main'
-        run: |
-          tail -n 30 "$RUNNER_TEMP/exposure.log" >> "$GITHUB_STEP_SUMMARY" || true
-          if [ -f data/exposure_cache.json ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/exposure_cache.json
-            git diff --cached --quiet || { git commit -m "Update exposure cache [skip ci]"; git pull --rebase -q origin main || true; git push origin HEAD:main; }
-          fi
+      - run: PYTHONPATH=. python scripts/asset_diag.py
