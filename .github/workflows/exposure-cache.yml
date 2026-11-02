@@ -25,6 +25,7 @@ jobs:
       GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
       DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
       ALTIMETRY_OUT_DIR: ${{ github.workspace }}/altdata
+      EXPOSURE_OUT_DIR: ${{ github.workspace }}/exposure_out
       EXPOSURE_REFRESH: ${{ github.event.inputs.refresh }}
       EXPOSURE_BUDGET_MIN: '320'
       PYTHONUNBUFFERED: '1'
@@ -40,6 +41,14 @@ jobs:
         run: python drive_sync.py pull
       - name: Compute exposure (payams, then stations)
         run: python exposure_cache.py 2>&1 | tee "$RUNNER_TEMP/exposure.log"
+      - name: Build payam_exposure.csv for the Abuk app
+        if: always()
+        run: |
+          mkdir -p "$EXPOSURE_OUT_DIR"
+          python scripts/make_payam_exposure.py --cache data/exposure_cache.json -o "$EXPOSURE_OUT_DIR/payam_exposure.csv" 2>&1 | tee "$RUNNER_TEMP/payam_exposure.log"
+          tail -n 14 "$RUNNER_TEMP/payam_exposure.log" >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Upload payam_exposure.csv to the Drive folder
+        run: python drive_sync.py push exposure
       - name: Keep a copy of the cache with the run
         if: always()
         uses: actions/upload-artifact@v4
