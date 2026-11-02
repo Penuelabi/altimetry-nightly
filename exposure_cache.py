@@ -283,6 +283,84 @@ if c.get('payams_complete') and (not c.get('pop_complete') or REFRESH or pop_sta
         save(c)
         print('population table saved:', len(prow), 'payams')
 
+# --- 1d. 2025 population (project asset, 40 m) and facilities by "Facility subtype" per payam -------------------------------
+# Adds c['payams_new'] = {county: {payam: {pcode, pop25, pop25_risk, pop25_now, fac_t, fac_r, fac_n}}}; fac_* map each facility subtype to
+# the number of facilities in the payam (t), inside the at-risk area (r) and inside the current flood extent (n). Incremental like 1c.
+POP25 = 'projects/ee-penuelabi/assets/SSD_2025q2_populacehealthdataorg'
+FACILITIES = 'projects/ee-penuelabi/assets/SSD_Facilities'
+SUBTYPE = 'Facility subtype'
+NEW_SOURCE = 'SSD_2025q2_populacehealthdataorg (40 m, April 2025); SSD_Facilities by Facility subtype'
+c = load()
+if c.get('payams_complete') and (not c.get('new_complete') or c.get('new_source') != NEW_SOURCE or REFRESH) and left() > 900:
+    K_PCODE = next((k for k in keys if k.lower() in ('adm3_pcode', 'adm3_pcod', 'pcode3', 'pcode')), None)
+    has_now = flooded is not None and risk_basis.startswith('Sentinel-1 same-season baseline +')
+    p25 = ee.Image(POP25).select(0)
+    p25_proj = p25.projection()
+    p25img = p25.rename('pop25').addBands(p25.multiply(risk).rename('pop25_risk'))
+    fac = ee.FeatureCollection(FACILITIES).select([SUBTYPE])
+    if has_now:
+        p25img = p25img.addBands(p25.multiply(flooded).rename('pop25_now'))
+        flood30 = flooded.reproject('EPSG:4326', None, 30)
+    n = payam.size().getInfo()
+    lst = payam.toList(n)
+    stale = c.get('new_source') != NEW_SOURCE
+    done = {} if (REFRESH or stale) else (c.get('payams_new') or {})
+    meta = payam.reduceColumns(ee.Reducer.toList(2), [A2, A3]).get('list').getInfo()
+    by = {k: dict(v) for k, v in done.items()}
+    CHUNK_NEW = int(os.environ.get('EXPOSURE_CHUNK_NEW', '4'))  # each payam runs three facility aggregations; 20 at once is "too many concurrent aggregations"
+
+    def newf(f):
+        g = f.geometry()
+        s = p25img.reduceRegion(ee.Reducer.sum(), g, crs=p25_proj, maxPixels=1e10, tileScale=8)
+        fs = risk30.reduceRegions(fac.filterBounds(g), ee.Reducer.max().setOutputs(['r']), 30, tileScale=4)
+        if has_now:
+            fs = flood30.reduceRegions(fs, ee.Reducer.max().setOutputs(['n']), 30, tileScale=4)
+        props = {'payam': f.get(A3), 'county': f.get(A2), 'pop25': s.get('pop25'), 'pop25_risk': s.get('pop25_risk'),
+                 'fac_t': fs.aggregate_histogram(SUBTYPE),
+                 'fac_r': fs.filter(ee.Filter.gt('r', 0)).aggregate_histogram(SUBTYPE)}
+        if has_now:
+            props['pop25_now'] = s.get('pop25_now')
+            props['fac_n'] = fs.filter(ee.Filter.gt('n', 0)).aggregate_histogram(SUBTYPE)
+        if K_PCODE:
+            props['pcode'] = f.get(K_PCODE)
+        return ee.Feature(None, props)
+
+    saved = 0
+    for sweep in range(3):  # payams that failed are tried again once the load has dropped
+        todo = [i for i, (cn, pn) in enumerate(meta) if pn not in (by.get(cn) or {})]
+        print(f'2025 population and facilities, pass {sweep + 1}: {len(meta) - len(todo)} payams done, {len(todo)} to do')
+        if not todo or left() < 600:
+            break
+        got_any = False
+        for i in range(0, len(todo), CHUNK_NEW):
+            if left() < 600:
+                print('budget used up during the 2025 table; it will continue on the next run'); break
+            sub = ee.FeatureCollection([lst.get(j) for j in todo[i:i + CHUNK_NEW]])
+            for attempt in range(3):
+                try:
+                    for r in [x['properties'] for x in sub.map(newf).getInfo()['features']]:
+                        by.setdefault(r['county'], {})[r['payam']] = {k: (round(v) if isinstance(v, float) else v) for k, v in r.items()
+                                                                      if k not in ('county', 'payam') and v is not None}
+                        saved += 1
+                    got_any = True
+                    break
+                except Exception as e:
+                    print(f'  2025 payams {i}-{i + CHUNK_NEW} attempt {attempt + 1} failed: {str(e)[:120]}')
+                    time.sleep(15 * (attempt + 1))
+            if (i // CHUNK_NEW) % 10 == 9:
+                print(f'2025 payams {min(i + CHUNK_NEW, len(todo))}/{len(todo)}', flush=True)
+                c['payams_new'], c['new_source'] = by, NEW_SOURCE
+                c['new_complete'] = sum(len(v) for v in by.values()) >= 0.98 * n
+                save(c)
+        if not got_any:
+            break
+    if saved:
+        c['payams_new'] = by
+        c['new_source'] = NEW_SOURCE
+        c['new_complete'] = sum(len(v) for v in by.values()) >= 0.98 * n
+        save(c)
+        print('2025 table saved:', saved, 'payams;', sum(len(v) for v in by.values()), 'of', n, 'in the table')
+
 # --- 2. station exposure (25 km) -----------------------------------------------------------------------------------
 ss = os.path.join(ALT, 'station_status.csv')
 if not os.path.exists(ss):
