@@ -436,3 +436,17 @@ describe('water stations', () => {
     expect(payamsOf(p.state, p.county)).toContain(p.payam);
   });
 });
+
+import { countText, riskShare } from '../src';
+describe('exposure figures', () => {
+  it('works out the share at risk and refuses to guess', () => {
+    expect(riskShare({ total: 9833, risk: 4100 })).toBe(42);
+    expect(riskShare({ total: 10, risk: 12 })).toBe(100);
+    expect(riskShare({ total: 0, risk: 0 })).toBeNull();
+    expect(riskShare({ total: 5, risk: null })).toBeNull();
+  });
+  it('writes numbers with separators and a dash for unknown', () => {
+    expect(countText(12345)).toBe('12,345');
+    expect(countText(null)).toBe('—');
+  });
+});

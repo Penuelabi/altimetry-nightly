@@ -2,8 +2,9 @@ import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from '@hono/node-server/serve-static';
 import type { AdminLoc, ContactKind, GaugeReading, Role, SignupRequest, SyncRecord } from '@abuk/core';
-import { nearestStations, type StationLevels } from '@abuk/core';
+import { nearestStations, type ExposureResult, type StationLevels } from '@abuk/core';
 import { stationHistory } from './stations';
+import { exposureTable, findExposure } from './exposure';
 import { applyOps, editAllowed, newId, normContact, normId, opAllowed, opError, parseGauge, signupError, SIGNUP_NOTE_MAX, weakPin, seedRegister, seedStore, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
 import { cfg, health, missing, NotConfigured } from './config';
 import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, SIGNUP_MAX_PENDING, changeSignups, loadSignups, newPin, tempPinFields, changeUsers, checkKey, checkPin, issueSession, loadUsers, makeUser, pinFields, readSession, toPublic, type Session, type StoredUser } from './auth';
@@ -217,6 +218,15 @@ app.get('/api/stations/near', auth(), async c => {
   const { list, stale } = await stationHistory();
   const stations = nearestStations(list, { lat, lon }, n, obs);
   const out: StationLevels = { at: new Date().toISOString(), from: { lat, lon }, asOf: stations.flatMap(s => s.obs.map(o => o.d)).sort().pop() ?? '', stations, ...(stale ? { stale: true } : {}) };
+  return c.json(out);
+});
+
+// People, buildings, schools and health facilities at risk inside one payam (payam_exposure.csv in the Drive folder).
+app.get('/api/exposure', auth(), async c => {
+  const pcode = c.req.query('pcode') ?? '', payam = c.req.query('payam') ?? '', county = c.req.query('county') ?? '';
+  if (!/^[A-Za-z0-9_-]{2,20}$/.test(pcode)) return c.json({ error: 'invalid', message: 'Give the payam code.' }, 400);
+  const { rows, found, stale } = await exposureTable();
+  const out: ExposureResult = { at: new Date().toISOString(), fileFound: found, row: findExposure(rows, { pcode, payam, county }), ...(stale ? { stale: true } : {}) };
   return c.json(out);
 });
 

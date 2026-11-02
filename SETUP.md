@@ -85,6 +85,8 @@ Phone numbers never ship in the app. Add them to `config/leads.json` in the acce
 - Bluetooth phone-to-phone swap: browsers can't do it, so it's left for the Android builds
 - Dinka strings: these need a community translator
 
+**Water stations screen:** the graph reads `merged_altimetry_stations.csv` from the same Drive folder. The "Within <payam>" card reads `payam_exposure.csv`, one row per payam, which you export from your flood analysis. Columns are found by name: `ADM3_PCODE` (or `ADM3_EN`), optional `ADM2_EN`, `hazard` (say what "at risk" means), `as_of`, then a total and an at-risk column for each of population, buildings, schools and health facilities, for example `population`, `population_at_risk`, `schools`, `schools_at_risk`, `health_facilities`, `health_at_risk`. Empty cells show as a dash, never zero. Neither file has been read from Cloud Run yet.
+
 **Data finding:** `station_status.csv` has no altimetry station within 20 km, or even 50 km, of the farm point (7.731° N, 31.402° E). The nearest is White Nile km 4500 at about 91 km. The server falls back to the three nearest stations and the app says so.
 
 ## Deploying

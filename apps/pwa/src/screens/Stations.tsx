@@ -1,6 +1,6 @@
 // Water level graph for the station nearest to any payam: pick state, county and payam, see its last observations.
 import { useEffect, useMemo, useState } from 'react';
-import { countiesOf, distanceNote, levelSummary, listPayams, payamAt, payamByCode, payamCentre, payamsOf, statesList, type Obs, type StationLevels, type StationSeries } from '@abuk/core';
+import { countiesOf, countText, distanceNote, levelSummary, listPayams, payamAt, payamByCode, payamCentre, payamsOf, riskShare, statesList, type Count, type ExposureResult, type Obs, type StationLevels, type StationSeries } from '@abuk/core';
 import { api, explain } from '../api';
 import { useOnline, usePlace } from '../net';
 import { getState, setState, useApp } from '../store';
@@ -51,6 +51,28 @@ function LevelChart({ title, obs }: { title: string; obs: Obs[] }) {
   );
 }
 
+// What sits inside the payam and how much of it is at risk, from payam_exposure.csv in the Drive folder.
+function ExposureCard({ payam, res }: { payam: string; res: ExposureResult }) {
+  const row = res.row;
+  if (!row) return <div className="note">{res.fileFound ? `payam_exposure.csv has no row for ${payam}.` : 'The at-risk counts for this payam are not available yet: payam_exposure.csv is not in the project Drive folder.'}</div>;
+  const items: [string, Count][] = [['Population', row.population], ['Buildings', row.buildings], ['Schools', row.schools], ['Health facilities', row.health]];
+  return (
+    <div className="box col g8" style={{ padding: 12 }}>
+      <div className="kick sm">Within {payam}</div>
+      {items.map(([label, c]) => {
+        const pct = riskShare(c);
+        return (
+          <div key={label} className="rowg" style={{ padding: '6px 0', borderBottom: '1px solid var(--color-divider)' }}>
+            <span>{label}<span className="sub"> {countText(c.total)} in all</span></span>
+            <span className="num"><b>{countText(c.risk)}</b> at risk{pct != null ? <span className="sub"> {pct}%</span> : null}</span>
+          </div>
+        );
+      })}
+      <p className="note">{row.hazard ? `At risk means: ${row.hazard}. ` : ''}{row.asOf ? `As of ${row.asOf}. ` : ''}{res.stale ? 'The server could not refresh these just now, so these are the last it had.' : ''}</p>
+    </div>
+  );
+}
+
 export function Stations() {
   const s = useApp(), online = useOnline(), place = usePlace();
   const gpsArea = useMemo(() => payamAt(place.lat, place.lon), [place.lat, place.lon]);
@@ -66,6 +88,7 @@ export function Stations() {
   const [which, setWhich] = useState(0);
   const key = area?.pcode ?? '';
   const data: StationLevels | undefined = key ? s.stationLevels[key] : undefined;
+  const exposure: ExposureResult | undefined = key ? s.exposure[key] : undefined;
   const live = !!s.session && !s.session.demo;
 
   const load = async () => {
@@ -74,19 +97,23 @@ export function Stations() {
     if (!online) return setErr(data ? 'No signal: showing the readings saved on this phone.' : 'No signal, and nothing saved for this place yet.');
     setBusy(true); setErr('');
     const c = payamCentre(area);
-    try {
-      const r = await api<StationLevels>(`/api/stations/near?lat=${c.lat.toFixed(4)}&lon=${c.lon.toFixed(4)}&n=3&obs=10`);
-      setState(st => ({ stationLevels: { ...st.stationLevels, [area.pcode]: r } }));
-      setWhich(0);
-    } catch (e) { setErr(explain(e)); }
-    finally { setBusy(false); }
+    // Two separate lookups: a missing station file must not hide the at-risk counts, and the other way round.
+    const q = `pcode=${encodeURIComponent(area.pcode)}&payam=${encodeURIComponent(area.payam)}&county=${encodeURIComponent(area.county)}`;
+    const [r, x] = await Promise.allSettled([
+      api<StationLevels>(`/api/stations/near?lat=${c.lat.toFixed(4)}&lon=${c.lon.toFixed(4)}&n=3&obs=10`),
+      api<ExposureResult>(`/api/exposure?${q}`),
+    ]);
+    if (x.status === 'fulfilled') setState(st => ({ exposure: { ...st.exposure, [area.pcode]: x.value } }));
+    if (r.status === 'fulfilled') { setState(st => ({ stationLevels: { ...st.stationLevels, [area.pcode]: r.value } })); setWhich(0); }
+    else setErr(explain(r.reason));
+    setBusy(false);
   };
   // Fetch when the place changes, unless it was fetched in the last hour.
   useEffect(() => {
     setWhich(0);
     if (!area || !live || !online) return;
     const have = getState().stationLevels[area.pcode];
-    if (!have || Date.now() - Date.parse(have.at) > 3_600_000) load();
+    if (!have || !getState().exposure[area.pcode] || Date.now() - Date.parse(have.at) > 3_600_000) load();
   }, [key, live, online]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const states = statesList(), counties = sel.state ? countiesOf(sel.state) : [], payams = sel.state && sel.county ? payamsOf(sel.state, sel.county) : [];
@@ -143,6 +170,7 @@ export function Stations() {
         </>
       )}
       {data && !st && <div className="note">No station in the data has readings.</div>}
+      {area && exposure && <ExposureCard payam={area.payam} res={exposure} />}
       {!data && !busy && !err && <button className="btn" onClick={load} disabled={!area}>Show the nearest station</button>}
     </div>
   );

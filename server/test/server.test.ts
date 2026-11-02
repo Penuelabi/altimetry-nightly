@@ -219,3 +219,36 @@ describe('station history file', () => {
     expect(parseStationHistory('x,y\n1,2')).toEqual([]);
   });
 });
+
+import { findExposure, parseExposure } from '../src/exposure';
+describe('payam exposure file', () => {
+  const csv = 'ADM3_PCODE,ADM3_EN,ADM2_EN,hazard,as_of,population,population_at_risk,total_buildings,buildings_flooded,schools,schools_at_risk,health_facilities,health_at_risk\n'
+    + 'SS030501,Ageer,Duk,flooded 2+ times in 2019-2025,2025,"9,833",4100,1200,300,6,2,3,\n'
+    + 'SS030502,Dongchak,Duk,,,5000,,800,,2,,1,0\n';
+  it('reads totals and at-risk counts by column name', () => {
+    const [a] = parseExposure(csv);
+    expect(a).toMatchObject({ pcode: 'SS030501', payam: 'Ageer', county: 'Duk', hazard: 'flooded 2+ times in 2019-2025', asOf: '2025' });
+    expect(a.population).toEqual({ total: 9833, risk: 4100 });
+    expect(a.buildings).toEqual({ total: 1200, risk: 300 });
+    expect(a.schools).toEqual({ total: 6, risk: 2 });
+    expect(a.health).toEqual({ total: 3, risk: null });
+  });
+  it('keeps empty cells as unknown, not zero', () => {
+    const b = parseExposure(csv)[1];
+    expect(b.population).toEqual({ total: 5000, risk: null });
+    expect(b.health).toEqual({ total: 1, risk: 0 });
+  });
+  it('finds a payam by code, or by name and county', () => {
+    const rows = parseExposure(csv);
+    expect(findExposure(rows, { pcode: 'ss030502' })?.payam).toBe('Dongchak');
+    expect(findExposure(rows, { pcode: 'SS999999', payam: 'ageer' })?.pcode).toBe('SS030501');
+    const twin = parseExposure('ADM3_EN,ADM2_EN,population\nPayam,A,1\nPayam,B,2');
+    expect(findExposure(twin, { payam: 'Payam' })).toBeNull();
+    expect(findExposure(twin, { payam: 'Payam', county: 'B' })?.population.total).toBe(2);
+  });
+  it('rejects a file with no payam column or no counts', () => {
+    expect(parseExposure('a,b\n1,2')).toEqual([]);
+    expect(parseExposure('ADM3_PCODE,note\nSS1,x')).toEqual([]);
+    expect(parseExposure('')).toEqual([]);
+  });
+});

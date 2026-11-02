@@ -7,7 +7,7 @@ import { driveDownload, driveFind } from './adapters/google';
 export interface Hist { uid: string; name: string; type: string; lat: number; lon: number; obs: Obs[] }
 
 // The first `upTo` fields of one CSV line, honouring quotes ("Victoria, Lake").
-function fieldsOf(line: string, upTo: number): string[] {
+export function fieldsOf(line: string, upTo: number): string[] {
   const out: string[] = [];
   let f = '', q = false;
   for (let i = 0; i < line.length && out.length < upTo; i++) {
