@@ -7,7 +7,7 @@ Writes data/exposure_cache.json:
   payams   {county: [ {payam, area_km2, area_risk_km2, schools, schools_risk, health, health_risk, buildings, buildings_risk,
                        roads_km, roads_risk_km} ]}
   county   {county: {schools, schools_risk, health, health_risk}}
-  payams_pop {county: {payam: {pcode, pop, pop_risk, pop_now}}}   WorldPop 2020 inside each payam and inside the at-risk / flooded-now area
+  payams_pop {county: {payam: {pcode, pop, pop_risk, pop_now}}}   GHSL GHS-POP 2020 inside each payam and inside the at-risk / flooded-now area
   stations {station_uid: {county, payam, pop, pop_risk, schools, schools_risk, health, health_risk, buildings, buildings_risk,
                           counties, payams: [ {payam, county, pop, pop_risk, bld, sch, sch_r, hl, hl_r} ]}}
 
@@ -229,19 +229,25 @@ if flooded is not None and risk_basis.startswith('Sentinel-1 same-season baselin
         save(c)
         print('flooded-now table saved:', len(nrows), 'payams')
 
-# --- 1c. population per payam (WorldPop 2020), with the payam code the Abuk app looks payams up by ----------------------
+# --- 1c. population per payam (GHSL GHS-POP 2020), with the payam code the Abuk app looks payams up by ----------------------
 # Whole country, incremental like the flooded-now table. Adds c['payams_pop'] = {county: {payam: {pcode, pop, pop_risk, pop_now}}};
 # every existing key is left as it was, so the county report and the other readers of this file are not affected.
+# The WorldPop 100 m layer for South Sudan is smoothed (largest cell in Juba Town is 0.7 people), which left the towns at a few
+# hundred people. GHSL GHS-POP R2023A keeps the urban peaks, so a cache built with another source is recomputed once.
+POP_SOURCE = 'GHSL GHS-POP R2023A, 100 m, 2020'
 c = load()
-if c.get('payams_complete') and (not c.get('pop_complete') or REFRESH) and left() > 900:
+pop_stale = c.get('pop_source') != POP_SOURCE
+if c.get('payams_complete') and (not c.get('pop_complete') or REFRESH or pop_stale) and left() > 900:
+    ghs = ee.ImageCollection('JRC/GHSL/P2023A/GHS_POP').filter(ee.Filter.eq('system:index', '2020')).first().select('population_count')
+    ghs_proj = ghs.projection()
     K_PCODE = next((k for k in keys if k.lower() in ('adm3_pcode', 'adm3_pcod', 'pcode3', 'pcode')), None)
     has_now = flooded is not None and risk_basis.startswith('Sentinel-1 same-season baseline +')
-    popimg = wp.rename('pop').addBands(wp.multiply(risk).rename('pop_risk'))
+    popimg = ghs.rename('pop').addBands(ghs.multiply(risk).rename('pop_risk'))
     if has_now:
-        popimg = popimg.addBands(wp.multiply(flooded).rename('pop_now'))
+        popimg = popimg.addBands(ghs.multiply(flooded).rename('pop_now'))
     n = payam.size().getInfo()
     lst = payam.toList(n)
-    done = {} if REFRESH else (c.get('payams_pop') or {})
+    done = {} if (REFRESH or pop_stale) else (c.get('payams_pop') or {})
     meta = payam.reduceColumns(ee.Reducer.toList(2), [A2, A3]).get('list').getInfo()
     todo = [i for i, (cn, pn) in enumerate(meta) if pn not in (done.get(cn) or {})]
     print(f'population: {len(meta) - len(todo)} payams already done, {len(todo)} to do; payam code field: {K_PCODE}')
@@ -252,7 +258,7 @@ if c.get('payams_complete') and (not c.get('pop_complete') or REFRESH) and left(
         sub = ee.FeatureCollection([lst.get(j) for j in todo[i:i + CHUNK]])
 
         def popf(f):
-            s = popimg.reduceRegion(ee.Reducer.sum(), f.geometry(), 100, maxPixels=1e10, tileScale=8)
+            s = popimg.reduceRegion(ee.Reducer.sum(), f.geometry(), crs=ghs_proj, maxPixels=1e10, tileScale=8)
             props = {'payam': f.get(A3), 'county': f.get(A2), 'pop': s.get('pop'), 'pop_risk': s.get('pop_risk')}
             if has_now:
                 props['pop_now'] = s.get('pop_now')
@@ -272,7 +278,7 @@ if c.get('payams_complete') and (not c.get('pop_complete') or REFRESH) and left(
             by.setdefault(r['county'], {})[r['payam']] = {k: (round(v) if isinstance(v, float) else v) for k, v in r.items()
                                                           if k not in ('county', 'payam') and v is not None}
         c['payams_pop'] = by
-        c['pop_source'] = 'WorldPop 100 m, 2020'
+        c['pop_source'] = POP_SOURCE
         c['pop_complete'] = sum(len(v) for v in by.values()) >= 0.98 * n
         save(c)
         print('population table saved:', len(prow), 'payams')
