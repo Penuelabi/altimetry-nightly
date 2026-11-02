@@ -42,12 +42,13 @@ export async function driveList(parent: string): Promise<DriveFile[]> {
 
 // Downloads are cached by file id + modifiedTime: the nightly workflow updates files once a day.
 const blobCache = new Map<string, { mod: string; buf: Buffer }>();
-export async function driveDownload(f: DriveFile): Promise<Buffer> {
+// cache = false for big files that the caller keeps in a smaller form itself.
+export async function driveDownload(f: DriveFile, cache = true): Promise<Buffer> {
   const hit = blobCache.get(f.id);
   if (hit && hit.mod === f.modifiedTime) return hit.buf;
   const res = await gfetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&supportsAllDrives=true`);
   const buf = Buffer.from(await res.arrayBuffer());
-  blobCache.set(f.id, { mod: f.modifiedTime, buf });
+  if (cache) blobCache.set(f.id, { mod: f.modifiedTime, buf });
   return buf;
 }
 

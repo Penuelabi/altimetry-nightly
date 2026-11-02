@@ -401,3 +401,38 @@ describe('self sign-up', () => {
     expect(m).not.toContain('Questions');
   });
 });
+
+import { distanceNote, levelSummary, nearestStations, payamCentre, payamsOf } from '../src';
+
+describe('water stations', () => {
+  const o = (d: string, v: number) => ({ d, v });
+  const st = (uid: string, lat: number, lon: number, n = 12) => ({ uid, lat, lon, obs: Array.from({ length: n }, (_, i) => o(`2026-10-${String(i + 1).padStart(2, '0')}`, 1135 + i / 100)) });
+  it('picks the nearest stations and the newest observations', () => {
+    const r = nearestStations([st('far', 2, 31), st('near', 7.8, 31.4), st('mid', 8.5, 31.5), st('empty', 7.7, 31.4, 0)], { lat: 7.73, lon: 31.4 }, 2, 10);
+    expect(r.map(s => s.uid)).toEqual(['near', 'mid']);
+    expect(r[0].obs).toHaveLength(10);
+    expect(r[0].obs[9].d).toBe('2026-10-12');
+    expect(r[0].km).toBeLessThan(15);
+  });
+  it('labels the lowest, highest and latest, and the change from the previous reading', () => {
+    const s = levelSummary([o('10-09', 1135.86), o('10-13', 1135.9), o('10-23', 1135.81), o('10-30', 1135.85)])!;
+    expect(s.max).toEqual(o('10-13', 1135.9));
+    expect(s.min).toEqual(o('10-23', 1135.81));
+    expect(s.last.d).toBe('10-30');
+    expect(s.change).toBeCloseTo(0.04, 3);
+    expect(levelSummary([])).toBeNull();
+    expect(levelSummary([o('a', 1)])!.change).toBeNull();
+  });
+  it('says plainly when the nearest station is far', () => {
+    expect(distanceNote(10)).toContain('close enough');
+    expect(distanceNote(91)).toContain('far away');
+  });
+  it('finds a point inside the payam for its centre', () => {
+    const p = listPayams().find(x => x.county === 'Duk')!;
+    const a = payamsIn(p.county, p.state).find(x => x.payam === p.payam)!;
+    const c = payamCentre(a);
+    expect(c.lat).toBeGreaterThan(6); expect(c.lat).toBeLessThan(10);
+    expect(c.lon).toBeGreaterThan(30); expect(c.lon).toBeLessThan(33);
+    expect(payamsOf(p.state, p.county)).toContain(p.payam);
+  });
+});

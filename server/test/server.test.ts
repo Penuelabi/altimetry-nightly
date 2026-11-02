@@ -195,3 +195,27 @@ describe('admin-issued PIN', () => {
     expect(toPublic(own).tempPin).toBeUndefined();
   });
 });
+
+import { parseStationHistory } from '../src/stations';
+
+describe('station history file', () => {
+  const head = 'source,station_id,station_uid,type,location/river_name,latitude,longitude,year,month,day,date,Water Surface Elevation - values(m),uncertainty (m),minimium';
+  const row = (uid: string, name: string, d: string, v: string, lat = -1.0001, lon = 33) => `DAHITI,2,${uid},lake,"${name}",${lat},${lon},2026,10,9,${d},${v},0,1134.99`;
+  it('reads a quoted station name and keeps the newest observations in date order', () => {
+    const csv = [head, row('dahiti:2', 'Victoria, Lake', '2026-10-13', '1135.90'), row('dahiti:2', 'Victoria, Lake', '2026-10-09', '1135.86'), row('dahiti:2', 'Victoria, Lake', '2026-10-30', '1135.85')].join('\r\n');
+    const [s] = parseStationHistory(csv);
+    expect(s.name).toBe('Victoria, Lake');
+    expect(s.lat).toBeCloseTo(-1.0001);
+    expect(s.obs.map(o => o.d)).toEqual(['2026-10-09', '2026-10-13', '2026-10-30']);
+    expect(parseStationHistory(csv, 2)[0].obs.map(o => o.d)).toEqual(['2026-10-13', '2026-10-30']);
+  });
+  it('skips rows with no value or a bad date and keeps one value per date', () => {
+    const csv = [head, row('a:1', 'Nile', '2026-10-01', ''), row('a:1', 'Nile', 'not-a-date', '5'), row('a:1', 'Nile', '2026-10-02', '5.5'), row('a:1', 'Nile', '2026-10-02', '5.6')].join('\n');
+    expect(parseStationHistory(csv)[0].obs).toEqual([{ d: '2026-10-02', v: 5.6 }]);
+  });
+  it('keeps stations apart and returns nothing for a file without the needed columns', () => {
+    const csv = [head, row('a:1', 'Nile', '2026-10-02', '5'), row('b:2', 'Sobat', '2026-10-02', '7', 8, 33)].join('\n');
+    expect(parseStationHistory(csv).map(s => s.uid)).toEqual(['a:1', 'b:2']);
+    expect(parseStationHistory('x,y\n1,2')).toEqual([]);
+  });
+});

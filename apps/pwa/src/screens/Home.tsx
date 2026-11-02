@@ -42,7 +42,7 @@ function Ledger() {
     ['Log harvest', () => go('harvest'), true], ['Map a plot', () => tab('map'), true], ['Processing', () => go('process'), false],
     ['Flood model', () => go('flood'), false], ['Crop check', () => go('monitor'), true], ['Data sources', () => go('sources'), false],
     ['VSLA savings & loans', () => go('vsla'), true], ['Land assessment', () => go('degradation'), true],
-    ['Container farming', () => go('container'), true], ['Satellite indices', () => go('satellite'), true],
+    ['Container farming', () => go('container'), true], ['Satellite indices', () => go('satellite'), true], ['Water stations', () => go('stations'), true],
     ['Finance readiness', () => go('readiness'), true], ['Livestock & fish', () => go('herd'), false],
     ['Farm register · plots, crops, groups', () => openRegister('plots'), false, 'span2'],
     ['Where your data is saved', () => go('datamap'), false, 'span2'],

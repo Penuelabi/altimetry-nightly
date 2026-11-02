@@ -2,6 +2,8 @@ import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from '@hono/node-server/serve-static';
 import type { AdminLoc, ContactKind, GaugeReading, Role, SignupRequest, SyncRecord } from '@abuk/core';
+import { nearestStations, type StationLevels } from '@abuk/core';
+import { stationHistory } from './stations';
 import { applyOps, editAllowed, newId, normContact, normId, opAllowed, opError, parseGauge, signupError, SIGNUP_NOTE_MAX, weakPin, seedRegister, seedStore, signinError, whereIs, type FarmOp, type Register } from '@abuk/core';
 import { cfg, health, missing, NotConfigured } from './config';
 import { EXPIRY_DAYS, PIN, PIN_LOCK_MIN, PIN_MAX_FAILS, SIGNUP_MAX_PENDING, changeSignups, loadSignups, newPin, tempPinFields, changeUsers, checkKey, checkPin, issueSession, loadUsers, makeUser, pinFields, readSession, toPublic, type Session, type StoredUser } from './auth';
@@ -205,6 +207,17 @@ app.get('/api/sources/pull', auth(), async c => {
   const p = coords(c), radius = Math.min(200, Math.max(1, Number(c.req.query('radius')) || 20));
   if (!p) return c.json({ error: 'invalid', message: 'lat and lon are required' }, 400);
   return c.json(await pull(p.lat, p.lon, radius));
+});
+
+// The stations nearest to a point with their newest observations, for the water-level graph.
+app.get('/api/stations/near', auth(), async c => {
+  const lat = Number(c.req.query('lat')), lon = Number(c.req.query('lon'));
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return c.json({ error: 'invalid', message: 'Give lat and lon.' }, 400);
+  const n = Math.min(5, Math.max(1, Math.round(Number(c.req.query('n')) || 3))), obs = Math.min(60, Math.max(3, Math.round(Number(c.req.query('obs')) || 10)));
+  const { list, stale } = await stationHistory();
+  const stations = nearestStations(list, { lat, lon }, n, obs);
+  const out: StationLevels = { at: new Date().toISOString(), from: { lat, lon }, asOf: stations.flatMap(s => s.obs.map(o => o.d)).sort().pop() ?? '', stations, ...(stale ? { stale: true } : {}) };
+  return c.json(out);
 });
 
 app.get('/api/sources/gee', auth(), async c => {
