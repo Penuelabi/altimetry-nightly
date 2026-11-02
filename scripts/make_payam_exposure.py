@@ -492,19 +492,17 @@ def main():
             parts.append('schools and health facilities taken from the supplied facility list')
         if a.risk:
             parts.append('counts from the supplied risk table take priority')
-        if cache_pop:
+        if cache_pop and not combined:
             parts.append('population: GHSL GHS-POP 2020 inside the same area')
         if pop_risk:
             parts.append('population: the exposed share from the *_exposure_by_payam exports')
         if estimated:
             parts.append('population: estimated from the share of %s at risk' % ('land area' if a.estimate_population == 'area' else 'buildings'))
-        if raised:
+        if raised and not combined:
             parts.append('population: where the layer gave fewer people than buildings it is %g x buildings' % a.persons_per_building)
-        if any('_fac' in r for r in payams.rows):
-            parts.append('population_2025: SSD_2025q2 population grid (April 2025); fac_*: SSD_Facilities counted by Facility subtype')
         if combined:
-            parts.append('population, schools and health facilities: the larger of the two sources (population_ghsl / population_2025, '
-                         'schools_old / schools_subtype, health_old / health_subtype)')
+            parts.append('population: the larger of GHSL 2020 and the April 2025 grid, never below %g x buildings; '
+                         'schools and health facilities: the larger of the original lists and the SSD_Facilities subtypes' % a.persons_per_building)
         hazard = '; '.join(parts)
     if a.as_of is not None:
         as_of = a.as_of
