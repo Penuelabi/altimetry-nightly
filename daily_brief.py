@@ -4,7 +4,7 @@ Daily and weekly email briefs (HTML + plain text) built from county_bulletin_lat
 station_status.csv and merged_altimetry_stations.csv.
 
 Daily : 3 drought-watch counties, 3 flood-watch counties, river trigger, gauge watch list, towns to monitor.
-Weekly: forecast confidence, priorities for the next 2 weeks, climate/flood news (ReliefWeb, if reachable).
+Weekly: priorities for the next 2 weeks, Lake Victoria level graph, compiled and verified news (data/news.json).
 
 Pure functions, no SMTP here (send_digest.py sends).
 """
@@ -189,7 +189,7 @@ def _footer(subscribe_url, unsubscribe_to):
     return h, t
 
 
-def build_daily(doc, gauges=None, subscribe_url='', reply_to='penuelabi@gmail.com', today=None):
+def build_daily(doc, gauges=None, subscribe_url='', reply_to='penuelabi@gmail.com', today=None, lake_h='', lake_t=''):
     df = county_frame(doc)
     trig = doc.get('sudd_river_trigger') or {}
     dw, fw = drought_watch(df), flood_watch(df, trig)
@@ -256,12 +256,12 @@ def build_daily(doc, gauges=None, subscribe_url='', reply_to='penuelabi@gmail.co
               f'<div style="font-size:12px;color:#555">ECMWF run {html.escape(run)} UTC | rain and soil data to {html.escape(str(doc.get("antecedent_data_end")))} | '
               f'{counts["red"]} red, {counts["orange"]} orange, {counts["yellow"]} yellow, {counts["green"]} green counties</div>'
               f'<h3>Top 3 drought-watch counties</h3>{dh}<h3>Top 3 flood-watch counties</h3>{fh}'
-              f'<p style="font-size:11px;color:#777">{infra_note}</p>{trig_h}'
+              f'<p style="font-size:11px;color:#777">{infra_note}</p>{trig_h}{lake_h}'
               f'<h3>Gauge watch list</h3>{gh}<h3>Towns and counties to monitor</h3>{towh}'
               f'<p style="font-size:11px;color:#777">Decision support, not an official warning. Full county detail is in the attached PDF. '
               f'Data: {html.escape(" ".join(doc.get("attribution", [])))}</p>{foot_h}</div>')
     body_t = '\n'.join([f"South Sudan hydro-climate watch - {date}", f"ECMWF run {run} UTC | {counts['red']} red, {counts['orange']} orange, "
-                        f"{counts['yellow']} yellow, {counts['green']} green", ''] + dt + [''] + ft + ['', infra_note, '', trig_t, '', gt, '',
+                        f"{counts['yellow']} yellow, {counts['green']} green", ''] + dt + [''] + ft + ['', infra_note, '', trig_t, ''] + ([lake_t, ''] if lake_t else []) + [gt, '',
                         'Towns and counties to monitor:'] + ttxt + ['', 'Decision support, not an official warning. Full detail in the attached PDF.', foot_t])
     return subject, body_t, body_h
 

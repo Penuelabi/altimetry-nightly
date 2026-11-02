@@ -50,7 +50,8 @@ def build_message(doc, pdf_path=None, min_level='yellow', sender='', to='', toda
         for adv in c.get('advisory', [])[:3]:
             lines.append(f"    - {adv}")
     lines += ["", "Decision support, not an official warning. Alert scales are provisional.", "",
-              "Data: " + " ".join(doc.get('attribution', []))]
+              "Data: " + " ".join(doc.get('attribution', [])), "",
+              "Subscribe to the Android app: https://abuk-server-26ltd3lrlq-ew.a.run.app/join/"]
     msg.set_content("\n".join(lines))
     if pdf_path and os.path.exists(pdf_path):
         with open(pdf_path, 'rb') as fh:
@@ -104,19 +105,18 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None, pdf=None, label=''
     import daily_brief as db
     alt = os.environ.get('ALTIMETRY_OUT_DIR', 'altdata')
     sub = (os.environ.get('SUBSCRIBE_URL') or '').strip()
-    chart = None
+    chart, lake_h, lake_t = None, '', ''
+    try:                                              # Lake Victoria graph (last 10 observations), same in the daily and weekly emails
+        chart = db.lake_chart_png(10)
+        _, lake_t = db.lake_caption(10)
+        if chart:
+            lake_h = ('<div style="margin:12px 0"><img src="cid:lakechart" alt="Lake Victoria, last 10 observations (m)" '
+                      'style="max-width:100%;height:auto"></div>')
+    except Exception as e:
+        print(f'WARNING: Lake Victoria chart skipped: {type(e).__name__}: {e}')
+        chart = None
     if kind == 'weekly':
         news, note = db.compiled_news(today)          # data/news.json: the weekly compiled and verified news
-        lake_h = lake_t = ''
-        try:                                          # Lake Victoria graph (last 10 observations), placed after the priorities
-            chart = db.lake_chart_png(10)
-            _, lake_t = db.lake_caption(10)
-            if chart:
-                lake_h = ('<div style="margin:12px 0"><img src="cid:lakechart" alt="Lake Victoria, last 10 observations (m)" '
-                          'style="max-width:100%;height:auto"></div>')
-        except Exception as e:
-            print(f'WARNING: Lake Victoria chart skipped: {type(e).__name__}: {e}')
-            chart = None
         subject, text, html = db.build_weekly(doc, news, note, sub, sender, today, lake_h, lake_t)
     else:
         merged = os.path.join(alt, 'merged_altimetry_stations.csv')
@@ -126,17 +126,7 @@ def rich_message(doc, out, sender, to, bcc, kind, today=None, pdf=None, label=''
                 gauges = db.gauge_watch(merged, os.path.join(alt, 'station_status.csv'), today)
         except Exception as e:
             print(f'WARNING: gauge watch skipped: {type(e).__name__}: {e}')
-        subject, text, html = db.build_daily(doc, gauges, sub, sender, today)
-        try:
-            import nile_pulse
-            pu = nile_pulse.pulse(today)
-            if pu:
-                text = nile_pulse.text_block(pu) + '\n\n' + text
-                i = html.lower().find('<body')
-                j = html.find('>', i) + 1 if i >= 0 else 0
-                html = html[:j] + nile_pulse.html_block(pu) + html[j:]
-        except Exception as e:
-            print(f'WARNING: Nile pulse block skipped: {type(e).__name__}: {e}')
+        subject, text, html = db.build_daily(doc, gauges, sub, sender, today, lake_h, lake_t)
     msg = EmailMessage()
     msg['Subject'], msg['From'], msg['To'] = subject, sender, to
     msg['Reply-To'] = sender
