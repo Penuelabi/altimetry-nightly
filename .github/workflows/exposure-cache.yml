@@ -40,8 +40,15 @@ jobs:
         run: python drive_sync.py pull
       - name: Compute exposure (payams, then stations)
         run: python exposure_cache.py 2>&1 | tee "$RUNNER_TEMP/exposure.log"
-      - name: Commit the cache
+      - name: Keep a copy of the cache with the run
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exposure-cache
+          path: data/exposure_cache.json
+      - name: Commit the cache
+        # Only on main: a run started on another branch must not push its half of the history to main.
+        if: always() && github.ref_name == 'main'
         run: |
           tail -n 30 "$RUNNER_TEMP/exposure.log" >> "$GITHUB_STEP_SUMMARY" || true
           if [ -f data/exposure_cache.json ]; then
