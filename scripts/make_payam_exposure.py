@@ -8,7 +8,8 @@ What goes in (download the files from Drive first; every input is optional excep
 
   --population  Population-by-payam exports (Duk_population_by_payam.csv, KapoetaEast_population_by_payam.csv, ...).
                 Files, folders or wildcards, as many as you like. Needs ADM2_EN, ADM3_EN, ADM3_PCODE and a "sum"
-                column. They give the payam codes the app looks payams up by, so only payams in these files are written.
+                column. A *_exposure_by_payam.csv export (columns pop and exposed) works too and also gives
+                population at risk; those figures are never overwritten by --estimate-population. They give the payam codes the app looks payams up by, so only payams in these files are written.
   --cache       data/exposure_cache.json from the main branch (written every Sunday by exposure-cache.yml after the
                 flood extent is exported). It gives schools, health facilities and buildings with how many are at
                 risk, for all payams. It has no payam codes and no population, hence --population. Payams are
@@ -155,18 +156,28 @@ class Payams:
 
 
 def load_population(paths, payams):
+    """Population per payam. A *_exposure_by_payam.csv export (columns pop and exposed) also gives population at risk.
+
+    Returns how many payams got a population-at-risk figure that way.
+    """
+    with_risk = 0
     for path in expand(paths):
         n = 0
         for row in read_table(path):
             code, name = pick(row, 'adm3_pcode', 'pcode'), pick(row, 'adm3_en', 'payam', 'payam_name')
-            val = num(pick(row, 'sum', 'population'))
+            val = num(pick(row, 'sum', 'population', 'pop'))
             if not (code or name) or val is None:
                 continue
             r = payams.find(code, name, pick(row, 'adm2_en', 'county'), create=True, source=path)
             if r is not None:
                 r['population'] = whole(val)
+                exposed = num(row.get('exposed'))
+                if exposed is not None:
+                    r['population_at_risk'] = whole(min(exposed, val))
+                    with_risk += 1
                 n += 1
         print('%s: %d payams' % (os.path.basename(path), n))
+    return with_risk
 
 
 def load_cache(path, basis, payams):
@@ -335,7 +346,7 @@ def main():
     a = ap.parse_args()
 
     payams = Payams()
-    load_population(a.population, payams)
+    pop_risk = load_population(a.population, payams)
     if not payams.rows:
         sys.exit('no payams found in the population files (need ADM3_EN and a "sum" column)')
     label, cache_text, cache_built = '', '', ''
@@ -360,6 +371,8 @@ def main():
             parts.append('schools and health facilities taken from the supplied facility list')
         if a.risk:
             parts.append('counts from the supplied risk table take priority')
+        if pop_risk:
+            parts.append('population: the exposed share from the *_exposure_by_payam exports')
         if estimated:
             parts.append('population: estimated from the share of %s at risk' % ('land area' if a.estimate_population == 'area' else 'buildings'))
         hazard = '; '.join(parts)
