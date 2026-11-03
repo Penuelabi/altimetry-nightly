@@ -5,8 +5,8 @@
 | Verdict | Counties |
 | --- | --- |
 | OK (gauge on the county) | 39 |
-| OK | 23 |
-| REVIEW DATA AGE | 14 |
+| OK | 24 |
+| REVIEW DATA AGE | 13 |
 | REVIEW LINK | 3 |
 
 ## Counties to review
@@ -16,7 +16,6 @@
 | Kapoeta East | Pibor km 4625 | 150.9 | 16.0 | Turkwel Trib01 km 323 | 11.2 | linked gauge 151 km from the county; closer fresh gauge Turkwel Trib01 km 323 (11 km) |
 | Kapoeta South | Pager km 5355 | 133.7 | 35.0 | Pager km 5350 | 136.0 | linked gauge 134 km from the county; linked reading 35 days old |
 | Kapoeta North | Pibor km 4625 | 127.0 | 16.0 | Lotilla km 4712 | 99.8 | linked gauge 127 km from the county; closer fresh gauge Lotilla km 4712 (100 km) |
-| Maban | R Adar km 3880 | 54.8 | 31.0 | R Adar km 3865 | 59.7 | linked reading 31 days old |
 | Tonj South | Unknown, River | 30.2 | 43.0 | Ibba km 4410 | 30.2 | linked reading 43 days old |
 | Cueibet | Gulnam km 4631 | 25.6 | 288.0 | Gulnam km 4574 | 41.2 | linked reading 288 days old |
 | Wulu | Unknown, River | 7.0 | 43.0 | Ibba km 4410 | 7.0 | linked reading 43 days old |
