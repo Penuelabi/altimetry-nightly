@@ -1,6 +1,6 @@
 # Unity - anticipatory action situation brief
 
-Prepared 2026-11-06 01:56 UTC for the Unity state TWG-AA. Rain and soil data to 2026-11-03; ECMWF run 2026-11-05 12 UTC.
+Prepared 2026-11-06 17:03 UTC for the Unity state TWG-AA. Rain and soil data to 2026-11-03; ECMWF run 2026-11-06 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -18,9 +18,9 @@ Prepared 2026-11-06 01:56 UTC for the Unity state TWG-AA. Rain and soil data to 
 | Pariang | Unity | **ORANGE** | drought / dry spell | 0 | 0% | 4,128 |
 | Abiemnhom | Unity | **YELLOW** | drought / dry spell | 0 | 0% | 165 |
 | Guit | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 3,497 |
-| Koch | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 513 |
-| Leer | Unity | **YELLOW** | flood / waterlogging | 1 | 0% | 985 |
-| Mayendit | Unity | **YELLOW** | flood / waterlogging | 1 | 0% | 2,032 |
+| Koch | Unity | **YELLOW** | flood / waterlogging | 1 | 0% | 513 |
+| Leer | Unity | **YELLOW** | flood / waterlogging | 2 | 0% | 985 |
+| Mayendit | Unity | **YELLOW** | flood / waterlogging | 2 | 0% | 2,032 |
 | Rubkona | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 16,480 |
 
 ## Anticipatory action plans

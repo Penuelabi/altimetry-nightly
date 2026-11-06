@@ -25,13 +25,13 @@
 | Ezo | Jur km 4964 | 0.3 | 31.0 | Ibba km 4410 | 2.5 | linked reading 31 days old |
 | Abiemnhom | Bhar-al-arab, River | 0.0 | 39.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 39 days old |
 | Aweil West | Wadi Boro, River | 0.0 | 37.0 | Lol km 4833 | 0.0 | linked reading 37 days old |
-| Panyikang | White Nile, River | 0.0 | 42.0 | Sobat, River | 0.0 | linked reading 42 days old |
+| Panyikang | White Nile, River | 0.0 | 42.0 | Sobat km 4023 | 0.0 | linked reading 42 days old |
 | Nyirol | Fulus km 4165 | 0.0 | 94.0 | Fulus km 4114 | 0.0 | linked reading 94 days old |
 | Manyo | White Nile, River | 0.0 | 34.0 | White Nile km 3739 | 0.0 | linked reading 34 days old |
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 291.0 | Gulnam km 4669 | 2.9 | linked reading 291 days old |
-| Terekeka | White Nile, River | 0.0 | 42.0 | Nile km 4843 | 0.0 | linked reading 42 days old |
+| Terekeka | White Nile, River | 0.0 | 42.0 | White Nile, River | 0.0 | linked reading 42 days old |
 | Tambura | Jur km 4973 | 0.0 | 31.0 | Ibba km 4410 | 69.9 | linked reading 31 days old |
 | Tonj North | Unknown, River | 0.0 | 36.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 36 days old |
-| Twic East | White Nile, River | 0.0 | 44.0 | White Nile, River | 0.0 | linked reading 44 days old |
+| Twic East | White Nile, River | 0.0 | 44.0 | White Nile km 4536 | 0.0 | linked reading 44 days old |
 
 Rules: review when the linked gauge is over 100 km from the county, its latest reading is over 30 days old, or a fresh gauge is at least 25 km closer. The link file is not changed by this audit.

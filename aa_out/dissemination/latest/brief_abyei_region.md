@@ -1,6 +1,6 @@
 # Abyei Region - anticipatory action situation brief
 
-Prepared 2026-11-06 01:56 UTC for the Abyei Region state TWG-AA. Rain and soil data to 2026-11-03; ECMWF run 2026-11-05 12 UTC.
+Prepared 2026-11-06 17:03 UTC for the Abyei Region state TWG-AA. Rain and soil data to 2026-11-03; ECMWF run 2026-11-06 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
