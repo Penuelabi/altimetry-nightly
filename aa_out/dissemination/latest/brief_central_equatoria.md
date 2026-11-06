@@ -1,6 +1,6 @@
 # Central Equatoria - anticipatory action situation brief
 
-Prepared 2026-11-05 17:46 UTC for the Central Equatoria state TWG-AA. Rain and soil data to 2026-11-02; ECMWF run 2026-11-05 00 UTC.
+Prepared 2026-11-06 01:56 UTC for the Central Equatoria state TWG-AA. Rain and soil data to 2026-11-03; ECMWF run 2026-11-05 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,8 +12,8 @@ Prepared 2026-11-05 17:46 UTC for the Central Equatoria state TWG-AA. Rain and s
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Terekeka | Central Equatoria | **ORANGE** | drought / dry spell | 15 | 0% | 4,725 |
-| Juba | Central Equatoria | **YELLOW** | flood / waterlogging | 17 | 0% | 2,953 |
+| Terekeka | Central Equatoria | **ORANGE** | drought / dry spell | 18 | 0% | 4,725 |
+| Juba | Central Equatoria | **YELLOW** | flood / waterlogging | 22 | 0% | 2,953 |
 
 ## Decisions for the group
 - Agree the warning for the 2 counties with an alert and the channels (radio hubs, chiefs, SMS).
