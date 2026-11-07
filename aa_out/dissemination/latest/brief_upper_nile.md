@@ -1,6 +1,6 @@
 # Upper Nile - anticipatory action situation brief
 
-Prepared 2026-11-07 01:15 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-11-04; ECMWF run 2026-11-06 12 UTC.
+Prepared 2026-11-07 16:01 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-11-04; ECMWF run 2026-11-07 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -14,10 +14,10 @@ Prepared 2026-11-07 01:15 UTC for the Upper Nile state TWG-AA. Rain and soil dat
 |---|---|---|---|---|---|---|
 | Baliet | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 1,252 |
 | Fashoda | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 1,926 |
-| Longochuk | Upper Nile | **ORANGE** | drought / dry spell | 1 | 0% | 257 |
-| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 1 | 0% | 15,180 |
+| Longochuk | Upper Nile | **ORANGE** | drought / dry spell | 2 | 0% | 257 |
+| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 2 | 0% | 15,180 |
 | Maban | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 25 |
-| Maiwut | Upper Nile | **ORANGE** | drought / dry spell | 4 | 0% | 331 |
+| Maiwut | Upper Nile | **ORANGE** | drought / dry spell | 6 | 0% | 331 |
 | Malakal | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 6,999 |
 | Manyo | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 2,021 |
 | Melut | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 5,600 |
