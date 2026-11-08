@@ -1,4 +1,4 @@
-# County to gauge link audit (2026-11-07)
+# County to gauge link audit (2026-11-08)
 
 79 counties checked. Distances are from the gauge to the county polygon (0 = gauge inside the county).
 
@@ -13,21 +13,21 @@
 
 | County | Linked gauge | km | Age (d) | Nearest fresh alternative | km | Flags |
 | --- | --- | --- | --- | --- | --- | --- |
-| Kapoeta East | Pibor km 4625 | 150.9 | 20.0 | Turkwel Trib01 km 323 | 11.2 | linked gauge 151 km from the county; closer fresh gauge Turkwel Trib01 km 323 (11 km) |
-| Kapoeta South | Pager km 5355 | 133.7 | 39.0 | Pager km 5350 | 136.0 | linked gauge 134 km from the county; linked reading 39 days old |
-| Kapoeta North | Pibor km 4625 | 127.0 | 20.0 | Lotilla km 4712 | 99.8 | linked gauge 127 km from the county; closer fresh gauge Lotilla km 4712 (100 km) |
-| Tonj South | Unknown, River | 30.2 | 37.0 | Ibba km 4410 | 30.2 | linked reading 37 days old |
-| Cueibet | Gulnam km 4631 | 25.6 | 292.0 | Gulnam km 4574 | 41.2 | linked reading 292 days old |
-| Wulu | Unknown, River | 7.0 | 37.0 | Ibba km 4410 | 7.0 | linked reading 37 days old |
-| Raja | Wadi Boro, River | 6.9 | 36.0 | Chel km 5095 | 0.0 | linked reading 36 days old |
-| Abiemnhom | Bhar-al-arab, River | 0.0 | 40.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 40 days old |
-| Nyirol | Fulus km 4165 | 0.0 | 95.0 | Fulus km 4114 | 0.0 | linked reading 95 days old |
-| Manyo | White Nile, River | 0.0 | 35.0 | White Nile km 3739 | 0.0 | linked reading 35 days old |
-| Aweil West | Wadi Boro, River | 0.0 | 38.0 | Lol km 4833 | 0.0 | linked reading 38 days old |
-| Panyikang | White Nile, River | 0.0 | 43.0 | Sobat km 4023 | 0.0 | linked reading 43 days old |
-| Terekeka | White Nile, River | 0.0 | 43.0 | White Nile, River | 0.0 | linked reading 43 days old |
-| Rumbek Centre | Gulnam km 4631 | 0.0 | 292.0 | Gulnam km 4669 | 2.9 | linked reading 292 days old |
-| Tonj North | Unknown, River | 0.0 | 37.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 37 days old |
-| Twic East | White Nile, River | 0.0 | 45.0 | White Nile km 4536 | 0.0 | linked reading 45 days old |
+| Kapoeta East | Pibor km 4625 | 150.9 | 21.0 | Turkwel Trib01 km 323 | 11.2 | linked gauge 151 km from the county; closer fresh gauge Turkwel Trib01 km 323 (11 km) |
+| Kapoeta South | Pager km 5355 | 133.7 | 40.0 | Pager km 5350 | 136.0 | linked gauge 134 km from the county; linked reading 40 days old |
+| Kapoeta North | Pibor km 4625 | 127.0 | 21.0 | Lotilla km 4712 | 99.8 | linked gauge 127 km from the county; closer fresh gauge Lotilla km 4712 (100 km) |
+| Tonj South | Unknown, River | 30.2 | 38.0 | Ibba km 4410 | 30.2 | linked reading 38 days old |
+| Cueibet | Gulnam km 4631 | 25.6 | 293.0 | Gulnam km 4574 | 41.2 | linked reading 293 days old |
+| Wulu | Unknown, River | 7.0 | 38.0 | Ibba km 4410 | 7.0 | linked reading 38 days old |
+| Raja | Wadi Boro, River | 6.9 | 37.0 | Chel km 5095 | 0.0 | linked reading 37 days old |
+| Abiemnhom | Bhar-al-arab, River | 0.0 | 41.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 41 days old |
+| Nyirol | Fulus km 4165 | 0.0 | 96.0 | Fulus km 4114 | 0.0 | linked reading 96 days old |
+| Manyo | White Nile, River | 0.0 | 36.0 | White Nile km 3739 | 0.0 | linked reading 36 days old |
+| Aweil West | Wadi Boro, River | 0.0 | 39.0 | Lol km 4833 | 0.0 | linked reading 39 days old |
+| Panyikang | White Nile, River | 0.0 | 44.0 | Sobat km 4023 | 0.0 | linked reading 44 days old |
+| Terekeka | White Nile, River | 0.0 | 44.0 | White Nile, River | 0.0 | linked reading 44 days old |
+| Rumbek Centre | Gulnam km 4631 | 0.0 | 293.0 | Gulnam km 4669 | 2.9 | linked reading 293 days old |
+| Tonj North | Unknown, River | 0.0 | 38.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 38 days old |
+| Twic East | White Nile, River | 0.0 | 46.0 | White Nile km 4536 | 0.0 | linked reading 46 days old |
 
 Rules: review when the linked gauge is over 100 km from the county, its latest reading is over 30 days old, or a fresh gauge is at least 25 km closer. The link file is not changed by this audit.

@@ -1,6 +1,6 @@
 # Warrap - anticipatory action situation brief
 
-Prepared 2026-11-07 16:01 UTC for the Warrap state TWG-AA. Rain and soil data to 2026-11-04; ECMWF run 2026-11-07 00 UTC.
+Prepared 2026-11-08 01:00 UTC for the Warrap state TWG-AA. Rain and soil data to 2026-11-05; ECMWF run 2026-11-07 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -14,9 +14,9 @@ Prepared 2026-11-07 16:01 UTC for the Warrap state TWG-AA. Rain and soil data to
 |---|---|---|---|---|---|---|
 | Gogrial East | Warrap | **ORANGE** | drought / dry spell | 0 | 0% | 9,049 |
 | Gogrial West | Warrap | **ORANGE** | drought / dry spell | 0 | 0% | 34,800 |
-| Tonj East | Warrap | **ORANGE** | drought / dry spell | 2 | 0% | 105 |
+| Tonj East | Warrap | **ORANGE** | drought / dry spell | 1 | 0% | 105 |
 | Tonj North | Warrap | **ORANGE** | drought / dry spell | 1 | 0% | 7,001 |
-| Tonj South | Warrap | **ORANGE** | drought / dry spell | 3 | 0% | 3,140 |
+| Tonj South | Warrap | **ORANGE** | drought / dry spell | 2 | 0% | 3,140 |
 | Twic | Warrap | **ORANGE** | drought / dry spell | 0 | 0% | 11,366 |
 
 ## Decisions for the group
