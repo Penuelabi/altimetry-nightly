@@ -1,134 +1,124 @@
 county,station_uid,season,readiness_first_signal,activation_first_signal,activation_outcome,activation_lead_days,flood_displacement,first_displacement_month,listed_in_assessment
-Abiemnhom,dahiti:18741,2021-22,2022-01-04,2022-01-04,false alarm,,,,
-Abiemnhom,dahiti:18741,2022-23,2022-09-04,2022-10-01,false alarm,,,,
-Abiemnhom,dahiti:18741,2023-24,2023-07-25,,correct negative,,,,
+Abiemnhom,dahiti:18741,2021-22,2021-10-15,,correct negative,,,,
+Abiemnhom,dahiti:18741,2022-23,2022-09-04,,correct negative,,,,
+Abiemnhom,dahiti:18741,2023-24,2023-10-14,,correct negative,,,,
 Abiemnhom,dahiti:18741,2024-25,2024-09-29,2024-10-26,false alarm,,,,
-Abiemnhom,dahiti:18741,2025-26,2025-07-23,,correct negative,,,,
-Akobo,dahiti:23353,2020-21,2020-07-18,2020-11-03,false alarm,,,,
-Akobo,dahiti:23353,2021-22,2021-10-20,2021-10-20,hit,,False,,True
-Akobo,dahiti:23353,2022-23,2022-09-09,2022-10-06,false alarm,,,,
-Akobo,dahiti:23353,2023-24,2023-12-12,,correct negative,,,,
-Akobo,dahiti:23353,2025-26,2025-09-20,2025-09-20,hit,,False,,True
-Aweil South,hydroweb:7813,2021-22,2021-07-24,2021-09-16,hit,,False,,True
-Aweil South,hydroweb:7813,2022-23,2022-09-02,,miss,,False,,True
-Aweil South,hydroweb:7813,2023-24,2023-08-19,,correct negative,,,,
-Aweil South,hydroweb:7813,2024-25,2024-08-04,2024-10-24,hit,,False,,True
-Aweil West,dahiti:23343,2021-22,2021-07-01,2022-01-06,false alarm,,,,
+Akobo,dahiti:23353,2020-21,2020-09-10,2020-12-27,false alarm,,,,
+Akobo,dahiti:23353,2021-22,2021-10-20,,miss,,False,,True
+Akobo,dahiti:23353,2022-23,2022-11-02,,correct negative,,,,
+Akobo,dahiti:23353,2025-26,2025-10-17,,miss,,False,,True
+Aweil South,hydroweb:7813,2020-21,2020-11-23,,correct negative,,,,
+Aweil South,hydroweb:7813,2021-22,2021-10-13,,miss,,False,,True
+Aweil South,hydroweb:7813,2022-23,2022-12-19,,miss,,False,,True
+Aweil South,hydroweb:7813,2023-24,2023-10-12,,correct negative,,,,
+Aweil South,hydroweb:7813,2024-25,2024-08-31,2024-10-24,hit,,False,,True
+Aweil South,hydroweb:7813,2025-26,2025-12-03,,correct negative,,,,
+Aweil West,dahiti:23343,2020-21,2020-10-04,,correct negative,,,,
+Aweil West,dahiti:23343,2021-22,2021-08-24,,correct negative,,,,
 Aweil West,dahiti:23343,2022-23,2022-09-06,2022-10-03,hit,,False,,True
 Aweil West,dahiti:23343,2024-25,2024-09-04,2024-10-01,hit,,False,,True
-Aweil West,dahiti:23343,2025-26,2025-10-14,2025-10-14,false alarm,,,,
-Canal/Pigi,dahiti:12178,2021-22,2021-07-13,2021-09-05,hit,-4.0,True,2021-09,True
-Canal/Pigi,dahiti:12178,2022-23,2022-08-22,2022-10-15,false alarm,,,,
-Canal/Pigi,dahiti:12178,2023-24,2023-07-12,,correct negative,,,,
-Canal/Pigi,dahiti:12178,2024-25,2024-08-20,2024-10-13,hit,,False,,True
-Canal/Pigi,dahiti:12178,2025-26,2025-07-10,2025-09-02,hit,-1.0,True,2025-09,True
-Cueibet,dahiti:2686,2020-21,2020-08-22,2020-11-09,false alarm,,,,
-Cueibet,dahiti:2686,2021-22,2021-08-14,,miss,,False,,True
-Cueibet,dahiti:2686,2022-23,2022-07-27,2022-10-05,hit,,False,,True
+Aweil West,dahiti:23343,2025-26,2025-09-17,2025-10-14,false alarm,,,,
+Canal/Pigi,dahiti:12178,2020-21,2021-01-05,,miss,,True,2020-08,False
+Canal/Pigi,dahiti:12178,2021-22,2021-08-09,2021-09-05,hit,-4.0,True,2021-09,True
+Canal/Pigi,dahiti:12178,2022-23,2022-09-18,2022-10-15,false alarm,,,,
+Canal/Pigi,dahiti:12178,2023-24,2023-11-24,,correct negative,,,,
+Canal/Pigi,dahiti:12178,2024-25,2024-09-16,2024-10-13,hit,,False,,True
+Canal/Pigi,dahiti:12178,2025-26,2025-08-06,2025-09-02,hit,-1.0,True,2025-09,True
+Cueibet,dahiti:2686,2020-21,2020-08-22,,correct negative,,,,
+Cueibet,dahiti:2686,2022-23,2022-09-15,2022-10-24,hit,,False,,True
 Cueibet,dahiti:2686,2023-24,2023-11-05,,correct negative,,,,
-Cueibet,dahiti:2686,2024-25,2024-07-10,2024-10-07,hit,,False,,True
-Cueibet,dahiti:2686,2025-26,2025-07-12,2025-11-08,hit,,False,,True
-Gogrial West,hydroweb:7813,2021-22,2021-07-24,2021-09-16,hit,,False,,True
-Gogrial West,hydroweb:7813,2022-23,2022-09-02,,miss,,False,,True
-Gogrial West,hydroweb:7813,2023-24,2023-08-19,,correct negative,,,,
-Gogrial West,hydroweb:7813,2024-25,2024-08-04,2024-10-24,hit,,False,,True
-Ibba,dahiti:2686,2020-21,2020-08-22,2020-11-09,false alarm,,,,
-Ibba,dahiti:2686,2021-22,2021-08-14,,correct negative,,,,
-Ibba,dahiti:2686,2022-23,2022-07-27,2022-10-05,hit,,False,,True
+Cueibet,dahiti:2686,2024-25,2024-08-29,2024-11-16,hit,,False,,True
+Cueibet,dahiti:2686,2025-26,2025-11-08,2025-11-08,hit,,False,,True
+Gogrial West,hydroweb:7813,2020-21,2020-11-23,,correct negative,,,,
+Gogrial West,hydroweb:7813,2021-22,2021-10-13,,miss,,False,,True
+Gogrial West,hydroweb:7813,2022-23,2022-12-19,,miss,,False,,True
+Gogrial West,hydroweb:7813,2023-24,2023-10-12,,correct negative,,,,
+Gogrial West,hydroweb:7813,2024-25,2024-08-31,2024-10-24,hit,,False,,True
+Gogrial West,hydroweb:7813,2025-26,2025-12-03,,correct negative,,,,
+Ibba,dahiti:2686,2020-21,2020-08-22,,correct negative,,,,
+Ibba,dahiti:2686,2022-23,2022-09-15,2022-10-24,hit,,False,,True
 Ibba,dahiti:2686,2023-24,2023-11-05,,correct negative,,,,
-Ibba,dahiti:2686,2024-25,2024-07-10,2024-10-07,false alarm,,,,
-Ibba,dahiti:2686,2025-26,2025-07-12,2025-11-08,false alarm,,,,
+Ibba,dahiti:2686,2024-25,2024-08-29,2024-11-16,false alarm,,,,
+Ibba,dahiti:2686,2025-26,2025-11-08,2025-11-08,false alarm,,,,
 Juba,hydroweb:7856,2020-21,2020-07-29,2021-01-07,late,,True,2020-09,False
 Juba,hydroweb:7856,2021-22,2021-09-07,2021-09-07,hit,55.0,True,2021-11,True
-Juba,hydroweb:7856,2023-24,2023-07-14,,correct negative,,,,
-Juba,hydroweb:7856,2024-25,2024-07-26,2024-10-15,hit,,False,,True
+Juba,hydroweb:7856,2022-23,2022-09-20,,correct negative,,,,
+Juba,hydroweb:7856,2024-25,2024-08-22,2024-10-15,hit,,False,,True
 Juba,hydroweb:7856,2025-26,2025-10-28,2025-10-28,hit,,False,,True
-Malakal,dahiti:11815,2020-21,2021-01-30,2021-01-30,hit,30.0,True,2021-03,False
-Malakal,dahiti:11815,2021-22,2021-07-11,2021-09-03,late,,True,2021-08,True
-Malakal,dahiti:11815,2022-23,2022-07-24,2022-10-13,false alarm,,,,
-Malakal,dahiti:11815,2024-25,2024-09-14,2024-10-03,hit,-2.0,True,2024-10,False
-Malakal,dahiti:11815,2025-26,2025-07-02,2025-09-02,hit,-1.0,True,2025-09,True
-Manyo,dahiti:16323,2021-22,2021-07-04,2021-12-13,false alarm,,,,
-Manyo,dahiti:16323,2022-23,2022-07-17,2022-10-06,late,,True,2022-09,True
-Manyo,dahiti:16323,2025-26,2025-07-28,2025-09-20,hit,,False,,True
-Maridi,dahiti:2686,2020-21,2020-08-22,2020-11-09,false alarm,,,,
-Maridi,dahiti:2686,2021-22,2021-08-14,,correct negative,,,,
-Maridi,dahiti:2686,2022-23,2022-07-27,2022-10-05,false alarm,,,,
+Malakal,dahiti:11815,2020-21,2021-01-30,,miss,,True,2021-03,False
+Malakal,dahiti:11815,2021-22,2021-09-30,2021-09-30,late,,True,2021-08,True
+Malakal,dahiti:11815,2022-23,2022-09-16,2022-10-13,false alarm,,,,
+Malakal,dahiti:11815,2024-25,2024-10-03,2024-10-03,hit,-2.0,True,2024-10,False
+Malakal,dahiti:11815,2025-26,2025-08-31,2025-09-02,hit,-1.0,True,2025-09,True
+Manyo,dahiti:16323,2021-22,2021-11-16,,correct negative,,,,
+Manyo,dahiti:16323,2022-23,2022-10-06,2022-11-02,late,,True,2022-09,True
+Manyo,dahiti:16323,2024-25,2024-10-31,,miss,,False,,True
+Manyo,dahiti:16323,2025-26,2025-09-20,2025-10-17,hit,,False,,True
+Maridi,dahiti:2686,2020-21,2020-08-22,,correct negative,,,,
+Maridi,dahiti:2686,2022-23,2022-09-15,2022-10-24,false alarm,,,,
 Maridi,dahiti:2686,2023-24,2023-11-05,,correct negative,,,,
-Maridi,dahiti:2686,2024-25,2024-07-10,2024-10-07,false alarm,,,,
-Maridi,dahiti:2686,2025-26,2025-07-12,2025-11-08,false alarm,,,,
-Mvolo,dahiti:2686,2020-21,2020-08-22,2020-11-09,false alarm,,,,
-Mvolo,dahiti:2686,2021-22,2021-08-14,,correct negative,,,,
-Mvolo,dahiti:2686,2022-23,2022-07-27,2022-10-05,hit,,False,,True
+Maridi,dahiti:2686,2024-25,2024-08-29,2024-11-16,false alarm,,,,
+Maridi,dahiti:2686,2025-26,2025-11-08,2025-11-08,false alarm,,,,
+Mvolo,dahiti:2686,2020-21,2020-08-22,,correct negative,,,,
+Mvolo,dahiti:2686,2022-23,2022-09-15,2022-10-24,hit,,False,,True
 Mvolo,dahiti:2686,2023-24,2023-11-05,,correct negative,,,,
-Mvolo,dahiti:2686,2024-25,2024-07-10,2024-10-07,false alarm,,,,
-Mvolo,dahiti:2686,2025-26,2025-07-12,2025-11-08,hit,,False,,True
-Nyirol,hydroweb:7848,2020-21,2021-01-30,2021-01-30,false alarm,,,,
-Nyirol,hydroweb:7848,2021-22,2021-07-11,2021-09-03,false alarm,,,,
-Nyirol,hydroweb:7848,2022-23,2022-07-24,2022-10-13,hit,,False,,True
-Nyirol,hydroweb:7848,2024-25,2024-11-07,2024-11-07,false alarm,,,,
+Mvolo,dahiti:2686,2024-25,2024-08-29,2024-11-16,false alarm,,,,
+Mvolo,dahiti:2686,2025-26,2025-11-08,2025-11-08,hit,,False,,True
+Nyirol,hydroweb:7848,2021-22,2021-09-30,2021-09-30,false alarm,,,,
+Nyirol,hydroweb:7848,2022-23,2022-09-16,2022-10-13,hit,,False,,True
+Nyirol,hydroweb:7848,2024-25,2024-10-11,2024-11-07,false alarm,,,,
 Nyirol,hydroweb:7848,2025-26,2025-08-31,2025-09-27,hit,,False,,True
 Pariang,hydroweb:7830,2020-21,2020-08-15,,correct negative,,,,
-Pariang,hydroweb:7830,2021-22,2021-12-14,2021-12-14,hit,49.0,True,2022-02,False
-Pariang,hydroweb:7830,2022-23,2022-09-10,2022-10-07,false alarm,,,,
-Pariang,hydroweb:7830,2023-24,2023-07-04,,correct negative,,,,
-Pariang,hydroweb:7830,2024-25,2024-11-01,2024-11-01,false alarm,,,,
-Pariang,hydroweb:7830,2025-26,2025-09-21,2025-09-21,false alarm,,,,
-Pibor,hydroweb:7909,2020-21,2020-08-02,2020-11-18,false alarm,,,,
-Pibor,hydroweb:7909,2021-22,2021-10-08,2021-10-08,false alarm,,,,
+Pariang,hydroweb:7830,2022-23,2022-10-07,2022-11-03,false alarm,,,,
+Pariang,hydroweb:7830,2024-25,2024-11-01,,correct negative,,,,
+Pariang,hydroweb:7830,2025-26,2025-10-18,,correct negative,,,,
+Pibor,hydroweb:7909,2020-21,2020-08-29,,correct negative,,,,
+Pibor,hydroweb:7909,2021-22,2021-09-11,2021-10-08,false alarm,,,,
 Pibor,hydroweb:7909,2022-23,2022-09-24,2022-10-21,false alarm,,,,
-Pibor,hydroweb:7909,2023-24,2023-12-27,,correct negative,,,,
-Pibor,hydroweb:7909,2024-25,2024-07-30,,correct negative,,,,
-Pibor,hydroweb:7909,2025-26,2025-09-08,2025-09-08,hit,,False,,True
-Pochalla,hydroweb:7909,2020-21,2020-08-02,2020-11-18,false alarm,,,,
-Pochalla,hydroweb:7909,2021-22,2021-10-08,2021-10-08,false alarm,,,,
+Pibor,hydroweb:7909,2025-26,2025-09-08,,miss,,False,,True
+Pochalla,hydroweb:7909,2020-21,2020-08-29,,correct negative,,,,
+Pochalla,hydroweb:7909,2021-22,2021-09-11,2021-10-08,false alarm,,,,
 Pochalla,hydroweb:7909,2022-23,2022-09-24,2022-10-21,hit,,False,,True
-Pochalla,hydroweb:7909,2023-24,2023-12-27,,correct negative,,,,
-Pochalla,hydroweb:7909,2024-25,2024-07-30,,miss,,False,,True
-Pochalla,hydroweb:7909,2025-26,2025-09-08,2025-09-08,hit,,False,,True
-Renk,hydroweb:7893,2021-22,2021-07-25,2022-01-03,hit,29.0,True,2022-02,True
-Renk,hydroweb:7893,2022-23,2022-07-11,2022-10-27,late,,True,2022-09,True
-Renk,hydroweb:7893,2025-26,2025-07-22,2025-09-14,hit,,False,,True
-Rumbek Centre,dahiti:2686,2020-21,2020-08-22,2020-11-09,false alarm,,,,
-Rumbek Centre,dahiti:2686,2021-22,2021-08-14,,correct negative,,,,
-Rumbek Centre,dahiti:2686,2022-23,2022-07-27,2022-10-05,false alarm,,,,
+Pochalla,hydroweb:7909,2025-26,2025-09-08,,miss,,False,,True
+Renk,hydroweb:7893,2021-22,2021-11-10,,miss,,True,2022-02,True
+Renk,hydroweb:7893,2022-23,2022-09-30,2022-10-27,late,,True,2022-09,True
+Renk,hydroweb:7893,2024-25,2024-11-21,,miss,,True,2024-08,False
+Renk,hydroweb:7893,2025-26,2025-10-11,2025-11-07,hit,,False,,True
+Rumbek Centre,dahiti:2686,2020-21,2020-08-22,,correct negative,,,,
+Rumbek Centre,dahiti:2686,2022-23,2022-09-15,2022-10-24,false alarm,,,,
 Rumbek Centre,dahiti:2686,2023-24,2023-11-05,,correct negative,,,,
-Rumbek Centre,dahiti:2686,2024-25,2024-07-10,2024-10-07,false alarm,,,,
-Rumbek Centre,dahiti:2686,2025-26,2025-07-12,2025-11-08,hit,,False,,True
-Rumbek East,dahiti:2686,2020-21,2020-08-22,2020-11-09,false alarm,,,,
-Rumbek East,dahiti:2686,2021-22,2021-08-14,,miss,,False,,True
-Rumbek East,dahiti:2686,2022-23,2022-07-27,2022-10-05,false alarm,,,,
+Rumbek Centre,dahiti:2686,2024-25,2024-08-29,2024-11-16,false alarm,,,,
+Rumbek Centre,dahiti:2686,2025-26,2025-11-08,2025-11-08,hit,,False,,True
+Rumbek East,dahiti:2686,2020-21,2020-08-22,,correct negative,,,,
+Rumbek East,dahiti:2686,2022-23,2022-09-15,2022-10-24,false alarm,,,,
 Rumbek East,dahiti:2686,2023-24,2023-11-05,,correct negative,,,,
-Rumbek East,dahiti:2686,2024-25,2024-07-10,2024-10-07,hit,,False,,True
-Rumbek East,dahiti:2686,2025-26,2025-07-12,2025-11-08,hit,,False,,True
-Tonj South,dahiti:2686,2020-21,2020-08-22,2020-11-09,false alarm,,,,
-Tonj South,dahiti:2686,2021-22,2021-08-14,,correct negative,,,,
-Tonj South,dahiti:2686,2022-23,2022-07-27,2022-10-05,hit,,False,,True
+Rumbek East,dahiti:2686,2024-25,2024-08-29,2024-11-16,hit,,False,,True
+Rumbek East,dahiti:2686,2025-26,2025-11-08,2025-11-08,hit,,False,,True
+Tonj South,dahiti:2686,2020-21,2020-08-22,,correct negative,,,,
+Tonj South,dahiti:2686,2022-23,2022-09-15,2022-10-24,hit,,False,,True
 Tonj South,dahiti:2686,2023-24,2023-11-05,,correct negative,,,,
-Tonj South,dahiti:2686,2024-25,2024-07-10,2024-10-07,hit,,False,,True
-Tonj South,dahiti:2686,2025-26,2025-07-12,2025-11-08,false alarm,,,,
-Twic,hydroweb:7825,2021-22,2021-12-08,2021-12-08,false alarm,,,,
-Twic,hydroweb:7825,2022-23,2022-09-04,2022-10-01,hit,,False,,True
-Twic,hydroweb:7825,2023-24,2023-07-25,,correct negative,,,,
+Tonj South,dahiti:2686,2024-25,2024-08-29,2024-11-16,hit,,False,,True
+Tonj South,dahiti:2686,2025-26,2025-11-08,2025-11-08,false alarm,,,,
+Twic,hydroweb:7825,2021-22,2021-11-11,,correct negative,,,,
+Twic,hydroweb:7825,2022-23,2022-09-04,2022-10-28,hit,,False,,True
+Twic,hydroweb:7825,2023-24,2023-10-14,,correct negative,,,,
 Twic,hydroweb:7825,2024-25,2024-09-29,2024-10-26,hit,,False,,True
-Twic,hydroweb:7825,2025-26,2025-07-23,,miss,,False,,True
-Ulang,dahiti:3764,2020-21,2020-07-19,2020-11-05,false alarm,,,,
-Ulang,dahiti:3764,2021-22,2021-08-10,2021-11-07,false alarm,,,,
-Ulang,dahiti:3764,2022-23,2022-09-10,2022-10-10,false alarm,,,,
-Ulang,dahiti:3764,2023-24,2023-12-30,,correct negative,,,,
-Ulang,dahiti:3764,2025-26,2025-10-25,2025-10-25,false alarm,,,,
-Uror,hydroweb:7848,2020-21,2021-01-30,2021-01-30,false alarm,,,,
-Uror,hydroweb:7848,2021-22,2021-07-11,2021-09-03,false alarm,,,,
-Uror,hydroweb:7848,2022-23,2022-07-24,2022-10-13,false alarm,,,,
-Uror,hydroweb:7848,2024-25,2024-11-07,2024-11-07,hit,,False,,True
+Ulang,dahiti:3764,2020-21,2020-09-26,2021-01-03,false alarm,,,,
+Ulang,dahiti:3764,2021-22,2021-11-07,,correct negative,,,,
+Ulang,dahiti:3764,2022-23,2022-09-30,2022-10-20,false alarm,,,,
+Ulang,dahiti:3764,2024-25,2024-11-02,,correct negative,,,,
+Ulang,dahiti:3764,2025-26,2025-11-03,,correct negative,,,,
+Uror,hydroweb:7848,2021-22,2021-09-30,2021-09-30,false alarm,,,,
+Uror,hydroweb:7848,2022-23,2022-09-16,2022-10-13,false alarm,,,,
+Uror,hydroweb:7848,2024-25,2024-10-11,2024-11-07,hit,,False,,True
 Uror,hydroweb:7848,2025-26,2025-08-31,2025-09-27,false alarm,,,,
-Wulu,dahiti:2686,2020-21,2020-08-22,2020-11-09,false alarm,,,,
-Wulu,dahiti:2686,2021-22,2021-08-14,,correct negative,,,,
-Wulu,dahiti:2686,2022-23,2022-07-27,2022-10-05,false alarm,,,,
+Wulu,dahiti:2686,2020-21,2020-08-22,,correct negative,,,,
+Wulu,dahiti:2686,2022-23,2022-09-15,2022-10-24,false alarm,,,,
 Wulu,dahiti:2686,2023-24,2023-11-05,,correct negative,,,,
-Wulu,dahiti:2686,2024-25,2024-07-10,2024-10-07,false alarm,,,,
-Wulu,dahiti:2686,2025-26,2025-07-12,2025-11-08,hit,,False,,True
+Wulu,dahiti:2686,2024-25,2024-08-29,2024-11-16,false alarm,,,,
+Wulu,dahiti:2686,2025-26,2025-11-08,2025-11-08,hit,,False,,True
 Yirol East,hydroweb:7890,2020-21,2020-08-06,,correct negative,,,,
-Yirol East,hydroweb:7890,2021-22,2021-07-23,2021-09-15,late,,True,2021-08,True
-Yirol East,hydroweb:7890,2024-25,2024-08-03,2024-11-19,late,,True,2024-11,False
-Yirol East,hydroweb:7890,2025-26,2025-10-09,2025-10-09,hit,,False,,True
+Yirol East,hydroweb:7890,2021-22,2021-07-23,,miss,,True,2021-08,True
+Yirol East,hydroweb:7890,2022-23,2022-09-28,,correct negative,,,,
+Yirol East,hydroweb:7890,2024-25,2024-08-03,,miss,,True,2024-11,False
+Yirol East,hydroweb:7890,2025-26,2025-07-20,2025-11-05,hit,,False,,True
