@@ -1,23 +1,23 @@
 # Central Equatoria - anticipatory action situation brief
 
-Prepared 2026-11-08 16:22 UTC for the Central Equatoria state TWG-AA. Rain and soil data to 2026-11-05; ECMWF run 2026-11-08 00 UTC.
+Prepared 2026-11-09 01:17 UTC for the Central Equatoria state TWG-AA. Rain and soil data to 2026-11-05; ECMWF run 2026-11-08 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
 - Counties by alert level: red 0, orange 6, yellow 0, green 0.
 - No anticipatory action plan is in readiness or activated.
-- River gauges at a proposed trigger level: 1 counties (0 at activation level).
+- River gauges at a proposed trigger level: 0 counties (0 at activation level).
 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Juba | Central Equatoria | **ORANGE** | drought / dry spell | 21 | 2% | 2,953 |
-| Kajo-keji | Central Equatoria | **ORANGE** | drought / dry spell | 29 | 4% | 190 |
-| Lainya | Central Equatoria | **ORANGE** | drought / dry spell | 28 | 4% | 72 |
-| Morobo | Central Equatoria | **ORANGE** | drought / dry spell | 31 | 8% | 44 |
+| Juba | Central Equatoria | **ORANGE** | drought / dry spell | 20 | 0% | 2,953 |
+| Kajo-keji | Central Equatoria | **ORANGE** | drought / dry spell | 30 | 6% | 190 |
+| Lainya | Central Equatoria | **ORANGE** | drought / dry spell | 22 | 4% | 72 |
+| Morobo | Central Equatoria | **ORANGE** | drought / dry spell | 28 | 4% | 44 |
 | Terekeka | Central Equatoria | **ORANGE** | drought / dry spell | 13 | 0% | 4,725 |
-| Yei | Central Equatoria | **ORANGE** | drought / dry spell | 28 | 0% | 154 |
+| Yei | Central Equatoria | **ORANGE** | drought / dry spell | 22 | 0% | 154 |
 
 ## Decisions for the group
 - Agree the warning for the 6 counties with an alert and the channels (radio hubs, chiefs, SMS).
