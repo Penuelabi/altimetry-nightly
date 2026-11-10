@@ -25,7 +25,7 @@
 | Raja | Wadi Boro, River | 6.9 | 39.0 | Chel km 5095 | 0.0 | linked reading 39 days old |
 | Abiemnhom | Bhar-al-arab, River | 0.0 | 43.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 43 days old |
 | Aweil West | Wadi Boro, River | 0.0 | 41.0 | Lol km 4833 | 0.0 | linked reading 41 days old |
-| Panyikang | White Nile, River | 0.0 | 46.0 | Sobat km 4029 | 0.0 | linked reading 46 days old |
+| Panyikang | White Nile, River | 0.0 | 46.0 | Sobat km 4023 | 0.0 | linked reading 46 days old |
 | Nyirol | Fulus km 4165 | 0.0 | 98.0 | Fulus km 4114 | 0.0 | linked reading 98 days old |
 | Mundri East | Yei km 4848 | 0.0 | 31.0 | Yei km 4779 | 8.1 | linked reading 31 days old |
 | Manyo | White Nile, River | 0.0 | 38.0 | White Nile km 3739 | 0.0 | linked reading 38 days old |

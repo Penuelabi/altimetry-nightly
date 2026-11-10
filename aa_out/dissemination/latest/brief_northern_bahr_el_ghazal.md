@@ -1,6 +1,6 @@
 # Northern Bahr el Ghazal - anticipatory action situation brief
 
-Prepared 2026-11-10 03:54 UTC for the Northern Bahr el Ghazal state TWG-AA. Rain and soil data to 2026-11-07; ECMWF run 2026-11-09 12 UTC.
+Prepared 2026-11-10 17:23 UTC for the Northern Bahr el Ghazal state TWG-AA. Rain and soil data to 2026-11-07; ECMWF run 2026-11-10 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
