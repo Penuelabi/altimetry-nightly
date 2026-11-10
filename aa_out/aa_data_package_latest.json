@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261109_2010",
+ "name": "south-sudan-hydroclimate-aa-20261110_0354",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261109_2010",
- "created": "2026-11-09T20:10:15Z",
+ "version": "20261110_0354",
+ "created": "2026-11-10T03:54:50Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -129,12 +129,12 @@
      {
       "check": "alert_level categories",
       "status": "pass",
-      "detail": "green, orange, red, yellow"
+      "detail": "orange, red, yellow"
      },
      {
       "check": "data_end_date freshness",
       "status": "pass",
-      "detail": "latest 2026-11-05 (4 days old, limit 7)"
+      "detail": "latest 2026-11-07 (3 days old, limit 7)"
      },
      {
       "check": "county coverage",
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 179548,
-   "hash": "sha256:a31e05aa0f5a010942de1e2ff83530e6e8fd3bd3fb6b542576a1b62c0cdd8c18",
+   "bytes": 180946,
+   "hash": "sha256:18cb08a9cfe7955e485d44ec3f2f6ee750853a1119cc5c8e5f0b529838b39283",
    "rows": 79,
    "schema": {
     "fields": [
@@ -699,7 +699,7 @@
      {
       "check": "updated_utc freshness",
       "status": "pass",
-      "detail": "latest 2026-11-09 (0 days old, limit 3)"
+      "detail": "latest 2026-11-09 (1 days old, limit 3)"
      }
     ]
    },
@@ -851,8 +851,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 7711,
-   "hash": "sha256:fcc18d843962666bfa22f0ec9dd664df74dd0099b10f0947c969f18de5d0d921",
+   "bytes": 11038,
+   "hash": "sha256:e7ca2d1d3e7076c24049c3a78fd217a6bddc9aba8ac8abfe87fb1be9caac5e4f",
    "rows": 79,
    "schema": {
     "fields": [
@@ -894,7 +894,7 @@
      },
      {
       "name": "last_date",
-      "type": "number",
+      "type": "date",
       "hxl": "#date+observed"
      },
      {
@@ -904,7 +904,7 @@
      },
      {
       "name": "flood_status",
-      "type": "number"
+      "type": "string"
      },
      {
       "name": "seasonal_pctile",
@@ -1422,7 +1422,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 1627,
-   "hash": "sha256:907325a2fe4d355971808423c43c7e3c3525dbe42ab3dde4d75062e0c0b45302",
+   "hash": "sha256:66597e283f14d78ec638c85f4cd592e78bcc36a717669b216fd92c45b8922692",
    "rows": 6,
    "schema": {
     "fields": [
@@ -1563,8 +1563,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 2217,
-   "hash": "sha256:1283ecc25195672635bc10e9c90f3042f29910b49c11d88d9c1ef93a9864eacd",
+   "bytes": 2216,
+   "hash": "sha256:907d35fdc2bfcf6f51b411570eba2b6ecf7421f1a347854652624ab3b59fd361",
    "rows": 30,
    "schema": {
     "fields": [

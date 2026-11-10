@@ -1,6 +1,6 @@
 # Unity - anticipatory action situation brief
 
-Prepared 2026-11-09 20:10 UTC for the Unity state TWG-AA. Rain and soil data to 2026-11-05; ECMWF run 2026-11-09 00 UTC.
+Prepared 2026-11-10 03:54 UTC for the Unity state TWG-AA. Rain and soil data to 2026-11-07; ECMWF run 2026-11-09 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -14,19 +14,19 @@ Prepared 2026-11-09 20:10 UTC for the Unity state TWG-AA. Rain and soil data to 
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
 | Mayom | Unity | **ORANGE** | drought / dry spell | 0 | 0% | 22,600 |
-| Panyijiar | Unity | **ORANGE** | drought / dry spell | 1 | 0% | 4,064 |
+| Panyijiar | Unity | **ORANGE** | drought / dry spell | 3 | 0% | 4,064 |
 | Pariang | Unity | **ORANGE** | drought / dry spell | 0 | 0% | 4,128 |
 | Abiemnhom | Unity | **YELLOW** | drought / dry spell | 0 | 0% | 165 |
 | Guit | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 3,497 |
-| Koch | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 513 |
-| Leer | Unity | **YELLOW** | flood / waterlogging | 1 | 0% | 985 |
-| Mayendit | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 2,032 |
+| Koch | Unity | **YELLOW** | flood / waterlogging | 1 | 0% | 513 |
+| Leer | Unity | **YELLOW** | flood / waterlogging | 2 | 0% | 985 |
+| Mayendit | Unity | **YELLOW** | flood / waterlogging | 2 | 0% | 2,032 |
 | Rubkona | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 16,480 |
 
 ## Anticipatory action plans
 | Plan | County | Stage | Since | Plan status | River / readiness / activation (m) |
 |---|---|---|---|---|---|
-| AAP-FL-PANYIJIAR | Panyijiar | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 392.67// |
+| AAP-FL-PANYIJIAR | Panyijiar | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 397.07// |
 | AAP-FL-LEER | Leer | **activated** | 2026-10-09 14:03 | draft (example) - not validated | 400.63// |
 | AAP-FL-GUIT | Guit | **activated** | 2026-10-07 10:25 | draft (example) - not validated | 394.42// |
 
