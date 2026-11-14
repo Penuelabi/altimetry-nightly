@@ -13,7 +13,7 @@ Baliet,Upper Nile,dahiti:18743,"Sobat, River","Sobat, River",upstream,high,0.0,2
 Bor South,Jonglei,hydroweb:7889,White Nile km 4681,White Nile km 4681,audit-override,medium,0.0,2026-10-22,419.7,Below 2-yr level,37.5,0.0022
 Budi,Eastern Equatoria,hydroweb:102552,Pager km 5350,Pager km 5350,audit-override,medium,88.0,2026-10-22,975.87,Above 5-yr level,82.1429,0.0526
 Canal/Pigi,Jonglei,dahiti:12178,"White Nile, River","White Nile, River",upstream,high,0.0,2026-11-08,390.139,Above 2-yr level,66.6667,-0.004
-Cueibet,Lakes,hydroweb:110221,Gulnam km 4631,Gulnam km 4631,local,high,25.6,2026-01-19,412.23,Stale (last pass 297 d ago),71.4286,-0.0004
+Cueibet,Lakes,hydroweb:110221,Gulnam km 4631,Gulnam km 4631,local,high,25.6,2026-01-19,412.23,Stale (last pass 298 d ago),71.4286,-0.0004
 Duk,Jonglei,hydroweb:7877,White Nile km 4500,White Nile km 4500,audit-override,medium,0.1,2026-11-02,407.18,Below 2-yr level,8.3333,-0.043
 Ezo,Western Equatoria,hydroweb:108192,Jur km 4964,Jur km 4964,downstream,high,0.3,2026-11-02,483.69,Below 2-yr level,15.3846,0.0081
 Fangak,Jonglei,hydroweb:105860,Bahr El Zeraf km 4110,Bahr El Zeraf km 4110,audit-override,medium,0.0,2026-10-22,393.23,Near 2-yr level (within error),62.5,-0.0019
@@ -21,7 +21,7 @@ Fashoda,Upper Nile,hydroweb:7969,White Nile km 3905,White Nile km 3905,audit-ove
 Gogrial East,Warrap,hydroweb:203777,Nahr Al Jur km 4456,Nahr Al Jur km 4456,audit-override,medium,0.0,2026-11-01,403.35,Below 2-yr level,0.0,-0.0057
 Gogrial West,Warrap,hydroweb:203695,Lol km 4620,Lol km 4620,upstream,high,2.5,2026-11-05,411.71,Below 2-yr level,0.0,-0.02
 Guit,Unity,hydroweb:7900,White Nile km 4218,White Nile km 4218,audit-override,medium,0.0,2026-10-16,394.42,Below 2-yr level,68.75,0.0159
-Ibba,Western Equatoria,hydroweb:111296,Ibba km 4410,Ibba km 4410,local,high,70.0,2026-10-31,475.18,Below 2-yr level,0.0,0.009
+Ibba,Western Equatoria,hydroweb:111296,Ibba km 4410,Ibba km 4410,local,high,70.0,2026-11-10,475.21,Below 2-yr level,4.0,0.003
 Ikotos,Eastern Equatoria,hydroweb:102552,Pager km 5350,Pager km 5350,audit-override,medium,65.9,2026-10-22,975.87,Above 5-yr level,82.1429,0.0526
 Juba,Central Equatoria,hydroweb:203765,Nile km 5018,Nile km 5018,upstream,high,0.0,2026-10-20,510.1,Below 2-yr level,14.2857,0.0076
 Jur River,Western Bahr el Ghazal,hydroweb:102830,Jur km 4780,Jur km 4780,local,high,0.0,2026-10-23,441.58,Below 2-yr level,0.0,0.0159
@@ -29,8 +29,8 @@ Kajo-keji,Central Equatoria,hydroweb:203765,Nile km 5018,Nile km 5018,audit-over
 Kapoeta East,Eastern Equatoria,hydroweb:101872,Pibor km 4625,Pibor km 4625,downstream,high,150.9,2026-10-18,405.72,Below 2-yr level,4.5455,0.0074
 Kapoeta North,Eastern Equatoria,hydroweb:101872,Pibor km 4625,Pibor km 4625,downstream,high,127.0,2026-10-18,405.72,Below 2-yr level,4.5455,0.0074
 Kapoeta South,Eastern Equatoria,hydroweb:106718,Pager km 5355,Pager km 5355,nearest,indicative,133.7,2026-09-29,964.9,Below 2-yr level,0.0,0.0007
-Koch,Unity,hydroweb:111298,Bhr Lgzl Trib 03 km 4333,Bhr Lgzl Trib 03 km 4333,upstream,high,0.5,2026-10-31,392.97,Below 2-yr level,0.0,0.004
-Lafon,Eastern Equatoria,hydroweb:201328,Nile km 4826,Nile km 4826,audit-override,medium,32.9,2026-10-20,434.92,Below 2-yr level,57.1429,0.0262
+Koch,Unity,hydroweb:111298,Bhr Lgzl Trib 03 km 4333,Bhr Lgzl Trib 03 km 4333,upstream,high,0.5,2026-11-10,392.91,Below 2-yr level,0.0,-0.006
+Lafon,Eastern Equatoria,hydroweb:201328,Nile km 4826,Nile km 4826,audit-override,medium,32.9,2026-11-10,434.83,Below 2-yr level,42.8571,-0.0043
 Lainya,Central Equatoria,hydroweb:203361,Yei km 4848,Yei km 4848,local,high,33.0,2026-10-10,628.27,Below 2-yr level,0.0,-0.0138
 Leer,Unity,hydroweb:7875,White Nile km 4371,White Nile km 4371,audit-override,medium,0.0,2026-11-02,400.63,Below 2-yr level,28.3333,-0.006
 Longochuk,Upper Nile,hydroweb:203704,Baro km 4388,Baro km 4388,audit-override,medium,43.9,2026-10-30,404.5,Below 2-yr level,0.0,-0.029
@@ -49,17 +49,17 @@ Mundri East,Western Equatoria,hydroweb:203361,Yei km 4848,Yei km 4848,audit-over
 Mundri West,Western Equatoria,hydroweb:105342,Yei km 4779,Yei km 4779,local,high,0.0,2026-10-20,544.2,Below 2-yr level,0.0,0.033
 Mvolo,Western Equatoria,hydroweb:104259,Gulnam km 4669,Gulnam km 4669,local,high,52.8,2026-10-31,423.74,Below 2-yr level,0.0,-0.0126
 Nagero,Western Equatoria,hydroweb:108192,Jur km 4964,Jur km 4964,audit-override,medium,7.5,2026-11-02,483.69,Below 2-yr level,15.3846,0.0081
-Nyirol,Jonglei,hydroweb:106193,Fulus km 4165,Fulus km 4165,local,high,0.0,2026-08-04,392.98,Stale (last pass 100 d ago),0.0,0.0
+Nyirol,Jonglei,hydroweb:106193,Fulus km 4165,Fulus km 4165,local,high,0.0,2026-08-04,392.98,Stale (last pass 101 d ago),0.0,0.0
 Nzara,Western Equatoria,hydroweb:108191,Jur km 4973,Jur km 4973,downstream,high,23.4,2026-11-02,484.91,Below 2-yr level,15.3846,0.0115
 Panyijiar,Unity,hydroweb:104260,Gulnam km 4574,Gulnam km 4574,local,high,22.2,2026-10-31,397.07,Below 2-yr level,0.0,-0.0144
 Panyikang,Upper Nile,dahiti:15557,"White Nile, River","White Nile, River",audit-override,medium,0.0,2026-09-25,391.411,Above 5-yr level,92.8571,0.0044
-Pariang,Unity,hydroweb:111300,Bahr Al Arab km 4263,Bahr Al Arab km 4263,upstream,high,17.2,2026-10-31,391.45,Below 2-yr level,34.4828,-0.003
+Pariang,Unity,hydroweb:111300,Bahr Al Arab km 4263,Bahr Al Arab km 4263,upstream,high,17.2,2026-11-10,391.37,Below 2-yr level,18.9655,-0.008
 Pibor,Jonglei,hydroweb:7909,Lotilla km 4712,Lotilla km 4712,upstream,high,0.0,2026-10-18,410.86,Below 2-yr level,9.0909,0.0041
 Pochalla,Jonglei,hydroweb:102319,Baro Trib 01 km 4483,Baro Trib 01 km 4483,audit-override,medium,14.8,2026-10-20,409.7,Below 2-yr level,21.4286,0.0
 Raja,Western Bahr el Ghazal,dahiti:23344,"Wadi Boro, River","Wadi Boro, River",downstream,high,6.9,2026-10-02,466.165,Below 2-yr level,0.0,0.0033
 Renk,Upper Nile,hydroweb:201707,White Nile km 3750,White Nile km 3750,upstream,high,0.0,2026-11-03,386.12,Below 2-yr level,12.5,-0.0076
 Rubkona,Unity,hydroweb:104262,Bahr Al Arab km 4333,Bahr Al Arab km 4333,upstream,high,14.1,2026-10-31,391.03,Below 2-yr level,5.0,-0.0019
-Rumbek Centre,Lakes,hydroweb:110221,Gulnam km 4631,Gulnam km 4631,local,high,0.0,2026-01-19,412.23,Stale (last pass 297 d ago),71.4286,-0.0004
+Rumbek Centre,Lakes,hydroweb:110221,Gulnam km 4631,Gulnam km 4631,local,high,0.0,2026-01-19,412.23,Stale (last pass 298 d ago),71.4286,-0.0004
 Rumbek East,Lakes,hydroweb:104259,Gulnam km 4669,Gulnam km 4669,local,high,0.0,2026-10-31,423.74,Below 2-yr level,0.0,-0.0126
 Rumbek North,Lakes,hydroweb:104260,Gulnam km 4574,Gulnam km 4574,local,high,0.0,2026-10-31,397.07,Below 2-yr level,0.0,-0.0144
 Tambura,Western Equatoria,hydroweb:108191,Jur km 4973,Jur km 4973,downstream,high,0.0,2026-11-02,484.91,Below 2-yr level,15.3846,0.0115
@@ -72,9 +72,9 @@ Twic,Warrap,hydroweb:103547,Lol Trib01 km 4417,Lol Trib01 km 4417,local,high,0.0
 Twic East,Jonglei,dahiti:17749,"White Nile, River","White Nile, River",audit-override,medium,0.0,2026-09-23,410.105,Above 2-yr level,93.75,-0.0028
 Ulang,Upper Nile,hydroweb:113241,Sobat Trib 01 km 4390,Sobat Trib 01 km 4390,upstream,high,0.1,2026-11-05,402.2,Below 2-yr level,0.0,-0.014
 Uror,Jonglei,hydroweb:106719,Fulus km 4188,Fulus km 4188,local,high,25.3,2026-10-26,395.17,Below 2-yr level,0.0,-0.0019
-Wau,Western Bahr el Ghazal,hydroweb:111154,Jur km 4808,Jur km 4808,upstream,high,0.0,2026-10-30,446.64,Below 2-yr level,3.4483,-0.015
+Wau,Western Bahr el Ghazal,hydroweb:111154,Jur km 4808,Jur km 4808,upstream,high,0.0,2026-11-09,446.73,Below 2-yr level,6.8966,0.009
 Wulu,Lakes,dahiti:2686,"Unknown, River","Unknown, River",local,high,7.0,2026-10-01,474.986,Below 2-yr level,0.0,-0.0249
-Yambio,Western Equatoria,hydroweb:111296,Ibba km 4410,Ibba km 4410,audit-override,medium,21.3,2026-10-31,475.18,Below 2-yr level,0.0,0.009
+Yambio,Western Equatoria,hydroweb:111296,Ibba km 4410,Ibba km 4410,audit-override,medium,21.3,2026-11-10,475.21,Below 2-yr level,4.0,0.003
 Yei,Central Equatoria,hydroweb:203361,Yei km 4848,Yei km 4848,local,high,35.3,2026-10-10,628.27,Below 2-yr level,0.0,-0.0138
 Yirol East,Lakes,hydroweb:7890,White Nile km 4716,White Nile km 4716,upstream,high,21.3,2026-10-22,422.2,Below 2-yr level,23.3333,0.0041
 Yirol West,Lakes,hydroweb:104992,Yei km 4546,Yei km 4546,local,high,43.7,2026-10-18,412.42,Below 2-yr level,0.0,-0.0152
