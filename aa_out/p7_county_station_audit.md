@@ -18,7 +18,7 @@
 | Kapoeta North | Pibor km 4625 | 127.0 | 27.0 | Lotilla km 4712 | 99.8 | linked gauge 127 km from the county; closer fresh gauge Lotilla km 4712 (100 km) |
 | Maridi | Yei km 4848 | 40.5 | 35.0 | Yei km 4779 | 41.3 | linked reading 35 days old |
 | Yei | Yei km 4848 | 35.3 | 35.0 | Dungu km 3554 | 58.2 | linked reading 35 days old |
-| Lainya | Yei km 4848 | 33.0 | 35.0 | Nile km 5018 | 43.4 | linked reading 35 days old |
+| Lainya | Yei km 4848 | 33.0 | 35.0 | White Nile km 4994 | 37.0 | linked reading 35 days old |
 | Tonj South | Unknown, River | 30.2 | 44.0 | Ibba km 4410 | 30.2 | linked reading 44 days old |
 | Cueibet | Gulnam km 4631 | 25.6 | 299.0 | Gulnam km 4574 | 41.2 | linked reading 299 days old |
 | Wulu | Unknown, River | 7.0 | 44.0 | Ibba km 4410 | 7.0 | linked reading 44 days old |
@@ -30,7 +30,7 @@
 | Mundri East | Yei km 4848 | 0.0 | 35.0 | Yei km 4779 | 8.1 | linked reading 35 days old |
 | Manyo | White Nile, River | 0.0 | 42.0 | White Nile km 3739 | 0.0 | linked reading 42 days old |
 | Tonj North | Unknown, River | 0.0 | 44.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 44 days old |
-| Terekeka | White Nile, River | 0.0 | 50.0 | Nile km 4834 | 0.0 | linked reading 50 days old |
+| Terekeka | White Nile, River | 0.0 | 50.0 | White Nile km 4853 | 0.0 | linked reading 50 days old |
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 299.0 | Gulnam km 4669 | 2.9 | linked reading 299 days old |
 | Twic East | White Nile, River | 0.0 | 52.0 | White Nile km 4536 | 0.0 | linked reading 52 days old |
 
