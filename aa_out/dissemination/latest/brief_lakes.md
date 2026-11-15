@@ -1,6 +1,6 @@
 # Lakes - anticipatory action situation brief
 
-Prepared 2026-11-15 01:21 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-11-10; ECMWF run 2026-11-14 12 UTC.
+Prepared 2026-11-15 16:42 UTC for the Lakes state TWG-AA. Rain and soil data to 2026-11-12; ECMWF run 2026-11-15 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -12,14 +12,14 @@ Prepared 2026-11-15 01:21 UTC for the Lakes state TWG-AA. Rain and soil data to 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
-| Awerial | Lakes | **ORANGE** | drought / dry spell | 5 | 0% | 5,340 |
-| Cueibet | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 531 |
-| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 1,661 |
-| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 3,596 |
-| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 6 |
-| Wulu | Lakes | **ORANGE** | drought / dry spell | 6 | 0% | 108 |
-| Yirol East | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 3,725 |
-| Yirol West | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 2,910 |
+| Awerial | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 5,340 |
+| Cueibet | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 531 |
+| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 1,661 |
+| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 3,596 |
+| Rumbek North | Lakes | **ORANGE** | drought / dry spell | 2 | 0% | 6 |
+| Wulu | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 108 |
+| Yirol East | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 3,725 |
+| Yirol West | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 2,910 |
 
 ## Decisions for the group
 - Agree the warning for the 8 counties with an alert and the channels (radio hubs, chiefs, SMS).
