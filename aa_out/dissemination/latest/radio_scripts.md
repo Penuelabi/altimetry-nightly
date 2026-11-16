@@ -1,18 +1,18 @@
-# Radio scripts - 2026-11-15 16:42 UTC
+# Radio scripts - 2026-11-16 01:31 UTC
 
 > Drafts for SSMS / MHADM validation before broadcast. Read slowly; repeat the key action twice.
 
 ## Kapoeta South (Eastern Equatoria) - English
 
-Good day, listeners in Kapoeta South. This is a red dry-spell message for Kapoeta South, Eastern Equatoria. About 1 millimetres of rain are expected this week and there is a 78% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Kapoeta South. This is a red dry-spell message for Kapoeta South, Eastern Equatoria. About 1 millimetres of rain are expected this week and there is a 86% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Lafon (Eastern Equatoria) - English
 
-Good day, listeners in Lafon. This is a red dry-spell message for Lafon, Eastern Equatoria. About 3 millimetres of rain are expected this week and there is a 84% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Lafon. This is a red dry-spell message for Lafon, Eastern Equatoria. About 4 millimetres of rain are expected this week and there is a 70% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Magwi (Eastern Equatoria) - English
 
-Good day, listeners in Magwi. This is a red dry-spell message for Magwi, Eastern Equatoria. About 4 millimetres of rain are expected this week and there is a 66% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Magwi. This is a red dry-spell message for Magwi, Eastern Equatoria. About 4 millimetres of rain are expected this week and there is a 70% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Abyei Region (Abyei Region) - English
 
@@ -20,51 +20,51 @@ Good day, listeners in Abyei Region. This is a orange dry-spell message for Abye
 
 ## Juba (Central Equatoria) - English
 
-Good day, listeners in Juba. This is a orange dry-spell message for Juba, Central Equatoria. About 3 millimetres of rain are expected this week and there is a 82% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Juba. This is a orange dry-spell message for Juba, Central Equatoria. About 3 millimetres of rain are expected this week and there is a 76% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Kajo-keji (Central Equatoria) - English
 
-Good day, listeners in Kajo-keji. This is a orange dry-spell message for Kajo-keji, Central Equatoria. About 3 millimetres of rain are expected this week and there is a 66% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Kajo-keji. This is a orange dry-spell message for Kajo-keji, Central Equatoria. About 4 millimetres of rain are expected this week and there is a 66% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Lainya (Central Equatoria) - English
 
-Good day, listeners in Lainya. This is a orange dry-spell message for Lainya, Central Equatoria. About 3 millimetres of rain are expected this week and there is a 54% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Lainya. This is a orange dry-spell message for Lainya, Central Equatoria. About 4 millimetres of rain are expected this week and there is a 66% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Morobo (Central Equatoria) - English
 
-Good day, listeners in Morobo. This is a orange dry-spell message for Morobo, Central Equatoria. About 2 millimetres of rain are expected this week and there is a 58% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Morobo. This is a orange dry-spell message for Morobo, Central Equatoria. About 3 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Terekeka (Central Equatoria) - English
 
-Good day, listeners in Terekeka. This is a orange dry-spell message for Terekeka, Central Equatoria. About 4 millimetres of rain are expected this week and there is a 58% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Terekeka. This is a orange dry-spell message for Terekeka, Central Equatoria. About 4 millimetres of rain are expected this week and there is a 66% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Yei (Central Equatoria) - English
 
-Good day, listeners in Yei. This is a orange dry-spell message for Yei, Central Equatoria. About 4 millimetres of rain are expected this week and there is a 52% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Yei. This is a orange dry-spell message for Yei, Central Equatoria. About 4 millimetres of rain are expected this week and there is a 50% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Budi (Eastern Equatoria) - English
 
-Good day, listeners in Budi. This is a orange dry-spell message for Budi, Eastern Equatoria. About 3 millimetres of rain are expected this week and there is a 80% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Budi. This is a orange dry-spell message for Budi, Eastern Equatoria. About 4 millimetres of rain are expected this week and there is a 82% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Ikotos (Eastern Equatoria) - English
 
-Good day, listeners in Ikotos. This is a orange dry-spell message for Ikotos, Eastern Equatoria. About 4 millimetres of rain are expected this week and there is a 68% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Ikotos. This is a orange dry-spell message for Ikotos, Eastern Equatoria. About 5 millimetres of rain are expected this week and there is a 66% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Kapoeta East (Eastern Equatoria) - English
 
-Good day, listeners in Kapoeta East. This is a orange dry-spell message for Kapoeta East, Eastern Equatoria. About 2 millimetres of rain are expected this week and there is a 98% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Kapoeta East. This is a orange dry-spell message for Kapoeta East, Eastern Equatoria. About 2 millimetres of rain are expected this week and there is a 92% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Kapoeta North (Eastern Equatoria) - English
 
-Good day, listeners in Kapoeta North. This is a orange dry-spell message for Kapoeta North, Eastern Equatoria. About 2 millimetres of rain are expected this week and there is a 88% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Kapoeta North. This is a orange dry-spell message for Kapoeta North, Eastern Equatoria. About 2 millimetres of rain are expected this week and there is a 82% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Akobo (Jonglei) - English
 
-Good day, listeners in Akobo. This is a orange dry-spell message for Akobo, Jonglei. About 3 millimetres of rain are expected this week and there is a 80% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Akobo. This is a orange dry-spell message for Akobo, Jonglei. About 3 millimetres of rain are expected this week and there is a 78% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Bor South (Jonglei) - English
 
-Good day, listeners in Bor South. This is a orange dry-spell message for Bor South, Jonglei. About 4 millimetres of rain are expected this week and there is a 60% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Bor South. This is a orange dry-spell message for Bor South, Jonglei. About 5 millimetres of rain are expected this week and there is a 76% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Canal/Pigi (Jonglei) - English
 
@@ -76,39 +76,39 @@ Good day, listeners in Duk. This is a orange dry-spell message for Duk, Jonglei.
 
 ## Nyirol (Jonglei) - English
 
-Good day, listeners in Nyirol. This is a orange dry-spell message for Nyirol, Jonglei. About 1 millimetres of rain are expected this week and there is a 92% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Nyirol. This is a orange dry-spell message for Nyirol, Jonglei. About 1 millimetres of rain are expected this week and there is a 96% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Pibor (Jonglei) - English
 
-Good day, listeners in Pibor. This is a orange dry-spell message for Pibor, Jonglei. About 6 millimetres of rain are expected this week and there is a 52% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Pibor. This is a orange dry-spell message for Pibor, Jonglei. About 7 millimetres of rain are expected this week and there is a 62% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Pochalla (Jonglei) - English
 
-Good day, listeners in Pochalla. This is a orange dry-spell message for Pochalla, Jonglei. About 6 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Pochalla. This is a orange dry-spell message for Pochalla, Jonglei. About 7 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Twic East (Jonglei) - English
 
-Good day, listeners in Twic East. This is a orange dry-spell message for Twic East, Jonglei. About 3 millimetres of rain are expected this week and there is a 72% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Twic East. This is a orange dry-spell message for Twic East, Jonglei. About 4 millimetres of rain are expected this week and there is a 70% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Uror (Jonglei) - English
 
-Good day, listeners in Uror. This is a orange dry-spell message for Uror, Jonglei. About 3 millimetres of rain are expected this week and there is a 76% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Uror. This is a orange dry-spell message for Uror, Jonglei. About 4 millimetres of rain are expected this week and there is a 80% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Awerial (Lakes) - English
 
-Good day, listeners in Awerial. This is a orange dry-spell message for Awerial, Lakes. About 3 millimetres of rain are expected this week and there is a 52% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Awerial. This is a orange dry-spell message for Awerial, Lakes. About 4 millimetres of rain are expected this week and there is a 54% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Cueibet (Lakes) - English
 
-Good day, listeners in Cueibet. This is a orange dry-spell message for Cueibet, Lakes. About 3 millimetres of rain are expected this week and there is a 76% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Cueibet. This is a orange dry-spell message for Cueibet, Lakes. About 3 millimetres of rain are expected this week and there is a 74% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Rumbek Centre (Lakes) - English
 
-Good day, listeners in Rumbek Centre. This is a orange dry-spell message for Rumbek Centre, Lakes. About 3 millimetres of rain are expected this week and there is a 72% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Rumbek Centre. This is a orange dry-spell message for Rumbek Centre, Lakes. About 3 millimetres of rain are expected this week and there is a 68% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Rumbek East (Lakes) - English
 
-Good day, listeners in Rumbek East. This is a orange dry-spell message for Rumbek East, Lakes. About 3 millimetres of rain are expected this week and there is a 66% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Rumbek East. This is a orange dry-spell message for Rumbek East, Lakes. About 4 millimetres of rain are expected this week and there is a 50% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Rumbek North (Lakes) - English
 
@@ -116,15 +116,15 @@ Good day, listeners in Rumbek North. This is a orange dry-spell message for Rumb
 
 ## Wulu (Lakes) - English
 
-Good day, listeners in Wulu. This is a orange dry-spell message for Wulu, Lakes. About 4 millimetres of rain are expected this week and there is a 52% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Wulu. This is a orange dry-spell message for Wulu, Lakes. About 5 millimetres of rain are expected this week and there is a 58% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Yirol East (Lakes) - English
 
-Good day, listeners in Yirol East. This is a orange dry-spell message for Yirol East, Lakes. About 3 millimetres of rain are expected this week and there is a 74% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Yirol East. This is a orange dry-spell message for Yirol East, Lakes. About 4 millimetres of rain are expected this week and there is a 68% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Yirol West (Lakes) - English
 
-Good day, listeners in Yirol West. This is a orange dry-spell message for Yirol West, Lakes. About 3 millimetres of rain are expected this week and there is a 54% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Yirol West. This is a orange dry-spell message for Yirol West, Lakes. About 4 millimetres of rain are expected this week and there is a 56% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Aweil Centre (Northern Bahr el Ghazal) - English
 
@@ -140,7 +140,7 @@ Good day, listeners in Aweil North. This is a orange dry-spell message for Aweil
 
 ## Aweil South (Northern Bahr el Ghazal) - English
 
-Good day, listeners in Aweil South. This is a orange dry-spell message for Aweil South, Northern Bahr el Ghazal. About 0 millimetres of rain are expected this week and there is a 98% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Aweil South. This is a orange dry-spell message for Aweil South, Northern Bahr el Ghazal. About 0 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Aweil West (Northern Bahr el Ghazal) - English
 
@@ -152,7 +152,7 @@ Good day, listeners in Mayom. This is a orange dry-spell message for Mayom, Unit
 
 ## Panyijiar (Unity) - English
 
-Good day, listeners in Panyijiar. This is a orange dry-spell message for Panyijiar, Unity. About 3 millimetres of rain are expected this week and there is a 82% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Panyijiar. This is a orange dry-spell message for Panyijiar, Unity. About 3 millimetres of rain are expected this week and there is a 90% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Pariang (Unity) - English
 
@@ -168,11 +168,11 @@ Good day, listeners in Fashoda. This is a orange dry-spell message for Fashoda, 
 
 ## Longochuk (Upper Nile) - English
 
-Good day, listeners in Longochuk. This is a orange dry-spell message for Longochuk, Upper Nile. About 1 millimetres of rain are expected this week and there is a 98% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Longochuk. This is a orange dry-spell message for Longochuk, Upper Nile. About 2 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Luakpiny/Nasir (Upper Nile) - English
 
-Good day, listeners in Luakpiny/Nasir. This is a orange dry-spell message for Luakpiny/Nasir, Upper Nile. About 1 millimetres of rain are expected this week and there is a 90% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Luakpiny/Nasir. This is a orange dry-spell message for Luakpiny/Nasir, Upper Nile. About 2 millimetres of rain are expected this week and there is a 96% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Maban (Upper Nile) - English
 
@@ -180,7 +180,7 @@ Good day, listeners in Maban. This is a orange dry-spell message for Maban, Uppe
 
 ## Maiwut (Upper Nile) - English
 
-Good day, listeners in Maiwut. This is a orange dry-spell message for Maiwut, Upper Nile. About 2 millimetres of rain are expected this week and there is a 82% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Maiwut. This is a orange dry-spell message for Maiwut, Upper Nile. About 3 millimetres of rain are expected this week and there is a 88% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Malakal (Upper Nile) - English
 
@@ -200,23 +200,23 @@ Good day, listeners in Renk. This is a orange dry-spell message for Renk, Upper 
 
 ## Ulang (Upper Nile) - English
 
-Good day, listeners in Ulang. This is a orange dry-spell message for Ulang, Upper Nile. About 1 millimetres of rain are expected this week and there is a 94% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Ulang. This is a orange dry-spell message for Ulang, Upper Nile. About 2 millimetres of rain are expected this week and there is a 98% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Gogrial East (Warrap) - English
 
-Good day, listeners in Gogrial East. This is a orange dry-spell message for Gogrial East, Warrap. About 0 millimetres of rain are expected this week and there is a 98% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Gogrial East. This is a orange dry-spell message for Gogrial East, Warrap. About 0 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Gogrial West (Warrap) - English
 
-Good day, listeners in Gogrial West. This is a orange dry-spell message for Gogrial West, Warrap. About 0 millimetres of rain are expected this week and there is a 98% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Gogrial West. This is a orange dry-spell message for Gogrial West, Warrap. About 0 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Tonj East (Warrap) - English
 
-Good day, listeners in Tonj East. This is a orange dry-spell message for Tonj East, Warrap. About 1 millimetres of rain are expected this week and there is a 90% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Tonj East. This is a orange dry-spell message for Tonj East, Warrap. About 2 millimetres of rain are expected this week and there is a 88% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Tonj North (Warrap) - English
 
-Good day, listeners in Tonj North. This is a orange dry-spell message for Tonj North, Warrap. About 1 millimetres of rain are expected this week and there is a 96% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Tonj North. This is a orange dry-spell message for Tonj North, Warrap. About 1 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Tonj South (Warrap) - English
 
@@ -228,7 +228,7 @@ Good day, listeners in Twic. This is a orange dry-spell message for Twic, Warrap
 
 ## Jur River (Western Bahr el Ghazal) - English
 
-Good day, listeners in Jur River. This is a orange dry-spell message for Jur River, Western Bahr el Ghazal. About 2 millimetres of rain are expected this week and there is a 94% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Jur River. This is a orange dry-spell message for Jur River, Western Bahr el Ghazal. About 2 millimetres of rain are expected this week and there is a 96% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Raja (Western Bahr el Ghazal) - English
 
@@ -236,7 +236,11 @@ Good day, listeners in Raja. This is a orange dry-spell message for Raja, Wester
 
 ## Wau (Western Bahr el Ghazal) - English
 
-Good day, listeners in Wau. This is a orange dry-spell message for Wau, Western Bahr el Ghazal. About 1 millimetres of rain are expected this week and there is a 90% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Wau. This is a orange dry-spell message for Wau, Western Bahr el Ghazal. About 1 millimetres of rain are expected this week and there is a 92% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+
+## Ezo (Western Equatoria) - English
+
+Good day, listeners in Ezo. This is a orange dry-spell message for Ezo, Western Equatoria. About 8 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Maridi (Western Equatoria) - English
 
@@ -244,19 +248,27 @@ Good day, listeners in Maridi. This is a orange dry-spell message for Maridi, We
 
 ## Mundri East (Western Equatoria) - English
 
-Good day, listeners in Mundri East. This is a orange dry-spell message for Mundri East, Western Equatoria. About 4 millimetres of rain are expected this week and there is a 58% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Mundri East. This is a orange dry-spell message for Mundri East, Western Equatoria. About 4 millimetres of rain are expected this week and there is a 70% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Mvolo (Western Equatoria) - English
 
-Good day, listeners in Mvolo. This is a orange dry-spell message for Mvolo, Western Equatoria. About 5 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Mvolo. This is a orange dry-spell message for Mvolo, Western Equatoria. About 4 millimetres of rain are expected this week and there is a 56% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+
+## Nzara (Western Equatoria) - English
+
+Good day, listeners in Nzara. This is a orange dry-spell message for Nzara, Western Equatoria. About 8 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+
+## Yambio (Western Equatoria) - English
+
+Good day, listeners in Yambio. This is a orange dry-spell message for Yambio, Western Equatoria. About 7 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Torit (Eastern Equatoria) - English
 
-Good day, listeners in Torit. This is a yellow dry-spell message for Torit, Eastern Equatoria. About 4 millimetres of rain are expected this week and there is a 80% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Torit. This is a yellow dry-spell message for Torit, Eastern Equatoria. About 4 millimetres of rain are expected this week and there is a 74% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Ayod (Jonglei) - English
 
-Good day, listeners in Ayod. This is a yellow flood message for Ayod, Jonglei. About 1 millimetres of rain are expected this week and there is a 96% chance of a week without rain. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Ayod. This is a yellow flood message for Ayod, Jonglei. About 2 millimetres of rain are expected this week and there is a 98% chance of a week without rain. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
 
 ## Fangak (Jonglei) - English
 
@@ -272,11 +284,11 @@ Good day, listeners in Guit. This is a yellow flood message for Guit, Unity. Abo
 
 ## Koch (Unity) - English
 
-Good day, listeners in Koch. This is a yellow flood message for Koch, Unity. About 0 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Koch. This is a yellow flood message for Koch, Unity. About 1 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
 
 ## Leer (Unity) - English
 
-Good day, listeners in Leer. This is a yellow flood message for Leer, Unity. About 1 millimetres of rain are expected this week and there is a 76% chance of a week without rain. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Leer. This is a yellow flood message for Leer, Unity. About 1 millimetres of rain are expected this week and there is a 84% chance of a week without rain. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
 
 ## Mayendit (Unity) - English
 
@@ -284,20 +296,24 @@ Good day, listeners in Mayendit. This is a yellow flood message for Mayendit, Un
 
 ## Rubkona (Unity) - English
 
-Good day, listeners in Rubkona. This is a yellow flood message for Rubkona, Unity. About 0 millimetres of rain are expected this week and there is a 98% chance of a week without rain. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Rubkona. This is a yellow flood message for Rubkona, Unity. About 0 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: move children, the elderly and people with disabilities to high ground first; keep food, seed and important papers high and dry; move animals early and keep boats ready; and use safe water to avoid cholera. Listen again tomorrow at the same time and follow your chief and local authorities. Message prepared by SS Climate Monitor (advisory).
 
 ## Panyikang (Upper Nile) - English
 
 Good day, listeners in Panyikang. This is a yellow dry-spell message for Panyikang, Upper Nile. About 0 millimetres of rain are expected this week and there is a 100% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
+## Ibba (Western Equatoria) - English
+
+Good day, listeners in Ibba. This is a yellow dry-spell message for Ibba, Western Equatoria. About 6 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+
 ## Mundri West (Western Equatoria) - English
 
-Good day, listeners in Mundri West. This is a yellow dry-spell message for Mundri West, Western Equatoria. About 5 millimetres of rain are expected this week and there is a 50% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Mundri West. This is a yellow dry-spell message for Mundri West, Western Equatoria. About 4 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
 ## Nagero (Western Equatoria) - English
 
-Good day, listeners in Nagero. This is a yellow dry-spell message for Nagero, Western Equatoria. About 5 millimetres of rain are expected this week and there is a 52% chance of a week without rain. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Nagero. This is a yellow dry-spell message for Nagero, Western Equatoria. About 5 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
 
-## Nzara (Western Equatoria) - English
+## Tambura (Western Equatoria) - English
 
-Good day, listeners in Nzara. This is a yellow dry-spell message for Nzara, Western Equatoria. About 8 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).
+Good day, listeners in Tambura. This is a yellow dry-spell message for Tambura, Western Equatoria. About 8 millimetres of rain are expected this week. Over the coming days, please: save water and protect water points; plan grazing moves early and peacefully; delay new planting until rain returns; and check on the elderly and the sick in the heat. Listen again tomorrow. Message prepared by SS Climate Monitor (advisory).

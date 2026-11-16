@@ -1,6 +1,6 @@
 # Jonglei - anticipatory action situation brief
 
-Prepared 2026-11-15 16:42 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-11-12; ECMWF run 2026-11-15 00 UTC.
+Prepared 2026-11-16 01:31 UTC for the Jonglei state TWG-AA. Rain and soil data to 2026-11-13; ECMWF run 2026-11-15 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -8,21 +8,21 @@ Prepared 2026-11-15 16:42 UTC for the Jonglei state TWG-AA. Rain and soil data t
 - Counties by alert level: red 0, orange 9, yellow 2, green 0.
 - Validated plans in readiness: 0; activated: 0.
 - Draft plans whose rules are met: 3 (for review, not activations).
-- River gauges at a proposed trigger level: 6 counties (1 at activation level).
+- River gauges at a proposed trigger level: 5 counties (5 at activation level).
 
 ## Counties with an alert
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
 | Akobo | Jonglei | **ORANGE** | drought / dry spell | 3 | 0% | 1,673 |
-| Bor South | Jonglei | **ORANGE** | drought / dry spell | 4 | 0% | 7,498 |
+| Bor South | Jonglei | **ORANGE** | drought / dry spell | 5 | 0% | 7,498 |
 | Canal/Pigi | Jonglei | **ORANGE** | drought / dry spell | 0 | 0% | 2,399 |
 | Duk | Jonglei | **ORANGE** | drought / dry spell | 3 | 0% | 5,015 |
 | Nyirol | Jonglei | **ORANGE** | drought / dry spell | 1 | 0% | 814 |
-| Pibor | Jonglei | **ORANGE** | drought / dry spell | 6 | 0% | 1,354 |
-| Pochalla | Jonglei | **ORANGE** | drought / dry spell | 6 | 0% | 498 |
-| Twic East | Jonglei | **ORANGE** | drought / dry spell | 3 | 0% | 6,132 |
-| Uror | Jonglei | **ORANGE** | drought / dry spell | 3 | 0% | 1,768 |
-| Ayod | Jonglei | **YELLOW** | flood / waterlogging | 1 | 0% | 7,356 |
+| Pibor | Jonglei | **ORANGE** | drought / dry spell | 7 | 0% | 1,354 |
+| Pochalla | Jonglei | **ORANGE** | drought / dry spell | 7 | 0% | 498 |
+| Twic East | Jonglei | **ORANGE** | drought / dry spell | 4 | 0% | 6,132 |
+| Uror | Jonglei | **ORANGE** | drought / dry spell | 4 | 0% | 1,768 |
+| Ayod | Jonglei | **YELLOW** | flood / waterlogging | 2 | 0% | 7,356 |
 | Fangak | Jonglei | **YELLOW** | flood / waterlogging | 0 | 0% | 4,546 |
 
 ## Anticipatory action plans
@@ -71,3 +71,4 @@ Prepared 2026-11-15 16:42 UTC for the Jonglei state TWG-AA. Rain and soil data t
 - AAP-FL-TWICEAST activated (draft plan: no community message)
 - AAP-FL-AYOD activated (draft plan: no community message)
 - AAP-FL-FANGAK activated (draft plan: no community message)
+- 1 county gauges have no satellite pass in the last weeks: Nyirol
