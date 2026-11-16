@@ -4,9 +4,9 @@
 
 | Verdict | Counties |
 | --- | --- |
-| OK (gauge on the county) | 37 |
+| OK (gauge on the county) | 38 |
 | OK | 21 |
-| REVIEW DATA AGE | 18 |
+| REVIEW DATA AGE | 17 |
 | REVIEW LINK | 3 |
 
 ## Counties to review
@@ -19,18 +19,17 @@
 | Maridi | Yei km 4848 | 40.5 | 37.0 | Yei km 4779 | 41.3 | linked reading 37 days old |
 | Yei | Yei km 4848 | 35.3 | 37.0 | Dungu km 3554 | 58.2 | linked reading 37 days old |
 | Lainya | Yei km 4848 | 33.0 | 37.0 | White Nile km 4994 | 37.0 | linked reading 37 days old |
-| Tonj South | Unknown, River | 30.2 | 46.0 | Ibba km 4410 | 30.2 | linked reading 46 days old |
+| Tonj South | Unknown, River | 30.2 | 36.0 | Ibba km 4410 | 30.2 | linked reading 36 days old |
 | Cueibet | Gulnam km 4631 | 25.6 | 301.0 | Gulnam km 4574 | 41.2 | linked reading 301 days old |
-| Wulu | Unknown, River | 7.0 | 46.0 | Ibba km 4410 | 7.0 | linked reading 46 days old |
+| Wulu | Unknown, River | 7.0 | 36.0 | Ibba km 4410 | 7.0 | linked reading 36 days old |
 | Raja | Wadi Boro, River | 6.9 | 45.0 | Chel km 5095 | 0.0 | linked reading 45 days old |
-| Fashoda | White Nile km 3905 | 0.0 | 31.0 | White Nile, River | 1.8 | linked reading 31 days old |
 | Abiemnhom | Bhar-al-arab, River | 0.0 | 49.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 49 days old |
 | Aweil West | Wadi Boro, River | 0.0 | 47.0 | Lol km 4833 | 0.0 | linked reading 47 days old |
 | Panyikang | White Nile, River | 0.0 | 52.0 | Sobat km 4023 | 0.0 | linked reading 52 days old |
 | Nyirol | Fulus km 4165 | 0.0 | 104.0 | Fulus km 4114 | 0.0 | linked reading 104 days old |
 | Mundri East | Yei km 4848 | 0.0 | 37.0 | Yei km 4779 | 8.1 | linked reading 37 days old |
 | Manyo | White Nile, River | 0.0 | 44.0 | White Nile km 3739 | 0.0 | linked reading 44 days old |
-| Tonj North | Unknown, River | 0.0 | 46.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 46 days old |
+| Tonj North | Unknown, River | 0.0 | 36.0 | Bahr Al Arab Trib 02 km 4435 | 0.0 | linked reading 36 days old |
 | Terekeka | White Nile, River | 0.0 | 52.0 | White Nile km 4853 | 0.0 | linked reading 52 days old |
 | Rumbek Centre | Gulnam km 4631 | 0.0 | 301.0 | Gulnam km 4669 | 2.9 | linked reading 301 days old |
 | Twic East | White Nile, River | 0.0 | 54.0 | White Nile km 4536 | 0.0 | linked reading 54 days old |
