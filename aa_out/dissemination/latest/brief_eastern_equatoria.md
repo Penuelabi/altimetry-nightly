@@ -1,6 +1,6 @@
 # Eastern Equatoria - anticipatory action situation brief
 
-Prepared 2026-11-17 04:16 UTC for the Eastern Equatoria state TWG-AA. Rain and soil data to 2026-11-14; ECMWF run 2026-11-16 12 UTC.
+Prepared 2026-11-17 19:16 UTC for the Eastern Equatoria state TWG-AA. Rain and soil data to 2026-11-14; ECMWF run 2026-11-17 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -17,7 +17,7 @@ Prepared 2026-11-17 04:16 UTC for the Eastern Equatoria state TWG-AA. Rain and s
 | Magwi | Eastern Equatoria | **RED** | drought / dry spell | 3 | 0% | 843 |
 | Budi | Eastern Equatoria | **ORANGE** | drought / dry spell | 2 | 0% | 4 |
 | Ikotos | Eastern Equatoria | **ORANGE** | drought / dry spell | 3 | 0% | 42 |
-| Kapoeta North | Eastern Equatoria | **ORANGE** | drought / dry spell | 1 | 0% | 403 |
+| Kapoeta North | Eastern Equatoria | **ORANGE** | drought / dry spell | 2 | 0% | 403 |
 | Torit | Eastern Equatoria | **YELLOW** | drought / dry spell | 3 | 0% | 14 |
 
 ## Decisions for the group

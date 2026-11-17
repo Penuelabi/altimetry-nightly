@@ -1,11 +1,11 @@
 # South Sudan - anticipatory action situation brief
 
-Prepared 2026-11-17 04:16 UTC for the national TWG-AA. Rain and soil data to 2026-11-14; ECMWF run 2026-11-16 12 UTC.
+Prepared 2026-11-17 19:16 UTC for the national TWG-AA. Rain and soil data to 2026-11-14; ECMWF run 2026-11-17 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
 ## Summary
-- Counties by alert level: red 3, orange 62, yellow 13, green 1.
+- Counties by alert level: red 3, orange 60, yellow 12, green 4.
 - Validated plans in readiness: 0; activated: 0.
 - Draft plans whose rules are met: 6 (for review, not activations).
 - River gauges at a proposed trigger level: 15 counties (15 at activation level).
@@ -25,24 +25,24 @@ Prepared 2026-11-17 04:16 UTC for the national TWG-AA. Rain and soil data to 202
 | Yei | Central Equatoria | **ORANGE** | drought / dry spell | 4 | 0% | 154 |
 | Budi | Eastern Equatoria | **ORANGE** | drought / dry spell | 2 | 0% | 4 |
 | Ikotos | Eastern Equatoria | **ORANGE** | drought / dry spell | 3 | 0% | 42 |
-| Kapoeta North | Eastern Equatoria | **ORANGE** | drought / dry spell | 1 | 0% | 403 |
+| Kapoeta North | Eastern Equatoria | **ORANGE** | drought / dry spell | 2 | 0% | 403 |
 | Akobo | Jonglei | **ORANGE** | drought / dry spell | 4 | 0% | 1,673 |
-| Bor South | Jonglei | **ORANGE** | drought / dry spell | 4 | 0% | 7,498 |
+| Bor South | Jonglei | **ORANGE** | drought / dry spell | 5 | 0% | 7,498 |
 | Canal/Pigi | Jonglei | **ORANGE** | drought / dry spell | 0 | 0% | 2,399 |
-| Duk | Jonglei | **ORANGE** | drought / dry spell | 3 | 0% | 5,015 |
+| Duk | Jonglei | **ORANGE** | drought / dry spell | 4 | 0% | 5,015 |
 | Nyirol | Jonglei | **ORANGE** | drought / dry spell | 1 | 0% | 814 |
-| Pibor | Jonglei | **ORANGE** | drought / dry spell | 6 | 0% | 1,354 |
-| Pochalla | Jonglei | **ORANGE** | drought / dry spell | 7 | 0% | 498 |
+| Pibor | Jonglei | **ORANGE** | drought / dry spell | 10 | 0% | 1,354 |
+| Pochalla | Jonglei | **ORANGE** | drought / dry spell | 12 | 0% | 498 |
 | Twic East | Jonglei | **ORANGE** | drought / dry spell | 4 | 0% | 6,132 |
 | Uror | Jonglei | **ORANGE** | drought / dry spell | 4 | 0% | 1,768 |
-| Awerial | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 5,340 |
-| Cueibet | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 531 |
-| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 1,661 |
-| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 3,596 |
+| Awerial | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 5,340 |
+| Cueibet | Lakes | **ORANGE** | drought / dry spell | 5 | 0% | 531 |
+| Rumbek Centre | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 1,661 |
+| Rumbek East | Lakes | **ORANGE** | drought / dry spell | 5 | 0% | 3,596 |
 | Rumbek North | Lakes | **ORANGE** | drought / dry spell | 3 | 0% | 6 |
 | Wulu | Lakes | **ORANGE** | drought / dry spell | 6 | 0% | 108 |
-| Yirol East | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 3,725 |
-| Yirol West | Lakes | **ORANGE** | drought / dry spell | 4 | 0% | 2,910 |
+| Yirol East | Lakes | **ORANGE** | drought / dry spell | 5 | 0% | 3,725 |
+| Yirol West | Lakes | **ORANGE** | drought / dry spell | 5 | 0% | 2,910 |
 | Aweil Centre | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 0 | 0% | 382 |
 | Aweil East | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 0 | 0% | 15,726 |
 | Aweil North | Northern Bahr el Ghazal | **ORANGE** | drought / dry spell | 0 | 0% | 1,375 |
@@ -54,7 +54,7 @@ Prepared 2026-11-17 04:16 UTC for the national TWG-AA. Rain and soil data to 202
 | Baliet | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 1,252 |
 | Fashoda | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 1,926 |
 | Longochuk | Upper Nile | **ORANGE** | drought / dry spell | 1 | 0% | 257 |
-| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 2 | 0% | 15,180 |
+| Luakpiny/Nasir | Upper Nile | **ORANGE** | drought / dry spell | 1 | 0% | 15,180 |
 | Maban | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 25 |
 | Maiwut | Upper Nile | **ORANGE** | drought / dry spell | 3 | 0% | 331 |
 | Malakal | Upper Nile | **ORANGE** | drought / dry spell | 0 | 0% | 6,999 |
@@ -68,28 +68,25 @@ Prepared 2026-11-17 04:16 UTC for the national TWG-AA. Rain and soil data to 202
 | Tonj North | Warrap | **ORANGE** | drought / dry spell | 1 | 0% | 7,001 |
 | Tonj South | Warrap | **ORANGE** | drought / dry spell | 4 | 0% | 3,140 |
 | Twic | Warrap | **ORANGE** | drought / dry spell | 0 | 0% | 11,366 |
-| Jur River | Western Bahr el Ghazal | **ORANGE** | drought / dry spell | 1 | 0% | 5,068 |
+| Jur River | Western Bahr el Ghazal | **ORANGE** | drought / dry spell | 2 | 0% | 5,068 |
 | Raja | Western Bahr el Ghazal | **ORANGE** | drought / dry spell | 0 | 0% | 23 |
 | Wau | Western Bahr el Ghazal | **ORANGE** | drought / dry spell | 1 | 0% | 1,411 |
-| Ezo | Western Equatoria | **ORANGE** | drought / dry spell | 8 | 0% | 37 |
 | Maridi | Western Equatoria | **ORANGE** | drought / dry spell | 6 | 0% | 4 |
 | Mundri East | Western Equatoria | **ORANGE** | drought / dry spell | 3 | 0% | 59 |
-| Mvolo | Western Equatoria | **ORANGE** | drought / dry spell | 4 | 0% | 135 |
-| Nzara | Western Equatoria | **ORANGE** | drought / dry spell | 9 | 0% | 12 |
-| Tambura | Western Equatoria | **ORANGE** | drought / dry spell | 8 | 0% | 50 |
-| Yambio | Western Equatoria | **ORANGE** | drought / dry spell | 8 | 0% | 15 |
+| Mvolo | Western Equatoria | **ORANGE** | drought / dry spell | 5 | 0% | 135 |
+| Nzara | Western Equatoria | **ORANGE** | drought / dry spell | 10 | 0% | 12 |
+| Yambio | Western Equatoria | **ORANGE** | drought / dry spell | 10 | 0% | 15 |
 | Torit | Eastern Equatoria | **YELLOW** | drought / dry spell | 3 | 0% | 14 |
-| Ayod | Jonglei | **YELLOW** | flood / waterlogging | 2 | 0% | 7,356 |
+| Ayod | Jonglei | **YELLOW** | flood / waterlogging | 1 | 0% | 7,356 |
 | Fangak | Jonglei | **YELLOW** | flood / waterlogging | 0 | 0% | 4,546 |
 | Abiemnhom | Unity | **YELLOW** | drought / dry spell | 0 | 0% | 165 |
 | Guit | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 3,497 |
 | Koch | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 513 |
-| Leer | Unity | **YELLOW** | flood / waterlogging | 2 | 0% | 985 |
-| Mayendit | Unity | **YELLOW** | flood / waterlogging | 2 | 0% | 2,032 |
+| Leer | Unity | **YELLOW** | flood / waterlogging | 1 | 0% | 985 |
+| Mayendit | Unity | **YELLOW** | flood / waterlogging | 1 | 0% | 2,032 |
 | Rubkona | Unity | **YELLOW** | flood / waterlogging | 0 | 0% | 16,480 |
 | Panyikang | Upper Nile | **YELLOW** | drought / dry spell | 0 | 0% | 1,376 |
-| Ibba | Western Equatoria | **YELLOW** | drought / dry spell | 7 | 0% | 0 |
-| Mundri West | Western Equatoria | **YELLOW** | drought / dry spell | 4 | 0% | 42 |
+| Mundri West | Western Equatoria | **YELLOW** | drought / dry spell | 5 | 0% | 42 |
 | Nagero | Western Equatoria | **YELLOW** | drought / dry spell | 5 | 0% | 34 |
 
 ## Anticipatory action plans
@@ -161,7 +158,7 @@ Prepared 2026-11-17 04:16 UTC for the national TWG-AA. Rain and soil data to 202
 - AAP-FL-AYOD (draft plan): its activation rule is met. Review the plan and its trigger; this is not an activation.
 - AAP-FL-TWICEAST (draft plan): its activation rule is met. Review the plan and its trigger; this is not an activation.
 - AAP-FL-GUIT (draft plan): its activation rule is met. Review the plan and its trigger; this is not an activation.
-- Agree the warning for the 78 counties with an alert and the channels (radio hubs, chiefs, SMS).
+- Agree the warning for the 75 counties with an alert and the channels (radio hubs, chiefs, SMS).
 - Ask intermediaries to translate and validate templates for: Bari, Dinka (Thuongjang), Juba Arabic, Nuer (Thok Naath), Shilluk (Dhok Cøllø).
 
 ## Notes
