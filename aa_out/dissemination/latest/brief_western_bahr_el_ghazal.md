@@ -1,6 +1,6 @@
 # Western Bahr el Ghazal - anticipatory action situation brief
 
-Prepared 2026-11-17 19:16 UTC for the Western Bahr el Ghazal state TWG-AA. Rain and soil data to 2026-11-14; ECMWF run 2026-11-17 00 UTC.
+Prepared 2026-11-18 03:13 UTC for the Western Bahr el Ghazal state TWG-AA. Rain and soil data to 2026-11-15; ECMWF run 2026-11-17 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -14,7 +14,7 @@ Prepared 2026-11-17 19:16 UTC for the Western Bahr el Ghazal state TWG-AA. Rain 
 |---|---|---|---|---|---|---|
 | Jur River | Western Bahr el Ghazal | **ORANGE** | drought / dry spell | 2 | 0% | 5,068 |
 | Raja | Western Bahr el Ghazal | **ORANGE** | drought / dry spell | 0 | 0% | 23 |
-| Wau | Western Bahr el Ghazal | **ORANGE** | drought / dry spell | 1 | 0% | 1,411 |
+| Wau | Western Bahr el Ghazal | **ORANGE** | drought / dry spell | 2 | 0% | 1,411 |
 
 ## Decisions for the group
 - Agree the warning for the 3 counties with an alert and the channels (radio hubs, chiefs, SMS).

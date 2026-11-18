@@ -1,9 +1,9 @@
 {
  "profile": "tabular-data-package",
- "name": "south-sudan-hydroclimate-aa-20261117_1916",
+ "name": "south-sudan-hydroclimate-aa-20261118_0313",
  "title": "South Sudan hydro-climate and anticipatory action data package",
- "version": "20261117_1916",
- "created": "2026-11-17T19:16:49Z",
+ "version": "20261118_0313",
+ "created": "2026-11-18T03:13:27Z",
  "description": "County hydro-climate bulletin, altimetry flood thresholds, county-gauge links, county flood risk profile, proposed river triggers and anticipatory action plan status, checked and documented for the national early warning repository (SSRAA 2025-2030, Pillar 2, activity d). Decision support, not an official warning.",
  "publisher": "South Sudan Climate Monitor (hydro-climate platform)",
  "licenses": [
@@ -134,7 +134,7 @@
      {
       "check": "data_end_date freshness",
       "status": "pass",
-      "detail": "latest 2026-11-14 (3 days old, limit 7)"
+      "detail": "latest 2026-11-15 (3 days old, limit 7)"
      },
      {
       "check": "county coverage",
@@ -149,8 +149,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 178758,
-   "hash": "sha256:bd9d1beae15ad9440192b5b8e3fdc8067dff270b05ecc357defd6aaeaf47272d",
+   "bytes": 178602,
+   "hash": "sha256:93775b8ea1d8228634f81eababe73e96a261aca4b12c92c53de4f4b2f65a96db",
    "rows": 79,
    "schema": {
     "fields": [
@@ -699,7 +699,7 @@
      {
       "check": "updated_utc freshness",
       "status": "pass",
-      "detail": "latest 2026-11-17 (0 days old, limit 3)"
+      "detail": "latest 2026-11-17 (1 days old, limit 3)"
      }
     ]
    },
@@ -851,8 +851,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 11012,
-   "hash": "sha256:25bb21eb71ea0fa6ea1e92f844a6fc238dec23ad4d36075739af07159bfadb03",
+   "bytes": 11013,
+   "hash": "sha256:e6e955fffbe48b53f187ed1757a7f884f442a654c522b266799d9e5cf6bbed30",
    "rows": 79,
    "schema": {
     "fields": [
@@ -1422,7 +1422,7 @@
    "mediatype": "text/csv",
    "encoding": "utf-8",
    "bytes": 1620,
-   "hash": "sha256:f9cfed0e3edce0b51b565829f24c8cf4b1b2bb0b11ac941087a51e13ce4df02b",
+   "hash": "sha256:e67da905d3bcf9f334af29fffcb2e3e1c5ff9e7bf2a8b8a81ffc9908c0d2861d",
    "rows": 6,
    "schema": {
     "fields": [
@@ -1563,8 +1563,8 @@
    "format": "csv",
    "mediatype": "text/csv",
    "encoding": "utf-8",
-   "bytes": 2198,
-   "hash": "sha256:5a8d045df72efcf0f584fe3af4512b3196c31929701494cd7efa9b7db065be45",
+   "bytes": 2213,
+   "hash": "sha256:84796c5500065694d110b07c42b1b2e936173df6d69aa5222e9dc0e45df4a7be",
    "rows": 30,
    "schema": {
     "fields": [
