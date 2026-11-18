@@ -1,4 +1,4 @@
-# Anticipatory action plans - status 2026-11-18 03:13 UTC
+# Anticipatory action plans - status 2026-11-18 18:30 UTC
 
 | Plan | County | Stage | Since | River level / readiness / activation (m) | Alert | Missing or stale |
 |---|---|---|---|---|---|---|
