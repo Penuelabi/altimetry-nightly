@@ -1,6 +1,6 @@
 # Western Equatoria - anticipatory action situation brief
 
-Prepared 2026-11-18 18:30 UTC for the Western Equatoria state TWG-AA. Rain and soil data to 2026-11-15; ECMWF run 2026-11-18 00 UTC.
+Prepared 2026-11-19 02:56 UTC for the Western Equatoria state TWG-AA. Rain and soil data to 2026-11-16; ECMWF run 2026-11-18 12 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
@@ -13,11 +13,11 @@ Prepared 2026-11-18 18:30 UTC for the Western Equatoria state TWG-AA. Rain and s
 | County | State | Level | Hazard | Week-1 rain (mm) | Heavy-rain chance | People on flood-prone ground |
 |---|---|---|---|---|---|---|
 | Maridi | Western Equatoria | **ORANGE** | drought / dry spell | 12 | 0% | 4 |
-| Mundri East | Western Equatoria | **ORANGE** | drought / dry spell | 6 | 0% | 59 |
-| Mvolo | Western Equatoria | **ORANGE** | drought / dry spell | 10 | 0% | 135 |
-| Nzara | Western Equatoria | **ORANGE** | drought / dry spell | 14 | 0% | 12 |
-| Mundri West | Western Equatoria | **YELLOW** | drought / dry spell | 8 | 0% | 42 |
-| Nagero | Western Equatoria | **YELLOW** | drought / dry spell | 8 | 0% | 34 |
+| Mundri East | Western Equatoria | **ORANGE** | drought / dry spell | 7 | 0% | 59 |
+| Mvolo | Western Equatoria | **ORANGE** | drought / dry spell | 9 | 0% | 135 |
+| Nzara | Western Equatoria | **ORANGE** | drought / dry spell | 15 | 0% | 12 |
+| Mundri West | Western Equatoria | **YELLOW** | drought / dry spell | 10 | 0% | 42 |
+| Nagero | Western Equatoria | **YELLOW** | drought / dry spell | 9 | 0% | 34 |
 
 ## Decisions for the group
 - Agree the warning for the 6 counties with an alert and the channels (radio hubs, chiefs, SMS).
