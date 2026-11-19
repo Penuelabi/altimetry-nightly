@@ -4,9 +4,9 @@
 
 | Verdict | Counties |
 | --- | --- |
-| OK (gauge on the county) | 37 |
+| OK (gauge on the county) | 38 |
 | OK | 21 |
-| REVIEW DATA AGE | 18 |
+| REVIEW DATA AGE | 17 |
 | REVIEW LINK | 3 |
 
 ## Counties to review
@@ -23,7 +23,6 @@
 | Cueibet | Gulnam km 4631 | 25.6 | 304.0 | Gulnam km 4574 | 41.2 | linked reading 304 days old |
 | Wulu | Unknown, River | 7.0 | 39.0 | Ibba km 4410 | 7.0 | linked reading 39 days old |
 | Raja | Wadi Boro, River | 6.9 | 48.0 | Chel km 5095 | 0.0 | linked reading 48 days old |
-| Aweil North | Lol km 4838 | 0.0 | 31.0 | Lol km 4729 | 0.0 | linked reading 31 days old |
 | Abiemnhom | Bhar-al-arab, River | 0.0 | 52.0 | Bahr Al Arab km 4333 | 0.0 | linked reading 52 days old |
 | Aweil West | Wadi Boro, River | 0.0 | 50.0 | Lol km 4833 | 0.0 | linked reading 50 days old |
 | Panyikang | White Nile, River | 0.0 | 55.0 | Sobat km 4023 | 0.0 | linked reading 55 days old |
