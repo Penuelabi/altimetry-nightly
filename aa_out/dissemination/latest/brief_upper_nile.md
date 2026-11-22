@@ -1,6 +1,6 @@
 # Upper Nile - anticipatory action situation brief
 
-Prepared 2026-11-22 01:39 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-11-17; ECMWF run 2026-11-21 12 UTC.
+Prepared 2026-11-22 17:30 UTC for the Upper Nile state TWG-AA. Rain and soil data to 2026-11-17; ECMWF run 2026-11-22 00 UTC.
 
 > Decision support from the hydro-climate platform (satellite rain, soil, river levels and the ECMWF ensemble). Official warnings are issued by SSMS; plans are activated by the TWG-AA.
 
