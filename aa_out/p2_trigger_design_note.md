@@ -1,6 +1,6 @@
 # River triggers - design note (proposal for validation)
 
-Generated 2026-11-16 20:04 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
+Generated 2026-11-23 02:04 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticipatory Action, Pillar 2: Trigger and Early Warning Systems).
 
 ## Proposed rule
 - **Activation (counties with a reliable gauge): S85+U55** (best TSS among rules with FAR <= 35% that caught >= 30% of flood seasons on time, a median of >= 14 days before displacement; median 24 days before displacement).
@@ -16,9 +16,9 @@ Generated 2026-11-16 20:04 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | level | 2yr+0.25m | 108 | 52 | 30 | 4 | 18 | 21 | 58% | 38% | 0.41 | 0.20 | -1 |
 | level | P95 | 108 | 52 | 25 | 9 | 18 | 19 | 48% | 36% | 0.35 | 0.14 | 38 |
-| level | P90 | 108 | 52 | 35 | 6 | 11 | 32 | 67% | 44% | 0.42 | 0.10 | 2 |
 | level | 5yr | 108 | 52 | 17 | 7 | 28 | 13 | 33% | 35% | 0.26 | 0.09 | 10 |
 | level | 2yr | 108 | 52 | 42 | 6 | 4 | 40 | 81% | 45% | 0.46 | 0.09 | 26 |
+| level | P90 | 108 | 52 | 35 | 6 | 11 | 33 | 67% | 45% | 0.41 | 0.08 | 2 |
 | level | P80 | 108 | 52 | 43 | 6 | 3 | 43 | 83% | 47% | 0.45 | 0.06 | 21 |
 | level | 2yr-0.25m | 108 | 52 | 45 | 3 | 4 | 49 | 87% | 51% | 0.45 | -0.01 | 22 |
 | level | 10yr | 108 | 52 | 1 | 1 | 50 | 3 | 2% | 60% | 0.02 | -0.03 |  |
@@ -58,7 +58,7 @@ Generated 2026-11-16 20:04 UTC by aa_p2_trigger_scorecard.py (Roadmap on Anticip
 
 ## Counties
 Rule used: bulletin flood alert 47, seasonal + regional 18, regional 14.
-At or above a proposed value now: 15: Panyijiar (activation), Fangak (activation), Leer (activation), Ayod (activation), Twic East (activation), Guit (activation), Duk (activation), Panyikang (activation), Fashoda (activation), Renk (activation), Bor South (activation), Koch (activation), Manyo (activation), Juba (activation), Pariang (activation)
+At or above a proposed value now: 14: Panyijiar (activation), Fangak (activation), Leer (activation), Ayod (activation), Twic East (activation), Guit (activation), Duk (activation), Panyikang (activation), Fashoda (activation), Renk (activation), Bor South (activation), Koch (activation), Juba (activation), Pariang (activation)
 
 ## How to read and validate
 - POD: share of flood seasons caught on time. FAR: share of the seasons a rule fired with no impact recorded. CSI and TSS combine both; higher is better. Late = fired after displacement had begun (counted as a miss).

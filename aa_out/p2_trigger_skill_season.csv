@@ -5,8 +5,8 @@ displacement or listed in a flood assessment,P70,level,108,52,46,4,2,52,4,0.885,
 flood displacement only,P70,level,108,19,13,4,2,85,4,0.684,0.833,0.125,-0.271,23.0
 displacement or listed in a flood assessment,P80,level,108,52,43,6,3,43,13,0.827,0.467,0.453,0.059,21.0
 flood displacement only,P80,level,108,19,11,6,2,75,14,0.579,0.815,0.117,-0.264,21.0
-displacement or listed in a flood assessment,P90,level,108,52,35,6,11,32,24,0.673,0.438,0.417,0.102,2.0
-flood displacement only,P90,level,108,19,8,6,5,59,30,0.421,0.808,0.103,-0.242,2.0
+displacement or listed in a flood assessment,P90,level,108,52,35,6,11,33,23,0.673,0.446,0.412,0.084,2.0
+flood displacement only,P90,level,108,19,8,6,5,60,29,0.421,0.811,0.101,-0.253,2.0
 displacement or listed in a flood assessment,P95,level,108,52,25,9,18,19,37,0.481,0.358,0.352,0.141,37.5
 flood displacement only,P95,level,108,19,4,9,6,40,49,0.211,0.755,0.068,-0.239,37.5
 displacement or listed in a flood assessment,2yr-0.50m,level,108,52,45,3,4,54,2,0.865,0.529,0.425,-0.099,36.0
