@@ -870,6 +870,56 @@ def obs_key(frame):
             + pd.to_numeric(frame[WSE_COL]).round(3).map('{:.3f}'.format))
 
 
+def triple_key(frame):
+    """source | station | date  (a row's identity WITHOUT the water level, which GEE rows are matched on)."""
+    return (frame['source'].astype(str) + '|'
+            + pd.to_numeric(frame['station_id']).astype(int).astype(str) + '|'
+            + frame['date'].astype(str))
+
+
+# Rows whose climate values were back-filled are NOT a reason to rebuild the whole GEE table: their keys are
+# flagged in the ledger (column pending_update) and only those rows are replaced in GEE on the next upload.
+MAX_INCREMENTAL_ROWS = 5000          # more changed rows than this -> full rebuild is cheaper than a big filter
+
+
+def mark_changed_in_ledger(ledger_path, changed_keys):
+    """Flag changed observation keys in the ledger. Returns False when a full rebuild is needed instead."""
+    changed_keys = set(changed_keys)
+    if not os.path.exists(ledger_path):
+        return False
+    led = pd.read_csv(ledger_path)
+    if 'key' not in led:
+        return False
+    already = (led['pending_update'].astype(str).str.lower().isin(['1', 'true'])
+               if 'pending_update' in led else pd.Series(False, index=led.index))
+    flagged = already | led['key'].isin(changed_keys)
+    if int(flagged.sum()) > MAX_INCREMENTAL_ROWS:
+        return False
+    led['pending_update'] = flagged.astype(int)
+    led.to_csv(ledger_path, index=False)
+    return True
+
+
+def read_ledger(ledger_path):
+    """Returns (all uploaded keys, keys flagged for replacement)."""
+    led = pd.read_csv(ledger_path)
+    done = set(led['key'])
+    if 'pending_update' in led:
+        flagged = set(led.loc[led['pending_update'].astype(str).str.lower().isin(['1', 'true']), 'key'])
+    else:
+        flagged = set()
+    return done, flagged
+
+
+def removal_filter(rows):
+    """ee.Filter matching every GEE feature with the same source / station / date as these rows."""
+    parts = []
+    for (src, sid), grp in rows.groupby([rows['source'].astype(str), pd.to_numeric(rows['station_id']).astype(int)]):
+        parts.append(ee.Filter.And(ee.Filter.eq('source', str(src)), ee.Filter.eq('station_id', int(sid)),
+                                   ee.Filter.inList('date', sorted(set(grp['date'].astype(str))))))
+    return parts[0] if len(parts) == 1 else ee.Filter.Or(*parts)
+
+
 print("\n=== STEP 1: CHECK MERGED STATION OBSERVATIONS ===")
 if REBUILD_OUTPUTS:
     for p in (MASTER_CSV, MASTER_XLSX, GEE_LEDGER):
@@ -1774,14 +1824,18 @@ held_back = int((hold & ~obs_key(final).isin(old_keys)).sum())
 
 # --- Update saved rows (new columns, back-filled climate, derived columns) ----
 master_changed, n_backfilled, n_derived = False, 0, 0
+structural_change = False          # new columns / derived-column changes: GEE table must be rebuilt
+changed_rows = None                # rows whose climate values were back-filled tonight
 if master_full is not None:
     file_cols = pd.read_csv(MASTER_CSV, nrows=0).columns
     if any(col not in file_cols for col in final.columns):
         master_changed = True            # new columns (e.g. station_uid, seasonal_*, QC) -> rewrite
+        structural_change = True
     for col in GAPFILL_COLS:
         if col not in master_full:
             master_full[col] = np.where(master_full[CLIMATE_COLS_OUT].notna().all(axis=1), 0.0, np.nan)
             master_changed = True
+            structural_change = True
     if master_sel is not None and master_sel.any():
         co = clim_out.set_index(clim_out.station_uid + '|' + clim_out.date_key)
         mk = master_full['station_uid'] + '|' + master_full['date']
@@ -1796,6 +1850,7 @@ if master_full is not None:
         for col in CLIMATE_COLS_OUT + GAPFILL_COLS:
             master_full.loc[diff, col] = nv[col][diff]
         n_backfilled = int(diff.sum())
+        changed_rows = master_full.loc[diff, ['source', 'station_id', 'date', WSE_COL]].copy()
         master_changed = master_changed or n_backfilled > 0
 
     # Derived columns (lookup-anchored min / max / average, seasonal baseline, QC)
@@ -1806,6 +1861,7 @@ if master_full is not None:
         if col not in master_full:
             master_full[col] = new_v
             master_changed = True
+            structural_change = True
             continue
         old = master_full[col]
         if col in TEXT_COLS:
@@ -1819,6 +1875,7 @@ if master_full is not None:
             if REBUILD_ON_DERIVED_CHANGES and col not in REBUILD_IGNORE_COLS:
                 n_derived += int((~same).sum())
                 master_changed = True
+                structural_change = True
 
 out_cols = list(final.columns)
 if master_full is not None:
@@ -1832,10 +1889,17 @@ elif master_changed:
     everything = pd.concat([master_full.reindex(columns=out_cols), new_rows], ignore_index=True)
     everything.to_csv(MASTER_CSV, index=False)
     write_full_xlsx(everything)
+    gee_msg = "GEE asset will be rebuilt"
     if os.path.exists(GEE_LEDGER):
-        os.remove(GEE_LEDGER)
+        if (not structural_change) and changed_rows is not None and len(changed_rows):
+            if mark_changed_in_ledger(GEE_LEDGER, obs_key(changed_rows)):
+                gee_msg = f"only these {len(changed_rows)} rows will be replaced in GEE (no full rebuild)"
+            else:
+                os.remove(GEE_LEDGER)
+        else:
+            os.remove(GEE_LEDGER)
     print(f"Saved rows updated ({n_backfilled} with new or changed climate values, "
-          f"{n_derived} derived values changed or added); master files rewritten, GEE asset will be rebuilt.")
+          f"{n_derived} derived values changed or added); master files rewritten, {gee_msg}.")
 else:
     header = pd.read_csv(MASTER_CSV, nrows=0).columns.tolist()
     if len(new_rows):
@@ -2059,13 +2123,20 @@ if UPLOAD_TO_GEE:
         print("GEE_FULL_REBUILD is set -> merged_observations will be rebuilt from the full merged table "
               "(nothing is appended, so no duplicates).")
     elif os.path.exists(GEE_LEDGER) and asset_exists(target):
-        done_keys, rebuild = set(pd.read_csv(GEE_LEDGER)['key']), False
+        done_keys, changed_keys = read_ledger(GEE_LEDGER)
+        rebuild = False
     else:
-        done_keys, rebuild = set(), True       # first run, or saved rows were changed
+        done_keys, changed_keys, rebuild = set(), set(), True       # first run, or the ledger was removed
 
-    pending = master if rebuild else master[~master_keys.isin(done_keys)]
+    refresh = pd.Series(False, index=master.index)
+    if not rebuild and changed_keys:
+        # replace every GEE row with the same source / station / date as a changed row, then re-add them from the CSV
+        tri = triple_key(master)
+        refresh = tri.isin(set(tri[master_keys.isin(changed_keys)]))
+    pending = master if rebuild else master[~master_keys.isin(done_keys) | refresh]
     print(f"Observations to upload: {len(pending)}"
-          + (" (full rebuild)" if rebuild else " (new only)"))
+          + (" (full rebuild)" if rebuild else f" ({int((~master_keys.isin(done_keys)).sum())} new, "
+                                               f"{int(refresh.sum())} replaced with updated climate values)"))
 
     if pending.empty:
         wait_for([st_task])
@@ -2087,7 +2158,13 @@ if UPLOAD_TO_GEE:
         if all(s == 'COMPLETED' for s in states[:-1]):
             # 2. merge INSIDE GEE: current merged_observations + new parts
             new_fc = ee.FeatureCollection([ee.FeatureCollection(p) for p in part_ids]).flatten()
-            combined = new_fc if rebuild else ee.FeatureCollection(target).merge(new_fc)
+            if rebuild:
+                combined = new_fc
+            else:
+                current = ee.FeatureCollection(target)
+                if refresh.any():
+                    current = current.filter(ee.Filter.Not(removal_filter(master[refresh])))
+                combined = current.merge(new_fc)
             staging = f'{target}_{RUN_STAMP}'
             t = start_export(combined, staging, 'merged_observations')
 
