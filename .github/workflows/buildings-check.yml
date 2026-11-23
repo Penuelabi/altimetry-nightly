@@ -1,4 +1,4 @@
-name: Buildings check, one payam (manual)
+name: GEE incremental test, one payam (manual)
 on:
   workflow_dispatch:
     inputs:
@@ -20,6 +20,6 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install earthengine-api
-      - name: Buildings check
+      - name: GEE incremental test
         shell: bash
-        run: python buildings_check.py
+        run: python gee_incremental_test.py
