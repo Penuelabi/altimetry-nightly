@@ -35,13 +35,14 @@ var BUILD_GHSOBAT = 'projects/sat-io/open-datasets/JRC/GHS-OBAT/GHS_OBAT_GPKG_SS
 var BUILD_VIDA = 'projects/sat-io/open-datasets/VIDA_COMBINED/SSD';
 var GHSL_BUILT_S = 'JRC/GHSL/P2023A/GHS_BUILT_S/2020';
 var FLOOD_EXTENT_ASSET = 'projects/sudan-1575919084043/assets/maximum_flood_extent';
-var BASELINE_ASSET = 'projects/wajaras-remote-s-1565857510402/assets/flood_baseline_s1_0915_0926_2017_2025';
+var BASELINE_ASSET = 'projects/sudan-1575919084043/assets/flood_baseline_s1v6_0915_0926_2017_2025';
 var SMAP_ID = 'NASA/SMAP/SPL4SMGP/008';     // change to .../007 if your account can't read 008
 var GSMAP_ID = 'JAXA/GPM_L3/GSMaP/v8/operational';
 var GSMAP_BAND = 'hourlyPrecipRateGC';
 var A2 = 'ADM2_EN';
 
-var FREQ_RARE = 0.15, MIN_FLOOD_YEARS = 3, BUILDINGS_SKIP_ABOVE = 40000;
+var MIN_VALID_YEARS = 5, MIN_FLOODED_YEARS = 2;   // v6 baseline: flood-prone = flooded in >=2 of >=5 valid years
+var BUILDINGS_SKIP_ABOVE = 40000;
 var FLOOD_COUNTY_SHARE_SEVERE = 0.50;          // bulletin_extras.py FLOOD_COUNTY_SHARE_SEVERE
 var DROUGHT_RED_DRY_DAYS = 21;                 // bulletin_extras.py DROUGHT_RED_DRY_DAYS
 var WET_DAY_MM = 1.0;
@@ -59,8 +60,8 @@ var risk, riskBasis;
 try {
   ee.data.getAsset(BASELINE_ASSET);
   var base = ee.Image(BASELINE_ASSET);
-  var freq = base.select('freq').unmask(0);
-  var hasBase = base.select('n_years').unmask(0).gte(MIN_FLOOD_YEARS);
+  var prone = base.select('n_flood').unmask(0).gte(MIN_FLOODED_YEARS);
+  var hasBase = base.select('n_years').unmask(0).gte(MIN_VALID_YEARS);
   var flooded;
   try {
     ee.data.getAsset(FLOOD_EXTENT_ASSET);
@@ -70,7 +71,7 @@ try {
     flooded = ee.Image.constant(0);
     riskBasis = 'Sentinel-1 same-season baseline';
   }
-  risk = flooded.max(freq.gte(FREQ_RARE).and(hasBase)).rename('risk');
+  risk = flooded.max(prone.and(hasBase)).rename('risk');
 } catch (e) {
   var gsw = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('max_extent').eq(1).unmask(0);
   var gfd = ee.ImageCollection('GLOBAL_FLOOD_DB/MODIS_EVENTS/V1').select('flooded').sum().gt(0).unmask(0);

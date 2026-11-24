@@ -41,8 +41,8 @@ HEALTH = 'projects/ee-penuelabi/assets/SSD_Health'
 ROADS = 'projects/sat-io/open-datasets/GRIP4/Africa'
 BUILD_A = 'projects/sat-io/open-datasets/VIDA_COMBINED/SSD'
 FLOOD_EXTENT_ASSET = os.environ.get('FLOOD_EXTENT_ASSET') or 'projects/sudan-1575919084043/assets/maximum_flood_extent'
-BASELINE_ASSET = 'projects/wajaras-remote-s-1565857510402/assets/flood_baseline_s1_0915_0926_2017_2025'
-FREQ_RARE, MIN_FLOOD_YEARS, BUF_M = 0.15, 3, 25000
+BASELINE_ASSET = 'projects/sudan-1575919084043/assets/flood_baseline_s1v6_0915_0926_2017_2025'
+MIN_VALID_YEARS, MIN_FLOODED_YEARS, BUF_M = 5, 2, 25000   # v6 baseline: flood-prone = flooded in >=2 of >=5 valid years
 A2, A3, A1 = 'ADM2_EN', 'ADM3_EN', 'ADM1_EN'
 
 
@@ -80,15 +80,15 @@ flooded = None
 try:
     ee.data.getAsset(BASELINE_ASSET)
     base = ee.Image(BASELINE_ASSET)
-    freq = base.select('freq').unmask(0)
-    has_base = base.select('n_years').unmask(0).gte(MIN_FLOOD_YEARS)
+    prone = base.select('n_flood').unmask(0).gte(MIN_FLOODED_YEARS)
+    has_base = base.select('n_years').unmask(0).gte(MIN_VALID_YEARS)
     try:
         ee.data.getAsset(FLOOD_EXTENT_ASSET)
         flooded = ee.Image(FLOOD_EXTENT_ASSET).select(0).gt(0).unmask(0)
     except Exception:
         flooded = ee.Image.constant(0)
         risk_basis = 'Sentinel-1 same-season baseline'
-    risk = flooded.max(freq.gte(FREQ_RARE).And(has_base)).rename('risk')
+    risk = flooded.max(prone.And(has_base)).rename('risk')
 except Exception as e:
     print('baseline asset not readable by the service account, using JRC surface water + Global Flood DB:', str(e)[:150])
     gsw = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('max_extent').eq(1).unmask(0)
